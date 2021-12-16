@@ -164,6 +164,7 @@
           this.showTutorialStep(this.tutorialStep);
         }
       });
+      console.log(process.env.AWS_ID.length);
     },
     async created() {
       await this.createUrl(this.widgetPointer);
@@ -404,7 +405,6 @@
 
 <style scoped>
   .imageSwipe {
-    min-height: 100vh;
     height: 532px;
   }
   .user-card {
