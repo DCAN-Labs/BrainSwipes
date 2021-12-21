@@ -40,6 +40,7 @@
          :userSettings="userSettings"
          :needsSecret="needsSecret"
          :serverSecret="serverSecret"
+         :db="db"
          v-on:widgetRating="sendWidgetResponse"
          v-on:updateUserSettings="updateUserSettings"
          :playMode="'play'"

@@ -4,6 +4,7 @@
      :userSettings="userSettings"
      :needsSecret="needsSecret"
      :serverSecret="serverSecret"
+     :db="db"
      v-on:updateUserSettings="updateUserSettings">
       <ImageSwipe
       v-if="widgetType=='ImageSwipe'"
@@ -13,6 +14,7 @@
       :widgetSummary="widgetSummary"
       :userSettings="userSettings"
       :tutorialStep="tutorialStep"
+      :db="db"
       v-on:widgetRating="widgetRating"
       v-on:updateUserSettings="updateUserSettings"
       :playMode="playMode"
@@ -215,6 +217,10 @@
       serverSecret: {
         type: String,
         required: false,
+      },
+      db: {
+        type: Object,
+        required: true,
       },
     },
     components: {

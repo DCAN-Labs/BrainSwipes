@@ -100,6 +100,7 @@ export default {
           widgetPointer: '',
           widgetProperties: {},
           userSettings: {},
+          awsId: '',
         },
       });
       return vm.getPropertiesSchema();

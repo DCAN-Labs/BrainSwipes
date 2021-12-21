@@ -77,16 +77,6 @@
   Vue.use(VueHammer);
   Vue.use(require('vue-shortkey'));
 
-  // connecting to the s3 bucket
-  const s3Client = new S3Client({
-    credentials: {
-      accessKeyId: process.env.VUE_APP_AWS_ID,
-      secretAccessKey: process.env.VUE_APP_AWS_KEY },
-    endpoint: 'https://s3.msi.umn.edu',
-    region: 'global',
-  },
-  );
-
   export default {
     name: 'ImageSwipe',
     props: {
@@ -136,6 +126,10 @@
         type: Number,
         required: false,
       },
+      db: {
+        type: Object,
+        required: true,
+      },
     },
     components: { VueHammer, GridLoader },
     directives: {
@@ -151,8 +145,14 @@
          * save the swipe direction.
          */
         swipe: null,
+        /**
+         * create urls
+         */
         imgUrl: null,
         imgKey: null,
+        awsKey: null,
+        awsId: null,
+        s3Client: null,
       };
     },
     /**
@@ -166,13 +166,18 @@
       });
     },
     async created() {
-      await this.createUrl(this.widgetPointer);
+      await this.fetchMsiId();
+      // console.log(this.awsId);
+      await this.fetchMsiKey();
+      // console.log(this.awsKey);
+      this.createClient(this.awsId, this.awsKey);
+      await this.createUrl(this.widgetPointer, this.s3Client);
     },
     methods: {
       /**
        * Creates the Signed URL for accessing brainswipes s3 bucket on MSI
        */
-      async createUrl(pointer) {
+      async createUrl(pointer, client) {
         // choosing an image path from the firebase
         const key = `${pointer}.png`;
         // setting up the Get command
@@ -182,12 +187,40 @@
         };
         const command = new GetObjectCommand(getObjectParams);
         // getting the signed URL
-        const url = await getSignedUrl(s3Client, command, { expiresIn: 300 });
+        const url = await getSignedUrl(client, command, { expiresIn: 300 });
         // setting the url key based on the new url
         const urlKey = url.split('?')[0];
         // updating the data elements
         this.imgUrl = url;
         this.imgKey = urlKey;
+      },
+      async fetchMsiId() {
+        await this.db.ref('settings')
+          .child('msi')
+          .child('id')
+          .once('value')
+          .then((snap) => {
+            this.awsId = snap.val();
+          });
+      },
+      async fetchMsiKey() {
+        await this.db.ref('settings')
+          .child('msi')
+          .child('key')
+          .once('value')
+          .then((snap) => {
+            this.awsKey = snap.val();
+          });
+      },
+      createClient(id, key) {
+        this.s3Client = new S3Client({
+          credentials: {
+            accessKeyId: id,
+            secretAccessKey: key },
+          endpoint: 'https://s3.msi.umn.edu',
+          region: 'global',
+        },
+        );
       },
       /**
        * Show a tutorial step

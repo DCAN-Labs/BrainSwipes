@@ -59,6 +59,10 @@
         type: String,
         required: false,
       },
+      db: {
+        type: Object,
+        required: true,
+      },
     },
     data() {
       return {
