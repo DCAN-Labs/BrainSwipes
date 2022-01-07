@@ -31,6 +31,7 @@
 
 
         <b-button type="submit" variant="primary">Submit</b-button>
+        <b-button>Reset Password</b-button>
 
       </b-form>
 
