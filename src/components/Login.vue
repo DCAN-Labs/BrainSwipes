@@ -31,12 +31,14 @@
 
 
         <b-button type="submit" variant="primary">Submit</b-button>
-        <b-button>Reset Password</b-button>
 
       </b-form>
 
       <p class="mt-3">
         Don't have an account? <router-link :to="{ name: 'SignUp', query: routerQuery}">Create one</router-link>
+      </p>
+      <p class='reset'>
+        Forgot password? <b-button @click="resetPassword" id="passwordReset" size="sm" type="submit" variant="primary">Reset it</b-button>
       </p>
     </div>
 
@@ -46,16 +48,25 @@
 #login {
   min-height: 100vh;
 }
+
+#passwordReset {
+  font-size: 0.6em;
+}
+
+.reset {
+  margin-top: 0.5em;
+}
 </style>
 <script>
 /**
  * The login component for the `/login` route.
  */
   import firebase from 'firebase';
+  import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
   export default {
     name: 'login',
-    props: {
+  props: {
       routerQuery: {
         type: Object,
       },
@@ -98,6 +109,19 @@
                   },
                 );
       },
+      resetPassword() {
+        console.log(this.form.email);
+        const auth = getAuth();
+        sendPasswordResetEmail(auth, this.form.email)
+          .then(() => {
+            console.log('password reset email sent')
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // ..
+          });
+      }
     },
   };
 </script>
