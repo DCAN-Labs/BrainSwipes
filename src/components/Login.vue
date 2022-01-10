@@ -1,6 +1,17 @@
 <template name="login">
   <div id="login">
     <h1> Log In </h1>
+    <!-- Modal Component -->
+    <b-modal id="confirmreset" :title="resetTitle"
+      ref="confirmreset" size="lg">
+      <p>{{resetStatus}}</p>
+      <div slot="modal-footer" class="w-100">
+        <b-form @submit="closeDialog">
+          <b-button type="submit" variant="primary">Return to Login</b-button>
+        </b-form>
+      </div>
+
+    </b-modal>
 
     <div id="signupForm" class="container fluid">
       <b-alert :show="errors.show" variant="danger">{{errors.message}}</b-alert>
@@ -62,11 +73,10 @@
  * The login component for the `/login` route.
  */
   import firebase from 'firebase';
-  import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
   export default {
     name: 'login',
-  props: {
+    props: {
       routerQuery: {
         type: Object,
       },
@@ -87,6 +97,8 @@
           show: false,
           message: null,
         },
+        resetStatus: '',
+        resetTitle: '',
       };
     },
     methods: {
@@ -110,17 +122,29 @@
                 );
       },
       resetPassword() {
-        console.log(this.form.email);
-        const auth = getAuth();
-        sendPasswordResetEmail(auth, this.form.email)
-          .then(() => {
-            console.log('password reset email sent')
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            // ..
-          });
+        if(this.form.email) {
+          firebase.auth().sendPasswordResetEmail(this.form.email)
+            .then(() => {
+              this.resetTitle = 'Password Reset';
+              this.resetStatus = `A password reset email has been sent to ${this.form.email}`;
+              this.$refs.confirmreset.show();
+            })
+            .catch((error) => {
+              const errorCode = error.code;
+              const errorMessage = error.message;
+              this.resetTitle = 'Error Resetting Password'
+              this.resetStatus = `The following error occurred while attempting to reset your password: ${errorMessage}`;
+              this.$refs.confirmreset.show();
+            });
+        } else {
+          this.resetTitle = 'Enter Email'
+          this.resetStatus = `Please enter your email into the email field.`;
+          this.$refs.confirmreset.show();
+        }
+      },
+      closeDialog(e) {
+        e.preventDefault();
+        this.$refs.confirmreset.hide();
       }
     },
   };
