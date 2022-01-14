@@ -12,6 +12,16 @@
       </div>
 
     </b-modal>
+    <b-modal id="emailverification" title="Email Verification"
+      ref="emailverification" size="lg">
+      <p>An email has been sent to {{verifying}}. You will need to verify your email to access some datasets.</p>
+      <div slot="modal-footer" class="w-100">
+        <b-form @submit="verifiedClick">
+          <b-button type="submit" variant="primary">OK</b-button>
+        </b-form>
+      </div>
+
+    </b-modal>
 
     <div id="signupForm" class="container fluid">
       <b-form @submit="onSubmit" validated>
@@ -112,16 +122,13 @@
           consented: false,
         },
         /**
-         * **TODO**: I'm not sure this is used anywhere. Check this.
-         */
-        show: true,
-        /**
          * A variable to keep track of errors, whether to show it and the error message.
          */
         errors: {
           show: false,
           message: null,
         },
+        verifying: 'test',
       };
     },
     props: {
@@ -163,6 +170,7 @@
         .then((snapshot) => {
           const val = snapshot.val();
           if (!val) {
+            this.verifying = this.form.email;
             this.createAccount();
           } else {
             this.errors.show = true;
@@ -178,9 +186,17 @@
         this.form.consented = true;
         this.$refs.consentform.hide();
       },
+      verifiedClick(e) {
+        e.preventDefault();
+        console.log(firebase.auth().currentUser.emailVerified);
+        this.$router.replace('tutorial');
+      },
       /**
        * Open the consent form modal.
        */
+      openEmailVerificationModal() {
+        this.$refs.emailverification.show();
+      },
       openConsentModal() {
         this.$refs.consentform.show();
       },
@@ -226,11 +242,8 @@
         }).then(() => {
             // Profile updated successfully!
           this.insertUser(user);
-          if (this.config.needsTutorial) {
-            this.$router.replace('tutorial');
-          } else {
-            this.$router.replace('play');
-          }
+          firebase.auth().currentUser.sendEmailVerification();
+          this.openEmailVerificationModal()
         }, (err) => {
             // An error happened.
           this.errors.show = true;

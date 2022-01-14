@@ -111,9 +111,8 @@
         e.preventDefault();
         firebase.auth().signInWithEmailAndPassword(this.form.email, this.form.password).then(
                   (user) => {
-                    // console.log('user', user);
                     this.$emit('login', user);
-                    this.$router.push({ name: 'Play', query: this.routerQuery });
+                    this.$router.push({ name: 'Home', query: this.routerQuery });
                   },
                   (err) => {
                     this.errors.show = true;
@@ -130,16 +129,12 @@
               this.$refs.confirmreset.show();
             })
             .catch((error) => {
-              const errorCode = error.code;
-              const errorMessage = error.message;
-              this.resetTitle = 'Error Resetting Password'
-              this.resetStatus = `The following error occurred while attempting to reset your password: ${errorMessage}`;
-              this.$refs.confirmreset.show();
+              this.errors.show = true;
+              this.errors.message = error.message;
             });
         } else {
-          this.resetTitle = 'Enter Email'
-          this.resetStatus = `Please enter your email into the email field.`;
-          this.$refs.confirmreset.show();
+          this.errors.show = true;
+          this.errors.message = 'Please enter your email'
         }
       },
       closeDialog(e) {

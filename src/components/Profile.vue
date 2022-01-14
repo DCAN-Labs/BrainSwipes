@@ -17,7 +17,16 @@
         You have {{userData.score}} points!
       </p>
       <hr>
-
+      <h1>
+        {{yourEmail}}
+      </h1>
+      <p>
+        {{verificationStatus}}
+      </p>
+      <b-form v-if="!verified" @submit="verifyEmail">
+        <b-button id="verifyEmail" type="submit" variant="primary">Verify Email</b-button>
+      </b-form>
+      <hr>
       <h3>Level {{currentLevel.level}}</h3>
       <p class="lead">
         Keep playing to unlock the remaining animals!
@@ -103,6 +112,7 @@
  * @author Anisha Keshavan
  * @license Apache 2.0
  */
+import firebase from 'firebase';
 
 export default {
   name: 'profile',
@@ -126,6 +136,22 @@ export default {
      */
     blankImage() {
       return this.config.profile.blankImage;
+    },
+    yourEmail() {
+      return firebase.auth().currentUser.email;
+    },
+    verificationStatus() {
+      let verificationStatus;
+      if (firebase.auth().currentUser.emailVerified) {
+        verificationStatus =  `Your email address is verified.`        
+      } else {
+        console.log('test');
+        verificationStatus = `Please verify the email associated with this account.`
+      }
+      return verificationStatus;
+    },
+    verified() {
+      return firebase.auth().currentUser.emailVerified;
     },
   },
   props: {
@@ -244,6 +270,9 @@ export default {
             this.$forceUpdate();
           }
         });
+    },
+    verifyEmail(){
+      firebase.auth().currentUser.sendEmailVerification();
     },
   },
 };
