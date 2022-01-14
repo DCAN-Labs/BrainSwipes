@@ -9,7 +9,7 @@
       </div>
       <p class="buttons mt-3">
         <router-link class="btn btn-primary white" :to="{name: 'Play', query: routerQuery}"> BCP </router-link>
-        <router-link class="btn btn-primary turned-off white" :disabled="!whateverActivatesThisLink" :event="whateverActivatesThisLink ? 'click' : ''" :to="{name: 'PlayABCD', query: routerQuery}">
+        <router-link class="btn btn-primary turned-off white" :disabled="!activeABCD" :event="activeABCD ? 'click' : ''" :to="{name: 'PlayABCD', query: routerQuery}">
           <span>
             ABCD
           </span>
@@ -67,6 +67,9 @@ export default {
      */
     landingStyle() {
       return { 'background-image': `url("${this.config.home.backgroundUrl}")` };
+    },
+    activeABCD() {
+      return false;
     },
   },
 };
