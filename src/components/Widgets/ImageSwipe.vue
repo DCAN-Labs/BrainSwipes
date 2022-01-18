@@ -165,14 +165,14 @@
     },
     methods: {
       postRequest(pointer) {
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.open('POST', '/', true);
           xhr.setRequestHeader('Content-Type', 'application/json');
           xhr.onload = resolve;
           xhr.onerror = reject;
           xhr.send(JSON.stringify({
-            pointer: pointer,
+            pointer,
           }));
         });
       },
@@ -181,9 +181,9 @@
        */
       async createUrl(pointer) {
         // getting the signed URL
-        const url = await this.postRequest(pointer).then(data => {
-          return data.currentTarget.responseText;
-        });
+        const url = await this.postRequest(pointer).then(data =>
+          data.currentTarget.responseText,
+        );
         // setting the url key based on the new url
         const urlKey = url.split('?')[0];
         // updating the data elements

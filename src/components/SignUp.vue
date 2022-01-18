@@ -243,7 +243,7 @@
             // Profile updated successfully!
           this.insertUser(user);
           firebase.auth().currentUser.sendEmailVerification();
-          this.openEmailVerificationModal()
+          this.openEmailVerificationModal();
         }, (err) => {
             // An error happened.
           this.errors.show = true;

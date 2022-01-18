@@ -143,10 +143,10 @@ export default {
     verificationStatus() {
       let verificationStatus;
       if (firebase.auth().currentUser.emailVerified) {
-        verificationStatus =  `Your email address is verified.`        
+        verificationStatus = 'Your email address is verified.';
       } else {
         console.log('test');
-        verificationStatus = `Please verify the email associated with this account.`
+        verificationStatus = 'Please verify the email associated with this account.';
       }
       return verificationStatus;
     },
@@ -271,7 +271,7 @@ export default {
           }
         });
     },
-    verifyEmail(){
+    verifyEmail() {
       firebase.auth().currentUser.sendEmailVerification();
     },
   },

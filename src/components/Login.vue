@@ -121,7 +121,7 @@
                 );
       },
       resetPassword() {
-        if(this.form.email) {
+        if (this.form.email) {
           firebase.auth().sendPasswordResetEmail(this.form.email)
             .then(() => {
               this.resetTitle = 'Password Reset';
@@ -134,13 +134,13 @@
             });
         } else {
           this.errors.show = true;
-          this.errors.message = 'Please enter your email'
+          this.errors.message = 'Please enter your email';
         }
       },
       closeDialog(e) {
         e.preventDefault();
         this.$refs.confirmreset.hide();
-      }
+      },
     },
   };
 </script>
