@@ -117,7 +117,9 @@ import axios from 'axios';
 
 // firebase-related libraries
 import VueFire from 'vuefire';
-import firebase from 'firebase';
+import { onAuthStateChanged, signOut, getAuth } from 'firebase/auth';
+import { getDatabase, ref, query, orderByChild, onValue } from 'firebase/database';
+import { initializeApp, deleteApp } from 'firebase/app';
 // import { db } from './firebaseConfig';
 
 
@@ -149,9 +151,6 @@ import Footer from './components/Footer';
 Vue.use(VueFire);
 Vue.use(BootstrapVue);
 
-// this is only for debugging. probably should get rid of it.
-window.firebase = firebase;
-
 /**
  * This is the main entrypoint to the app.
  */
@@ -166,7 +165,7 @@ export default {
       /**
        * This is the firebase database object.
        */
-      db: firebase.database(),
+      db: getDatabase(),
       /**
        * This is the config object, it defines the look of the app
        */
@@ -197,9 +196,9 @@ export default {
    */
   mounted() {
     AOS.init();
-    this.userInfo = firebase.auth().currentUser;
+    this.userInfo = getAuth().currentUser;
     const self = this;
-    firebase.auth().onAuthStateChanged((user) => {
+    onAuthStateChanged(getAuth(), (user) => {
       self.userInfo = user || {};
     });
   },
@@ -227,26 +226,19 @@ export default {
      */
     firebaseKeys(newKeys) {
       // there has been a change in firebaseKeys
-      firebase
-        .auth()
-        .signOut()
+      signOut()
         .then(() => {
           this.userInfo = {};
-          firebase
-            .app()
-            .delete()
+          deleteApp()
             .then(() => {
-              firebase.initializeApp(newKeys);
-              this.db = firebase.database();
-              this.db
-                .ref('/users/')
-                .orderByChild('score')
-                .on('value', (snap) => {
-                  this.allUsers = snap.val();
-                });
-              this.userInfo = firebase.auth().currentUser || {};
+              initializeApp(newKeys);
+              this.db = getDatabase();
+              onValue(query(ref(this.db, '/users/'), orderByChild('score')), (snap) => {
+                this.allUsers = snap.val();
+              });
+              this.userInfo = getAuth().currentUser || {};
               const self = this;
-              firebase.auth().onAuthStateChanged((user) => {
+              onAuthStateChanged(getAuth(), (user) => {
                 self.userInfo = user || {};
               });
             });
@@ -347,9 +339,7 @@ export default {
      * log out of firebase
      */
     logout() {
-      firebase
-        .auth()
-        .signOut()
+      signOut()
         .then(() => {
           this.userInfo = {};
           this.$router.replace('login');
@@ -365,8 +355,7 @@ export default {
      * set the tutorial status of the current user
      */
     setTutorial(val) {
-      this.db
-        .ref(`/users/${this.userInfo.displayName}`)
+      ref(this.db, `/users/${this.userInfo.displayName}`)
         .child('taken_tutorial')
         .set(val);
       this.$router.replace('play');

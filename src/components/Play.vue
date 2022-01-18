@@ -108,6 +108,7 @@
        6. Updating that sample's summary
        7. And then loading the next sample to view.
    */
+  import { ref, onValue, runTransaction, set, push } from 'firebase/database';
   import _ from 'lodash';
   import Vue from 'vue';
   import WidgetSelector from './WidgetSelector';
@@ -235,7 +236,7 @@
       currentLevel() {
         if (this.userData.score === this.currentLevel.min && this.currentLevel.min) {
           this.$refs.levelUp.show();
-          this.db.ref(`/users/${this.userInfo.displayName}`).child('level').set(this.currentLevel.level);
+          set(ref(this.db, (`/users/${this.userInfo.displayName}/level`)), this.currentLevel.level);
         }
       },
       /**
@@ -244,8 +245,10 @@
        */
       widgetPointer() {
         /* eslint-disable */
-        this.widgetPointer ? this.db.ref('sampleSummary').child(this.widgetPointer).once('value', (snap) => {
+        this.widgetPointer ? onValue(ref(this.db, (`sampleSummary/${this.widgetPointer}`)), (snap) => {
           this.widgetSummary = snap.val();
+        }, {
+          onlyOnce: true,
         }) : null;
         /* eslint-enable */
       },
@@ -303,16 +306,14 @@
       */
       initUserSettings() {
         // console.log('updating user settings');
-        this.db.ref('userSettings')
-          .child(this.userInfo.displayName)
-          .on('value', (snap) => {
-            const val = snap.val();
-            if (val == null) {
-              this.userSettings = {};
-            } else {
-              this.userSettings = val;
-            }
-          });
+        onValue(ref(this.db, (`userSettings/${this.userInfo.displayName}`)), (snap) => {
+          const val = snap.val();
+          if (val == null) {
+            this.userSettings = {};
+          } else {
+            this.userSettings = val;
+          }
+        });
       },
       /**
       * update the /userSettings/<username> in firebase.
@@ -320,9 +321,7 @@
       */
       updateUserSettings(settings) {
         if (settings) {
-          this.db.ref('userSettings')
-            .child(this.userInfo.displayName)
-            .set(settings);
+          set(ref(this.db, (`userSettings/${this.userInfo.displayName}`)), settings);
         }
       },
       /**
@@ -330,7 +329,7 @@
        * but don't watch it in real time, just fetch the data once.
        */
       initSampleCounts() {
-        this.db.ref('sampleCounts').once('value', (snap) => {
+        onValue(ref(this.db, ('sampleCounts')), (snap) => {
           /* eslint-disable */
           this.sampleCounts = _.map(snap.val(), (val, key) => {
             return { '.key': key, '.value': val };
@@ -342,6 +341,8 @@
             this.startTime = new Date();
             this.setNextSampleId();
           }
+        }, {
+          onlyOnce: true,
         });
       },
       /**
@@ -350,15 +351,15 @@
        */
       initSeenSamples() {
         // console.log('userSeenSamples', this.userInfo.displayName);
-        this.db.ref('userSeenSamples')
-          .child(this.userInfo.displayName)
-          .once('value', (snap) => {
+        onValue(ref(this.db, (`userSeenSamples/${this.userInfo.displayName}`)), (snap) => {
             /* eslint-disable */
             this.userSeenSamples = _.map(snap.val(), (val, key) => {
               return { '.key': key, '.value': val };
             });
             /* eslint-enable */
-          });
+        }, {
+          onlyOnce: true,
+        });
       },
       /**
        * A method to shuffle an array.
@@ -472,7 +473,7 @@
       * along with their user displayName and the time they took to respond.
       */
       sendVote(response, time) {
-        this.db.ref('votes').push({
+        push(ref(this.db, ('votes')), {
           user: this.userInfo.displayName,
           sample: this.widgetPointer,
           response,
@@ -483,27 +484,20 @@
       * this method update's the user's score by scoreIncrement;
       */
       updateScore(scoreIncrement) {
-        this.db.ref('users')
-          .child(this.userInfo.displayName)
-          .child('score')
-          .transaction(score => (score || 0) + scoreIncrement);
+        runTransaction(ref(this.db, (`users/${this.userInfo.displayName}/score`)), score => (score || 0) + scoreIncrement);
       },
       /**
        * Update the summary of a given widgetPointer
        */
       updateSummary(summary) {
-        this.db.ref('sampleSummary')
-          .child(this.widgetPointer)
-          .set(summary);
+        set(ref(this.db, `sampleSummary/${this.widgetPointer}`), summary);
       },
       /**
        * Update the sampleCount of the current widgetPointer.
        */
       updateCount() {
         // update the firebase database copy
-        this.db.ref('sampleCounts')
-          .child(this.widgetPointer)
-          .transaction(count => (count || 0) + 1);
+        runTransaction(ref(this.db, `sampleCounts/${this.widgetPointer}`), count => (count || 0) + 1);
 
         // update the local copy
         _.map(this.sampleCounts, (val) => {
@@ -520,11 +514,7 @@
       updateSeen() {
         // mark that this user has seen this widgetPointer
         // update the firebase database copy
-        this.db.ref('userSeenSamples')
-          .child(this.userInfo.displayName)
-          .child(this.widgetPointer)
-          .transaction(count => (count || 0) + 1);
-
+        runTransaction(ref(this.db, `userSeenSamples/${this.userInfo.displayName}/${this.widgetPointer}`), count => (count || 0) + 1);
         // update the local copy
         this.userSeenSamples.push({ '.key': this.widgetPointer, '.value': 1 });
       },
@@ -544,12 +534,11 @@
        * fetch the server secret and set it in this.data
        */
       fetchServerSecret() {
-        this.db.ref('settings')
-          .child('secret')
-          .once('value')
-          .then((snap) => {
-            this.serverSecret = snap.val();
-          });
+        onValue(ref(this.db, 'settings/secret'), (snap) => {
+          this.serverSecret = snap.val();
+        }, {
+          onlyOnce: true,
+        });
       },
     },
   };

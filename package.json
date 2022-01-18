@@ -30,7 +30,7 @@
     "d3-array": "^1.2.1",
     "docsify-cli": "^4.2.1",
     "file-system": "^2.2.2",
-    "firebase": "^4.9.0",
+    "firebase": "^9.6.3",
     "firebase-auth": "^0.1.2",
     "firebase-server": "^1.0.0",
     "font-awesome": "^4.7.0",

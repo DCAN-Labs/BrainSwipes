@@ -72,7 +72,7 @@
 /**
  * The login component for the `/login` route.
  */
-  import firebase from 'firebase';
+  import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 
   export default {
     name: 'login',
@@ -109,7 +109,7 @@
        */
       onSubmit(e) {
         e.preventDefault();
-        firebase.auth().signInWithEmailAndPassword(this.form.email, this.form.password).then(
+        signInWithEmailAndPassword(this.form.email, this.form.password).then(
                   (user) => {
                     this.$emit('login', user);
                     this.$router.push({ name: 'Home', query: this.routerQuery });
@@ -122,7 +122,7 @@
       },
       resetPassword() {
         if (this.form.email) {
-          firebase.auth().sendPasswordResetEmail(this.form.email)
+          sendPasswordResetEmail(this.form.email)
             .then(() => {
               this.resetTitle = 'Password Reset';
               this.resetStatus = `A password reset email has been sent to ${this.form.email}`;

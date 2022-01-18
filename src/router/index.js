@@ -14,7 +14,8 @@ import Leaderboard from '@/components/Leaderboard';
 import Tutorial from '@/components/Tutorial';
 import Review from '@/components/Review';
 import Chats from '@/components/Chats';
-import firebase from 'firebase';
+import { getAuth } from 'firebase/auth';
+import { ref, onValue } from 'firebase/database';
 import config from '../config';
 
 Vue.use(Router);
@@ -121,7 +122,7 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  const currentUser = firebase.auth().currentUser;
+  const currentUser = getAuth().currentUser;
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
 
@@ -131,13 +132,14 @@ router.beforeEach((to, from, next) => {
   // make sure the user has take the tutorial
   if (to.name === 'Play') {
     if (currentUser) {
-      firebase.database().ref(`/users/${currentUser.displayName}`).once('value')
-        .then((snap) => {
-          const data = snap.val();
-          if (!data.taken_tutorial && config.needsTutorial) {
-            next({ path: '/tutorial', query: from.query });
-          }
-        });
+      onValue(ref(`/users/${getAuth().currentUser.displayName}`), (snap) => {
+        const data = snap.val();
+        if (!data.taken_tutorial && config.needsTutorial) {
+          next({ path: '/tutorial', query: from.query });
+        }
+      }, {
+        onlyOnce: true,
+      });
     } else {
       next({ path: '/login', query: from.query });
     }
@@ -145,8 +147,7 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAdmin) {
     // console.log('requires admin');
-    firebase.database().ref(`/settings/admins/${currentUser.displayName}`).once('value')
-    .then((snap) => {
+    onValue(ref(`/settings/admins/${getAuth().currentUser.displayName}`), (snap) => {
       // console.log('snap is', snap.val());
       if (requiresAdmin && !snap.val()) next('unauthorized');
       else next();

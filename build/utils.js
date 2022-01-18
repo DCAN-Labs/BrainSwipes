@@ -87,13 +87,14 @@ exports.createNotifierCallback = function () {
       return
     }
     const error = errors[0]
-
-    const filename = error.file.split('!').pop()
-    notifier.notify({
-      title: pkg.name,
-      message: severity + ': ' + error.name,
-      subtitle: filename || '',
-      icon: path.join(__dirname, 'logo.png')
-    })
+    if (error){
+      const filename = error.file.split('!').pop()
+      notifier.notify({
+        title: pkg.name,
+        message: severity + ': ' + error.name,
+        subtitle: filename || '',
+        icon: path.join(__dirname, 'logo.png')
+      })
+    }
   }
 }
