@@ -17,6 +17,8 @@
       <p>
         The founders of the SwipesForScience game template - <a href="https://anisha.pizza/"> Anisha</a> and <a href="https://github.com/SwipesForScience/SwipesForScience/blob/master">Andreea</a> - met at the <a href="https://github.com/SwipesForScience/SwipesForScience/blob/master">eLife Innovation Sprint</a> in 2018. You can see their original work and <a href="https://github.com/SwipesForScience/SwipesForScience">template on GitHub</a>.
       </p>
+    <h1>Contact Us</h1>
+      <p>If you have any questions please contact us at <a href="mailto:dcanlab@umn.edu">dcanlab@umn.edu</a>!</p>
     </b-container>
 
   </div>
