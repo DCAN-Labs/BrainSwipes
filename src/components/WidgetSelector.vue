@@ -102,14 +102,10 @@
         type: String,
         required: false,
       },
-<<<<<<< HEAD
-      db: {
-=======
       /**
        * the authenticated user object from firebase
        */
       userInfo: {
->>>>>>> server
         type: Object,
         required: true,
       },

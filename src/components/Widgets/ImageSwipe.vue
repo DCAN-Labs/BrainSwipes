@@ -124,14 +124,10 @@
         type: Number,
         required: false,
       },
-<<<<<<< HEAD
-      db: {
-=======
       /**
        * the authenticated user object from firebase
        */
       userInfo: {
->>>>>>> server
         type: Object,
         required: true,
       },
@@ -194,25 +190,11 @@
       /**
        * Creates the Signed URL for accessing brainswipes s3 bucket on MSI
        */
-<<<<<<< HEAD
-      async createUrl(pointer, client) {
-        // choosing an image path from the firebase
-        const key = `${pointer}.png`;
-        // setting up the Get command
-        const getObjectParams = {
-          Bucket: 'brainswipes',
-          Key: key,
-        };
-        const command = new GetObjectCommand(getObjectParams);
-        // getting the signed URL
-        const url = await getSignedUrl(client, command, { expiresIn: 300 });
-=======
       async createUrl(pointer) {
         // getting the signed URL
         const url = await this.postRequest(pointer).then(data => {
           return data.currentTarget.responseText;
         });
->>>>>>> server
         // setting the url key based on the new url
         const urlKey = url.split('?')[0];
         // updating the data elements
