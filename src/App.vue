@@ -62,7 +62,7 @@
         <ul class="navRoot">
           <li class="navSection main-logo">
             <router-link to="/">
-              <img src="./assets/swipes-for-science-logo.svg" alt="Swipes for Science logo" />
+              <img src="./assets/swipes-for-science-logo.svg" alt="BrainSwipes logo" />
             </router-link>
           </li>
           <li class="navSection mobile-menu">
@@ -100,7 +100,9 @@
         :configurationState="configurationState"
       />
     </div>
-    <Footer v-on:openConfig="openConfig" :config="config" :routerQuery="routerQuery"></Footer>
+    <div class="foot">
+      <Footer v-on:openConfig="openConfig" :config="config" :routerQuery="routerQuery"></Footer>
+    </div>
   </div>
 </template>
 
@@ -413,7 +415,11 @@ export default {
 .content {
   flex: 1 0 auto;
   min-height: -webkit-fill-available;
-  height: fit-content;
+  height: 90vh;
+}
+
+.router {
+  height: 80vh;
 }
 
 #app {
@@ -437,7 +443,7 @@ export default {
   justify-content: space-between;
   position: relative;
   padding: 1em 1.25em;
-  height: 7.5em;
+  height: 10vh;
 }
 
 .navRoot .navSection.main-logo {
@@ -463,6 +469,12 @@ export default {
   .navRoot .navSection.main-logo {
     position: static;
     transform: none;
+  }
+}
+
+@media (max-width: 1040px){
+  .foot{
+    display: none;
   }
 }
 </style>

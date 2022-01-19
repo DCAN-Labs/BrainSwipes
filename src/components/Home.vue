@@ -1,12 +1,19 @@
 <template>
   <div class="home container">
     <div class="jumbotron landing" :style="landingStyle">
-      <h1>{{title}}</h1>
-      <p class="lead buttons mt-3">
-        {{tagline}}
-      </p>
+      <div id="titles">
+        <h1>{{title}}</h1>
+        <p class="lead mt-3">
+          {{tagline}}
+        </p>
+      </div>
       <p class="buttons mt-3">
-        <router-link class="btn btn-primary white" :to="{name: 'Play', query: routerQuery}"> Play Now </router-link>
+        <router-link class="btn btn-primary white" :to="{name: 'Play', query: routerQuery}"> BCP </router-link>
+        <router-link class="btn btn-primary turned-off white" :disabled="!whateverActivatesThisLink" :event="whateverActivatesThisLink ? 'click' : ''" :to="{name: 'PlayABCD', query: routerQuery}">
+          <span>
+            ABCD
+          </span>
+        </router-link>
       </p>
     </div>
   </div>
@@ -69,7 +76,7 @@ export default {
 <style scoped>
 
 h1, h2 {
-  font-weight: normal;
+  font-weight: bold;
 }
 ul {
   list-style-type: none;
@@ -100,24 +107,55 @@ a {
   background-repeat: no-repeat;
   background-position: center;
   height: 80vh;
+  text-align: center;
 }
 
 .landing h1 {
-  background-color: black;
-  color: white;
+  color: black;
   max-width: 350px;
   margin: auto;
 }
 
 .landing .lead {
-  background-color: black;
-  color: white;
+  color: black;
   max-width: 250px;
   margin: auto;
 }
 
 .white {
   color: white;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: maroon;
+  border-color: maroon;
+}
+
+.turned-off{
+  background-color: rgba(128, 0, 0, 0.3);
+}
+.jumbotron {
+    padding: 2rem 1rem;
+    margin-bottom: 0rem;
+}
+
+#titles {
+  padding: 0.4rem;
+  margin: 0 auto; 
+  text-shadow: white 1px 1px, white 0 0 1px;
+}
+
+.turned-off:hover{
+  cursor: not-allowed;
+}
+
+.turned-off:hover span {
+  display: none;
+}
+
+.turned-off:hover:before {
+  content: 'Unavailable';
 }
 
 </style>

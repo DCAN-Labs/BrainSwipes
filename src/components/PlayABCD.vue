@@ -1,4 +1,4 @@
-<template name="play">
+<template name="playABCD">
   <div id="play" class="container">
     <!-- Modal Component -->
     <b-modal id="levelUp" ref="levelUp" title="You've Levelled Up!" ok-only>
@@ -40,10 +40,8 @@
          :userSettings="userSettings"
          :needsSecret="needsSecret"
          :serverSecret="serverSecret"
-         :db="db"
          v-on:widgetRating="sendWidgetResponse"
          v-on:updateUserSettings="updateUserSettings"
-         :userInfo="userInfo"
          :playMode="'play'"
          ref="widget"
         />
@@ -78,13 +76,6 @@
     max-width: 500px;
   }
 
-  @media (max-height: 683px){
-    .container {
-      padding-bottom: 12.5vh;
-    }
-  }
-
-
 </style>
 
 <script>
@@ -117,7 +108,7 @@
   Vue.component('WidgetSelector', WidgetSelector);
 
   export default {
-    name: 'play',
+    name: 'playABCD',
     props: {
       /**
        * the authenticated user object from firebase

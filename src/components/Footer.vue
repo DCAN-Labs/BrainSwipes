@@ -40,12 +40,10 @@ export default {
     return {
       menuItems: [
         { path: '/', name: 'Home' },
-        { path: '/play', name: 'Game' },
         { path: '/tutorial', name: 'Tutorial' },
-        { path: '/chats', name: 'Chat' },
+        { path: '/chats', name: 'Chats' },
         { path: '/leaderboard', name: 'Leaderboard' },
         { path: '/about', name: 'About' },
-        { path: '/contact', name: 'Contact us' },
       ],
     };
   },
@@ -63,8 +61,10 @@ export default {
 <style scoped>
 footer {
   width: 100%;
-  position: relative;
+  position: fixed;
   padding: 1.25em;
+  height: 10vh;
+  background-color: white;
 }
 .footer__container {
   margin: 0 auto;
@@ -73,7 +73,7 @@ footer {
   align-items: center;
 }
 .footer__container .logo {
-  width: 6em;
+  width: 3em;
 }
 .footer__container nav {
   display: flex;
@@ -92,11 +92,11 @@ footer {
     padding: 2em;
   }
   .footer__container .logo {
-    width: 8em;
+    width: 3em;
+    vertical-align: middle;
   }
   .footer__container {
     max-width: 65em;
-    align-items: flex-end;
   }
   .footer__container nav {
     flex-wrap: nowrap;

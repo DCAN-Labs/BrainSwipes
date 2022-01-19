@@ -69,8 +69,6 @@
   import { VueHammer } from 'vue2-hammer';
   import imagesLoaded from 'vue-images-loaded';
   import GridLoader from 'vue-spinner/src/PulseLoader';
-  import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
-  import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
   import VueProgressiveImage from '../../../node_modules/vue-progressive-image/dist/vue-progressive-image';
 
   Vue.use(VueProgressiveImage);
@@ -126,7 +124,14 @@
         type: Number,
         required: false,
       },
+<<<<<<< HEAD
       db: {
+=======
+      /**
+       * the authenticated user object from firebase
+       */
+      userInfo: {
+>>>>>>> server
         type: Object,
         required: true,
       },
@@ -174,9 +179,22 @@
       await this.createUrl(this.widgetPointer, this.s3Client);
     },
     methods: {
+      postRequest(pointer) {
+        return new Promise(function (resolve, reject) {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/', true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.onload = resolve;
+          xhr.onerror = reject;
+          xhr.send(JSON.stringify({
+            pointer: pointer,
+          }));
+        });
+      },
       /**
        * Creates the Signed URL for accessing brainswipes s3 bucket on MSI
        */
+<<<<<<< HEAD
       async createUrl(pointer, client) {
         // choosing an image path from the firebase
         const key = `${pointer}.png`;
@@ -188,6 +206,13 @@
         const command = new GetObjectCommand(getObjectParams);
         // getting the signed URL
         const url = await getSignedUrl(client, command, { expiresIn: 300 });
+=======
+      async createUrl(pointer) {
+        // getting the signed URL
+        const url = await this.postRequest(pointer).then(data => {
+          return data.currentTarget.responseText;
+        });
+>>>>>>> server
         // setting the url key based on the new url
         const urlKey = url.split('?')[0];
         // updating the data elements
