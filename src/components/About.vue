@@ -1,31 +1,22 @@
 <template>
   <div id="about">
-    <h1> About </h1>
 
     <b-container>
-
+    <h1> Who are we? </h1>
       <p>
-        You get points for each sample you annotate.
+        Brainswipes.us is run by the Developmental Cognition and Neuroimaging (DCAN) lab. Our work focuses on advancing the understanding of brain development in health and disease.
       </p>
-
       <p>
-        You can unlock the following animals based on the number of points you have:
+        We specialize in using a type of neuroimaging called resting state functional connectivity magnetic resonance imaging to study the brain across development (from infancy to aging), in different disorders (ADHD, autism, Parkinson’s Disease), and across different species (humans, non-human primates and rodents). We combine this technique with multiple other neuroimaging, behavioral and biological measures.
       </p>
-
-      <b-container fluid class="p-4">
-        <b-row>
-          <b-col v-for="lev in levels" v-if="lev.img" :key="lev.level">
-            <div >
-              <b-img fluid class="pokemon" :src="lev.img_grey" alt="Thumbnail"/>
-              <br>
-              Level {{lev.level}}
-              <br>
-              <span>{{lev.min}} points</span>
-            </div>
-          </b-col>
-        </b-row>
-      </b-container>
-
+    <h1> Why do we need this app? </h1>
+      <p>
+        To use the often stated saying in introduction to statistics classes, “garbage in, garbage out.” Our research often involves using large-scale neuroimaging brain datasets. We want to be sure that the brain data that we use and share with the broader community has undergone effective quality control. BrainSwipes leverages crowdsourcing to review and rate large amounts of data quickly. This makes our results more replicable and reliable. 
+      </p>
+    <h1> Origin of Swipes For Science </h1>
+      <p>
+        The founders of the SwipesForScience game template - <a href="https://anisha.pizza/"> Anisha</a> and <a href="https://github.com/SwipesForScience/SwipesForScience/blob/master">Andreea</a> - met at the <a href="https://github.com/SwipesForScience/SwipesForScience/blob/master">eLife Innovation Sprint</a> in 2018. You can see their original work and <a href="https://github.com/SwipesForScience/SwipesForScience">template on GitHub</a>.
+      </p>
     </b-container>
 
   </div>
@@ -34,16 +25,14 @@
 
 <style>
 
-.pokemon{
-  min-width: 25px;
-  min-height: 25px;
-  width: 100px;
-  height: 100px;
-}
-
-
 #about {
   min-height: 100vh;
+}
+
+p {
+  text-align: justify;
+  padding-top: 0.5em;
+  padding-bottom: 1.5em;
 }
 
 </style>
