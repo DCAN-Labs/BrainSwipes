@@ -144,7 +144,7 @@ export default {
     font-size: 1.375em;
     color: hsl(273, 9%, 46%);
   }
-  /* .account-menu__user-information .username:after {
+  .account-menu__user-information .username:after {
     content: 'NEW';
     position: absolute;
     top: 1.6em;
@@ -154,7 +154,7 @@ export default {
     font-size: 0.8em;
     line-height: 1.5em;
     background-color: hsl(252, 38%, 95%);
-  } */
+  }
   .account-menu__dropdown {
     top: 100px;
   }

@@ -104,8 +104,7 @@
 /**
  * The component for the `/signup` route.
  */
-  import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-  import { ref } from 'firebase/database';
+  import firebase from 'firebase';
   import Terms from '@/components/Terms';
 
   export default {
@@ -167,7 +166,7 @@
       onSubmit(e) {
         e.preventDefault();
         // check for a unique username
-        ref('users').child(this.form.username).once('value')
+        firebase.database().ref('users').child(this.form.username).once('value')
         .then((snapshot) => {
           const val = snapshot.val();
           if (!val) {
@@ -189,7 +188,7 @@
       },
       verifiedClick(e) {
         e.preventDefault();
-        console.log(getAuth().currentUser.emailVerified);
+        console.log(firebase.auth().currentUser.emailVerified);
         this.$router.replace('tutorial');
       },
       /**
@@ -205,7 +204,7 @@
        * A method that creates the firebase account and shows an error if there is one.
        */
       createAccount() {
-        createUserWithEmailAndPassword(this.form.email, this.form.password).then(
+        firebase.auth().createUserWithEmailAndPassword(this.form.email, this.form.password).then(
           (user) => {
             this.updateProfile(user);
           }, (err) => {
@@ -220,7 +219,7 @@
        * **TODO**: set an error message if something goes wrong here.
        */
       insertUser(user) {
-        ref('users').child(user.displayName).set({
+        firebase.database().ref('users').child(user.displayName).set({
           score: 0,
           level: 0,
           admin: false,
@@ -244,7 +243,7 @@
             // Profile updated successfully!
           this.insertUser(user);
           firebase.auth().currentUser.sendEmailVerification();
-          this.openEmailVerificationModal()
+          this.openEmailVerificationModal();
         }, (err) => {
             // An error happened.
           this.errors.show = true;

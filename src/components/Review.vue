@@ -71,7 +71,6 @@
 
 <script>
   import _ from 'lodash';
-  import { ref, set, onValue, push } from 'firebase/database';
   import WidgetSelector from './WidgetSelector';
   /**
    * The review component shows the widget for a pointer to a sample in its route,
@@ -209,19 +208,27 @@
         e.preventDefault();
         const key = this.$route.params.key;
 
-        push(ref(this.db, `chats/sampleChats/${key}`), {
-          username: this.userData['.key'],
-          message: this.chatMessage,
-          time: new Date().toISOString(),
-        });
+        this.db.ref('chats')
+          .child('sampleChats')
+          .child(key).push({
+            username: this.userData['.key'],
+            message: this.chatMessage,
+            time: new Date().toISOString(),
+          });
 
-        set(ref(this.db, `chats/sampleChatIndex/${key}`), {
-          time: new Date().toISOString(),
-        });
+        this.db.ref('chats')
+          .child('sampleChatIndex')
+          .child(key).set({
+            time: new Date().toISOString(),
+          });
 
-        set(ref(this.db, `chats/userChat/${this.userData['.key']}/${key}`), {
-          watch: 1,
-        });
+        this.db.ref('chats')
+          .child('userChat')
+          .child(this.userData['.key'])
+          .child(key)
+          .set({
+            watch: 1,
+          });
 
         this.chatMessage = '';
 
@@ -234,7 +241,11 @@
         });
 
         usersToNotify.forEach((u) => {
-          set(ref(this.db, `chats/userNotifications/${u}/${key}`), true);
+          this.db.ref('chats')
+            .child('userNotifications')
+            .child(u)
+            .child(key)
+            .set(true);
         });
       },
       /**
@@ -252,24 +263,30 @@
        */
       setSampleInfo() {
         // get the chat for this sample
-        onValue(ref(this.db, `chats/sampleChats/${this.widgetPointer}`), (snap) => {
-          const chatData = snap.val();
-          this.chatHistory = chatData;
-        });
+        this.db.ref('chats')
+          .child('sampleChats')
+          .child(this.widgetPointer)
+          .on('value', (snap2) => {
+            const chatData = snap2.val();
+            this.chatHistory = chatData;
+          });
 
         // get the user's settings for the widget.
         if (this.userInfo.displayName) {
-          onValue(ref(this.db, `userSettings/${this.userInfo.displayName}`), (snap) => {
-            this.userSettings = snap.val() || {};
-          }, {
-            onlyOnce: true,
-          });
+          this.db.ref('userSettings')
+            .child(this.userInfo.displayName)
+            .once('value')
+            .then((snap) => {
+              this.userSettings = snap.val() || {};
+            });
         }
 
         // get the widget's summary info
-        onValue(ref(this.db, `sampleSummary/${this.widgetPointer}`), (snap) => {
-          this.widgetSummary = snap.val();
-        });
+        this.db.ref('sampleSummary')
+          .child(this.widgetPointer)
+          .on('value', (snap) => {
+            this.widgetSummary = snap.val();
+          });
       },
     },
   };

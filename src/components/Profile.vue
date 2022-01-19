@@ -112,8 +112,7 @@
  * @author Anisha Keshavan
  * @license Apache 2.0
  */
-import { getAuth } from 'firebase/auth';
-import { limitToLast, orderByKey, query, ref, onValue } from 'firebase/database';
+import firebase from 'firebase';
 
 export default {
   name: 'profile',
@@ -139,12 +138,12 @@ export default {
       return this.config.profile.blankImage;
     },
     yourEmail() {
-      return getAuth().currentUser.email;
+      return firebase.auth().currentUser.email;
     },
     verificationStatus() {
       let verificationStatus;
       if (firebase.auth().currentUser.emailVerified) {
-        verificationStatus =  `Your email address is verified.`        
+        verificationStatus = 'Your email address is verified.';
       } else {
         console.log('test');
         verificationStatus = `Please verify the email associated with this account.`
@@ -152,7 +151,7 @@ export default {
       return verificationStatus;
     },
     verified() {
-      return getAuth().currentUser.emailVerified;
+      return firebase.auth().currentUser.emailVerified;
     },
   },
   props: {
@@ -226,12 +225,17 @@ export default {
      */
     chats() {
       this.chats.forEach((c) => {
-        onValue(query(ref(this.db, `chats/sampleChats/${c}`), orderByKey(), limitToLast(1)), (snap) => {
-          const data = snap.val();
-          this.chatInfo[c] = data[Object.keys(data)[0]];
-          this.getNotifications(c);
-          this.$forceUpdate();
-        });
+        this.db.ref('chats')
+          .child('sampleChats')
+          .child(c)
+          .orderByKey()
+          .limitToLast(1)
+          .on('value', (snap) => {
+            const data = snap.val();
+            this.chatInfo[c] = data[Object.keys(data)[0]];
+            this.getNotifications(c);
+            this.$forceUpdate();
+          });
       });
     },
   },
@@ -241,12 +245,15 @@ export default {
      *
      */
     getUserChats() {
-      onValue(ref(this.db, `chats/userChat/${this.userData['.key']}`), (snap) => {
-        const data = snap.val();
-        if (data) {
-          this.chats = Object.keys(data);
-        }
-      });
+      this.db.ref('chats')
+        .child('userChat')
+        .child(this.userData['.key'])
+        .on('value', (snap) => {
+          const data = snap.val();
+          if (data) {
+            this.chats = Object.keys(data);
+          }
+        });
     },
     /**
      * In theory this method should set a flag to tell the UI
@@ -254,14 +261,17 @@ export default {
      * saw their chats. I don't think this method is even called yet.
      */
     getNotifications(key) {
-      onValue(ref(this.db, `notifications/${this.userData['.key']}/${key}`), (snap) => {
-        if (snap.val()) {
-          this.chatInfo[key].notify = true;
-          this.$forceUpdate();
-        }
-      });
+      this.db.ref('notifications')
+        .child(this.userData['.key'])
+        .child(key)
+        .on('value', (snap) => {
+          if (snap.val()) {
+            this.chatInfo[key].notify = true;
+            this.$forceUpdate();
+          }
+        });
     },
-    verifyEmail(){
+    verifyEmail() {
       firebase.auth().currentUser.sendEmailVerification();
     },
   },

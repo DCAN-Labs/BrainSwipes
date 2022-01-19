@@ -91,7 +91,6 @@ import axios from 'axios';
 import _ from 'lodash';
 // eslint-disable-next-line
 import LoadManifestWorker from 'worker-loader!../workers/LoadManifestWorker';
-import { ref, onValue, remove } from 'firebase/database';
 
 /** Admin panel for the /admin route.
  * The admin panel syncs data from `config.manifestUrl`. Only people
@@ -181,15 +180,13 @@ export default {
      * This method keeps track of sampleCounts, but only loads it once.
      */
     addFirebaseListener() {
-      onValue(ref(this.db, 'sampleCounts'), (snap) => {
+      this.db.ref('sampleCounts').once('value', (snap) => {
         /* eslint-disable */
         this.sampleCounts = _.map(snap.val(), (val, key) => {
           return { '.key': key, '.value': val };
         });
         /* eslint-enable */
         this.status = 'complete';
-      }, {
-        onlyOnce: true,
       });
     },
     /**
@@ -384,7 +381,7 @@ export default {
         // check to see if the key is in the manifest.
         if (this.manifestEntries.indexOf(key) < 0) {
           // since the key isn't there, remove it from firebase.
-          remove(ref(this.db, (`sampleCounts${key}`)));
+          this.db.ref('sampleCounts').child(key).remove();
         }
       });
     },
