@@ -121,13 +121,8 @@
                 );
       },
       resetPassword() {
-<<<<<<< HEAD
-        if (this.form.email) {
-          sendPasswordResetEmail(this.form.email)
-=======
         if(this.form.email) {
           firebase.auth().sendPasswordResetEmail(this.form.email)
->>>>>>> parent of b44341a... fixed eslint errors
             .then(() => {
               this.resetTitle = 'Password Reset';
               this.resetStatus = `A password reset email has been sent to ${this.form.email}`;
