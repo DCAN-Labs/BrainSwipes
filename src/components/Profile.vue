@@ -143,11 +143,16 @@ export default {
     },
     verificationStatus() {
       let verificationStatus;
+<<<<<<< HEAD
       if (getAuth().currentUser.emailVerified) {
         verificationStatus = 'Your email address is verified.';
+=======
+      if (firebase.auth().currentUser.emailVerified) {
+        verificationStatus =  `Your email address is verified.`        
+>>>>>>> parent of b44341a... fixed eslint errors
       } else {
         console.log('test');
-        verificationStatus = 'Please verify the email associated with this account.';
+        verificationStatus = `Please verify the email associated with this account.`
       }
       return verificationStatus;
     },
@@ -261,8 +266,13 @@ export default {
         }
       });
     },
+<<<<<<< HEAD
     verifyEmail() {
       getAuth().currentUser.sendEmailVerification();
+=======
+    verifyEmail(){
+      firebase.auth().currentUser.sendEmailVerification();
+>>>>>>> parent of b44341a... fixed eslint errors
     },
   },
 };

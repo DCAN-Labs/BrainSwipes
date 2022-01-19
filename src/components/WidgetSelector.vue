@@ -31,7 +31,7 @@
  * the specific widget to the parent.
  */
   import ImageSwipe from './Widgets/ImageSwipe';
-
+  
   export default {
     name: 'WidgetSelector',
     props: {

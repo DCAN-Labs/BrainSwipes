@@ -121,8 +121,13 @@
                 );
       },
       resetPassword() {
+<<<<<<< HEAD
         if (this.form.email) {
           sendPasswordResetEmail(this.form.email)
+=======
+        if(this.form.email) {
+          firebase.auth().sendPasswordResetEmail(this.form.email)
+>>>>>>> parent of b44341a... fixed eslint errors
             .then(() => {
               this.resetTitle = 'Password Reset';
               this.resetStatus = `A password reset email has been sent to ${this.form.email}`;
@@ -134,13 +139,13 @@
             });
         } else {
           this.errors.show = true;
-          this.errors.message = 'Please enter your email';
+          this.errors.message = 'Please enter your email'
         }
       },
       closeDialog(e) {
         e.preventDefault();
         this.$refs.confirmreset.hide();
-      },
+      }
     },
   };
 </script>

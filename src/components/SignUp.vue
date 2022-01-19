@@ -243,8 +243,13 @@
         }).then(() => {
             // Profile updated successfully!
           this.insertUser(user);
+<<<<<<< HEAD
           getAuth().currentUser.sendEmailVerification();
           this.openEmailVerificationModal();
+=======
+          firebase.auth().currentUser.sendEmailVerification();
+          this.openEmailVerificationModal()
+>>>>>>> parent of b44341a... fixed eslint errors
         }, (err) => {
             // An error happened.
           this.errors.show = true;
