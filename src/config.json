@@ -1,6 +1,6 @@
 {
   "needsTutorial": true,
-  "manifestUrl": "../config/manifest.json",
+  "manifestUrl": "/static/manifest.json",
   "manifestType": "json",
   "widgetType": "ImageSwipe",
   "widgetProperties": {

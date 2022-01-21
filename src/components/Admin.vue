@@ -7,7 +7,7 @@
       <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
       <p v-if="manifestType === 'json'">
         <b>Data Source:</b>
-        <a :href="config.manifestUrl">{{config.manifestUrl}}</a>
+        <a :href="config.manifestUrl" target="_blank">Manifest JSON</a>
       </p>
 
       <p v-else-if="manifestType === 'pubmed'">
