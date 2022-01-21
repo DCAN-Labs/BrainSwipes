@@ -15,7 +15,7 @@
         <g transform="matrix(1,0,0,1,-26.8461,-27.8461)">
           <path
             d="M52,33L32,33M47,44L32,44"
-            style="fill:none;stroke:rgb(88,65,171);stroke-width:2.5px;"
+            style="fill:none;stroke:rgb(100,0,0);stroke-width:2.5px;"
           />
         </g>
       </svg>
@@ -61,6 +61,12 @@
   line-height: 50px;
   font-weight: 400;
   font-size: 1.125em;
+}
+a {
+  color: rgb(100,0,0);
+}
+h1 {
+  color: rgb(100,0,0);
 }
 
 @media (min-width: 65em) {

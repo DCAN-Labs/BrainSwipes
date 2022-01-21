@@ -90,7 +90,7 @@ export default {
   display: block;
   user-select: none;
   font-weight: 700;
-  color: hsl(253, 45%, 46%);
+  color: rgb(100, 0, 0);
   font-weight: 600;
   cursor: pointer;
 }
@@ -129,11 +129,20 @@ export default {
   }
   .account-menu .user-score {
     display: block;
+    top: 0.6em;
+    left: 0px;
+    padding: 0px 5px;
+    border-radius: 3px;
+    font-size: 1.2em;
+    line-height: 1.5em;
+    color: rgb(100, 0, 0);
+    font-weight: 700;
+    background-color: rgb(255,202,30)
   }
   .account-menu__user-information {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: flex-start;
     height: 5em;
     font-size: 0.75em;
@@ -142,18 +151,7 @@ export default {
     position: relative;
     font-weight: 700;
     font-size: 1.375em;
-    color: hsl(273, 9%, 46%);
-  }
-  .account-menu__user-information .username:after {
-    content: 'NEW';
-    position: absolute;
-    top: 1.6em;
-    left: 0px;
-    padding: 0px 5px;
-    border-radius: 3px;
-    font-size: 0.8em;
-    line-height: 1.5em;
-    background-color: hsl(252, 38%, 95%);
+    color: rgb(100, 0, 0);  
   }
   .account-menu__dropdown {
     top: 100px;

@@ -86,6 +86,7 @@ footer {
   width: 50%;
   height: 2em;
   text-align: left;
+  color: rgb(100, 0, 0);
 }
 @media (min-width: 65em) {
   footer {
