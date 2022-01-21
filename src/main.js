@@ -34,8 +34,4 @@ firebase.auth().onAuthStateChanged(() => {
       router,
     });
   }
-    // console.log('user is', user);
 });
-
-
-// export { db };
