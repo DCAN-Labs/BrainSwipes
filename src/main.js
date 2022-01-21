@@ -5,7 +5,7 @@ import firebase from 'firebase/app';
 import 'firebase/app-check';
 import App from './App';
 import router from './router';
-import config from './config';
+// import config from './config';
 
 
 Vue.config.productionTip = false;
@@ -21,7 +21,20 @@ This will make sure Firebase initializes before loading the app when a user refr
 - https://savvyapps.com/blog/definitive-guide-building-web-app-vuejs-firebase
 */
 
-firebase.initializeApp(config.firebaseKeys);
+firebase.initializeApp({
+  apiKey: 'AIzaSyCnRfYP0bEqFlOxu9-76cvYv2gMbgN4lrE',
+  authDomain: 'bcp-braindr.firebaseapp.com',
+  databaseURL: 'https://bcp-braindr.firebaseio.com',
+  projectId: 'bcp-braindr',
+  storageBucket: 'bcp-braindr.appspot.com',
+  messagingSenderId: '73279233790',
+  appId: '1:73279233790:web:2025c2cae1f90891850faf',
+  measurementId: 'G-K8PNLJ7F2J',
+});
+if (process.env.NODE_ENV === 'development') {
+  console.log(`NODE_ENV=${process.env.NODE_ENV}`);
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+}
 firebase.appCheck().activate('6LderB8eAAAAACq8C9buhjI7V3HeznZpTkH2wB4K', true);
 
 firebase.auth().onAuthStateChanged(() => {
