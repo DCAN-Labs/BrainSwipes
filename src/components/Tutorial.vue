@@ -35,6 +35,7 @@
            :playMode="'tutorial'"
            :userSettings="userSettings"
            :tutorialStep="step.tutorialStep"
+           :userInfo="userInfo"
            ref="widget"
           />
         </div>
@@ -152,6 +153,10 @@
        * and also the type of widget and where to update pointers to data
        */
       config: {
+        type: Object,
+        required: true,
+      },
+      userInfo: {
         type: Object,
         required: true,
       },

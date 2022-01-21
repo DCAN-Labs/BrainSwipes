@@ -21,6 +21,7 @@
                 @shortkey="swipeLeft"
                 v-hammer:swipe.left="swipeLeft"
                 ref="leftSwipe"
+                v-bind:class="{ focus: leftFocused }"
               > <i class="fa fa-long-arrow-left" aria-hidden="true"></i>
               {{widgetProperties.leftSwipeLabel}}
              </b-button>
@@ -34,6 +35,7 @@
               :to="'/review/'+widgetPointer"
               ref="helpButton"
               class="helpbtn"
+              v-bind:class="{ focus: helpFocused }"
               >Help</b-button>
 
               <b-button variant="success"
@@ -43,6 +45,7 @@
                 v-shortkey="['arrowright']"
                 @shortkey="swipeRight"
                 ref="rightSwipe"
+                v-bind:class="{ focus: rightFocused }"
               > {{widgetProperties.rightSwipeLabel}}
               <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
               </b-button>
@@ -148,6 +151,9 @@
         swipe: null,
         imgUrl: null,
         imgKey: null,
+        rightFocused: false,
+        leftFocused: false,
+        helpFocused: false,
       };
     },
     /**
@@ -197,15 +203,15 @@
         switch (stepNumber) {
           case 0:
             // highlight the pass button
-            this.$refs.rightSwipe.classList.add('focus');
+            this.rightFocused = true;
             break;
           case 1:
             // highlight the fail button
-            this.$refs.leftSwipe.classList.add('focus');
+            this.leftFocused = true;
             break;
           case 2:
             // highlight the help button
-            this.$refs.helpButton.classList.add('focus');
+            this.helpFocused = true;
             break;
           default:
             break;
