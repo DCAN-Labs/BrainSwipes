@@ -143,6 +143,23 @@ router.beforeEach((to, from, next) => {
     }
   }
 
+  if (to.name === 'PlayABCD') {
+    if (currentUser) {
+      firebase.database().ref(`/users/${currentUser.displayName}`).once('value')
+        .then((snap) => {
+          const data = snap.val();
+          if (!data.datasets.ABCD) {
+            next({ path: '/unauthorized', query: from.query });
+          }
+          if (!data.taken_tutorial && config.needsTutorial) {
+            next({ path: '/tutorial', query: from.query });
+          }
+        });
+    } else {
+      next({ path: '/login', query: from.query });
+    }
+  }
+
   if (requiresAdmin) {
     // console.log('requires admin');
     firebase.database().ref(`/settings/admins/${currentUser.displayName}`).once('value')

@@ -9,7 +9,7 @@
       </div>
       <p class="buttons mt-3">
         <router-link class="btn btn-primary white" :to="{name: 'Play', query: routerQuery}"> BCP </router-link>
-        <router-link class="btn btn-primary turned-off white" :disabled="!activeABCD" :event="activeABCD ? 'click' : ''" :to="{name: 'PlayABCD', query: routerQuery}">
+        <router-link class="btn btn-primary white" :disabled="!activeABCD" :event="activeABCD ? 'click' : ''" :to="{name: 'PlayABCD', query: routerQuery}" v-bind:class="{ turnedoff: !activeABCD }">
           <span>
             ABCD
           </span>
@@ -26,6 +26,7 @@
  * The landing page, on the route `/`. This component displays a title, tagline,
  * and background image splash page that's defined on the config property.
  */
+import firebase from 'firebase';
 
 export default {
   name: 'Home',
@@ -46,7 +47,7 @@ export default {
   },
   data() {
     return {
-
+      activeABCD: false,
     };
   },
   computed: {
@@ -68,8 +69,19 @@ export default {
     landingStyle() {
       return { 'background-image': `url("${this.config.home.backgroundUrl}")` };
     },
-    activeABCD() {
-      return false;
+  },
+  async created() {
+    await this.activateABCD();
+  },
+  methods: {
+    async activateABCD() {
+      const currentUser = firebase.auth().currentUser;
+      if (currentUser) {
+        firebase.database().ref(`/users/${currentUser.displayName}/datasets/ABCD`).once('value')
+          .then((snap) => {
+            this.activeABCD = snap.val();
+          });
+      }
     },
   },
 };
@@ -135,7 +147,7 @@ a {
   border-color: maroon;
 }
 
-.turned-off{
+.turnedoff{
   background-color: rgba(128, 0, 0, 0.3);
 }
 .jumbotron {
@@ -149,15 +161,15 @@ a {
   text-shadow: white 1px 1px, white 0 0 1px;
 }
 
-.turned-off:hover{
+.turnedoff:hover{
   cursor: not-allowed;
 }
 
-.turned-off:hover span {
+.turnedoff:hover span {
   display: none;
 }
 
-.turned-off:hover:before {
+.turnedoff:hover:before {
   content: 'Unavailable';
 }
 
