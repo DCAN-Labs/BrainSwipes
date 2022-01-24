@@ -145,7 +145,6 @@ export default {
       if (firebase.auth().currentUser.emailVerified) {
         verificationStatus = 'Your email address is verified.';
       } else {
-        console.log('test');
         verificationStatus = 'Please verify the email associated with this account.';
       }
       return verificationStatus;

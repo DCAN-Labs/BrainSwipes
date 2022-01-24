@@ -218,8 +218,8 @@
        * and when they consented.
        * **TODO**: set an error message if something goes wrong here.
        */
-      insertUser(user) {
-        firebase.database().ref('users').child(user.displayName).set({
+      insertUser() {
+        firebase.database().ref('users').child(firebase.auth().currentUser.displayName).set({
           score: 0,
           level: 0,
           admin: false,
@@ -236,14 +236,14 @@
        * Update the user's profile with their username
        * (in the displayName field of an authenticated user.)
        */
-      updateProfile(user) {
-        user.updateProfile({
+      updateProfile() {
+        firebase.auth().currentUser.updateProfile({
           displayName: this.form.username,
         }).then(() => {
             // Profile updated successfully!
-          this.insertUser(user);
+          this.insertUser();
           firebase.auth().currentUser.sendEmailVerification();
-          this.openEmailVerificationModal();
+          this.$router.replace('tutorial');
         }, (err) => {
             // An error happened.
           this.errors.show = true;

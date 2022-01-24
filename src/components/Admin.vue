@@ -78,14 +78,6 @@ export default {
        * the /sampleCounts document from Firebase.
        */
       sampleCounts: [],
-      /**
-      * A place to hold variables for pubmed query manifests.
-      */
-      pubmedQueryStore: {},
-      /**
-      * a place to hold a continuation token for s3.
-      */
-      continuation: null,
     };
   },
   props: {
