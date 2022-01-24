@@ -63,8 +63,7 @@
 }
 /* Leaderboard top score row */
 .leaderboard__row:first-of-type .leaderboard__row-container {
-  background-color: hsl(253, 44%, 47%);
-  color: hsl(0, 0%, 100%);
+  background-color: maroon;
   border-radius: 8px;
   margin-bottom:  1.25em ;
 }
@@ -114,8 +113,8 @@
   height: 3px;
   background-image: linear-gradient(
     90deg,
-    hsl(253, 44%, 47%),
-    hsl(253, 44%, 47%) 60%,
+    rgb(0,0,0),
+    rgb(0,0,0),
     transparent 60%,
     transparent 100%
   );
