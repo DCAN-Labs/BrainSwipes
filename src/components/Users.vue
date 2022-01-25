@@ -2,6 +2,19 @@
   <div id="users">
     <h1> Manage Users </h1>
 
+    <b-modal id="modifyuser" :title="userModified.name"
+      ref="modifyuser" size="lg">
+      <div>
+        <b-button variant="warning" @click="changeAdmin(userModified.isAdmin)">isAdmin: {{userModified.isAdmin}}</b-button>
+        <b-button variant="danger">datasets: {{userModified.datasets}}</b-button>
+      </div>
+      <div slot="modal-footer" class="w-100">
+          <b-button @click="closeDialogSubmit" type="submit" variant="primary">Submit</b-button>
+          <b-button @click="closeDialogCancel" type="submit" variant="primary">Cancel</b-button>
+      </div>
+
+    </b-modal>
+
     <b-container>
       <div v-if="loading">
           <Flask />
@@ -16,10 +29,10 @@
             <th>Datasets</th>
           </tr>
           <tr v-for="(value, name) in usersObject" :key="name" v-if="value.taken_tutorial">
-            <td>{{ name }}</td>
+            <td><b-button variant="outline-dark" @click="modifyUser(name, value)">{{ name }}</b-button></td>
             <td>{{ value.admin }}</td>
             <td>{{ value.score }}</td>
-            <td><b-button variant="dark">{{ value.datasets }}</b-button></td>
+            <td>{{ value.datasets }}</td>
           </tr>
         </table>
       </div>
@@ -32,7 +45,7 @@
 
 <style>
 .user-div {
-  padding-bottom: 15vh;
+  padding-bottom: 10vh;
 }
 table {
   margin: auto;
@@ -78,16 +91,19 @@ export default {
       /**
        * list of users in Firebase
        */
-      usersObject: {
-        // TestUser: {
-        //   admin: false,
-        //   consent: true,
-        //   level: 1,
-        //   score: 100,
-        //   taken_tutorial: true,
-        // },
-      },
+      usersObject: {},
+      /**
+       * Whether the user list is loading
+       */
       loading: true,
+      /**
+       * Name of the user being modified
+       */
+      userModified: {
+        name: '',
+        isAdmin: '',
+        datasets: [],
+      },
     };
   },
   props: {
@@ -110,13 +126,33 @@ export default {
      * Loads the users from Firebase
      */
     async loadUsers() {
-      console.log(this.usersObject);
       this.db.ref('/users').on('value', (snap) => {
         snap.forEach((element) => {
           this.usersObject[element.key] = element.val();
         });
         this.loading = false;
       });
+    },
+    modifyUser(name, value) {
+      this.userModified.name = name;
+      this.userModified.isAdmin = value.admin;
+      this.userModified.datasets = value.datasets;
+      this.$refs.modifyuser.show();
+    },
+    closeDialogCancel(e) {
+      e.preventDefault();
+      this.$refs.modifyuser.hide();
+    },
+    closeDialogSubmit(e) {
+      e.preventDefault();
+      this.$refs.modifyuser.hide();
+    },
+    changeAdmin(value) {
+      if (value) {
+        this.userModified.isAdmin = false;
+      } else {
+        this.userModified.isAdmin = true;
+      }
     },
   },
 };
