@@ -2,11 +2,27 @@
   <div id="users">
     <h1> Manage Users </h1>
 
-    <b-modal id="modifyuser" :title="userModified.name"
+    <b-modal id="modifyuser" :title="`Modifying permissions for ${userModified.name}`"
       ref="modifyuser" size="lg">
       <div>
-        <b-button variant="warning" @click="changeAdmin(userModified.isAdmin)">isAdmin: {{userModified.isAdmin}}</b-button>
-        <b-button variant="danger">datasets: {{userModified.datasets}}</b-button>
+        <table>
+          <tr>
+            <th>isAdmin</th>
+            <th>BCP</th>
+            <th>ABCD</th>
+          </tr>
+          <tr>
+            <td>
+              <b-button variant="warning" @click="changeAdmin(userModified.isAdmin)">{{userModified.isAdmin}}</b-button>
+            </td>
+            <td>
+              <b-button variant="primary">{{userModified.datasets.BCP}}</b-button>
+            </td>
+            <td>
+              <b-button variant="danger" @click="changeDatasetAccess('ABCD', userModified.datasets['ABCD'])">{{userModified.datasets['ABCD']}}</b-button>
+            </td>
+          </tr>
+        </table>
       </div>
       <div slot="modal-footer" class="w-100">
           <b-button @click="closeDialogSubmit" type="submit" variant="primary">Submit</b-button>
@@ -50,7 +66,10 @@
 table {
   margin: auto;
 }
-tr:nth-child(even) {
+#user-table button{
+  width: 100%;
+}
+.user-div tr:nth-child(even) {
   background-color: #D6EEEE;
 }
 th {
@@ -102,7 +121,10 @@ export default {
       userModified: {
         name: '',
         isAdmin: '',
-        datasets: [],
+        datasets: {
+          BCP: true,
+          ABCD: false,
+        },
       },
     };
   },
@@ -133,26 +155,70 @@ export default {
         this.loading = false;
       });
     },
+    /**
+     * Populates the userModified data element
+     * Opens the modify user dialog
+     */
     modifyUser(name, value) {
       this.userModified.name = name;
       this.userModified.isAdmin = value.admin;
-      this.userModified.datasets = value.datasets;
+      if (value.datasets) {
+        this.userModified.datasets.ABCD = value.datasets.ABCD;
+      } else {
+        this.userModified.datasets.ABCD = false;
+      }
       this.$refs.modifyuser.show();
     },
+    /**
+     * Closes the modify user dialog without updating
+     */
     closeDialogCancel(e) {
       e.preventDefault();
       this.$refs.modifyuser.hide();
     },
+    /**
+     * Closes the modify user dialog and calls updateFirebase
+     */
     closeDialogSubmit(e) {
       e.preventDefault();
       this.$refs.modifyuser.hide();
+      this.updateFirebase();
     },
+    /**
+     * Switches the user's admin status
+     * Does not modify the database until submitted
+     */
     changeAdmin(value) {
       if (value) {
         this.userModified.isAdmin = false;
       } else {
         this.userModified.isAdmin = true;
       }
+    },
+    /**
+     * Switches the user's dataset access
+     * Does not modify the database until submitted
+     */
+    changeDatasetAccess(dataset, value) {
+      if (value) {
+        this.userModified.datasets[dataset] = false;
+      } else {
+        this.userModified.datasets[dataset] = true;
+      }
+    },
+    /**
+     * Modifies the database with the prepared user data
+     */
+    updateFirebase() {
+      const obj = JSON.parse(JSON.stringify(this.userModified));
+      const user = obj.name;
+      const admin = obj.isAdmin;
+      const ABCD = obj.datasets.ABCD;
+      const updates = {};
+      updates[`/users/${user}/datasets/ABCD`] = ABCD;
+      updates[`/users/${user}/admin`] = admin;
+      // updates[`/settings/admins/${user}`] = admin ? 1 : 0;
+      this.db.ref().update(updates);
     },
   },
 };
