@@ -38,8 +38,6 @@
          :widgetProperties="widgetProperties"
          :widgetSummary="widgetSummary"
          :userSettings="userSettings"
-         :needsSecret="needsSecret"
-         :serverSecret="serverSecret"
          v-on:widgetRating="sendWidgetResponse"
          v-on:updateUserSettings="updateUserSettings"
          :userInfo="userInfo"
@@ -220,10 +218,6 @@
          * user settings comes from firebase. it can be set by the widget to save state for the user.
          */
         userSettings: {},
-        /**
-         * secret key (btoa'd) from the firebase server, in case the widget is locked.
-         */
-        serverSecret: '',
       };
     },
     watch: {
@@ -258,7 +252,6 @@
       this.initSampleCounts();
       this.initSeenSamples();
       this.initUserSettings();
-      this.fetchServerSecret();
     },
     components: {
       // WidgetSelector,
@@ -288,12 +281,6 @@
        */
       widgetProperties() {
         return this.config.widgetProperties;
-      },
-      /**
-       * whether or not the widget requires a secret (for locking down data)
-       */
-      needsSecret() {
-        return this.config.widgetUsesSecret;
       },
     },
     methods: {
@@ -539,17 +526,6 @@
        */
       showAlert() {
         this.dismissCountDown = this.dismissSecs;
-      },
-      /**
-       * fetch the server secret and set it in this.data
-       */
-      fetchServerSecret() {
-        this.db.ref('settings')
-          .child('secret')
-          .once('value')
-          .then((snap) => {
-            this.serverSecret = snap.val();
-          });
       },
     },
   };

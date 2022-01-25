@@ -1,26 +1,18 @@
 <template>
   <div class="WidgetSelector">
-    <Secret
-     :userSettings="userSettings"
-     :needsSecret="needsSecret"
-     :serverSecret="serverSecret"
-     v-on:updateUserSettings="updateUserSettings">
-      <ImageSwipe
-      v-if="widgetType=='ImageSwipe'"
-      ref="ImageSwipe"
-      :widgetPointer="widgetPointer"
-      :widgetProperties="widgetProperties"
-      :widgetSummary="widgetSummary"
-      :userSettings="userSettings"
-      :tutorialStep="tutorialStep"
-      v-on:widgetRating="widgetRating"
-      v-on:updateUserSettings="updateUserSettings"
-      :playMode="playMode"
-      :userInfo="userInfo"
-      />
-
-      
-    </Secret>
+    <ImageSwipe
+    v-if="widgetType=='ImageSwipe'"
+    ref="ImageSwipe"
+    :widgetPointer="widgetPointer"
+    :widgetProperties="widgetProperties"
+    :widgetSummary="widgetSummary"
+    :userSettings="userSettings"
+    :tutorialStep="tutorialStep"
+    v-on:widgetRating="widgetRating"
+    v-on:updateUserSettings="updateUserSettings"
+    :playMode="playMode"
+    :userInfo="userInfo"
+    />
   </div>
 </template>
 
@@ -84,20 +76,6 @@
        */
       tutorialStep: {
         type: Number,
-        required: false,
-      },
-      /**
-       * whether or not the data needs a secret
-       */
-      needsSecret: {
-        type: Boolean,
-        required: false,
-      },
-      /**
-       * the secret, only used if needed.
-       */
-      serverSecret: {
-        type: String,
         required: false,
       },
       /**
