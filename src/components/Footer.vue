@@ -47,6 +47,9 @@ export default {
       ],
     };
   },
+  mounted() {
+    this.addAdminRoutes();
+  },
   methods: {
     /**
      * The method to tell the parent component (App.vue) to open the config panel.
@@ -54,6 +57,9 @@ export default {
     openConfig(e) {
       e.preventDefault();
       this.$emit('openConfig');
+    },
+    addAdminRoutes() {
+      console.log('userdata');
     },
   },
 };

@@ -54,8 +54,7 @@ import LoadManifestWorker from 'worker-loader!../workers/LoadManifestWorker';
 /** Admin panel for the /admin route.
  * The admin panel syncs data from `config.manifestUrl`. Only people
  * that are authorized can see this page. Authorization comes from
- * /user/<username>/admin and from /settings/admins/<username>. Both need to be
- * true to see this page.
+ * /user/<username>/admin
  */
 export default {
   name: 'admin',

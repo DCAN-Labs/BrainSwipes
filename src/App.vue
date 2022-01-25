@@ -89,19 +89,12 @@
           :routerQuery="routerQuery"
         />
       </div>
-      <!-- Configuration Drawer -->
-      <Configure
-        ref="configurationPane"
-        v-if="showConfig"
-        :config="config"
-        v-on:closeConfig="closeConfig"
-        :userInfo="userInfo"
-        :db="db"
-        :configurationState="configurationState"
-      />
     </div>
     <div class="foot">
-      <Footer v-on:openConfig="openConfig" :config="config" :routerQuery="routerQuery"></Footer>
+      <Footer 
+        :config="config" 
+        :routerQuery="routerQuery"
+      />
     </div>
   </div>
 </template>
@@ -370,18 +363,6 @@ export default {
         .child('taken_tutorial')
         .set(val);
       this.$router.replace('play');
-    },
-    /**
-     * open the config panel
-     */
-    openConfig() {
-      this.showConfig = true;
-    },
-    /**
-     * close the config panel
-     */
-    closeConfig() {
-      this.showConfig = false;
     },
   },
   /**
