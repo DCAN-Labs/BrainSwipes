@@ -26,7 +26,7 @@
        v-if="status=='complete'">Click the button below to sync your firebase database with your manifest.</p>
 
       <div class="mb-3 pb-3">
-        <b-button v-if="status=='complete'" @click="refreshSamples">
+        <b-button v-if="status=='completed'" @click="refreshSamples"><!--should be status = complete -->
           <span> Refresh Sample List </span>
         </b-button>
         <div v-else>
@@ -34,7 +34,9 @@
           <b-progress :value="progress" :max="manifestEntries.length" variant="info" striped class="mb-2"></b-progress>
         </div>
       </div>
+      <div :text-content.prop="usersObject">
 
+      </div>
 
     </b-container>
 
@@ -78,6 +80,10 @@ export default {
        * the /sampleCounts document from Firebase.
        */
       sampleCounts: [],
+      /**
+       * list of users in Firebase
+       */
+      usersObject: [],
     };
   },
   props: {
@@ -113,7 +119,21 @@ export default {
   mounted() {
     this.addFirebaseListener();
   },
+  async created() {
+    await this.loadUsers();
+  },
   methods: {
+    /**
+     * Loads the users from Firebase
+     */
+    async loadUsers() {
+      this.db.ref('/users').on('value', (snap) => {
+        snap.forEach((element) => {
+          this.usersObject[element.key] = element.val();
+        });
+        console.log(this.usersObject);
+      });
+    },
     /**
      * This method keeps track of sampleCounts, but only loads it once.
      */

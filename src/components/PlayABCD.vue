@@ -335,6 +335,7 @@
             this.setNextSampleId();
           }
         });
+        console.log(this.sampleCounts);
       },
       /**
        * Initialize the samples that the user has seen, by fetching the
