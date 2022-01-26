@@ -195,7 +195,7 @@
          * if sampleCounts is empty after its fetched from the db, then noData
          * flag is set to true. TODO: prompt the user to the setup instructions
          */
-        noData: false,
+        noData: true,
 
         /**
          * widgetPointer is a pointer to the keys in sampleCounts, sampleSummary, and sampleChats
