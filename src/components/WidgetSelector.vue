@@ -6,12 +6,9 @@
     :widgetPointer="widgetPointer"
     :widgetProperties="widgetProperties"
     :widgetSummary="widgetSummary"
-    :userSettings="userSettings"
     :tutorialStep="tutorialStep"
     v-on:widgetRating="widgetRating"
-    v-on:updateUserSettings="updateUserSettings"
     :playMode="playMode"
-    :userInfo="userInfo"
     />
   </div>
 </template>
@@ -49,13 +46,6 @@
         required: true,
       },
       /**
-       * The user's settings on the widget. The schema is widget specific.
-       */
-      userSettings: {
-        type: Object,
-        required: true,
-      },
-      /**
        * The summary data for the widget.
        * This could keep track of the running average, for example.
        */
@@ -77,13 +67,6 @@
       tutorialStep: {
         type: Number,
         required: false,
-      },
-      /**
-       * the authenticated user object from firebase
-       */
-      userInfo: {
-        type: Object,
-        required: true,
       },
     },
     components: {
@@ -113,12 +96,6 @@
        */
       widgetRating(response) {
         this.$emit('widgetRating', response);
-      },
-      /**
-      * emit the widget's user settings to the parent
-      */
-      updateUserSettings(settings) {
-        this.$emit('updateUserSettings', settings);
       },
     },
   };

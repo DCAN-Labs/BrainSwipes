@@ -32,7 +32,6 @@
        :widgetPointer="widgetPointer"
        :widgetProperties="widgetProperties"
        :widgetSummary="widgetSummary"
-       :userSettings="userSettings"
        :playMode="''"
        ref="widget"
       />
@@ -80,13 +79,6 @@
   export default {
     name: 'review',
     props: {
-      /**
-       * the authenticated user object from firebase
-       */
-      userInfo: {
-        type: Object,
-        required: true,
-      },
       /**
        * the computed user data object based on userInfo
        */
@@ -140,10 +132,6 @@
          * The summary of the sample ID
          */
         widgetSummary: {},
-        /**
-         * The user's settings from firebase
-         */
-        userSettings: {},
         /**
          * The chat message that the user types.
          */
@@ -270,16 +258,6 @@
             const chatData = snap2.val();
             this.chatHistory = chatData;
           });
-
-        // get the user's settings for the widget.
-        if (this.userInfo.displayName) {
-          this.db.ref('userSettings')
-            .child(this.userInfo.displayName)
-            .once('value')
-            .then((snap) => {
-              this.userSettings = snap.val() || {};
-            });
-        }
 
         // get the widget's summary info
         this.db.ref('sampleSummary')

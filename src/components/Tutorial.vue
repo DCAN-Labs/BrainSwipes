@@ -33,9 +33,7 @@
            :widgetProperties="widgetProperties"
            :widgetSummary="widgetSummary"
            :playMode="'tutorial'"
-           :userSettings="userSettings"
            :tutorialStep="step.tutorialStep"
-           :userInfo="userInfo"
            ref="widget"
           />
         </div>
@@ -131,10 +129,6 @@
         * The sample IDs summary (not implemented yet)
         */
         widgetSummary: {}, // TODO: fill this properly
-        /**
-        * User settings from firebase (not implemented yet)
-        */
-        userSettings: {}, // TODO: fill this properly
       };
     },
     props: {
@@ -153,10 +147,6 @@
        * and also the type of widget and where to update pointers to data
        */
       config: {
-        type: Object,
-        required: true,
-      },
-      userInfo: {
         type: Object,
         required: true,
       },

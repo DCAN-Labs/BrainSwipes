@@ -103,13 +103,6 @@
         type: Object,
         required: false,
       },
-      /**
-       * The user's settings on the widget. The schema is widget specific.
-       */
-      userSettings: {
-        type: Object,
-        required: true,
-      },
      /**
       * Tells the widget if it should be in a "play mode" or maybe a "review mode".
       */
@@ -126,13 +119,6 @@
       tutorialStep: {
         type: Number,
         required: false,
-      },
-      /**
-       * the authenticated user object from firebase
-       */
-      userInfo: {
-        type: Object,
-        required: true,
       },
     },
     components: { VueHammer, GridLoader },
@@ -319,11 +305,6 @@
        */
       getPropertiesSchema() {
         return {
-          baseUrlTemplate: {
-            type: String,
-            required: true,
-            description: 'base url to the image file',
-          },
           delimiter: {
             type: String,
             required: false,
