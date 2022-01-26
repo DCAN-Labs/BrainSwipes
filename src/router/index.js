@@ -15,6 +15,7 @@ import Tutorial from '@/components/Tutorial';
 import Review from '@/components/Review';
 import Chats from '@/components/Chats';
 import Users from '@/components/Users';
+import Manifest from '@/components/Manifest';
 import firebase from 'firebase';
 import config from '../config';
 
@@ -122,6 +123,15 @@ const router = new Router({
       path: '/users',
       name: 'Users',
       component: Users,
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+      },
+    },
+    {
+      path: '/manifest',
+      name: 'Manifest',
+      component: Manifest,
       meta: {
         requiresAuth: true,
         requiresAdmin: true,
