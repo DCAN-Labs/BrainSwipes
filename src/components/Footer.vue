@@ -6,7 +6,7 @@
       </nav>
       <nav v-else>
         <router-link
-          v-if="isAdmin" :to="'Admin'" class="nav__link">
+          v-if="isAdmin" :to="'/admin'" class="nav__link">
           Admin
         </router-link>
         <router-link
