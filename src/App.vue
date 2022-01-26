@@ -66,7 +66,7 @@
             </router-link>
           </li>
           <li class="navSection mobile-menu">
-            <SliderMenu :needsTutorial="false" :isAdmin="false" />
+            <SliderMenu :needsTutorial="false"/>
           </li>
           <li class="navSection account-details">
             <AccountMenu :userInfo="userInfo" :userData="userData" :loggedIn="userIsDefined" @logout="logout" />

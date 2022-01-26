@@ -81,8 +81,8 @@ th {
 <script>
 import Flask from './Animations/Flask';
 
-/** Admin panel for the /admin route.
- * The admin panel syncs data from `config.manifestUrl`. Only people
+/** User Management panel for the /user route.
+ * The user panel changes user's access. Only people
  * that are authorized can see this page. Authorization comes from
  * /user/<username>/admin
  */
@@ -90,22 +90,6 @@ export default {
   name: 'users',
   data() {
     return {
-      /**
-       * The loading status
-       */
-      status: 'loading...',
-      /**
-       * Progress bar for the entries being synced to firebase
-       */
-      progress: 0,
-      /**
-       * The list of items to put into /sampleCounts
-       */
-      manifestEntries: [],
-      /**
-       * the /sampleCounts document from Firebase.
-       */
-      sampleCounts: [],
       /**
        * list of users in Firebase
        */

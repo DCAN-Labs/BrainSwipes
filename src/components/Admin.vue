@@ -7,32 +7,29 @@
       <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
       <p>
         <b>Data Source:</b>
-        <a :href="config.manifestUrl" target="_blank">Manifest JSON</a>
+        <input type="file" id="selectFiles" value="Import" /><br />
+        <b-button variant="warning" id="import" @click="importFile">Import The File!</b-button>
       </p>
-      <b-button variant="warning" @click="previewManifest">
-        <span> Preview </span>
-      </b-button>
-      <div v-if="manifestEntries.length" class="mt-3 pt-3">
-        <small>
-          Here are a few items in your manifest file. There are {{manifestEntries.length}} items in total
-        </small>
-        <textarea class="mt-3 mb-3 ml-3 mr-3 w-100"
-         :value="manifestEntries.slice(0,100) + '...'"
-         disabled rows="5">
-        </textarea>
-      </div>
 
       <p class="mt-3 pt-3"
        v-if="status=='complete'">Click the button below to sync your firebase database with your manifest.</p>
 
       <div class="mb-3 pb-3">
-        <b-button v-if="status=='completed'" @click="refreshSamples"><!--should be status = complete -->
+        <b-button v-if="status=='complete'" @click="refreshSamples">
           <span> Refresh Sample List </span>
         </b-button>
         <div v-else>
           <p>{{status}} {{progress}} / {{manifestEntries.length}}</p>
           <b-progress :value="progress" :max="manifestEntries.length" variant="info" striped class="mb-2"></b-progress>
         </div>
+      </div>
+      <div v-if="manifestEntries.length" class="mt-3 pt-3">
+        <small>
+          Here are a few items in your manifest file. There are {{manifestEntries.length}} items in total
+        </small>
+      </div>
+      <div class="file-import">
+        <pre id="result"></pre>
       </div>
 
     </b-container>
@@ -42,17 +39,19 @@
 </template>
 
 <style>
-
+#result{
+  text-align: start;
+  min-height: 1.2em;
+}
 </style>
 
 <script>
-import axios from 'axios';
 import _ from 'lodash';
 // eslint-disable-next-line
 import LoadManifestWorker from 'worker-loader!../workers/LoadManifestWorker';
 
 /** Admin panel for the /admin route.
- * The admin panel syncs data from `config.manifestUrl`. Only people
+ * The admin panel syncs data from the uploaded file. Only people
  * that are authorized can see this page. Authorization comes from
  * /user/<username>/admin
  */
@@ -113,6 +112,26 @@ export default {
   },
   methods: {
     /**
+     * Reads the uploaded file and puts it somewhere
+     * https://stackoverflow.com/a/59162687
+     */
+    /* eslint-disable */
+    importFile() {
+      const files = document.getElementById('selectFiles').files;
+      if (files.length <= 0) {
+        return false;
+      }
+      const fr = new FileReader();
+      fr.onload = (e) => {
+        const result = JSON.parse(e.target.result);
+        this.manifestEntries = result;
+        const formatted = JSON.stringify(result.slice(0, 100), null, 2);
+        document.getElementById('result').innerHTML = formatted;
+      };
+      fr.readAsText(files.item(0));
+    },
+    /* eslint-enable */
+    /**
      * This method keeps track of sampleCounts, but only loads it once.
      */
     addFirebaseListener() {
@@ -126,29 +145,18 @@ export default {
       });
     },
     /**
-     * A method that fetches the manifest so the user can see what's in it.
-     * TODO: add a .catch event and display an error if something goes wrong
-     * with this request.
-     */
-    previewManifest() {
-      axios.get(this.config.manifestUrl).then((resp) => {
-        this.manifestEntries = resp.data;
-      });
-    },
-    /**
      * this method runs in a worker, to check each item in /sampleCounts and each
-     * item in manifestUrl. If the item is in manifestUrl but not in /sampleCounts,
-     * it is added. If its not in manifestUrl but is in sampleCounts, its removed.
+     * item in manifestEntries. If the item is in manifestEntries but not in /sampleCounts,
+     * it is added. If its not in manifestEntries but is in sampleCounts, its removed.
      */
     refreshSamples() {
-      this.status = 'refreshing';
-      // grab all the data from the json file defined in the config
-      axios.get(this.config.manifestUrl).then((resp) => {
-        // resp.data has a list of firebase-friendly strings
-        const manifestEntries = resp.data;
-        this.manifestEntries = manifestEntries;
+      if (this.manifestEntries.length) {
+        console.log(this.manifestEntries.length);
+        this.status = 'refreshing';
         this.syncEntries();
-      });
+      } else {
+        document.getElementById('result').innerHTML = 'Please upload a file';
+      }
     },
     /**
     * sync manifest entries and firebase entries

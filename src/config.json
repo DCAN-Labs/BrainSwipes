@@ -1,7 +1,5 @@
 {
   "needsTutorial": true,
-  "manifestUrl": "/static/manifest.json",
-  "manifestType": "json",
   "widgetType": "ImageSwipe",
   "widgetProperties": {
     "baseUrlTemplate": "https://brainswipes.s3.msi.umn.edu{0}.png",

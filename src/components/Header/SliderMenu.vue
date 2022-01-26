@@ -90,17 +90,13 @@ export default {
         { path: '/', name: 'Home' },
         { path: '/leaderboard', name: 'Leaderboard' },
         { path: '/chats', name: 'Chats' },
-        { path: '/admin', name: 'Admin' },
         { path: '/tutorial', name: 'Tutorial' },
+        { path: '/about', name: 'About' },
       ],
     };
   },
   props: {
     needsTutorial: {
-      type: Boolean,
-      required: true,
-    },
-    isAdmin: {
       type: Boolean,
       required: true,
     },
