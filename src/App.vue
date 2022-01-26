@@ -111,7 +111,6 @@ import axios from 'axios';
 // firebase-related libraries
 import VueFire from 'vuefire';
 import firebase from 'firebase';
-// import { db } from './firebaseConfig';
 
 
 // useful library for objects and arrays

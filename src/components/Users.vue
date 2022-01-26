@@ -33,9 +33,9 @@
 
     <b-container>
       <div v-if="loading">
-          <Flask />
-          <p class="mt-3 pt-3 lead">loading...</p>
-        </div>
+        <Flask />
+        <p class="mt-3 pt-3 lead">loading...</p>
+      </div>
       <div v-else class="user-div">
         <table id="user-table">
           <tr>
@@ -182,6 +182,8 @@ export default {
       e.preventDefault();
       this.$refs.modifyuser.hide();
       this.updateFirebase();
+      this.loading = true;
+      this.loadUsers();
     },
     /**
      * Switches the user's admin status

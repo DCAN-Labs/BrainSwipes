@@ -2,7 +2,13 @@
   <footer>
     <div class="footer__container">
       <a href="https://innovation.umn.edu/developmental-cognition-and-neuroimaging-lab/" target="_blank"><img src="../assets/DCAN-logo.png" alt="DCAN logo" class="logo"></a>
-      <nav>
+      <nav v-if="loading">
+      </nav>
+      <nav v-else>
+        <router-link
+          v-if="isAdmin" :to="'Admin'" class="nav__link">
+          Admin
+        </router-link>
         <router-link
           v-for="menuItem in menuItems"
           :key="menuItem.name"
@@ -18,6 +24,8 @@
 /**
     Footer component with useful links and stuff.
   */
+import firebase from 'firebase';
+
 export default {
   name: 'Footer',
   props: {
@@ -45,10 +53,18 @@ export default {
         { path: '/leaderboard', name: 'Leaderboard' },
         { path: '/about', name: 'About' },
       ],
+      isAdmin: false,
+      loading: true,
     };
   },
   mounted() {
-    this.addAdminRoutes();
+    firebase.auth().onAuthStateChanged(() => {
+      this.loading = true;
+      this.addAdminRoutes();
+    });
+  },
+  async created() {
+    await this.addAdminRoutes();
   },
   methods: {
     /**
@@ -58,8 +74,18 @@ export default {
       e.preventDefault();
       this.$emit('openConfig');
     },
-    addAdminRoutes() {
-      console.log('userdata');
+    async addAdminRoutes() {
+      if (firebase.auth().currentUser) {
+        const displayName = firebase.auth().currentUser.displayName;
+        firebase.database().ref(`/users/${displayName}/admin`).once('value')
+          .then((snap) => {
+            this.isAdmin = snap.val();
+            this.loading = false;
+          });
+      } else {
+        this.isAdmin = false;
+        this.loading = false;
+      }
     },
   },
 };
