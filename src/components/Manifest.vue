@@ -135,7 +135,7 @@ export default {
      * This method keeps track of sampleCounts, but only loads it once.
      */
     addFirebaseListener() {
-      this.db.ref('sampleCounts').once('value', (snap) => {
+      this.db.ref('datasets/BCP/sampleCounts').once('value', (snap) => {
         /* eslint-disable */
         this.sampleCounts = _.map(snap.val(), (val, key) => {
           return { '.key': key, '.value': val };
@@ -186,7 +186,7 @@ export default {
         // check to see if the key is in the manifest.
         if (this.manifestEntries.indexOf(key) < 0) {
           // since the key isn't there, remove it from firebase.
-          this.db.ref('sampleCounts').child(key).remove();
+          this.db.ref('datasets/BCP/sampleCounts').child(key).remove();
         }
       });
     },

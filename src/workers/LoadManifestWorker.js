@@ -16,7 +16,7 @@ onmessage = function(e) {
   }
   _.map(filtered,
     (key) => {
-      db.ref('sampleCounts').child(key).set(0).then(() => {
+      db.ref('datasets/BCP/sampleCounts').child(key).set(0).then(() => {
         current += 1;
         if (current === target) {
             // We then have treated all the objects

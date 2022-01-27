@@ -11,7 +11,7 @@
       <div v-else>
         <p>No one has said anything yet!</p>
       </div>
-      <b-form @submit="sendChat">
+      <b-form @submit="sendChat('BCP')">
         <b-form-group id="exampleInputGroup1"
                 label="Enter chat message:"
                 label-for="exampleInput1"
@@ -22,7 +22,7 @@
                         required
                         placeholder="Enter your message">
           </b-form-input>
-          <b-button class="mt-2" variant="primary" @click="sendChat">Send</b-button>
+          <b-button class="mt-2" variant="primary" @click="sendChat('BCP')">Send</b-button>
         </b-form-group>
       </b-form>
 
@@ -186,7 +186,7 @@
      */
     mounted() {
       this.widgetPointer = this.$route.params.key;
-      this.setSampleInfo();
+      this.setSampleInfo('BCP');
     },
     methods: {
       /**
@@ -196,11 +196,11 @@
        * 3. set that the user has sent a chat for this sample to `chats/userChat/<username>`
        * 4. **TODO**: set that other users following this chat have something new to see.
        */
-      sendChat(e) {
+      sendChat(dataset, e) {
         e.preventDefault();
         const key = this.$route.params.key;
 
-        this.db.ref('chats')
+        this.db.ref(`datasets/${dataset}/chats`)
           .child('sampleChats')
           .child(key).push({
             username: this.userData['.key'],
@@ -208,13 +208,13 @@
             time: new Date().toISOString(),
           });
 
-        this.db.ref('chats')
+        this.db.ref(`datasets/${dataset}/chats`)
           .child('sampleChatIndex')
           .child(key).set({
             time: new Date().toISOString(),
           });
 
-        this.db.ref('chats')
+        this.db.ref(`datasets/${dataset}/chats`)
           .child('userChat')
           .child(this.userData['.key'])
           .child(key)
@@ -233,7 +233,7 @@
         });
 
         usersToNotify.forEach((u) => {
-          this.db.ref('chats')
+          this.db.ref(`datasets/${dataset}/chats`)
             .child('userNotifications')
             .child(u)
             .child(key)
@@ -253,9 +253,9 @@
       /**
        * Get the chat history for the current sample ID.
        */
-      setSampleInfo() {
+      setSampleInfo(dataset) {
         // get the chat for this sample
-        this.db.ref('chats')
+        this.db.ref(`datasets/${dataset}/chats`)
           .child('sampleChats')
           .child(this.widgetPointer)
           .on('value', (snap2) => {
@@ -264,7 +264,7 @@
           });
 
         // get the widget's summary info
-        this.db.ref('sampleSummary')
+        this.db.ref(`datasets/${dataset}/sampleSummary`)
           .child(this.widgetPointer)
           .on('value', (snap) => {
             this.widgetSummary = snap.val();

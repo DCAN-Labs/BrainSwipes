@@ -192,7 +192,7 @@
          * if sampleCounts is empty after its fetched from the db, then noData
          * flag is set to true. TODO: prompt the user to the setup instructions
          */
-        noData: true,
+        noData: false,
 
         /**
          * widgetPointer is a pointer to the keys in sampleCounts, sampleSummary, and sampleChats
@@ -223,7 +223,7 @@
        */
       widgetPointer() {
         /* eslint-disable */
-        this.widgetPointer ? this.db.ref('sampleSummary').child(this.widgetPointer).once('value', (snap) => {
+        this.widgetPointer ? this.db.ref('datasets/ABCD/sampleSummary').child(this.widgetPointer).once('value', (snap) => {
           this.widgetSummary = snap.val();
         }) : null;
         /* eslint-enable */
@@ -234,8 +234,8 @@
      * and also the samples the user has seen.
      */
     mounted() {
-      this.initSampleCounts();
-      this.initSeenSamples();
+      this.initSampleCounts('ABCD');
+      this.initSeenSamples('ABCD');
     },
     components: {
       // WidgetSelector,
@@ -272,8 +272,8 @@
        * Ask Firebase for the sampleCounts document,
        * but don't watch it in real time, just fetch the data once.
        */
-      initSampleCounts() {
-        this.db.ref('sampleCounts').once('value', (snap) => {
+      initSampleCounts(dataset) {
+        this.db.ref(`datasets/${dataset}/sampleCounts`).once('value', (snap) => {
           /* eslint-disable */
           this.sampleCounts = _.map(snap.val(), (val, key) => {
             return { '.key': key, '.value': val };
@@ -291,14 +291,14 @@
        * Initialize the samples that the user has seen, by fetching the
        * `/userSeenSamples/<username>` document from firebase, once.
        */
-      initSeenSamples() {
+      initSeenSamples(dataset) {
         if (typeof (this.userInfo.displayName) === 'undefined') {
           /** if initSeenSamples doesn't get a valid dislayName, re-route to home.
            * This happens when refreshing the play route.
            */
           this.$router.push({ path: '/home' });
         } else {
-          this.db.ref('userSeenSamples')
+          this.db.ref(`datasets/${dataset}/userSeenSamples`)
             .child(this.userInfo.displayName)
             .once('value', (snap) => {
               /* eslint-disable */
@@ -391,13 +391,13 @@
 
         // 2. send the widget data
         const timeDiff = new Date() - this.startTime;
-        this.sendVote(response, timeDiff);
+        this.sendVote(response, timeDiff, 'ABCD');
 
         // 3. update the score and count for the sample
         this.updateScore(this.$refs.widget.getScore(response));
-        this.updateSummary(this.$refs.widget.getSummary(response));
-        this.updateCount();
-        this.updateSeen();
+        this.updateSummary(this.$refs.widget.getSummary(response), 'ABCD');
+        this.updateCount('ABCD');
+        this.updateSeen('ABCD');
 
         // 3. set the next Sample
         this.setNextSampleId();
@@ -420,8 +420,8 @@
       * the user's response for the sample is sent to the db
       * along with their user displayName and the time they took to respond.
       */
-      sendVote(response, time) {
-        this.db.ref('votes').push({
+      sendVote(response, time, dataset) {
+        this.db.ref(`datasets/${dataset}/votes`).push({
           user: this.userInfo.displayName,
           sample: this.widgetPointer,
           response,
@@ -440,17 +440,17 @@
       /**
        * Update the summary of a given widgetPointer
        */
-      updateSummary(summary) {
-        this.db.ref('sampleSummary')
+      updateSummary(summary, dataset) {
+        this.db.ref(`datasets/${dataset}/sampleSummary`)
           .child(this.widgetPointer)
           .set(summary);
       },
       /**
        * Update the sampleCount of the current widgetPointer.
        */
-      updateCount() {
+      updateCount(dataset) {
         // update the firebase database copy
-        this.db.ref('sampleCounts')
+        this.db.ref(`datasets/${dataset}/sampleCounts`)
           .child(this.widgetPointer)
           .transaction(count => (count || 0) + 1);
 
@@ -466,10 +466,10 @@
       /**
        * Update that the user has seen this sample, incrementing by 1.
        */
-      updateSeen() {
+      updateSeen(dataset) {
         // mark that this user has seen this widgetPointer
         // update the firebase database copy
-        this.db.ref('userSeenSamples')
+        this.db.ref(`datasets/${dataset}/userSeenSamples`)
           .child(this.userInfo.displayName)
           .child(this.widgetPointer)
           .transaction(count => (count || 0) + 1);

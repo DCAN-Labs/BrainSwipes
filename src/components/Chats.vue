@@ -34,12 +34,12 @@
         * keep track of all the samples that have been discussed.
         */
         sampleChat: {
-          source: this.db.ref('chats').child('sampleChatIndex').orderByChild('time'),
+          source: this.db.ref('datasets/BCP/chats').child('sampleChatIndex').orderByChild('time'),
           readyCallback() {
             // this.sampleChat.reverse();
             this.sampleChat.forEach((c) => {
               // console.log('c is', c);
-              this.db.ref('chats')
+              this.db.ref('datasets/BCP/chats')
                 .child('sampleChats')
                 .child(c['.key'])
                 .orderByKey()

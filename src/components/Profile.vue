@@ -207,7 +207,7 @@ export default {
    */
   mounted() {
     if (this.userData['.key']) {
-      this.getUserChats();
+      this.getUserChats('BCP');
     }
   },
   watch: {
@@ -216,16 +216,36 @@ export default {
      */
     userData() {
       if (this.userData['.key']) {
-        this.getUserChats();
+        this.getUserChats('BCP');
       }
+    },
+    chats() {
+      this.watchChats('BCP');
+    },
+  },
+  methods: {
+    /**
+     * A method to read the firebase db ref /chats/<user_display_name>
+     *
+     */
+    getUserChats(dataset) {
+      this.db.ref(`datasets/${dataset}/chats`)
+        .child('userChat')
+        .child(this.userData['.key'])
+        .on('value', (snap) => {
+          const data = snap.val();
+          if (data) {
+            this.chats = Object.keys(data);
+          }
+        });
     },
     /**
      * for each chat key in the firebase database, update our local chatInfo data.
      * this watcher should update the chats ui in real time.
      */
-    chats() {
+    watchChats(dataset) {
       this.chats.forEach((c) => {
-        this.db.ref('chats')
+        this.db.ref(`datasets/${dataset}/chats`)
           .child('sampleChats')
           .child(c)
           .orderByKey()
@@ -237,23 +257,6 @@ export default {
             this.$forceUpdate();
           });
       });
-    },
-  },
-  methods: {
-    /**
-     * A method to read the firebase db ref /chats/<user_display_name>
-     *
-     */
-    getUserChats() {
-      this.db.ref('chats')
-        .child('userChat')
-        .child(this.userData['.key'])
-        .on('value', (snap) => {
-          const data = snap.val();
-          if (data) {
-            this.chats = Object.keys(data);
-          }
-        });
     },
     /**
      * In theory this method should set a flag to tell the UI

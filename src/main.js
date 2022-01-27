@@ -23,20 +23,20 @@ This will make sure Firebase initializes before loading the app when a user refr
 */
 
 firebase.initializeApp({
-  apiKey: 'AIzaSyCnRfYP0bEqFlOxu9-76cvYv2gMbgN4lrE',
-  authDomain: 'bcp-braindr.firebaseapp.com',
-  databaseURL: 'https://bcp-braindr.firebaseio.com',
-  projectId: 'bcp-braindr',
-  storageBucket: 'bcp-braindr.appspot.com',
-  messagingSenderId: '73279233790',
-  appId: '1:73279233790:web:2025c2cae1f90891850faf',
-  measurementId: 'G-K8PNLJ7F2J',
+  apiKey: 'AIzaSyAHYmTOolAYDczaOp-I22YZQCMAXTSzlt8',
+  authDomain: 'brainswipes.firebaseapp.com',
+  databaseURL: 'https://brainswipes-default-rtdb.firebaseio.com',
+  projectId: 'brainswipes',
+  storageBucket: 'brainswipes.appspot.com',
+  messagingSenderId: '518258041913',
+  appId: '1:518258041913:web:ae6cbc61a715d9941659e8',
+  measurementId: 'G-YNZSDHFLC7',
 });
-if (process.env.NODE_ENV === 'development') {
-  console.log(`NODE_ENV=${process.env.NODE_ENV}`);
-  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-}
-firebase.appCheck().activate('6LderB8eAAAAACq8C9buhjI7V3HeznZpTkH2wB4K', true);
+// if (process.env.NODE_ENV === 'development') {
+//   console.log(`NODE_ENV=${process.env.NODE_ENV}`);
+//   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+// }
+// firebase.appCheck().activate('6LderB8eAAAAACq8C9buhjI7V3HeznZpTkH2wB4K', true);
 
 firebase.auth().onAuthStateChanged(() => {
   if (!app) {

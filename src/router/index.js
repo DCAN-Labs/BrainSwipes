@@ -4,7 +4,7 @@ import About from '@/components/About';
 import Admin from '@/components/Admin';
 import Home from '@/components/Home';
 import Profile from '@/components/Profile';
-import Play from '@/components/Play';
+import PlayBCP from '@/components/PlayBCP';
 import PlayABCD from '@/components/PlayABCD';
 import Login from '@/components/Login';
 import SignUp from '@/components/SignUp';
@@ -55,8 +55,8 @@ const router = new Router({
     },
     {
       path: '/BCP/play',
-      name: 'Play',
-      component: Play,
+      name: 'PlayBCP',
+      component: PlayBCP,
       meta: {
         requiresAuth: true,
       },
