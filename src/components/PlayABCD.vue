@@ -292,16 +292,22 @@
        * `/userSeenSamples/<username>` document from firebase, once.
        */
       initSeenSamples() {
-        // console.log('userSeenSamples', this.userInfo.displayName);
-        this.db.ref('userSeenSamples')
-          .child(this.userInfo.displayName)
-          .once('value', (snap) => {
-            /* eslint-disable */
-            this.userSeenSamples = _.map(snap.val(), (val, key) => {
-              return { '.key': key, '.value': val };
+        if (typeof (this.userInfo.displayName) === 'undefined') {
+          /** if initSeenSamples doesn't get a valid dislayName, re-route to home.
+           * This happens when refreshing the play route.
+           */
+          this.$router.push({ path: '/home' });
+        } else {
+          this.db.ref('userSeenSamples')
+            .child(this.userInfo.displayName)
+            .once('value', (snap) => {
+              /* eslint-disable */
+              this.userSeenSamples = _.map(snap.val(), (val, key) => {
+                return { '.key': key, '.value': val };
+              });
+              /* eslint-enable */
             });
-            /* eslint-enable */
-          });
+        }
       },
       /**
        * A method to shuffle an array.
