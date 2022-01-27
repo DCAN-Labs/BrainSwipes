@@ -67,7 +67,7 @@
   }
 
   .progressive-image-main {
-    z-index: 0;
+    z-index: 0 !important;
   }
 
 </style>
