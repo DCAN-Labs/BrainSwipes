@@ -1,4 +1,4 @@
-<template name="playBCP">
+<template name="play">
   <div id="play" class="container">
     <!-- Modal Component -->
     <b-modal id="levelUp" ref="levelUp" title="You've Levelled Up!" ok-only>
@@ -40,6 +40,7 @@
          v-on:widgetRating="sendWidgetResponse"
          :playMode="'play'"
          ref="widget"
+         :dataset="dataset"
         />
       </div>
 
@@ -111,7 +112,7 @@
   Vue.component('WidgetSelector', WidgetSelector);
 
   export default {
-    name: 'playBCP',
+    name: 'play',
     props: {
       /**
        * the authenticated user object from firebase
@@ -158,6 +159,10 @@
       db: {
         type: Object,
         required: true,
+      },
+      dataset: {
+        type: String,
+        requred: true,
       },
     },
     data() {
@@ -230,7 +235,7 @@
        */
       widgetPointer() {
         /* eslint-disable */
-        this.widgetPointer ? this.db.ref('datasets/BCP/sampleSummary').child(this.widgetPointer).once('value', (snap) => {
+        this.widgetPointer ? this.db.ref(`datasets/${this.dataset}/sampleSummary`).child(this.widgetPointer).once('value', (snap) => {
           this.widgetSummary = snap.val();
         }) : null;
         /* eslint-enable */
@@ -241,8 +246,8 @@
      * and also the samples the user has seen.
      */
     mounted() {
-      this.initSampleCounts('BCP');
-      this.initSeenSamples('BCP');
+      this.initSampleCounts(this.dataset);
+      this.initSeenSamples(this.dataset);
     },
     components: {
       // WidgetSelector,
@@ -398,13 +403,13 @@
 
         // 2. send the widget data
         const timeDiff = new Date() - this.startTime;
-        this.sendVote(response, timeDiff, 'BCP');
+        this.sendVote(response, timeDiff, this.dataset);
 
         // 3. update the score and count for the sample
         this.updateScore(this.$refs.widget.getScore(response));
-        this.updateSummary(this.$refs.widget.getSummary(response), 'BCP');
-        this.updateCount('BCP');
-        this.updateSeen('BCP');
+        this.updateSummary(this.$refs.widget.getSummary(response), this.dataset);
+        this.updateCount(this.dataset);
+        this.updateSeen(this.dataset);
 
         // 3. set the next Sample
         this.setNextSampleId();

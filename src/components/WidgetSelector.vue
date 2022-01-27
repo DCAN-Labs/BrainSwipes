@@ -9,6 +9,7 @@
     :tutorialStep="tutorialStep"
     v-on:widgetRating="widgetRating"
     :playMode="playMode"
+    :dataset="dataset"
     />
   </div>
 </template>
@@ -67,6 +68,10 @@
       tutorialStep: {
         type: Number,
         required: false,
+      },
+      dataset: {
+        type: String,
+        required: true,
       },
     },
     components: {

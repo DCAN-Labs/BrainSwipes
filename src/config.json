@@ -2,7 +2,6 @@
   "needsTutorial": true,
   "widgetType": "ImageSwipe",
   "widgetProperties": {
-    "baseUrlTemplate": "https://brainswipes.s3.msi.umn.edu{0}.png",
     "delimiter": "%",
     "leftSwipeLabel": "Fail",
     "rightSwipeLabel": "Pass"
@@ -68,15 +67,6 @@
       "img": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F981.svg?sanitize=true",
       "img_grey": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/black/svg/1F981.svg?sanitize=true"
     }
-  },
-  "betaMode": false,
-  "firebaseKeys": {
-    "apiKey": "AIzaSyCnRfYP0bEqFlOxu9-76cvYv2gMbgN4lrE",
-    "authDomain": "bcp-braindr.firebaseapp.com",
-    "databaseURL": "https://bcp-braindr.firebaseio.com",
-    "projectId": "bcp-braindr",
-    "storageBucket": "bcp-braindr.appspot.com",
-    "messagingSenderId": "73279233790"
   },
   "app": {
     "navbarVariant": "info"

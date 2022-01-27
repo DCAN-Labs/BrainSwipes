@@ -8,7 +8,7 @@
         </p>
       </div>
       <p class="buttons mt-3">
-        <router-link class="btn btn-primary white" :to="{name: 'PlayBCP', query: routerQuery}"> BCP </router-link>
+        <router-link class="btn btn-primary white" :to="{name: 'Play', params: { dataset: dataset }, query: routerQuery}"> BCP </router-link>
         <router-link class="btn btn-primary white" :disabled="!activeABCD" :event="activeABCD ? 'click' : ''" :to="{name: 'PlayABCD', query: routerQuery}" v-bind:class="{ turnedoff: !activeABCD }">
           <span>
             ABCD
@@ -45,6 +45,10 @@ export default {
     },
     routerQuery: {
       type: Object,
+    },
+    dataset: {
+      type: String,
+      required: true,
     },
   },
   data() {

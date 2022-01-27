@@ -34,6 +34,7 @@
        :widgetSummary="widgetSummary"
        :playMode="''"
        ref="widget"
+       :dataset="dataset"
       />
     </div>
 
@@ -120,6 +121,10 @@
        */
       db: {
         type: Object,
+        required: true,
+      },
+      dataset: {
+        type: String,
         required: true,
       },
     },

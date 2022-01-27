@@ -21,7 +21,7 @@
 <script>
 
 /** Admin panel for the /admin route.
- * The admin panel syncs data from the uploaded file. Only people
+ * Links to other admin only routes. Only people
  * that are authorized can see this page. Authorization comes from
  * /user/<username>/admin
  */

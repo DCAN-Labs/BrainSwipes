@@ -32,7 +32,7 @@
              </span>
 
              <b-button v-if="playMode"
-              :to="'/review/'+widgetPointer"
+              :to="{name: 'Review', params: { dataset: dataset, key: widgetPointer }}"
               ref="helpButton"
               class="helpbtn"
               v-bind:class="{ focus: helpFocused }"
@@ -119,6 +119,10 @@
       tutorialStep: {
         type: Number,
         required: false,
+      },
+      dataset: {
+        type: String,
+        required: true,
       },
     },
     components: { VueHammer, GridLoader },

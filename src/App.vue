@@ -4,60 +4,11 @@
          We've set up links on the navbar to different "routes",
          like the "Home" page and "About" page.
 
-         There is also a right-aligned link to Login with GitHub.
+         There is also a right-aligned link to Login.
          When logged in, this shows the username with a dropdown menu
          to see the profile or logout.
     -->
     <div class="content">
-      <div v-if="betaMode" class="corner-ribbon bottom-right sticky blue">Beta</div>
-      <b-navbar toggleable="md" type="dark" :variant="navbarVariant" v-show="false">
-        <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
-
-        <b-navbar-brand to="/" id="brandName">{{brandName}}</b-navbar-brand>
-
-        <!-- If the viewport is small, the navbar collapses.
-          Everything in b-collapse is what gets collapsed.
-        -->
-        <b-collapse is-nav id="nav_collapse">
-          <!--  Here are links to different routes  -->
-          <b-navbar-nav id="navLinks">
-            <b-nav-item :to="{ name: 'Home', query: routerQuery}" exact>Home</b-nav-item>
-            <b-nav-item :to="{ name: 'Leaderboard', query: routerQuery}">Leaderboard</b-nav-item>
-            <b-nav-item :to="{ name: 'PlayBCP', query: routerQuery}">PlayBCP</b-nav-item>
-            <b-nav-item :to="{ name: 'Chats', query: routerQuery}">Chats</b-nav-item>
-            <b-nav-item v-if="needsTutorial" :to="{ name: 'Tutorial', query: routerQuery}">Tutorial</b-nav-item>
-            <b-nav-item v-if="userData.admin" :to="{ name: 'Admin', query: routerQuery}">Admin</b-nav-item>
-          </b-navbar-nav>
-
-          <!-- Right aligned nav items -->
-          <b-navbar-nav class="ml-auto">
-            <!-- This part only displays if the user is authenticated -->
-            <b-nav-item-dropdown right v-if="userIsDefined">
-              <template slot="button-content">
-                <em>{{userInfo.displayName}}</em>
-              </template>
-              <b-dropdown-item :to="{ name: 'Profile', query: routerQuery }">Profile</b-dropdown-item>
-              <b-dropdown-item @click="logout">Signout</b-dropdown-item>
-            </b-nav-item-dropdown>
-
-            <!-- The login option shows if the user is not authenticated -->
-            <b-nav-item v-else :to="{ name: 'Login', query: routerQuery}">Login</b-nav-item>
-            <b-nav-text v-if="userIsDefined">
-              <b-img
-                v-if="currentLevel.img"
-                rounded="circle"
-                width="20"
-                height="20"
-                alt="img"
-                class="m-1"
-                :src="currentLevel.img"
-              />
-              {{userData.score}}
-            </b-nav-text>
-          </b-navbar-nav>
-        </b-collapse>
-      </b-navbar>
-
       <nav>
         <ul class="navRoot">
           <li class="navSection main-logo">
@@ -66,7 +17,10 @@
             </router-link>
           </li>
           <li class="navSection mobile-menu">
-            <SliderMenu :needsTutorial="false"/>
+            <SliderMenu
+             :needsTutorial="false"
+             :dataset="dataset"
+            />
           </li>
           <li class="navSection account-details">
             <AccountMenu :userInfo="userInfo" :userData="userData" :loggedIn="userIsDefined" @logout="logout" />
@@ -87,6 +41,7 @@
           :db="db"
           v-on:taken_tutorial="setTutorial"
           :routerQuery="routerQuery"
+          :dataset="dataset"
         />
       </div>
     </div>
@@ -94,6 +49,7 @@
       <Footer 
         :config="config" 
         :routerQuery="routerQuery"
+        :dataset="dataset"
       />
     </div>
   </div>
@@ -157,6 +113,10 @@ export default {
        * This is from firebase
        */
       userInfo: {},
+      /**
+       * The dataset to access. Default is BCP.
+       */
+      dataset: 'BCP',
       /**
        * This is the firebase database object.
        */
@@ -262,12 +222,6 @@ export default {
       return this.config.home.title;
     },
     /**
-     * whether or not to show the 'beta' ribbon, defined in the config.
-     */
-    betaMode() {
-      return this.config.betaMode;
-    },
-    /**
      * whether or not the user is forced to take the tutorial.
      */
     needsTutorial() {
@@ -363,7 +317,7 @@ export default {
         .ref(`/users/${this.userInfo.displayName}`)
         .child('taken_tutorial')
         .set(val);
-      this.$router.replace('playBCP');
+      this.$router.replace('play');
     },
   },
   /**
