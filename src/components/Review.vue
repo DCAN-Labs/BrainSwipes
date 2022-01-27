@@ -66,6 +66,10 @@
     padding-bottom: 10vh;
   }
 
+  .progressive-image-main {
+    z-index: 0;
+  }
+
 </style>
 
 <script>
