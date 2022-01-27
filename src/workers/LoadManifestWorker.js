@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import firebase from 'firebase';
+import firebase from 'firebase/app';
+import 'firebase/database';
 
 // eslint-disable-next-line
 onmessage = function(e) {

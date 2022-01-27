@@ -112,7 +112,8 @@
  * @author Anisha Keshavan
  * @license Apache 2.0
  */
-import firebase from 'firebase';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 
 export default {
   name: 'profile',

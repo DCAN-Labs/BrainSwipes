@@ -26,7 +26,9 @@
  * The landing page, on the route `/`. This component displays a title, tagline,
  * and background image splash page that's defined on the config property.
  */
-import firebase from 'firebase';
+import firebase from 'firebase/app';
+import 'firebase/database';
+import 'firebase/auth';
 
 export default {
   name: 'Home',
