@@ -33,7 +33,10 @@ export default {
     };
   },
   props: {
-
+    routerQuery: {
+      type: Object,
+      required: true,
+    },
   },
 };
 </script>

@@ -122,7 +122,7 @@ const router = new Router({
       },
     },
     {
-      path: '/users',
+      path: '/admin/users',
       name: 'Users',
       component: Users,
       meta: {
@@ -131,7 +131,7 @@ const router = new Router({
       },
     },
     {
-      path: '/manifest',
+      path: '/admin/manifest',
       name: 'Manifest',
       component: Manifest,
       meta: {
