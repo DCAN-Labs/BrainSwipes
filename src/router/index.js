@@ -57,6 +57,7 @@ const router = new Router({
       component: Play,
       meta: {
         requiresAuth: true,
+        requiresAccess: true,
       },
     },
     {
@@ -101,6 +102,9 @@ const router = new Router({
       path: '/:dataset/review/:key',
       name: 'Review',
       component: Review,
+      meta: {
+        requiresAccess: true,
+      },
     },
     {
       path: '/admin',
@@ -136,26 +140,35 @@ router.beforeEach((to, from, next) => {
   const currentUser = firebase.auth().currentUser;
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
+  const requiresAccess = to.matched.some(record => record.meta.requiresAccess);
 
   if (requiresAuth && !currentUser) {
     next({ path: '/login', query: from.query });
   }
   // make sure the user has take the tutorial
   if (to.name === 'Play') {
-    const dataset = to.params.dataset;
     if (currentUser) {
       firebase.database().ref(`/users/${currentUser.displayName}`).once('value')
         .then((snap) => {
           const data = snap.val();
-          if (!data.datasets[dataset]) {
-            next({ path: '/unauthorized', query: from.query });
-          } else if (!data.taken_tutorial) {
+          if (!data.taken_tutorial) {
             next({ path: '/tutorial', query: from.query });
           }
         });
     } else {
       next({ path: '/login', query: from.query });
     }
+  }
+
+  if (requiresAccess) {
+    const dataset = to.params.dataset;
+    firebase.database().ref(`/users/${currentUser.displayName}/datasets`).once('value')
+      .then((snap) => {
+        const data = snap.val();
+        if (!data[dataset]) {
+          next({ path: '/unauthorized', query: from.query });
+        }
+      });
   }
 
   if (requiresAdmin) {

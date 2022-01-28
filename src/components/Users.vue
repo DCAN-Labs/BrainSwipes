@@ -1,7 +1,7 @@
 <template>
   <div id="users">
     <h1> Manage Users </h1>
-    <!-- <b-button @click="setDatasetsAll" type="submit" variant="primary">datasets</b-button> -->
+    <!-- <b-button @click="setDatasetsAll" type="submit" variant="primary">reset datasets</b-button> -->
 
     <b-modal id="modifyuser" :title="`Modifying permissions for ${userModified.name}`"
       ref="modifyuser" size="lg">
@@ -9,18 +9,14 @@
         <table>
           <tr>
             <th>isAdmin</th>
-            <th>BCP</th>
-            <th>ABCD</th>
+            <th v-for="study in studies" :key="study">{{study}}</th>
           </tr>
           <tr>
             <td>
               <b-button variant="warning" @click="changeAdmin(userModified.isAdmin)">{{userModified.isAdmin}}</b-button>
             </td>
-            <td>
-              <b-button variant="primary">{{userModified.datasets.BCP}}</b-button>
-            </td>
-            <td>
-              <b-button variant="danger" @click="changeDatasetAccess('ABCD', userModified.datasets['ABCD'])">{{userModified.datasets['ABCD']}}</b-button>
+            <td v-for="(value, dataset) in userModified.datasets" :key="dataset">
+              <b-button variant="danger" @click="changeDatasetAccess(dataset, userModified.datasets[dataset])">{{value}}</b-button>
             </td>
           </tr>
         </table>
@@ -49,7 +45,16 @@
             <td><b-button variant="outline-dark" @click="modifyUser(name, value)">{{ name }}</b-button></td>
             <td>{{ value.admin }}</td>
             <td>{{ value.score }}</td>
-            <td>{{ value.datasets }}</td>
+            <td>
+              <table>
+                <tr>
+                  <th v-for="study in studies" :key="study">{{study}}</th>
+                </tr>
+                <tr>
+                  <td v-for="data in value.datasets" :key="data">{{ data }}</td>
+                </tr>
+              </table>
+            </td>
           </tr>
         </table>
       </div>
@@ -120,6 +125,13 @@ export default {
       type: Object,
       required: true,
     },
+    /**
+     * list of studies from the db
+     */
+    studies: {
+      type: Array,
+      required: true,
+    },
   },
   async created() {
     await this.loadUsers();
@@ -146,11 +158,7 @@ export default {
     modifyUser(name, value) {
       this.userModified.name = name;
       this.userModified.isAdmin = value.admin;
-      if (value.datasets) {
-        this.userModified.datasets.ABCD = value.datasets.ABCD;
-      } else {
-        this.userModified.datasets.ABCD = false;
-      }
+      this.userModified.datasets = value.datasets;
       this.$refs.modifyuser.show();
     },
     /**
@@ -208,15 +216,16 @@ export default {
     },
     /**
      * Blanket change of all user's dataset privelages to default
-     * not currently in use, saving in case needed
+     * for database emergencies, uncomment above.
      */
     setDatasetsAll() {
       /*eslint-disable*/
       for (const user in this.usersObject) {
         if (Object.hasOwnProperty.call(this.usersObject, user)) {
-          console.log(user);
           this.db.ref(`users/${user}/datasets`).set({ BCP: true, ABCD: false });
         }
+        this.loading = true;
+        this.loadUsers();
       }
       /*eslint-enable*/
     },

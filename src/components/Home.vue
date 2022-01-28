@@ -7,9 +7,8 @@
           Choose a dataset to QC
         </p>
       </div>
-      <p class="buttons mt-3">
-        <b-button class="btn btn-primary" @click="routeToPlay('BCP')">BCP</b-button>
-        <b-button class="btn btn-primary" :disabled="!datasetPrivileges.ABCD" v-bind:class="{ turnedoff: !datasetPrivileges.ABCD }" @click="routeToPlay('ABCD')">ABCD</b-button>
+      <p v-if="this.studies.length" class="buttons mt-3">
+        <b-button v-for="study in studies" :key="study" class="btn btn-primary" :disabled="!datasetPrivileges[study]" v-bind:class="{ turnedoff: !datasetPrivileges[study] }" @click="routeToPlay(study)">{{study}}</b-button>
       </p>
     </div>
   </div>
@@ -35,6 +34,14 @@ export default {
     },
     datasetPrivileges: {
       type: Object,
+      required: true,
+    },
+    db: {
+      type: Object,
+      required: true,
+    },
+    studies: {
+      type: Array,
       required: true,
     },
   },
@@ -102,18 +109,15 @@ a {
   margin: auto;
 }
 
-.white {
-  color: white;
-}
-
 .btn-primary {
   color: #fff;
   background-color: maroon;
   border-color: maroon;
+  margin-right: .2em;
 }
 
 .turnedoff{
-  background-color: rgba(128, 0, 0, 0.3);
+  background-color: rgba(128, 0, 0, 0.5);
 }
 .jumbotron {
     padding: 2rem 1rem;

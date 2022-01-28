@@ -135,13 +135,10 @@
     },
     props: {
       /**
-       * The config object that is loaded from src/config.js.
-       * It defines how the app is configured, including
-       * any content that needs to be displayed (app title, images, etc)
-       * and also the type of widget and where to update pointers to data
+       * list of studies in the app
        */
-      config: {
-        type: Object,
+      studies: {
+        type: Array,
         required: true,
       },
     },
@@ -253,6 +250,12 @@
           this.errors.show = true;
           this.errors.message = err.message;
         });
+      },
+      setDefaultPermissions() {
+        this.studies.forEach((study) => {
+          this.studiesObject[study] = false;
+        });
+        this.studiesObject.BCP = true;
       },
     },
   };

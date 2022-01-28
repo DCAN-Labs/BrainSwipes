@@ -44,6 +44,7 @@
           @changeDataset="updateDataset"
           :datasetPrivileges="datasetPrivileges"
           @changePermissions="updateDatasetPermissions"
+          :studies="studies"
         />
       </div>
     </div>
@@ -148,6 +149,10 @@ export default {
        * The user's dataset privalges
        */
       datasetPrivileges: {},
+      /**
+       * List of studies available
+       */
+      studies: [],
     };
   },
   /**
@@ -162,7 +167,6 @@ export default {
       self.userInfo = user || {};
     });
   },
-
   components: {
     Footer,
     SliderMenu,
@@ -246,12 +250,6 @@ export default {
     routerQuery() {
       return this.$route.query;
     },
-    /**
-     * The active datset routes
-     */
-    studies() {
-      return this.config.studies;
-    },
   },
   methods: {
     /**
@@ -303,12 +301,18 @@ export default {
     updateDatasetPermissions(newPermissions) {
       this.datasetPrivileges = newPermissions;
     },
+    async getStudies() {
+      this.db.ref('studies').on('value', (snap) => {
+        this.studies = snap.val();
+      });
+    },
   },
   /**
    * intialize the animate on scroll library (for tutorial) and listen to authentication state
    */
   async created() {
     await this.activateDatasets();
+    await this.getStudies();
   },
 };
 </script>
