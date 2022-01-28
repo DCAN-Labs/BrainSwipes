@@ -28,9 +28,8 @@
         <p v-html="step.text"></p>
         <span class="invisible">{{step.text}}</span>
         <div v-if="step.pointer" class="mt-3">
-          <WidgetSelector :widgetType="widgetType"
+          <WidgetSelector
            :widgetPointer="step.pointer"
-           :widgetProperties="widgetProperties"
            :widgetSummary="widgetSummary"
            :playMode="'tutorial'"
            :tutorialStep="step.tutorialStep"
@@ -159,18 +158,6 @@
     watch: {
     },
     computed: {
-      /**
-       * The widget type defined in config.
-       */
-      widgetType() {
-        return this.config.widgetType;
-      },
-      /**
-       * The widget properties defined in config.
-       */
-      widgetProperties() {
-        return this.config.widgetProperties;
-      },
       /**
        * The steps defined in config, with text and images to display.
        */

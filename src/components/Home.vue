@@ -2,14 +2,14 @@
   <div class="home container">
     <div class="jumbotron landing" :style="landingStyle">
       <div id="titles">
-        <h1>{{title}}</h1>
+        <h1>BrainSwipes by DCAN</h1>
         <p class="lead mt-3">
-          {{tagline}}
+          Choose a dataset to QC
         </p>
       </div>
       <p class="buttons mt-3">
         <b-button class="btn btn-primary" @click="routeToPlay('BCP')">BCP</b-button>
-        <b-button class="btn btn-primary" :disabled="!activeDatasets.ABCD" v-bind:class="{ turnedoff: !activeDatasets.ABCD }" @click="routeToPlay('ABCD')">ABCD</b-button>
+        <b-button class="btn btn-primary" :disabled="!datasetPrivileges.ABCD" v-bind:class="{ turnedoff: !datasetPrivileges.ABCD }" @click="routeToPlay('ABCD')">ABCD</b-button>
       </p>
     </div>
   </div>
@@ -20,22 +20,12 @@
 <script>
 /**
  * The landing page, on the route `/`. This component displays a title, tagline,
- * and background image splash page that's defined on the config property.
+ * and background image splash page.
  */
 
 export default {
   name: 'Home',
   props: {
-    /**
-     * The config object that is loaded from src/config.js.
-     * It defines how the app is configured, including
-     * any content that needs to be displayed (app title, images, etc)
-     * and also the type of widget and where to update pointers to data
-     */
-    config: {
-      type: Object,
-      required: true,
-    },
     routerQuery: {
       type: Object,
     },
@@ -43,38 +33,15 @@ export default {
       type: String,
       required: true,
     },
-    activeDatasets: {
+    datasetPrivileges: {
       type: Object,
       required: true,
     },
   },
   data() {
     return {
-      // activeDatasets: {
-      //   BCP: true,
-      //   ABCD: false,
-      // },
+      landingStyle: { 'background-image': 'url("/static/UMN_logos2_PRINT-09.svg")' },
     };
-  },
-  computed: {
-    /**
-     * The title to display. Defined in `config.home.title`
-     */
-    title() {
-      return this.config.home.title;
-    },
-    /**
-     * The tagline to display. Defined in `config.home.tagline`
-     */
-    tagline() {
-      return this.config.home.tagline;
-    },
-    /**
-     * The background image to display. Defined in `config.home.backgroundUrl`
-     */
-    landingStyle() {
-      return { 'background-image': `url("${this.config.home.backgroundUrl}")` };
-    },
   },
   methods: {
     routeToPlay(label) {

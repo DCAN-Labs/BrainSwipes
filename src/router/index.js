@@ -18,7 +18,6 @@ import Manifest from '@/components/Manifest';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
-import config from '../config';
 
 Vue.use(Router);
 
@@ -150,7 +149,7 @@ router.beforeEach((to, from, next) => {
           const data = snap.val();
           if (!data.datasets[dataset]) {
             next({ path: '/unauthorized', query: from.query });
-          } else if (!data.taken_tutorial && config.needsTutorial) {
+          } else if (!data.taken_tutorial) {
             next({ path: '/tutorial', query: from.query });
           }
         });

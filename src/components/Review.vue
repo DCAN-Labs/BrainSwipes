@@ -28,9 +28,8 @@
 
     </div>
     <div>
-      <WidgetSelector :widgetType="widgetType"
+      <WidgetSelector
        :widgetPointer="widgetPointer"
-       :widgetProperties="widgetProperties"
        :widgetSummary="widgetSummary"
        :playMode="''"
        ref="widget"
@@ -162,18 +161,6 @@
         });
         chats.reverse();
         return chats;
-      },
-      /**
-       * The widgetType to display, based on the config value.
-       */
-      widgetType() {
-        return this.config.widgetType;
-      },
-      /**
-       * The properties of the widget, from the config.
-       */
-      widgetProperties() {
-        return this.config.widgetProperties;
       },
     },
     watch: {

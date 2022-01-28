@@ -1,10 +1,8 @@
 <template>
   <div class="WidgetSelector">
     <ImageSwipe
-    v-if="widgetType=='ImageSwipe'"
     ref="ImageSwipe"
     :widgetPointer="widgetPointer"
-    :widgetProperties="widgetProperties"
     :widgetSummary="widgetSummary"
     :tutorialStep="tutorialStep"
     v-on:widgetRating="widgetRating"
@@ -25,25 +23,11 @@
   export default {
     name: 'WidgetSelector',
     props: {
-      /**
-       * WidgetType is a string. It can be "ImageSwipe" for example.
-       */
-      widgetType: {
-        type: String,
-        required: true,
-      },
        /**
         * The sample ID to tell the widget to display.
         */
       widgetPointer: {
         type: String,
-        required: true,
-      },
-      /**
-       * The widget-specific properties. The schema is widget specific.
-       */
-      widgetProperties: {
-        type: Object,
         required: true,
       },
       /**
@@ -82,19 +66,19 @@
        * proxy the widget's getFeedback method.
        */
       getFeedback(response) {
-        return this.$refs[this.widgetType].getFeedback(response);
+        return this.$refs.ImageSwipe.getFeedback(response);
       },
       /**
        * proxy the widget's getScore method.
        */
       getScore(response) {
-        return this.$refs[this.widgetType].getScore(response);
+        return this.$refs.ImageSwipe.getScore(response);
       },
       /**
        * proxy the widget's getSummary method.
        */
       getSummary(response) {
-        return this.$refs[this.widgetType].getSummary(response);
+        return this.$refs.ImageSwipe.getSummary(response);
       },
       /**
        * emit the widget's response to the parent.

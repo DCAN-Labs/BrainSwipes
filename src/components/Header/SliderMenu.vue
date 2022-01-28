@@ -96,10 +96,6 @@ export default {
     };
   },
   props: {
-    needsTutorial: {
-      type: Boolean,
-      required: true,
-    },
   },
   methods: {
     onClose() {

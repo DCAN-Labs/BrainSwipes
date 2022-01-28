@@ -23,7 +23,7 @@
                 ref="leftSwipe"
                 v-bind:class="{ focus: leftFocused }"
               > <i class="fa fa-long-arrow-left" aria-hidden="true"></i>
-              {{widgetProperties.leftSwipeLabel}}
+              Fail
              </b-button>
 
              <span style="float:left" v-else>
@@ -46,7 +46,7 @@
                 @shortkey="swipeRight"
                 ref="rightSwipe"
                 v-bind:class="{ focus: rightFocused }"
-              > {{widgetProperties.rightSwipeLabel}}
+              > Pass
               <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
               </b-button>
 
@@ -86,13 +86,6 @@
        */
       widgetPointer: {
         type: String,
-        required: true,
-      },
-     /**
-      * The widget-specific properties. The schema is widget specific.
-      */
-      widgetProperties: {
-        type: Object,
         required: true,
       },
      /**
@@ -305,31 +298,6 @@
         this.$emit('widgetRating', val);
       },
       /**
-       * This method should tell users how their widgetProperties configuration should be defined.
-       */
-      getPropertiesSchema() {
-        return {
-          delimiter: {
-            type: String,
-            required: false,
-            default: '__',
-            description: 'how to split the sample ID to fill in the template',
-          },
-          leftSwipeLabel: {
-            type: String,
-            required: false,
-            default: 'Fail',
-            description: 'label for the left swipe button',
-          },
-          rightSwipeLabel: {
-            type: String,
-            required: false,
-            default: 'True',
-            description: 'label for the right swipe button',
-          },
-        };
-      },
-      /**
        * set the swipe-left animation and vote 0
        */
       swipeLeft() {
@@ -360,30 +328,6 @@
        */
       setSwipe(sw) {
         this.swipe = sw;
-      },
-      /**
-      * Test all the lines of this widget.
-      */
-      test() {
-        this.getScore(1);
-        this.getScore(0);
-        this.getFeedback(1);
-        this.getFeedback(0);
-        this.getSummary(1);
-        this.getSummary(0);
-        this.vote(1);
-        if (this.playMode === 'play') {
-          this.showTutorialStep(0);
-          this.showTutorialStep(1);
-          this.showTutorialStep(2);
-        }
-        this.swipeLeft();
-        this.swipeRight();
-        this.onSwipe({ direction: 1 });
-        this.onSwipe({ direction: 2 });
-        this.setSwipe('swipe-left');
-        this.getPropertiesSchema();
-        return 1;
       },
     },
     watch: {

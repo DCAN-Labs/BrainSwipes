@@ -20,8 +20,8 @@
       </b-alert>
 
       <div v-if="noData">
-        <h1>There is no data in your database!</h1>
-        <p class="lead">Follow the instructions to set up your SwipesForScience App</p>
+        <h1>Didn't find any samples to display</h1>
+        <p class="lead">Try refreshing the page, otherwise this dataset might not be set up yet.</p>
         <img class="blankImage" :src="blankImage" alt="there is no data" />
       </div>
 
@@ -33,9 +33,7 @@
 
         <WidgetSelector
          v-else
-         :widgetType="widgetType"
          :widgetPointer="widgetPointer"
-         :widgetProperties="widgetProperties"
          :widgetSummary="widgetSummary"
          v-on:widgetRating="sendWidgetResponse"
          :playMode="'play'"
@@ -85,9 +83,9 @@
 <script>
   /**
    * This is the component for the `/play` route. It's view depends on the
-   * config property passed from the parent (`App.vue`). It displays the widget
-   * based on config.widgetType. It also decides which sample will be presented
-   * (`widgetPointer`) and passes the sample's summary (`widgetSummary`) to its
+   * config property passed from the parent (`App.vue`).
+   * It decides which sample will be presented (`widgetPointer`)
+   * and passes the sample's summary (`widgetSummary`) to its
    * widget component (`WidgetSelector`).
    *
    * This component is responsible for the following:
@@ -265,18 +263,6 @@
        */
       blankImage() {
         return this.config.play.blankImage;
-      },
-      /**
-       * type of widget, named exactly how it is in the Widgets folder
-       */
-      widgetType() {
-        return this.config.widgetType;
-      },
-      /**
-       * specific properties for a widget
-       */
-      widgetProperties() {
-        return this.config.widgetProperties;
       },
     },
     methods: {

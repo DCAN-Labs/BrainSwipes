@@ -18,7 +18,6 @@
           </li>
           <li class="navSection mobile-menu">
             <SliderMenu
-             :needsTutorial="false"
              :dataset="dataset"
             />
           </li>
@@ -43,7 +42,7 @@
           :routerQuery="routerQuery"
           :dataset="dataset"
           @changeDataset="updateDataset"
-          :activeDatasets="activeDatasets"
+          :datasetPrivileges="datasetPrivileges"
           @changePermissions="updateDatasetPermissions"
         />
       </div>
@@ -148,7 +147,7 @@ export default {
       /**
        * The user's dataset privalges
        */
-      activeDatasets: {},
+      datasetPrivileges: {},
     };
   },
   /**
@@ -190,18 +189,6 @@ export default {
      */
     brandName() {
       return this.config.home.title;
-    },
-    /**
-     * whether or not the user is forced to take the tutorial.
-     */
-    needsTutorial() {
-      return this.config.needsTutorial;
-    },
-    /**
-     * color of the navbar, based on bootstrap4 color variants.
-     */
-    navbarVariant() {
-      return this.config.app ? this.config.app.navbarVariant || 'info' : 'info';
     },
     /**
      * the current user's data, based on the userInfo from the firebase.auth.
@@ -259,6 +246,12 @@ export default {
     routerQuery() {
       return this.$route.query;
     },
+    /**
+     * The active datset routes
+     */
+    studies() {
+      return this.config.studies;
+    },
   },
   methods: {
     /**
@@ -303,12 +296,12 @@ export default {
       if (currentUser) {
         firebase.database().ref(`/users/${currentUser.displayName}/datasets`).once('value')
           .then((snap) => {
-            this.activeDatasets = snap.val();
+            this.datasetPrivileges = snap.val();
           });
       }
     },
     updateDatasetPermissions(newPermissions) {
-      this.activeDatasets = newPermissions;
+      this.datasetPrivileges = newPermissions;
     },
   },
   /**

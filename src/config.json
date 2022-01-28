@@ -1,15 +1,12 @@
 {
-  "needsTutorial": true,
-  "widgetType": "ImageSwipe",
-  "widgetProperties": {
-    "delimiter": "%",
-    "leftSwipeLabel": "Fail",
-    "rightSwipeLabel": "Pass"
-  },
   "iconAttribute": {
     "name": "openmoji",
     "url": "http://openmoji.org"
   },
+  "studies":[
+    "BCP",
+    "ABCD"
+  ],
   "levels": {
     "0": {
       "level": 0,
@@ -67,14 +64,6 @@
       "img": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/svg/1F981.svg?sanitize=true",
       "img_grey": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/black/svg/1F981.svg?sanitize=true"
     }
-  },
-  "app": {
-    "navbarVariant": "info"
-  },
-  "home": {
-    "title": "BrainSwipes by DCAN",
-    "tagline": "Choose a dataset to QC",
-    "backgroundUrl": "/static/UMN_logos2_PRINT-09.svg"
   },
   "play": {
     "blankImage": "https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_blank_canvas.svg?sanitize=true"
