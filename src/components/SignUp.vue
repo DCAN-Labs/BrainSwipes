@@ -221,13 +221,15 @@
        * **TODO**: set an error message if something goes wrong here.
        */
       insertUser() {
+        const date = new Date();
         firebase.database().ref('users').child(firebase.auth().currentUser.displayName).set({
           score: 0,
           level: 0,
           admin: false,
           taken_tutorial: false,
           consent: this.form.consented,
-          consentedOn: new Date(),
+          consentedOn: date,
+          datasets: { BCP: true },
         })
         .then(() => {
         })

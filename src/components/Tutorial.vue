@@ -35,6 +35,7 @@
            :playMode="'tutorial'"
            :tutorialStep="step.tutorialStep"
            ref="widget"
+           :dataset="dataset"
           />
         </div>
         <div v-if="step.tutorialCompleted">
@@ -148,6 +149,10 @@
        */
       config: {
         type: Object,
+        required: true,
+      },
+      dataset: {
+        type: String,
         required: true,
       },
     },

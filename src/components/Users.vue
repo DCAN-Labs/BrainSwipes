@@ -1,6 +1,7 @@
 <template>
   <div id="users">
     <h1> Manage Users </h1>
+    <!-- <b-button @click="setDatasetsAll" type="submit" variant="primary">datasets</b-button> -->
 
     <b-modal id="modifyuser" :title="`Modifying permissions for ${userModified.name}`"
       ref="modifyuser" size="lg">
@@ -203,6 +204,19 @@ export default {
       updates[`/users/${user}/datasets/ABCD`] = ABCD;
       updates[`/users/${user}/admin`] = admin;
       this.db.ref().update(updates);
+    },
+    /**
+     * Blanket change of all user's dataset privelages to default
+     */
+    setDatasetsAll() {
+      /*eslint-disable*/
+      for (const user in this.usersObject) {
+        if (Object.hasOwnProperty.call(this.usersObject, user)) {
+          console.log(user);
+          this.db.ref(`users/${user}/datasets`).set({ BCP: true, ABCD: false });
+        }
+      }
+      /*eslint-enable*/
     },
   },
 };
