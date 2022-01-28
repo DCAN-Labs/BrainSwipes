@@ -8,12 +8,8 @@
         </p>
       </div>
       <p class="buttons mt-3">
-        <router-link class="btn btn-primary white" :to="{name: 'Play', params: { dataset: dataset }, query: routerQuery}"> BCP </router-link>
-        <router-link class="btn btn-primary white" :disabled="!activeABCD" :event="activeABCD ? 'click' : ''" :to="{name: 'PlayABCD', query: routerQuery}" v-bind:class="{ turnedoff: !activeABCD }">
-          <span>
-            ABCD
-          </span>
-        </router-link>
+        <b-button class="btn btn-primary" @click="routeToPlay('BCP')">BCP</b-button>
+        <b-button class="btn btn-primary" :disabled="!activeDatasets.ABCD" v-bind:class="{ turnedoff: !activeDatasets.ABCD }" @click="routeToPlay('ABCD')">ABCD</b-button>
       </p>
     </div>
   </div>
@@ -26,9 +22,6 @@
  * The landing page, on the route `/`. This component displays a title, tagline,
  * and background image splash page that's defined on the config property.
  */
-import firebase from 'firebase/app';
-import 'firebase/database';
-import 'firebase/auth';
 
 export default {
   name: 'Home',
@@ -50,10 +43,17 @@ export default {
       type: String,
       required: true,
     },
+    activeDatasets: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
-      activeABCD: false,
+      // activeDatasets: {
+      //   BCP: true,
+      //   ABCD: false,
+      // },
     };
   },
   computed: {
@@ -76,18 +76,10 @@ export default {
       return { 'background-image': `url("${this.config.home.backgroundUrl}")` };
     },
   },
-  async created() {
-    await this.activateABCD();
-  },
   methods: {
-    async activateABCD() {
-      const currentUser = firebase.auth().currentUser;
-      if (currentUser) {
-        firebase.database().ref(`/users/${currentUser.displayName}/datasets/ABCD`).once('value')
-          .then((snap) => {
-            this.activeABCD = snap.val();
-          });
-      }
+    routeToPlay(label) {
+      this.$emit('changeDataset', label);
+      this.$router.push({ name: 'Play', params: { dataset: label }, query: this.routerQuery });
     },
   },
 };

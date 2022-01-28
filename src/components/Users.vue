@@ -165,8 +165,10 @@ export default {
      */
     closeDialogSubmit(e) {
       e.preventDefault();
+      const obj = JSON.parse(JSON.stringify(this.userModified));
       this.$refs.modifyuser.hide();
-      this.updateFirebase();
+      this.updateFirebase(obj);
+      this.$emit('changePermissions', obj.datasets);
       this.loading = true;
       this.loadUsers();
     },
@@ -195,18 +197,18 @@ export default {
     /**
      * Modifies the database with the prepared user data
      */
-    updateFirebase() {
-      const obj = JSON.parse(JSON.stringify(this.userModified));
+    updateFirebase(obj) {
       const user = obj.name;
       const admin = obj.isAdmin;
-      const ABCD = obj.datasets.ABCD;
+      const datasets = obj.datasets;
       const updates = {};
-      updates[`/users/${user}/datasets/ABCD`] = ABCD;
+      updates[`/users/${user}/datasets`] = datasets;
       updates[`/users/${user}/admin`] = admin;
       this.db.ref().update(updates);
     },
     /**
      * Blanket change of all user's dataset privelages to default
+     * not currently in use, saving in case needed
      */
     setDatasetsAll() {
       /*eslint-disable*/

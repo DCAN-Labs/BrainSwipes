@@ -308,7 +308,8 @@
           /** if initSeenSamples doesn't get a valid dislayName, re-route to home.
            * This happens when refreshing the play route.
            */
-          this.$router.push({ path: '/home' });
+          console.log('refresh');
+          // this.$router.push({ path: '/home' });
         } else {
           this.db.ref(`datasets/${dataset}/userSeenSamples`)
             .child(this.userInfo.displayName)

@@ -42,6 +42,9 @@
           v-on:taken_tutorial="setTutorial"
           :routerQuery="routerQuery"
           :dataset="dataset"
+          @changeDataset="updateDataset"
+          :activeDatasets="activeDatasets"
+          @changePermissions="updateDatasetPermissions"
         />
       </div>
     </div>
@@ -61,7 +64,6 @@
  */
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
-import axios from 'axios';
 
 
 // firebase-related libraries
@@ -114,9 +116,9 @@ export default {
        */
       userInfo: {},
       /**
-       * The dataset to access. Default is BCP.
+       * The dataset to access.
        */
-      dataset: 'BCP',
+      dataset: '',
       /**
        * This is the firebase database object.
        */
@@ -143,6 +145,10 @@ export default {
        * Whether or not to show Mobile menu, will be extracted into Header component later
        */
       showHeader: false,
+      /**
+       * The user's dataset privalges
+       */
+      activeDatasets: {},
     };
   },
   /**
@@ -172,42 +178,6 @@ export default {
       },
     };
   },
-  watch: {
-    /**
-     * watch the firebase keys. if they change, then delete the old firebase app,
-     * and then initialize a new one with the keys.
-     * also, log out of the old app, and set a listener on authentication state for the
-     * new app.
-     */
-    firebaseKeys(newKeys) {
-      // there has been a change in firebaseKeys
-      firebase
-        .auth()
-        .signOut()
-        .then(() => {
-          this.userInfo = {};
-          firebase
-            .app()
-            .delete()
-            .then(() => {
-              firebase.initializeApp(newKeys);
-              this.db = firebase.database();
-              this.db
-                .ref('/users/')
-                .orderByChild('score')
-                .on('value', (snap) => {
-                  this.allUsers = snap.val();
-                });
-              this.userInfo = firebase.auth().currentUser || {};
-              const self = this;
-              firebase.auth().onAuthStateChanged((user) => {
-                self.userInfo = user || {};
-              });
-            });
-        });
-    },
-  },
-
   computed: {
     /**
      * the firebase keys from the config file
@@ -319,24 +289,33 @@ export default {
         .set(val);
       this.$router.replace('play');
     },
+    /**
+     * Passed to child to update dataset on event
+     */
+    updateDataset(newDataset) {
+      this.dataset = newDataset;
+    },
+    /**
+     * What datasets the user can access
+     */
+    async activateDatasets() {
+      const currentUser = firebase.auth().currentUser;
+      if (currentUser) {
+        firebase.database().ref(`/users/${currentUser.displayName}/datasets`).once('value')
+          .then((snap) => {
+            this.activeDatasets = snap.val();
+          });
+      }
+    },
+    updateDatasetPermissions(newPermissions) {
+      this.activeDatasets = newPermissions;
+    },
   },
   /**
    * intialize the animate on scroll library (for tutorial) and listen to authentication state
    */
-  created() {
-    if (this.$route.query.config) {
-      // the URL has a config file that overrides the default one for this app!
-      axios
-        .get(this.$route.query.config)
-        .then((resp) => {
-          // remove the firebase project
-          this.config = resp.data;
-        })
-        .catch(() => {
-          // TODO: set a warning if the config url wasn't valid
-          // console.log(e.message);
-        });
-    }
+  async created() {
+    await this.activateDatasets();
   },
 };
 </script>

@@ -5,7 +5,6 @@ import Admin from '@/components/Admin';
 import Home from '@/components/Home';
 import Profile from '@/components/Profile';
 import Play from '@/components/Play';
-import PlayABCD from '@/components/PlayABCD';
 import Login from '@/components/Login';
 import SignUp from '@/components/SignUp';
 import Terms from '@/components/Terms';
@@ -57,14 +56,6 @@ const router = new Router({
       path: '/:dataset/play',
       name: 'Play',
       component: Play,
-      meta: {
-        requiresAuth: true,
-      },
-    },
-    {
-      path: '/ABCD/play',
-      name: 'PlayABCD',
-      component: PlayABCD,
       meta: {
         requiresAuth: true,
       },
@@ -152,28 +143,14 @@ router.beforeEach((to, from, next) => {
   }
   // make sure the user has take the tutorial
   if (to.name === 'Play') {
+    const dataset = to.params.dataset;
     if (currentUser) {
       firebase.database().ref(`/users/${currentUser.displayName}`).once('value')
         .then((snap) => {
           const data = snap.val();
-          if (!data.taken_tutorial && config.needsTutorial) {
-            next({ path: '/tutorial', query: from.query });
-          }
-        });
-    } else {
-      next({ path: '/login', query: from.query });
-    }
-  }
-
-  if (to.name === 'PlayABCD') {
-    if (currentUser) {
-      firebase.database().ref(`/users/${currentUser.displayName}`).once('value')
-        .then((snap) => {
-          const data = snap.val();
-          if (!data.datasets.ABCD) {
+          if (!data.datasets[dataset]) {
             next({ path: '/unauthorized', query: from.query });
-          }
-          if (!data.taken_tutorial && config.needsTutorial) {
+          } else if (!data.taken_tutorial && config.needsTutorial) {
             next({ path: '/tutorial', query: from.query });
           }
         });
