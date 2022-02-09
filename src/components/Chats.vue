@@ -108,6 +108,9 @@
         return this.config.chats.blankImage;
       },
     },
+    /**
+     * Prevents navigation to Chats when the dataset prop does not match the route name
+     */
     beforeRouteEnter(to, from, next) {
       next((vm) => {
         if (to.params.dataset !== vm.dataset) {
