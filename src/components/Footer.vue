@@ -15,6 +15,14 @@
           :to="menuItem.path"
           class="nav__link"
         >{{menuItem.name}}</router-link>
+        <div class="dropdown" @mouseover="hover = true" @mouseleave="hover = false">
+          <div clas="dropdown-menu" v-show="hover">
+            <div class="dropdown-content">
+              <a v-for="study in studies" :key="study" @click="routeToChats(study)" class="nav__link">{{study}}</a>
+            </div>
+          </div>
+          <a class="nav__link dropdown-button">Chats</a>
+        </div>
       </nav>
 
     </div>
@@ -45,18 +53,26 @@ export default {
       type: Object,
       required: true,
     },
+    dataset: {
+      type: String,
+      requred: true,
+    },
+    studies: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {
       menuItems: [
         { path: '/', name: 'Home' },
         { path: '/tutorial', name: 'Tutorial' },
-        { path: '/chats', name: 'Chats' },
         { path: '/leaderboard', name: 'Leaderboard' },
         { path: '/about', name: 'About' },
       ],
       isAdmin: false,
       loading: true,
+      hover: false,
     };
   },
   mounted() {
@@ -88,6 +104,13 @@ export default {
         this.isAdmin = false;
         this.loading = false;
       }
+    },
+    /**
+     * updates dataset prop and routes to the appropriate chats route
+     */
+    routeToChats(label) {
+      this.$emit('changeDataset', label);
+      this.$router.push({ name: 'Chats', params: { dataset: label }, query: this.routerQuery });
     },
   },
 };
@@ -246,5 +269,9 @@ footer p {
   width: 20px;
   height: 20px;
   text-align: center;
+}
+.dropdown-content {
+  position: absolute;
+  bottom: 100%;
 }
 </style>

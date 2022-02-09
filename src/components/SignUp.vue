@@ -251,6 +251,10 @@
           this.errors.message = err.message;
         });
       },
+      /**
+       * Utitility function for sweeping changes to db, used in setup,
+       * leaving alive here just in case but currently not in use.
+       */
       setDefaultPermissions() {
         this.studies.forEach((study) => {
           this.studiesObject[study] = false;

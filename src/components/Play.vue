@@ -291,10 +291,9 @@
        */
       initSeenSamples(dataset) {
         if (typeof (this.userInfo.displayName) === 'undefined') {
-          /** if initSeenSamples doesn't get a valid dislayName, re-route to home.
+          /** if initSeenSamples doesn't get a valid displayName, re-route to home.
            * This happens when refreshing the play route.
            */
-          console.log('refresh');
           // this.$router.push({ path: '/home' });
         } else {
           this.db.ref(`datasets/${dataset}/userSeenSamples`)
@@ -488,6 +487,16 @@
       showAlert() {
         this.dismissCountDown = this.dismissSecs;
       },
+    },
+    /**
+     * Prevents navigation to Play when the dataset prop does not match the route name
+     */
+    beforeRouteEnter(to, from, next) {
+      next((vm) => {
+        if (to.params.dataset !== vm.dataset) {
+          vm.$router.push({ name: 'Home' });
+        }
+      });
     },
   };
 </script>

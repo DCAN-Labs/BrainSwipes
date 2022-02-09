@@ -5,7 +5,7 @@
       <p class="lead">See which samples people are talking about</p>
       <p v-for="(c, index) in sampleChat" :key="index">
         <b-alert show>
-          <router-link :to="'/review/' + c['.key']">{{c['.key']}}</router-link>
+          <router-link :to="'/' + dataset + '/review/' + c['.key']">{{c['.key']}}</router-link>
           <br>
           <span v-if="chatInfo[c['.key']]">
             <b>{{chatInfo[c['.key']].username}}</b> : {{chatInfo[c['.key']].message}}
@@ -34,12 +34,12 @@
         * keep track of all the samples that have been discussed.
         */
         sampleChat: {
-          source: this.db.ref('datasets/BCP/chats').child('sampleChatIndex').orderByChild('time'),
+          source: this.db.ref(`datasets/${this.dataset}/chats`).child('sampleChatIndex').orderByChild('time'),
           readyCallback() {
             // this.sampleChat.reverse();
             this.sampleChat.forEach((c) => {
               // console.log('c is', c);
-              this.db.ref('datasets/BCP/chats')
+              this.db.ref(`datasets/${this.dataset}/chats`)
                 .child('sampleChats')
                 .child(c['.key'])
                 .orderByKey()
@@ -88,6 +88,10 @@
         type: Object,
         required: true,
       },
+      dataset: {
+        type: String,
+        requred: true,
+      },
     },
     computed: {
       /**
@@ -103,6 +107,13 @@
       blankChatImage() {
         return this.config.chats.blankImage;
       },
+    },
+    beforeRouteEnter(to, from, next) {
+      next((vm) => {
+        if (to.params.dataset !== vm.dataset) {
+          vm.$router.push({ name: 'Home' });
+        }
+      });
     },
   };
 </script>

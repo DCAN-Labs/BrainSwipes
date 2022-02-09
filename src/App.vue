@@ -45,6 +45,7 @@
           :datasetPrivileges="datasetPrivileges"
           @changePermissions="updateDatasetPermissions"
           :studies="studies"
+          :key="$route.fullPath"
         />
       </div>
     </div>
@@ -52,7 +53,9 @@
       <Footer 
         :config="config" 
         :routerQuery="routerQuery"
+        @changeDataset="updateDataset"
         :dataset="dataset"
+        :studies="studies"
       />
     </div>
   </div>
@@ -285,6 +288,7 @@ export default {
      */
     updateDataset(newDataset) {
       this.dataset = newDataset;
+      // console.log(`dataset updated: ${newDataset}`);
     },
     /**
      * What datasets the user can access

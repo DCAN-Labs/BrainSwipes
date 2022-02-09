@@ -11,7 +11,7 @@
       <div v-else>
         <p>No one has said anything yet!</p>
       </div>
-      <b-form @submit="sendChat('BCP')">
+      <b-form @submit="sendChat(dataset)">
         <b-form-group id="exampleInputGroup1"
                 label="Enter chat message:"
                 label-for="exampleInput1"
@@ -22,7 +22,7 @@
                         required
                         placeholder="Enter your message">
           </b-form-input>
-          <b-button class="mt-2" variant="primary" @click="sendChat('BCP')">Send</b-button>
+          <b-button class="mt-2" variant="primary" @click="sendChat(dataset)">Send</b-button>
         </b-form-group>
       </b-form>
 
@@ -178,7 +178,7 @@
      */
     mounted() {
       this.widgetPointer = this.$route.params.key;
-      this.setSampleInfo('BCP');
+      this.setSampleInfo(this.dataset);
     },
     methods: {
       /**

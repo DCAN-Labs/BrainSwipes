@@ -91,11 +91,12 @@ const router = new Router({
       component: Tutorial,
     },
     {
-      path: '/chats',
+      path: '/:dataset/chats',
       name: 'Chats',
       component: Chats,
       meta: {
         requiresAuth: true,
+        requiresAccess: true,
       },
     },
     {

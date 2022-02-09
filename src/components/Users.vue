@@ -45,7 +45,7 @@
             <td><b-button variant="outline-dark" @click="modifyUser(name, value)">{{ name }}</b-button></td>
             <td>{{ value.admin }}</td>
             <td>{{ value.score }}</td>
-            <td>
+            <td class="datasets">
               <table>
                 <tr>
                   <th v-for="study in studies" :key="study">{{study}}</th>
@@ -81,6 +81,9 @@ table {
 th {
   font-weight: 800;
   width: 120px;
+}
+.datasets tr:nth-child(even) {
+  background-color:blanchedalmond
 }
 </style>
 
