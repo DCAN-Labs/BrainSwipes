@@ -45,13 +45,10 @@
             <td><b-button variant="outline-dark" @click="modifyUser(name, value)">{{ name }}</b-button></td>
             <td>{{ value.admin }}</td>
             <td>{{ value.score }}</td>
-            <td class="datasets">
+            <td>
               <table>
                 <tr>
-                  <th v-for="study in studies" :key="study">{{study}}</th>
-                </tr>
-                <tr>
-                  <td v-for="data in value.datasets" :key="data">{{ data }}</td>
+                  <th v-for="study in studies" :key="study" v-bind:class="{red: !value.datasets[study], green: value.datasets[study]}">{{study}}</th>
                 </tr>
               </table>
             </td>
@@ -82,8 +79,11 @@ th {
   font-weight: 800;
   width: 120px;
 }
-.datasets tr:nth-child(even) {
-  background-color:blanchedalmond
+.red {
+  background-color: red;
+}
+.green {
+  background-color: green;
 }
 </style>
 
@@ -113,10 +113,7 @@ export default {
       userModified: {
         name: '',
         isAdmin: '',
-        datasets: {
-          BCP: true,
-          ABCD: false,
-        },
+        datasets: {},
       },
     };
   },
