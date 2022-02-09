@@ -11,7 +11,7 @@
       <div v-else>
         <p>No one has said anything yet!</p>
       </div>
-      <b-form @submit="sendChat(dataset)">
+      <b-form @submit="sendChat">
         <b-form-group id="exampleInputGroup1"
                 label="Enter chat message:"
                 label-for="exampleInput1"
@@ -22,7 +22,7 @@
                         required
                         placeholder="Enter your message">
           </b-form-input>
-          <b-button class="mt-2" variant="primary" @click="sendChat(dataset)">Send</b-button>
+          <b-button class="mt-2" variant="primary" @click="sendChat">Send</b-button>
         </b-form-group>
       </b-form>
 
@@ -188,11 +188,11 @@
        * 3. set that the user has sent a chat for this sample to `chats/userChat/<username>`
        * 4. **TODO**: set that other users following this chat have something new to see.
        */
-      sendChat(dataset, e) {
+      sendChat(e) {
         e.preventDefault();
         const key = this.$route.params.key;
 
-        this.db.ref(`datasets/${dataset}/chats`)
+        this.db.ref(`datasets/${this.dataset}/chats`)
           .child('sampleChats')
           .child(key).push({
             username: this.userData['.key'],
@@ -200,13 +200,13 @@
             time: new Date().toISOString(),
           });
 
-        this.db.ref(`datasets/${dataset}/chats`)
+        this.db.ref(`datasets/${this.dataset}/chats`)
           .child('sampleChatIndex')
           .child(key).set({
             time: new Date().toISOString(),
           });
 
-        this.db.ref(`datasets/${dataset}/chats`)
+        this.db.ref(`datasets/${this.dataset}/chats`)
           .child('userChat')
           .child(this.userData['.key'])
           .child(key)
@@ -225,7 +225,7 @@
         });
 
         usersToNotify.forEach((u) => {
-          this.db.ref(`datasets/${dataset}/chats`)
+          this.db.ref(`datasets/${this.dataset}/chats`)
             .child('userNotifications')
             .child(u)
             .child(key)
@@ -262,6 +262,16 @@
             this.widgetSummary = snap.val();
           });
       },
+    },
+    /**
+     * Prevents navigation to Review when the dataset prop does not match the route name
+     */
+    beforeRouteEnter(to, from, next) {
+      next((vm) => {
+        if (to.params.dataset !== vm.dataset) {
+          vm.$router.push({ name: 'Home' });
+        }
+      });
     },
   };
 </script>
