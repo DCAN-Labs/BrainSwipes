@@ -88,9 +88,8 @@ export default {
       isActive: false,
       menuItems: [
         { path: '/', name: 'Home' },
-        { path: '/leaderboard', name: 'Leaderboard' },
-        { path: '/chats', name: 'Chats' },
         { path: '/tutorial', name: 'Tutorial' },
+        { path: '/leaderboard', name: 'Leaderboard' },
         { path: '/about', name: 'About' },
       ],
     };
