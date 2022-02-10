@@ -156,9 +156,10 @@ export default {
      * Opens the modify user dialog
      */
     modifyUser(name, value) {
+      const valueCopy = JSON.parse(JSON.stringify(value));
       this.userModified.name = name;
-      this.userModified.isAdmin = value.admin;
-      this.userModified.datasets = value.datasets;
+      this.userModified.isAdmin = valueCopy.admin;
+      this.userModified.datasets = valueCopy.datasets;
       this.$refs.modifyuser.show();
     },
     /**
