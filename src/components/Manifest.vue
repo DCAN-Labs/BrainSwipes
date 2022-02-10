@@ -1,9 +1,25 @@
 <template>
   <div id="manifest">
-    <h1> Upload manifest.json to update the database </h1>
-
+    <h1 class="manifest-title"> Upload manifest.json to update the database </h1>
+    <b-modal id="newstudy" :title="'Add a New Study to BrainSwipes'" ref="newstudy" size="lg">
+      <div>
+        <b-input-group prepend="Name of Study" class="mt-3">
+        <b-form-input id="new-study-text" ref="new-study-text"></b-form-input>
+        </b-input-group>
+        <b-button-group size="lg">
+          <b-button class="study-button" style="margin-right:0" v-bind:class="{selected: !available}" @click="changeAvailability(false)">Restricted access</b-button>
+          <b-button class="study-button" v-bind:class="{selected: available}" @click="changeAvailability(true)">Available to all users</b-button>
+        </b-button-group>
+      </div>
+      <div slot="modal-footer" class="w-100">
+          <b-button @click="closeDialogSubmit" type="submit" variant="primary">Submit</b-button>
+          <b-button @click="closeDialogCancel" type="submit" variant="primary">Cancel</b-button>
+      </div>
+    </b-modal>
     <b-container>
-
+      <div class="study-buttons-row">
+        <b-button v-for="study in studies" :key="study" class="study-button" v-bind:class="{selected: study === selectedStudy}" @click="selectStudy(study)">{{study}}</b-button><b-button class="study-button" @click="newStudy">New Study</b-button>
+      </div>
       <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
       <p>
         <b>Data Source:</b>
@@ -43,6 +59,27 @@
   text-align: start;
   min-height: 1.2em;
 }
+.manifest-title {
+  margin-bottom: 2vh;
+}
+.study-buttons-row {
+  margin-bottom: 2vh;
+}
+.study-button {
+  color: #fff;
+  background-color:rgba(128,0,0,0.57);
+  border-color: maroon;
+  margin-right: .2em;
+}
+.study-button:hover {
+  background-color: rgba(128,0,0,1);
+}
+.selected {
+  background-color: rgba(128,0,0,.85);
+}
+.study-button:active, .study-button:focus {
+  background-color: rgba(128,0,0,.85);
+}
 </style>
 
 <script>
@@ -75,6 +112,14 @@ export default {
        * the /sampleCounts document from Firebase.
        */
       sampleCounts: [],
+      /**
+       * the currently selected study
+       */
+      selectedStudy: 'BCP',
+      /**
+       * If new study is available by default
+       */
+      available: false,
     };
   },
   props: {
@@ -101,6 +146,13 @@ export default {
      */
     db: {
       type: Object,
+      required: true,
+    },
+    /**
+     * The list of studies from the db
+     */
+    studies: {
+      type: Array,
       required: true,
     },
   },
@@ -135,7 +187,7 @@ export default {
      * This method keeps track of sampleCounts, but only loads it once.
      */
     addFirebaseListener() {
-      this.db.ref('datasets/BCP/sampleCounts').once('value', (snap) => {
+      this.db.ref(`datasets/${this.selectedStudy}/sampleCounts`).once('value', (snap) => {
         /* eslint-disable */
         this.sampleCounts = _.map(snap.val(), (val, key) => {
           return { '.key': key, '.value': val };
@@ -186,8 +238,71 @@ export default {
         // check to see if the key is in the manifest.
         if (this.manifestEntries.indexOf(key) < 0) {
           // since the key isn't there, remove it from firebase.
-          this.db.ref('datasets/BCP/sampleCounts').child(key).remove();
+          this.db.ref(`datasets/${this.selectedStudy}/sampleCounts`).child(key).remove();
         }
+      });
+    },
+    /**
+     * choose which study's data to modify
+     */
+    selectStudy(study) {
+      this.selectedStudy = study;
+      this.status = 'loading...';
+      this.addFirebaseListener();
+    },
+    /**
+     * Show the new study menu
+     */
+    newStudy() {
+      this.$refs.newstudy.show();
+    },
+    /**
+     * close the new study menu and submit changes
+     */
+    closeDialogSubmit(e) {
+      e.preventDefault();
+      this.addStudyToFirebase();
+      this.setUserDatasetPermissions();
+      this.$refs.newstudy.hide();
+    },
+    /**
+     * close the new study menu without submitting changes
+     */
+    closeDialogCancel(e) {
+      e.preventDefault();
+      this.$refs.newstudy.hide();
+    },
+    /**
+     * set the default availability of the new dataset
+     */
+    changeAvailability(value) {
+      this.available = value;
+    },
+    /**
+     * add the study to firebase
+     */
+    addStudyToFirebase() {
+      const studies = [];
+      this.db.ref('/studies').on('value', (snap) => {
+        snap.forEach((element) => {
+          studies.push(element.val());
+        });
+      });
+      studies.push(this.$refs['new-study-text'].localValue);
+      this.db.ref('/studies').set(studies);
+    },
+    /**
+     * set default permissions for the new study for all users
+     */
+    setUserDatasetPermissions() {
+      const newStudy = this.$refs['new-study-text'].localValue;
+      this.db.ref('/users').on('value', (snap) => {
+        snap.forEach((element) => {
+          const userRef = this.db.ref(`/users/${element.key}/datasets`);
+          const update = {};
+          update[newStudy] = this.available;
+          userRef.update(update);
+        });
       });
     },
   },
