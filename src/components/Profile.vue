@@ -51,7 +51,11 @@
 
       <hr>
 
-      <div v-if="chats.length">
+      <!-- Chats don't currently work with multiple datasets,
+      not worth dealing with right now.
+      Leaving here in case it matters later. -->
+
+      <!-- <div v-if="chats.length">
         <h2> Your Chats </h2>
         <p class="lead">
           Your discussions on specific samples
@@ -78,7 +82,7 @@
           You haven't said anything yet! When you're ready, join the discussion.
         </p>
         <img :src="blankImage" class="blankImage"/>
-      </div>
+      </div> -->
     </b-container>
 
   </div>
@@ -205,24 +209,24 @@ export default {
   /**
    * when the component is mounted, it gets the user's chats.
    */
-  mounted() {
-    if (this.userData['.key']) {
-      this.getUserChats('BCP');
-    }
-  },
-  watch: {
-    /**
-     * if the user is updated, get their chats. (is this necessary?)
-     */
-    userData() {
-      if (this.userData['.key']) {
-        this.getUserChats('BCP');
-      }
-    },
-    chats() {
-      this.watchChats('BCP');
-    },
-  },
+  // mounted() {
+  //   if (this.userData['.key']) {
+  //     this.getUserChats('BCP');
+  //   }
+  // },
+  // watch: {
+  //   /**
+  //    * if the user is updated, get their chats. (is this necessary?)
+  //    */
+  //   userData() {
+  //     if (this.userData['.key']) {
+  //       this.getUserChats('BCP');
+  //     }
+  //   },
+  //   chats() {
+  //     this.watchChats('BCP');
+  //   },
+  // },
   methods: {
     /**
      * A method to read the firebase db ref /chats/<user_display_name>
