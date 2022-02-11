@@ -32,7 +32,7 @@
              </span>
 
              <b-button v-if="playMode"
-              :to="{name: 'Review', params: { dataset: dataset, key: widgetPointer }}"
+              :to="'/' + dataset + '/review/'+widgetPointer"
               ref="helpButton"
               class="helpbtn"
               v-bind:class="{ focus: helpFocused }"
