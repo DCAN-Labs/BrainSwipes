@@ -46,6 +46,7 @@
           @changePermissions="updateDatasetPermissions"
           :studies="studies"
           :bucket="bucket"
+          @login="activateDatasets"
           :key="$route.fullPath"
         />
       </div>
@@ -57,6 +58,7 @@
         @changeDataset="updateDataset"
         :dataset="dataset"
         :studies="studies"
+        :datasetPrivileges="datasetPrivileges"
       />
     </div>
   </div>
@@ -269,6 +271,7 @@ export default {
         .signOut()
         .then(() => {
           this.userInfo = {};
+          this.datasetPrivileges = {};
           this.$router.replace('login');
         });
     },
