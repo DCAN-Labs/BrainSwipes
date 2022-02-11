@@ -18,7 +18,7 @@
         <div class="dropdown" @mouseover="hover = true" @mouseleave="hover = false">
           <div clas="dropdown-menu" v-show="hover">
             <div class="dropdown-content">
-              <a v-for="study in Object.keys(studies)" :key="study" @click="routeToChats(study)" class="nav__link">{{study}}</a>
+              <a v-for="study in Object.keys(studies)" :key="study" @click="routeToChats(study)" class="nav__link" v-show="datasetPrivileges[study]">{{study}}</a>
             </div>
           </div>
           <a class="nav__link dropdown-button">Chats</a>
@@ -61,6 +61,10 @@ export default {
       type: Object,
       required: true,
     },
+    datasetPrivileges: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -85,13 +89,6 @@ export default {
     await this.addAdminRoutes();
   },
   methods: {
-    /**
-     * The method to tell the parent component (App.vue) to open the config panel.
-     */
-    openConfig(e) {
-      e.preventDefault();
-      this.$emit('openConfig');
-    },
     async addAdminRoutes() {
       if (firebase.auth().currentUser) {
         const displayName = firebase.auth().currentUser.displayName;
