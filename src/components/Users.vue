@@ -7,7 +7,7 @@
         <table>
           <tr>
             <th>isAdmin</th>
-            <th v-for="study in studies" :key="study">{{study}}</th>
+            <th v-for="study in Object.keys(studies)" :key="study">{{study}}</th>
           </tr>
           <tr>
             <td>
@@ -46,7 +46,7 @@
             <td>
               <table>
                 <tr>
-                  <th v-for="study in studies" :key="study" v-bind:class="{red: !value.datasets[study], green: value.datasets[study]}">{{study}}</th>
+                  <th v-for="study in Object.keys(studies)" :key="study" v-bind:class="{red: !value.datasets[study], green: value.datasets[study]}">{{study}}</th>
                 </tr>
               </table>
             </td>
@@ -127,7 +127,7 @@ export default {
      * list of studies from the db
      */
     studies: {
-      type: Array,
+      type: Object,
       required: true,
     },
   },

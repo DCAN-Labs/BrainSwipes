@@ -7,8 +7,8 @@
           Choose a dataset to QC
         </p>
       </div>
-      <p v-if="this.studies.length" class="buttons mt-3">
-        <b-button v-for="study in studies" :key="study" class="btn btn-primary" v-show="datasetPrivileges[study]" @click="routeToPlay(study)">{{study}}</b-button>
+      <p v-if="Object.keys(studies).length" class="buttons mt-3">
+        <b-button v-for="study in Object.keys(studies)" :key="study" class="btn btn-primary" v-show="datasetPrivileges[study]" @click="routeToPlay(study)">{{study}}</b-button>
       </p>
     </div>
   </div>
@@ -41,7 +41,7 @@ export default {
       required: true,
     },
     studies: {
-      type: Array,
+      type: Object,
       required: true,
     },
   },

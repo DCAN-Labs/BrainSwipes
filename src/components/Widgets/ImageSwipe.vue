@@ -165,7 +165,6 @@
     methods: {
       postRequest(pointer) {
         const bucket = this.bucket;
-        console.log(bucket);
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.open('POST', '/', true);
@@ -173,7 +172,7 @@
           xhr.onload = resolve;
           xhr.onerror = reject;
           xhr.send(JSON.stringify({
-            pointer,
+            pointer, bucket,
           }));
         });
       },

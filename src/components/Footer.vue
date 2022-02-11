@@ -18,7 +18,7 @@
         <div class="dropdown" @mouseover="hover = true" @mouseleave="hover = false">
           <div clas="dropdown-menu" v-show="hover">
             <div class="dropdown-content">
-              <a v-for="study in studies" :key="study" @click="routeToChats(study)" class="nav__link">{{study}}</a>
+              <a v-for="study in Object.keys(studies)" :key="study" @click="routeToChats(study)" class="nav__link">{{study}}</a>
             </div>
           </div>
           <a class="nav__link dropdown-button">Chats</a>
@@ -58,7 +58,7 @@ export default {
       requred: true,
     },
     studies: {
-      type: Array,
+      type: Object,
       required: true,
     },
   },

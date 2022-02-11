@@ -138,7 +138,7 @@
        * list of studies in the app
        */
       studies: {
-        type: Array,
+        type: Object,
         required: true,
       },
     },
@@ -155,6 +155,16 @@
        */
       consentFormLabel() {
         return this.form.consented ? 'You have consented!' : 'Click to read and sign the consent form';
+      },
+      /**
+       * default permissions for each dataset
+       */
+      studyPermissions() {
+        const studyPermissions = {};
+        Object.keys(this.studies).forEach((study) => {
+          studyPermissions[study] = this.studies[study].available;
+        });
+        return studyPermissions;
       },
     },
     methods: {
@@ -226,7 +236,7 @@
           taken_tutorial: false,
           consent: this.form.consented,
           consentedOn: date,
-          datasets: { BCP: true },
+          datasets: this.studyPermissions,
         })
         .then(() => {
         })
@@ -250,16 +260,6 @@
           this.errors.show = true;
           this.errors.message = err.message;
         });
-      },
-      /**
-       * Utitility function for sweeping changes to db, used in setup,
-       * leaving alive here just in case but currently not in use.
-       */
-      setDefaultPermissions() {
-        this.studies.forEach((study) => {
-          this.studiesObject[study] = false;
-        });
-        this.studiesObject.BCP = true;
       },
     },
   };

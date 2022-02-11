@@ -4,21 +4,24 @@
     <b-modal id="newstudy" :title="'Add a New Study to BrainSwipes'" ref="newstudy" size="lg">
       <div>
         <b-input-group prepend="Name of Study" class="mt-3">
-        <b-form-input id="new-study-text" ref="new-study-text"></b-form-input>
+        <b-form-input id="new-study-text" ref="new-study-text" :disabled="formLockout" v-on:keyup="enableForm()"></b-form-input>
+        </b-input-group>
+        <b-input-group prepend="Name of MSI S3 Bucket" class="mt-3">
+        <b-form-input id="new-bucket-text" ref="new-bucket-text" :disabled="formLockout" v-on:keyup="enableForm()"></b-form-input>
         </b-input-group>
         <b-button-group size="lg">
-          <b-button class="study-button" style="margin-right:0" v-bind:class="{selected: !available}" @click="changeAvailability(false)">Restricted access</b-button>
-          <b-button class="study-button" v-bind:class="{selected: available}" @click="changeAvailability(true)">Available to all users</b-button>
+          <b-button class="study-button" style="margin-right:0" v-bind:class="{selected: !available}" :disabled="formLockout" @click="changeAvailability(false)">Restricted access</b-button>
+          <b-button class="study-button" v-bind:class="{selected: available}" :disabled="formLockout" @click="changeAvailability(true)">Available to all users</b-button>
         </b-button-group>
       </div>
       <div slot="modal-footer" class="w-100">
-          <b-button @click="closeDialogSubmit" type="submit" variant="primary">Submit</b-button>
-          <b-button @click="closeDialogCancel" type="submit" variant="primary">Cancel</b-button>
+          <b-button @click="closeDialogSubmit" :disabled="formDisabled || formLockout" type="submit" variant="primary">Submit</b-button>
+          <b-button @click="closeDialogCancel" :disabled="formLockout" type="submit" variant="primary">Cancel</b-button>
       </div>
     </b-modal>
     <b-container>
       <div v-if="!lockout" class="study-buttons-row">
-        <b-button v-for="study in studies" :key="study" class="study-button" v-bind:class="{selected: study === selectedStudy}" @click="selectStudy(study)">{{study}}</b-button><b-button class="study-button" @click="newStudy">New Study</b-button>
+        <b-button v-for="study in Object.keys(studies)" :key="study" class="study-button" v-bind:class="{selected: study === selectedStudy}" @click="selectStudy(study)">{{study}}</b-button><b-button class="study-button" @click="newStudy">New Study</b-button>
       </div>
       <div v-if="selectedStudy">
         <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
@@ -126,6 +129,14 @@ export default {
        * similar to status, but status depends on a dataset.
        */
       lockout: false,
+      /**
+       * if the new study form is disabled
+       */
+      formDisabled: true,
+      /**
+       * if the new dataset form is locked out
+       */
+      formLockout: false,
     };
   },
   props: {
@@ -158,7 +169,7 @@ export default {
      * The list of studies from the db
      */
     studies: {
-      type: Array,
+      type: Object,
       required: true,
     },
   },
@@ -262,12 +273,14 @@ export default {
      * Show the new study menu
      */
     newStudy() {
+      this.formLockout = false;
       this.$refs.newstudy.show();
     },
     /**
      * close the new study menu and submit changes
      */
     closeDialogSubmit(e) {
+      this.formLockout = true;
       e.preventDefault();
       this.addStudyToFirebase();
       this.setUserDatasetPermissions();
@@ -290,13 +303,10 @@ export default {
      * add the empty study to firebase
      */
     addStudyToFirebase() {
-      const studies = [];
-      this.db.ref('/studies').on('value', (snap) => {
-        snap.forEach((element) => {
-          studies.push(element.val());
-        });
-      });
-      studies.push(this.$refs['new-study-text'].localValue);
+      const studies = JSON.parse(JSON.stringify(this.studies));
+      const newStudy = this.$refs['new-study-text'].localValue;
+      const newBucket = this.$refs['new-bucket-text'].localValue;
+      studies[newStudy] = { available: this.available, bucket: newBucket };
       this.db.ref('/studies').set(studies);
     },
     /**
@@ -312,6 +322,9 @@ export default {
           userRef.update(update);
         });
       });
+    },
+    enableForm() {
+      this.formDisabled = this.$refs['new-study-text'].localValue.length === 0 || this.$refs['new-bucket-text'].localValue.length === 0;
     },
   },
 };

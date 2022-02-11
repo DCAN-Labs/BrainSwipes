@@ -156,7 +156,7 @@ export default {
       /**
        * List of studies available
        */
-      studies: [],
+      studies: {},
       /**
        * s3 bucket where the images are stored
        */
@@ -299,7 +299,7 @@ export default {
      * called by updateDataset to update the corresponding bucket
      */
     updateBucket(newDataset) {
-      this.bucket = `${newDataset}.bucket`;
+      this.bucket = this.studies[newDataset].bucket;
     },
     /**
      * What datasets the user can access
