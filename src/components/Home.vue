@@ -8,7 +8,7 @@
         </p>
       </div>
       <p v-if="this.studies.length" class="buttons mt-3">
-        <b-button v-for="study in studies" :key="study" class="btn btn-primary" :disabled="!datasetPrivileges[study]" v-bind:class="{ turnedoff: !datasetPrivileges[study] }" @click="routeToPlay(study)">{{study}}</b-button>
+        <b-button v-for="study in studies" :key="study" class="btn btn-primary" v-show="datasetPrivileges[study]" @click="routeToPlay(study)">{{study}}</b-button>
       </p>
     </div>
   </div>
@@ -116,9 +116,6 @@ a {
   margin-right: .2em;
 }
 
-.turnedoff{
-  background-color: rgba(128, 0, 0, 0.5);
-}
 .jumbotron {
     padding: 2rem 1rem;
     margin-bottom: 0rem;
@@ -128,18 +125,6 @@ a {
   padding: 0.4rem;
   margin: 0 auto; 
   text-shadow: white 1px 1px, white 0 0 1px;
-}
-
-.turnedoff:hover{
-  cursor: not-allowed;
-}
-
-.turnedoff:hover span {
-  display: none;
-}
-
-.turnedoff:hover:before {
-  content: 'Unavailable';
 }
 
 </style>
