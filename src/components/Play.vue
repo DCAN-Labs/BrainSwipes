@@ -39,6 +39,7 @@
          :playMode="'play'"
          ref="widget"
          :dataset="dataset"
+         :bucket="bucket"
         />
       </div>
 
@@ -158,9 +159,19 @@
         type: Object,
         required: true,
       },
+      /**
+       * the dataset to swipe on
+       */
       dataset: {
         type: String,
-        requred: true,
+        required: true,
+      },
+      /**
+       * the s3 bucket where the images for the dataset are held
+       */
+      bucket: {
+        type: String,
+        required: true,
       },
     },
     data() {

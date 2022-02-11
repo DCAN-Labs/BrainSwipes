@@ -45,6 +45,7 @@
           :datasetPrivileges="datasetPrivileges"
           @changePermissions="updateDatasetPermissions"
           :studies="studies"
+          :bucket="bucket"
           :key="$route.fullPath"
         />
       </div>
@@ -156,6 +157,10 @@ export default {
        * List of studies available
        */
       studies: [],
+      /**
+       * s3 bucket where the images are stored
+       */
+      bucket: '',
     };
   },
   /**
@@ -288,7 +293,13 @@ export default {
      */
     updateDataset(newDataset) {
       this.dataset = newDataset;
-      // console.log(`dataset updated: ${newDataset}`);
+      this.updateBucket(newDataset);
+    },
+    /**
+     * called by updateDataset to update the corresponding bucket
+     */
+    updateBucket(newDataset) {
+      this.bucket = `${newDataset}.bucket`;
     },
     /**
      * What datasets the user can access

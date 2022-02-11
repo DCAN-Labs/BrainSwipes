@@ -113,7 +113,17 @@
         type: Number,
         required: false,
       },
+      /**
+       * the dataset to swipe on
+       */
       dataset: {
+        type: String,
+        required: true,
+      },
+      /**
+       * the s3 bucket where the images for the dataset are held
+       */
+      bucket: {
         type: String,
         required: true,
       },
@@ -154,6 +164,8 @@
     },
     methods: {
       postRequest(pointer) {
+        const bucket = this.bucket;
+        console.log(bucket);
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.open('POST', '/', true);

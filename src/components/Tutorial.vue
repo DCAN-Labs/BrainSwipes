@@ -34,7 +34,8 @@
            :playMode="'tutorial'"
            :tutorialStep="step.tutorialStep"
            ref="widget"
-           :dataset="dataset"
+           :dataset="tutorialDataset"
+           :bucket="tutorialBucket"
           />
         </div>
         <div v-if="step.tutorialCompleted">
@@ -150,10 +151,6 @@
         type: Object,
         required: true,
       },
-      dataset: {
-        type: String,
-        required: true,
-      },
     },
     watch: {
     },
@@ -213,6 +210,18 @@
           return `#intro${this.currentBin.bin + 1}`;
         }
         return `#example${(this.currentBin.bin - this.steps.intro.length) + 1}`;
+      },
+      /**
+       * dataset that the tutorial images are from
+       */
+      tutorialDataset() {
+        return this.config.tutorial.dataset;
+      },
+      /**
+       * s3 bucket where the tutorial images are held
+       */
+      tutorialBucket() {
+        return this.config.tutorial.bucket;
       },
     },
     methods: {

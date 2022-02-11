@@ -8,6 +8,7 @@
     v-on:widgetRating="widgetRating"
     :playMode="playMode"
     :dataset="dataset"
+    :bucket="bucket"
     />
   </div>
 </template>
@@ -53,7 +54,17 @@
         type: Number,
         required: false,
       },
+      /**
+       * the dataset to swipe on
+       */
       dataset: {
+        type: String,
+        required: true,
+      },
+      /**
+       * the s3 bucket where the images for the dataset are held
+       */
+      bucket: {
         type: String,
         required: true,
       },

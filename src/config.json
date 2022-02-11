@@ -77,6 +77,8 @@
     "blankImage": "https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_chatting.svg?sanitize=true"
   },
   "tutorial": {
+    "bucket": "brainswipes",
+    "dataset": "BCP",
     "steps": {
       "intro": [
         {
