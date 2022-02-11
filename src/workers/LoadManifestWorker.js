@@ -10,22 +10,27 @@ onmessage = function(e) {
   const db = firebase.database();
   const filtered = _.filter(entries[0], m => entries[1].indexOf(m) < 0);
   const target = filtered.length;
+  const study = entries[3];
   let current = 0;
   if (!target) {
     postMessage('done');
   }
   _.map(filtered,
     (key) => {
-      db.ref('datasets/BCP/sampleCounts').child(key).set(0).then(() => {
-        current += 1;
-        if (current === target) {
-            // We then have treated all the objects
-          postMessage('done');
-        }
-        postMessage('progress');
-      })
-      .catch(() => {
-        postMessage('error');
-      });
+      if (study) {
+        db.ref(`datasets/${study}/sampleCounts`).child(key).set(0).then(() => {
+          current += 1;
+          if (current === target) {
+              // We then have treated all the objects
+            postMessage('done');
+          }
+          postMessage('progress');
+        })
+        .catch(() => {
+          postMessage('error');
+        });
+      } else {
+        console.log('no study');
+      }
     });
 };

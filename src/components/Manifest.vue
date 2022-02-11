@@ -1,6 +1,6 @@
 <template>
   <div id="manifest">
-    <h1 class="manifest-title"> Upload manifest.json to update the database </h1>
+    <h1 class="manifest-title"> Select a study to update in the database </h1>
     <b-modal id="newstudy" :title="'Add a New Study to BrainSwipes'" ref="newstudy" size="lg">
       <div>
         <b-input-group prepend="Name of Study" class="mt-3">
@@ -17,35 +17,36 @@
       </div>
     </b-modal>
     <b-container>
-      <div class="study-buttons-row">
+      <div v-if="!lockout" class="study-buttons-row">
         <b-button v-for="study in studies" :key="study" class="study-button" v-bind:class="{selected: study === selectedStudy}" @click="selectStudy(study)">{{study}}</b-button><b-button class="study-button" @click="newStudy">New Study</b-button>
       </div>
-      <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
-      <p>
-        <b>Data Source:</b>
-        <input type="file" id="selectFiles" value="Import" /><br />
-        <b-button variant="warning" id="import" @click="importFile">Import The File!</b-button>
-      </p>
+      <div v-if="selectedStudy">
+        <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
+        <p v-if="status=='complete'">
+          <b>Data Source:</b>
+          <input type="file" id="selectFiles" value="Import" /><br />
+          <b-button variant="warning" id="import" @click="importFile">Import The File!</b-button>
+        </p>
+        <p class="mt-3 pt-3"
+        v-if="status=='complete'">Click the button below to sync your firebase database with your manifest.</p>
 
-      <p class="mt-3 pt-3"
-       v-if="status=='complete'">Click the button below to sync your firebase database with your manifest.</p>
-
-      <div class="mb-3 pb-3">
-        <b-button v-if="status=='complete'" @click="refreshSamples">
-          <span> Refresh Sample List </span>
-        </b-button>
-        <div v-else>
-          <p>{{status}} {{progress}} / {{manifestEntries.length}}</p>
-          <b-progress :value="progress" :max="manifestEntries.length" variant="info" striped class="mb-2"></b-progress>
+        <div class="mb-3 pb-3">
+          <b-button v-if="status=='complete'" @click="refreshSamples">
+            <span> Refresh Sample List </span>
+          </b-button>
+          <div v-else>
+            <p>{{status}} {{progress}} / {{manifestEntries.length}}</p>
+            <b-progress :value="progress" :max="manifestEntries.length" variant="info" striped class="mb-2"></b-progress>
+          </div>
         </div>
-      </div>
-      <div v-if="manifestEntries.length" class="mt-3 pt-3">
-        <small>
-          Here are a few items in your manifest file. There are {{manifestEntries.length}} items in total
-        </small>
-      </div>
-      <div class="file-import">
-        <pre id="result"></pre>
+        <div v-if="manifestEntries.length && status=='complete'" class="mt-3 pt-3">
+          <small>
+            Here are a few items in your manifest file. There are {{manifestEntries.length}} items in total
+          </small>
+        </div>
+        <div v-if="status=='complete'" class="file-import">
+          <pre id="result"></pre>
+        </div>
       </div>
 
     </b-container>
@@ -115,11 +116,16 @@ export default {
       /**
        * the currently selected study
        */
-      selectedStudy: 'BCP',
+      selectedStudy: '',
       /**
        * If new study is available by default
        */
       available: false,
+      /**
+       * control lockout while db is loading
+       * similar to status, but status depends on a dataset.
+       */
+      lockout: false,
     };
   },
   props: {
@@ -203,9 +209,9 @@ export default {
      */
     refreshSamples() {
       if (this.manifestEntries.length) {
-        console.log(this.manifestEntries.length);
         this.status = 'refreshing';
         this.syncEntries();
+        this.manifestEntries = [];
       } else {
         document.getElementById('result').innerHTML = 'Please upload a file';
       }
@@ -222,10 +228,11 @@ export default {
       const worker = new LoadManifestWorker();
 
       // eslint-disable-next-line
-      worker.postMessage([this.manifestEntries, firebaseEntries, element.config.firebaseKeys]);
+      worker.postMessage([this.manifestEntries, firebaseEntries, element.config.firebaseKeys, this.selectedStudy]);
       worker.onmessage = function onmessage(e) {
-        element.status = 'complete';
         if (e.data === 'done') {
+          element.status = 'complete';
+          element.lockout = false;
           element.addFirebaseListener();
         } else {
           element.progress += 1;
@@ -241,6 +248,7 @@ export default {
           this.db.ref(`datasets/${this.selectedStudy}/sampleCounts`).child(key).remove();
         }
       });
+      this.lockout = true;
     },
     /**
      * choose which study's data to modify
@@ -279,7 +287,7 @@ export default {
       this.available = value;
     },
     /**
-     * add the study to firebase
+     * add the empty study to firebase
      */
     addStudyToFirebase() {
       const studies = [];
