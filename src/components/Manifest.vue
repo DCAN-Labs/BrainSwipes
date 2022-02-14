@@ -4,10 +4,10 @@
     <b-modal id="newstudy" :title="'Add a New Study to BrainSwipes'" ref="newstudy" size="lg">
       <div>
         <b-input-group prepend="Name of Study" class="mt-3">
-        <b-form-input id="new-study-text" ref="new-study-text" :disabled="formLockout" v-on:keyup="enableForm()"></b-form-input>
+        <b-form-input id="new-study-text" ref="new-study-text" :disabled="formLockout" autocomplete="off" v-on:keyup="enableForm()"></b-form-input>
         </b-input-group>
         <b-input-group prepend="Name of MSI S3 Bucket" class="mt-3">
-        <b-form-input id="new-bucket-text" ref="new-bucket-text" :disabled="formLockout" v-on:keyup="enableForm()"></b-form-input>
+        <b-form-input id="new-bucket-text" ref="new-bucket-text" :disabled="formLockout" autocomplete="off" v-on:keyup="enableForm()"></b-form-input>
         </b-input-group>
         <b-button-group size="lg">
           <b-button class="study-button" style="margin-right:0" v-bind:class="{selected: !available}" :disabled="formLockout" @click="changeAvailability(false)">Restricted access</b-button>
