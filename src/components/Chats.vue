@@ -5,7 +5,7 @@
       <p class="lead">See which samples people are talking about</p>
       <p v-for="(c, index) in sampleChat" :key="index">
         <b-alert show>
-          <router-link :to="'/' + dataset + '/review/' + c['.key']">{{c['.key']}}</router-link>
+          <router-link :to="'/' + dataset + '/review/' + c['.key'] + '/' + btoaBucket">{{c['.key']}}</router-link>
           <br>
           <span v-if="chatInfo[c['.key']]">
             <b>{{chatInfo[c['.key']].username}}</b> : {{chatInfo[c['.key']].message}}
@@ -88,9 +88,19 @@
         type: Object,
         required: true,
       },
+      /**
+       * the dataset to swipe on
+       */
       dataset: {
         type: String,
-        requred: true,
+        required: true,
+      },
+      /**
+       * the s3 bucket where the images for the dataset are held
+       */
+      bucket: {
+        type: String,
+        required: true,
       },
     },
     computed: {
@@ -106,6 +116,9 @@
        */
       blankChatImage() {
         return this.config.chats.blankImage;
+      },
+      btoaBucket() {
+        return btoa(this.bucket);
       },
     },
     /**
