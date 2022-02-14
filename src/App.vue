@@ -296,12 +296,6 @@ export default {
      */
     updateDataset(newDataset) {
       this.dataset = newDataset;
-      this.updateBucket(newDataset);
-    },
-    /**
-     * called by updateDataset to update the corresponding bucket
-     */
-    updateBucket(newDataset) {
       this.bucket = this.studies[newDataset].bucket;
     },
     /**

@@ -280,7 +280,10 @@
     beforeRouteEnter(to, from, next) {
       next((vm) => {
         if (to.params.dataset !== vm.dataset) {
-          vm.$router.push({ name: 'Home' });
+          /* eslint-disable */
+          vm.dataset = to.params.dataset;
+          vm.bucket = to.params.bucket;
+          /* eslint-enable */
         }
       });
     },
