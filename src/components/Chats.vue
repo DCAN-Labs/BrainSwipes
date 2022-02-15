@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <div v-if="!noData">
+    <div class="chats-div" v-if="!noData">
       <h1>Chats</h1>
       <p class="lead">See which samples people are talking about</p>
       <p v-for="(c, index) in sampleChat" :key="index">
@@ -13,7 +13,7 @@
         </b-alert>
       </p>
     </div>
-    <div class="chats-div" v-else>
+    <div v-else>
       <h1>Chats</h1>
       <p class="lead">No one has said anything yet!</p>
       <img :src="blankChatImage" class="blankImage"/>
