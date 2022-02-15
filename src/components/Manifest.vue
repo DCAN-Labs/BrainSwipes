@@ -173,12 +173,6 @@ export default {
       required: true,
     },
   },
-  /**
-   * When the app is mounted, add a listener to Firebase to keep track of sampleCounts.
-   */
-  mounted() {
-    this.addFirebaseListener();
-  },
   methods: {
     /**
      * Reads the uploaded file and puts it somewhere
