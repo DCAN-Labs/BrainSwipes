@@ -13,7 +13,7 @@
         </b-alert>
       </p>
     </div>
-    <div v-else>
+    <div class="chats-div" v-else>
       <h1>Chats</h1>
       <p class="lead">No one has said anything yet!</p>
       <img :src="blankChatImage" class="blankImage"/>
@@ -137,5 +137,8 @@
 <style>
   .blankImage {
     max-width: 500px;
+  }
+  .chats-div {
+    padding-bottom: 12vh;
   }
 </style>
