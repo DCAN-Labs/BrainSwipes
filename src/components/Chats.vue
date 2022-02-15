@@ -139,6 +139,6 @@
     max-width: 500px;
   }
   .chats-div {
-    padding-bottom: 12vh;
+    padding-bottom: 12vh !important;
   }
 </style>
