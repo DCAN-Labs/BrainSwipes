@@ -1,43 +1,46 @@
 <template name="review">
   <div id="review" class="container">
-
-    <div class="chat container">
-      <h3 class="mb-2">Chat</h3>
-      <div class="chatHistory pl-3 pr-3 pt-3 pb-3 mb-3" v-if="chatOrder.length">
-        <p v-for="msg in chatOrder" class="text-left" :key="msg.time">
-          <b>{{msg.username}}</b>: {{msg.message}}
-        </p>
-      </div>
-      <div v-else>
-        <p>No one has said anything yet!</p>
-      </div>
-      <b-form @submit="sendChat">
-        <b-form-group id="exampleInputGroup1"
-                label="Enter chat message:"
-                label-for="exampleInput1"
-                description="">
-          <b-form-input id="exampleInput1"
-                        type="text"
-                        v-model="chatMessage"
-                        required
-                        placeholder="Enter your message">
-          </b-form-input>
-          <b-button class="mt-2" variant="primary" @click="sendChat">Send</b-button>
-        </b-form-group>
-      </b-form>
-
+    <div v-if="loading">
+      LOADING
     </div>
-    <div>
-      <WidgetSelector
-       :widgetPointer="widgetPointer"
-       :widgetSummary="widgetSummary"
-       :playMode="''"
-       ref="widget"
-       :dataset="dataset"
-       :bucket="bucket"
-      />
-    </div>
+    <div v-else-if="allowed">
+      <div class="chat container">
+        <h3 class="mb-2">Chat</h3>
+        <div class="chatHistory pl-3 pr-3 pt-3 pb-3 mb-3" v-if="chatOrder.length">
+          <p v-for="msg in chatOrder" class="text-left" :key="msg.time">
+            <b>{{msg.username}}</b>: {{msg.message}}
+          </p>
+        </div>
+        <div v-else>
+          <p>No one has said anything yet!</p>
+        </div>
+        <b-form @submit="sendChat">
+          <b-form-group id="exampleInputGroup1"
+                  label="Enter chat message:"
+                  label-for="exampleInput1"
+                  description="">
+            <b-form-input id="exampleInput1"
+                          type="text"
+                          v-model="chatMessage"
+                          required
+                          placeholder="Enter your message">
+            </b-form-input>
+            <b-button class="mt-2" variant="primary" @click="sendChat">Send</b-button>
+          </b-form-group>
+        </b-form>
 
+      </div>
+      <div>
+        <WidgetSelector
+        :widgetPointer="widgetPointer"
+        :widgetSummary="widgetSummary"
+        :playMode="''"
+        ref="widget"
+        :dataset="dataset"
+        :bucket="bucket"
+        />
+      </div>
+    </div>
 
 
   </div>
@@ -74,8 +77,12 @@
 </style>
 
 <script>
+  import firebase from 'firebase/app';
+  import 'firebase/auth';
+  import 'firebase/database';
   import _ from 'lodash';
   import WidgetSelector from './WidgetSelector';
+
   /**
    * The review component shows the widget for a pointer to a sample in its route,
    * and lets the user discuss the sample in a chat-room type UI.
@@ -159,6 +166,14 @@
          * This list of previous chat messages.
          */
         chatHistory: [],
+        /**
+         * if the user is allowed to see this
+        */
+        allowed: false,
+        /**
+         * if the component is loading
+         */
+        loading: true,
       };
     },
     computed: {
@@ -190,6 +205,7 @@
     mounted() {
       this.widgetPointer = this.$route.params.key;
       this.setSampleInfo(this.dataset);
+      this.checkPermissions();
     },
     methods: {
       /**
@@ -272,6 +288,16 @@
           .on('value', (snap) => {
             this.widgetSummary = snap.val();
           });
+      },
+      checkPermissions() {
+        const currentUser = firebase.auth().currentUser;
+        const dataset = this.dataset;
+        firebase.database().ref(`/users/${currentUser.displayName}/datasets`).once('value')
+          .then((snap) => {
+            const data = snap.val();
+            this.allowed = data[dataset];
+          });
+        this.loading = false;
       },
     },
     /**
