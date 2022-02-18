@@ -91,8 +91,8 @@ export default {
   methods: {
     async addAdminRoutes() {
       if (firebase.auth().currentUser) {
-        const displayName = firebase.auth().currentUser.displayName;
-        firebase.database().ref(`/users/${displayName}/admin`).once('value')
+        const uid = firebase.auth().currentUser.uid;
+        firebase.database().ref(`/uids/${uid}/admin`).once('value')
           .then((snap) => {
             this.isAdmin = snap.val();
             this.loading = false;

@@ -292,7 +292,7 @@
       checkPermissions() {
         const currentUser = firebase.auth().currentUser;
         const dataset = this.dataset;
-        firebase.database().ref(`/users/${currentUser.displayName}/datasets`).once('value')
+        firebase.database().ref(`/uids/${currentUser.uid}/datasets`).once('value')
           .then((snap) => {
             const data = snap.val();
             this.allowed = data[dataset];

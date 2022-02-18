@@ -235,7 +235,7 @@
       currentLevel() {
         if (this.userData.score === this.currentLevel.min && this.currentLevel.min) {
           this.$refs.levelUp.show();
-          this.db.ref(`/users/${this.userInfo.displayName}`).child('level').set(this.currentLevel.level);
+          this.db.ref(`/uids/${this.userInfo.uid}`).child('level').set(this.currentLevel.level);
         }
       },
       /**

@@ -150,7 +150,7 @@ router.beforeEach((to, from, next) => {
   // make sure the user has take the tutorial
   if (to.name === 'Play') {
     if (currentUser) {
-      firebase.database().ref(`/users/${currentUser.displayName}`).once('value')
+      firebase.database().ref(`/uids/${currentUser.uid}`).once('value')
         .then((snap) => {
           const data = snap.val();
           if (!data.taken_tutorial) {
@@ -164,7 +164,7 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAccess) {
     const dataset = to.params.dataset;
-    firebase.database().ref(`/users/${currentUser.displayName}/datasets`).once('value')
+    firebase.database().ref(`/uids/${currentUser.uid}/datasets`).once('value')
       .then((snap) => {
         const data = snap.val();
         if (!data[dataset]) {
@@ -175,7 +175,7 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAdmin) {
     // console.log('requires admin');
-    firebase.database().ref(`/users/${currentUser.displayName}/admin`).once('value')
+    firebase.database().ref(`/uids/${currentUser.uid}/admin`).once('value')
     .then((snap) => {
       // console.log('snap is', snap.val());
       if (requiresAdmin && !snap.val()) next('unauthorized');
