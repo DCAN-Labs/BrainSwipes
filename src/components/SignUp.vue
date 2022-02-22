@@ -261,6 +261,7 @@
             // Profile updated successfully!
           this.insertUser();
           firebase.auth().currentUser.sendEmailVerification();
+          this.$emit('changePermissions');
           this.$router.replace('tutorial');
         }, (err) => {
             // An error happened.

@@ -176,10 +176,11 @@ export default {
       e.preventDefault();
       const obj = JSON.parse(JSON.stringify(this.userModified));
       this.$refs.modifyuser.hide();
-      this.updateFirebase(obj);
-      this.$emit('changePermissions', obj.datasets);
-      this.loading = true;
-      this.loadUsers();
+      this.updateFirebase(obj).then(() => {
+        this.$emit('changePermissions');
+        this.loading = true;
+        this.loadUsers();
+      });
     },
     /**
      * Switches the user's admin status
@@ -206,7 +207,7 @@ export default {
     /**
      * Modifies the database with the prepared user data
      */
-    updateFirebase(obj) {
+    async updateFirebase(obj) {
       const uid = obj.uid;
       const admin = obj.isAdmin;
       const datasets = obj.datasets;
