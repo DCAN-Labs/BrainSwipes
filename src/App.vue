@@ -304,8 +304,8 @@ export default {
           });
       }
     },
-    updateDatasetPermissions(newPermissions) {
-      this.datasetPrivileges = newPermissions;
+    updateDatasetPermissions() {
+      this.activateDatasets();
     },
     async getStudies() {
       this.db.ref('studies').on('value', (snap) => {

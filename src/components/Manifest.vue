@@ -279,6 +279,7 @@ export default {
       this.addStudyToFirebase();
       this.setUserDatasetPermissions();
       this.$refs.newstudy.hide();
+      this.$emit('changePermissions');
     },
     /**
      * close the new study menu without submitting changes
@@ -308,7 +309,7 @@ export default {
      */
     setUserDatasetPermissions() {
       const newStudy = this.$refs['new-study-text'].localValue;
-      this.db.ref('/uids').on('value', (snap) => {
+      this.db.ref('/uids').once('value').then((snap) => {
         snap.forEach((element) => {
           const userRef = this.db.ref(`/uids/${element.key}/datasets`);
           const update = {};
