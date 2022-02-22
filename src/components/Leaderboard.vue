@@ -171,20 +171,8 @@ export default {
       required: true,
     },
     /**
-       * This is an object that looks like:
-       ```
-       {
-        username: {
-          level:
-          score:
-          taken_tutorial:
-          consent:
-          admin:
-        }
-      }
-       ```
-       * it comes directly from the `/users` document in Firebase.
-       */
+     * it comes directly from the `/uids` document in Firebase.
+     */
     allUsers: {
       type: Object,
       required: true,
@@ -194,11 +182,11 @@ export default {
     sortedUsersList() {
       /* Removes '.key' property present on allUsers data */
       let allUsernames = Object.keys(this.allUsers).filter(
-        userName => userName !== '.key',
+        uid => uid !== '.key',
       );
       // eslint-disable-next-line
-      allUsernames = allUsernames.map((userName) => {
-        return { name: userName, score: this.allUsers[userName].score };
+      allUsernames = allUsernames.map((uid) => {
+        return { name: this.allUsers[uid].username, score: this.allUsers[uid].score };
       });
       /* Sort descending by score */
       allUsernames.sort((a, b) => b.score - a.score);

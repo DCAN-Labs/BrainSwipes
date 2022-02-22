@@ -27,7 +27,7 @@
           <li class="navSection desktop-menu"></li>
         </ul>
       </nav>
-
+      
       <!-- The content is in the router view -->
       <div class="router">
         <router-view
@@ -138,7 +138,7 @@ export default {
        */
       showConfig: false,
       /**
-       * All the users in the /users document
+       * All the users in the /uids document
        */
       allUsers: [],
       /**
@@ -186,7 +186,7 @@ export default {
   firebase() {
     return {
       allUsers: {
-        source: this.db.ref('/users/').orderByChild('score'),
+        source: this.db.ref('/uids/').orderByChild('score'),
         asObject: true,
       },
     };
@@ -199,14 +199,8 @@ export default {
       return this.config.firebaseKeys;
     },
     /**
-     * the brandname from the config file (home.title)
-     */
-    brandName() {
-      return this.config.home.title;
-    },
-    /**
      * the current user's data, based on the userInfo from the firebase.auth.
-     * this matches the info in allUsers (/users) to the firebase.auth user info.
+     * this matches the info in allUsers (/uids) to the firebase.auth user info.
      */
     userData() {
       let data = {};
@@ -217,7 +211,7 @@ export default {
       }
 
       _.map(this.allUsers, (value, key) => {
-        if (key === this.userInfo.displayName) {
+        if (value.username === this.userInfo.displayName) {
           data = value;
           data['.key'] = key;
         }
@@ -286,7 +280,7 @@ export default {
      */
     setTutorial(val) {
       this.db
-        .ref(`/users/${this.userInfo.displayName}`)
+        .ref(`/uids/${this.userInfo.uid}`)
         .child('taken_tutorial')
         .set(val);
       this.$router.replace('play');
@@ -304,7 +298,7 @@ export default {
     async activateDatasets() {
       const currentUser = firebase.auth().currentUser;
       if (currentUser) {
-        firebase.database().ref(`/users/${currentUser.displayName}/datasets`).once('value')
+        firebase.database().ref(`/uids/${currentUser.uid}/datasets`).once('value')
           .then((snap) => {
             this.datasetPrivileges = snap.val();
           });

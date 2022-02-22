@@ -175,17 +175,23 @@
       onSubmit(e) {
         e.preventDefault();
         // check for a unique username
-        firebase.database().ref('users').child(this.form.username).once('value')
-        .then((snapshot) => {
-          const val = snapshot.val();
-          if (!val) {
-            this.verifying = this.form.email;
-            this.createAccount();
-          } else {
-            this.errors.show = true;
-            this.errors.message = 'Username already exists! Please choose a unique username';
-          }
-        });
+        firebase.database().ref('uids').once('value')
+          .then((snapshot) => {
+            let usernameExists = false;
+            const val = snapshot.val();
+            Object.keys(val).forEach((uid) => {
+              if (val[uid].username === this.form.username) {
+                usernameExists = true;
+              }
+            });
+            if (!usernameExists) {
+              this.verifying = this.form.email;
+              this.createAccount();
+            } else {
+              this.errors.show = true;
+              this.errors.message = 'Username already exists! Please choose a unique username';
+            }
+          });
       },
       /**
        * Save that the user has consented.
@@ -222,14 +228,14 @@
         });
       },
       /**
-       * A method to insert a new user into the `/users` document of firebase.
+       * A method to insert a new user into the `/uids` document of firebase.
        * This initializes the user's score, level, whether or not they've consented.
        * and when they consented.
        * **TODO**: set an error message if something goes wrong here.
        */
       insertUser() {
         const date = new Date();
-        firebase.database().ref('users').child(firebase.auth().currentUser.displayName).set({
+        firebase.database().ref('uids').child(firebase.auth().currentUser.uid).set({
           score: 0,
           level: 0,
           admin: false,
@@ -237,6 +243,7 @@
           consent: this.form.consented,
           consentedOn: date,
           datasets: this.studyPermissions,
+          username: firebase.auth().currentUser.displayName,
         })
         .then(() => {
         })

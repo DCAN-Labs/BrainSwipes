@@ -222,7 +222,7 @@
         this.db.ref(`datasets/${this.dataset}/chats`)
           .child('sampleChats')
           .child(key).push({
-            username: this.userData['.key'],
+            username: this.userData.username,
             message: this.chatMessage,
             time: new Date().toISOString(),
           });
@@ -235,7 +235,7 @@
 
         this.db.ref(`datasets/${this.dataset}/chats`)
           .child('userChat')
-          .child(this.userData['.key'])
+          .child(this.userData.username)
           .child(key)
           .set({
             watch: 1,
@@ -246,7 +246,7 @@
         // add a flag to all other users following this chat.
         const usersToNotify = [];
         this.chatOrder.forEach((v) => {
-          if (usersToNotify.indexOf(v.username) < 0 && v.username !== this.userData['.key']) {
+          if (usersToNotify.indexOf(v.username) < 0 && v.username !== this.userData.username) {
             usersToNotify.push(v.username);
           }
         });
@@ -292,7 +292,7 @@
       checkPermissions() {
         const currentUser = firebase.auth().currentUser;
         const dataset = this.dataset;
-        firebase.database().ref(`/users/${currentUser.displayName}/datasets`).once('value')
+        firebase.database().ref(`/uids/${currentUser.uid}/datasets`).once('value')
           .then((snap) => {
             const data = snap.val();
             this.allowed = data[dataset];

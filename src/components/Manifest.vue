@@ -308,9 +308,9 @@ export default {
      */
     setUserDatasetPermissions() {
       const newStudy = this.$refs['new-study-text'].localValue;
-      this.db.ref('/users').on('value', (snap) => {
+      this.db.ref('/uids').on('value', (snap) => {
         snap.forEach((element) => {
-          const userRef = this.db.ref(`/users/${element.key}/datasets`);
+          const userRef = this.db.ref(`/uids/${element.key}/datasets`);
           const update = {};
           update[newStudy] = this.available;
           userRef.update(update);

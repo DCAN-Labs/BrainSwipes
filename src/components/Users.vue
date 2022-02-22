@@ -39,8 +39,8 @@
             <th>Score</th>
             <th>Datasets</th>
           </tr>
-          <tr v-for="(value, name) in usersObject" :key="name" v-if="value.taken_tutorial">
-            <td><b-button variant="outline-dark" @click="modifyUser(name, value)">{{ name }}</b-button></td>
+          <tr v-for="(value, uid) in usersObject" :key="uid" v-if="value.taken_tutorial">
+            <td><b-button variant="outline-dark" @click="modifyUser(uid, value)">{{ value.username }}</b-button></td>
             <td>{{ value.admin }}</td>
             <td>{{ value.score }}</td>
             <td>
@@ -109,6 +109,7 @@ export default {
        * Name of the user being modified
        */
       userModified: {
+        uid: '',
         name: '',
         isAdmin: '',
         datasets: {},
@@ -142,7 +143,7 @@ export default {
      * Loads the users from Firebase
      */
     async loadUsers() {
-      this.db.ref('/users').on('value', (snap) => {
+      this.db.ref('/uids').on('value', (snap) => {
         snap.forEach((element) => {
           this.usersObject[element.key] = element.val();
         });
@@ -153,9 +154,10 @@ export default {
      * Populates the userModified data element
      * Opens the modify user dialog
      */
-    modifyUser(name, value) {
+    modifyUser(uid, value) {
       const valueCopy = JSON.parse(JSON.stringify(value));
-      this.userModified.name = name;
+      this.userModified.uid = uid;
+      this.userModified.name = valueCopy.username;
       this.userModified.isAdmin = valueCopy.admin;
       this.userModified.datasets = valueCopy.datasets;
       this.$refs.modifyuser.show();
@@ -205,12 +207,12 @@ export default {
      * Modifies the database with the prepared user data
      */
     updateFirebase(obj) {
-      const user = obj.name;
+      const uid = obj.uid;
       const admin = obj.isAdmin;
       const datasets = obj.datasets;
       const updates = {};
-      updates[`/users/${user}/datasets`] = datasets;
-      updates[`/users/${user}/admin`] = admin;
+      updates[`/uids/${uid}/datasets`] = datasets;
+      updates[`/uids/${uid}/admin`] = admin;
       this.db.ref().update(updates);
     },
   },
