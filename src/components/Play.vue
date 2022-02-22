@@ -441,8 +441,8 @@
       * this method update's the user's score by scoreIncrement;
       */
       updateScore(scoreIncrement) {
-        this.db.ref('users')
-          .child(this.userInfo.displayName)
+        this.db.ref('uids')
+          .child(this.userInfo.uid)
           .child('score')
           .transaction(score => (score || 0) + scoreIncrement);
       },
