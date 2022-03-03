@@ -18,7 +18,9 @@
 </template>
 
 <style>
-
+  #summaries {
+    padding-bottom: 12vh;
+  }
 </style>
 
 <script>

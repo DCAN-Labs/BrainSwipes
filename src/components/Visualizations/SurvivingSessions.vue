@@ -1,6 +1,9 @@
 <template>
-  <div id="InterraterConcordance">
-    <apexchart type="line" height="200" :options="chartOptions" :series="series"></apexchart>
+  <div v-if="loading">
+    LOADING
+  </div>
+  <div v-else id="survivingSessions">
+    <apexchart type="line" height="350" :options="chartOptions" :series="series"></apexchart>
   </div>
 
 </template>
@@ -18,7 +21,7 @@
   Vue.component('apexchart', VueApexCharts);
 
   export default {
-    name: 'InterraterConcordance',
+    name: 'survivingSessions',
     data() {
       return {
         /**
@@ -35,22 +38,15 @@
           dataLabels: {
             enabled: false,
           },
-          colors: ['#008FFB'],
           title: {
             text: 'Number of Surviving Sessions at Different Rating Cutoffs',
           },
         },
-        series: [{
-          name: 'Sample Data',
-          data: [10, 41, 35, 51, 49, 62, 69, 91, 148],
-        }],
-        xaxis: {
-          categories: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-        },
+        series: [],
         /**
-         * number of samples with each threshold
+         * Not apexCharts stuff
          */
-        sampleSummaries: {},
+        loading: true,
       };
     },
     props: {
@@ -69,23 +65,38 @@
         required: true,
       },
     },
-    mounted() {
-    //   this.getSampleSummaries('BCP');
-    },
     methods: {
-      getSampleSummaries(dataset) {
-        this.db.ref(`/datasets/${dataset}/sampleSummary`).once('value').then((snap) => {
-          Object.keys(snap.val()).forEach((key) => {
-              const score = snap.val()[key].aveCount;
-              if (this.sampleSummaries[score]) {
-                this.sampleSummaries[score] = this.sampleSummaries[score] + 1;
-              } else {
-                this.sampleSummaries[score] = 1;
-              }
-          });
-          console.log(this.sampleSummaries);
-        });
+      async getData() {
+        const ref = this.db.ref('datasets/BCP/visualizations/survivingSessions');
+        const snap = await ref.once('value');
+        const T1 = [];
+        const T2 = [];
+        const rest = [];
+        const all = [];
+        for (let i = 0; i < 100; i += 5) {
+          T1.push([i, snap.val()[i].T1]);
+          T2.push([i, snap.val()[i].T2]);
+          rest.push([i, snap.val()[i].rest]);
+          all.push([i, snap.val()[i].all]);
+        }
+        this.series = [{
+          name: 'T1',
+          data: T1,
+        }, {
+          name: 'T2',
+          data: T2,
+        }, {
+          name: 'Rest',
+          data: rest,
+        }, {
+          name: 'All',
+          data: all,
+        }];
+        this.loading = false;
       },
+    },
+    created() {
+      this.getData();
     },
   };
 </script>
