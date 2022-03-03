@@ -15,7 +15,6 @@
 <script>
   import Vue from 'vue';
   import VueApexCharts from 'vue-apexcharts';
-  import colorGradient from 'javascript-color-gradient';
 
   Vue.use(VueApexCharts);
 
@@ -96,6 +95,13 @@
         type: Object,
         required: true,
       },
+      /**
+       * Color palette
+       */
+      gradientArray: {
+        type: Array,
+        required: true,
+      },
     },
     created() {
       this.setColors();
@@ -129,16 +135,12 @@
         this.loading = false;
       },
       setColors() {
-        const gradientArray = colorGradient
-          .setGradient('#440155', '#238a8d', '#fde725')
-          .setMidpoint(20)
-          .getArray();
         const ranges = [];
-        for (let i = 0; i < gradientArray.length; i += 1) {
+        for (let i = 0; i < this.gradientArray.length; i += 1) {
           ranges.push({
-            from: (100 / gradientArray.length) * i,
-            to: (100 / gradientArray.length) * (i + 1),
-            color: gradientArray[i],
+            from: (100 / this.gradientArray.length) * i,
+            to: (100 / this.gradientArray.length) * (i + 1),
+            color: this.gradientArray[i],
           });
         }
         ranges.push({

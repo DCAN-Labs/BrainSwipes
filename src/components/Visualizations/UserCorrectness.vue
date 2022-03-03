@@ -49,6 +49,16 @@
             type: 'category',
             categories: [],
           },
+          markers: {
+            discrete: [{
+              seriesIndex: 0,
+              dataPointIndex: 4,
+              fillColor: '#e3e3e3',
+              strokeColor: '#fff',
+              size: 50,
+              shape: 'circle',
+            }],
+          },
         },
         series: [{
           name: 'init',
@@ -58,6 +68,7 @@
          * Not apexCharts stuff
          */
         loading: true,
+        sizes: [],
       };
     },
     props: {
@@ -75,6 +86,13 @@
         type: Object,
         required: true,
       },
+      /**
+       * Color palette
+       */
+      gradientArray: {
+        type: Array,
+        required: true,
+      },
     },
     methods: {
       async getData() {
@@ -89,13 +107,28 @@
         sortable.sort((a, b) => b[3] - a[3]);
         const data = [];
         const names = [];
-        sortable.forEach((user) => {
+        const markers = [];
+        sortable.forEach((user, index) => {
           names.push(user[0]);
           data.push(user[3]);
+          markers.push(this.formatMarkers(user[2], index));
         });
         this.series = [{ name: 'Correctness Ratio', data }];
         this.chartOptions.xaxis = { type: 'category', categories: names };
+        this.chartOptions.markers = { discrete: markers };
         this.loading = false;
+      },
+      formatMarkers(numRatings, index) {
+        const color = '#FF00BB';
+        const size = Math.sqrt(numRatings);
+        return {
+          seriesIndex: 0,
+          dataPointIndex: index,
+          fillColor: color,
+          strokeColor: color,
+          size,
+          shape: 'circle',
+        };
       },
     },
     created() {

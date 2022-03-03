@@ -6,6 +6,7 @@
       <InterraterConcordance
       :dataset="dataset"
       :db="db"
+      :gradientArray="gradientArray"
       />
       <SurvivingSessions
       :dataset="dataset"
@@ -14,6 +15,7 @@
       <UserCorrectness
       :dataset="dataset"
       :db="db"
+      :gradientArray="gradientArray"
       />
     </b-container>
 
@@ -29,6 +31,7 @@
 
 <script>
   import Vue from 'vue';
+  import colorGradient from 'javascript-color-gradient';
   import InterraterConcordance from './Visualizations/InterraterConcordance';
   import SurvivngSessions from './Visualizations/SurvivingSessions';
   import UserCorrectness from './Visualizations/UserCorrectness';
@@ -61,6 +64,15 @@
       db: {
         type: Object,
         required: true,
+      },
+    },
+    computed: {
+      gradientArray() {
+        const gradientArray = colorGradient
+          .setGradient('#440155', '#238a8d', '#fde725')
+          .setMidpoint(20)
+          .getArray();
+        return gradientArray;
       },
     },
   };
