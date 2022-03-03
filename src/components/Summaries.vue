@@ -11,6 +11,10 @@
       :dataset="dataset"
       :db="db"
       />
+      <UserCorrectness
+      :dataset="dataset"
+      :db="db"
+      />
     </b-container>
 
   </div>
@@ -27,9 +31,11 @@
   import Vue from 'vue';
   import InterraterConcordance from './Visualizations/InterraterConcordance';
   import SurvivngSessions from './Visualizations/SurvivingSessions';
+  import UserCorrectness from './Visualizations/UserCorrectness';
 
   Vue.component('InterraterConcordance', InterraterConcordance);
   Vue.component('SurvivingSessions', SurvivngSessions);
+  Vue.component('UserCorrectness', UserCorrectness);
 
   /**
    * Visualizations of summary information.
