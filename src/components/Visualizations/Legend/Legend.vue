@@ -11,10 +11,25 @@
 
 <style scoped>
 #legend-tooltip {
+  border: 1px solid #e3e3e3;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 5px;
+  box-shadow: 2px 2px 6px -4px #999;
+  cursor: default;
+  font-size: 12px;
+  pointer-events: none;
   position: absolute;
-  background: white;
-  border: 1px solid grey;
-  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 12;
+  transition: 0.15s ease all;
+  padding: 10px;
+  text-align: left;
+  justify-content: left;
+  align-items: center;
+  font-family: Helvetica, Arial, sans-serif;
 }
 </style>
 
@@ -63,6 +78,7 @@
       legendMouseOff() {
         this.hidden = true;
       },
+      /* eslint-disable */
       moveTooltip() {
         document.addEventListener('mousemove', function(e) {
           let body = document.querySelector('body');
@@ -73,6 +89,7 @@
           tooltip.style.top = top + 'px';
         });
       }
+      /* eslint-enable */
     },
   };
 </script>
