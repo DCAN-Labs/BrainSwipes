@@ -3,22 +3,40 @@
     LOADING
   </div>
   <div v-else id="InterraterConcordance">
-    <apexchart ref="heatmap" type="heatmap" height="650" :options="chartOptions" :series="chartData"></apexchart>
+    <div class="chart-wrapper">
+      <apexchart ref="heatmap" type="heatmap" height="650" :options="chartOptions" :series="chartData"></apexchart>
+    </div>
+    <Legend
+      :max="100"
+      :min="0"
+      :gradientArray="gradientArray"
+      :label="'% Agreement'"
+    />
   </div>
 
 </template>
 
-<style>
-
+<style scoped>
+  #InterraterConcordance{
+    display: flex;
+    justify-content: center;
+  }
+  .chart-wrapper{
+    display: block;
+    overflow: hidden;
+    width: 100%;
+  }
 </style>
 
 <script>
   import Vue from 'vue';
   import VueApexCharts from 'vue-apexcharts';
+  import Legend from './Legend/Legend';
 
   Vue.use(VueApexCharts);
 
   Vue.component('apexchart', VueApexCharts);
+  Vue.component('Legend', Legend);
 
   export default {
     name: 'InterraterConcordance',
@@ -54,6 +72,9 @@
                 return `${value}%`;
               },
             },
+          },
+          legend: {
+            show: false,
           },
           plotOptions: {
             heatmap: {
