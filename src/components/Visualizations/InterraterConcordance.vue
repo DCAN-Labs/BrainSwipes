@@ -126,7 +126,7 @@
     },
     created() {
       this.setColors();
-      this.getData(500);
+      this.getData(100);
     },
     methods: {
       async getData(min) {
@@ -143,7 +143,7 @@
                 if (!ratio) {
                   ratio = 2;
                 }
-                series.push(100 * ratio.toFixed(2));
+                series.push((100 * ratio).toFixed(0));
               }
             });
             this.chartData.push({
