@@ -42,61 +42,23 @@
             text: 'Number of Surviving Sessions at Different Rating Cutoffs',
           },
         },
-        series: [],
-        /**
-         * Not apexCharts stuff
-         */
-        loading: true,
       };
     },
     props: {
       /**
-       * the dataset to swipe on
+       * data series for the visualization
        */
-      dataset: {
-        type: String,
+      series: {
+        type: Array,
         required: true,
       },
       /**
-       * the intialized firebase database
+       * is the data for this visualization still loading
        */
-      db: {
-        type: Object,
+      loading: {
+        type: Boolean,
         required: true,
       },
-    },
-    methods: {
-      async getData() {
-        const ref = this.db.ref('datasets/BCP/visualizations/survivingSessions');
-        const snap = await ref.once('value');
-        const T1 = [];
-        const T2 = [];
-        const rest = [];
-        const all = [];
-        for (let i = 0; i < 100; i += 5) {
-          T1.push([i, snap.val()[i].T1]);
-          T2.push([i, snap.val()[i].T2]);
-          rest.push([i, snap.val()[i].rest]);
-          all.push([i, snap.val()[i].all]);
-        }
-        this.series = [{
-          name: 'T1',
-          data: T1,
-        }, {
-          name: 'T2',
-          data: T2,
-        }, {
-          name: 'Rest',
-          data: rest,
-        }, {
-          name: 'All',
-          data: all,
-        }];
-        this.loading = false;
-      },
-    },
-    created() {
-      this.getData();
     },
   };
 </script>
