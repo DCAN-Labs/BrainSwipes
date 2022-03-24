@@ -39,14 +39,14 @@
             <th>Score</th>
             <th>Datasets</th>
           </tr>
-          <tr v-for="(value, uid) in usersObject" :key="uid" v-if="value.taken_tutorial">
-            <td><b-button variant="outline-dark" @click="modifyUser(uid, value)">{{ value.username }}</b-button></td>
-            <td>{{ value.admin }}</td>
-            <td>{{ value.score }}</td>
+          <tr v-for="uid in Object.keys(usersObject).sort((a, b) => { return (usersObject[b].username > usersObject[a].username)? -1 : 1 })" :key="uid" v-if="usersObject[uid].taken_tutorial">
+            <td><b-button variant="outline-dark" @click="modifyUser(uid, usersObject[uid])">{{ usersObject[uid].username? usersObject[uid].username : '' }}</b-button></td>
+            <td>{{ usersObject[uid].admin? usersObject[uid].admin : false }}</td>
+            <td>{{ usersObject[uid].score? usersObject[uid].score : '' }}</td>
             <td>
               <table>
                 <tr>
-                  <th v-for="study in Object.keys(studies)" :key="study" v-bind:class="{red: !value.datasets[study], green: value.datasets[study]}">{{study}}</th>
+                  <th v-for="study in Object.keys(studies)" :key="study" v-bind:class="{ red: usersObject[uid].datasets? !usersObject[uid].datasets[study] : false, green: usersObject[uid].datasets? usersObject[uid].datasets[study] : false }">{{study}}</th>
                 </tr>
               </table>
             </td>
