@@ -38,8 +38,8 @@
             <span> Refresh Sample List </span>
           </b-button>
           <div v-else>
-            <p>{{status}} {{progress}} / {{manifestEntries.length}}</p>
-            <b-progress :value="progress" :max="manifestEntries.length" variant="info" striped class="mb-2"></b-progress>
+            <p>{{status}} {{progress}} / {{target}}</p>
+            <b-progress :value="progress" :max="target" variant="info" striped class="mb-2"></b-progress>
           </div>
         </div>
         <div v-if="manifestEntries.length && status=='complete'" class="mt-3 pt-3">
@@ -88,8 +88,6 @@
 
 <script>
 import _ from 'lodash';
-// eslint-disable-next-line
-import LoadManifestWorker from 'worker-loader!../workers/LoadManifestWorker';
 
 /** Manifest panel for the /manifest route.
  * The manifest panel syncs data from the uploaded file. Only people
@@ -108,6 +106,7 @@ export default {
        * Progress bar for the entries being synced to firebase
        */
       progress: 0,
+      target: 0,
       /**
        * The list of items to put into /sampleCounts
        */
@@ -215,8 +214,11 @@ export default {
     refreshSamples() {
       if (this.manifestEntries.length) {
         this.status = 'refreshing';
+        this.lockout = true;
         this.syncEntries();
+        this.lockout = false;
         this.manifestEntries = [];
+        this.addFirebaseListener();
       } else {
         document.getElementById('result').innerHTML = 'Please upload a file';
       }
@@ -229,20 +231,8 @@ export default {
 
       // first, for anything in manifest entries that isn't in firebase db
       // add them.
-      const element = this;
-      const worker = new LoadManifestWorker();
 
-      // eslint-disable-next-line
-      worker.postMessage([this.manifestEntries, firebaseEntries, element.config.firebaseKeys, this.selectedStudy]);
-      worker.onmessage = function onmessage(e) {
-        if (e.data === 'done') {
-          element.status = 'complete';
-          element.lockout = false;
-          element.addFirebaseListener();
-        } else {
-          element.progress += 1;
-        }
-      };
+      this.updateManifest(firebaseEntries);
 
       // next check all of the items in firebase db
       // and remove any that aren't in manifestEntries
@@ -253,8 +243,34 @@ export default {
           this.db.ref(`datasets/${this.selectedStudy}/sampleCounts`).child(key).remove();
         }
       });
-      this.lockout = true;
     },
+    /* eslint-disable */
+    updateManifest(firebaseEntries) {
+      const filtered = _.filter(this.manifestEntries, m => firebaseEntries.indexOf(m) < 0);
+      const target = filtered.length;
+      this.target = target;
+      const study = this.selectedStudy;
+      let current = 0;
+      if (target) {
+        _.map(filtered,
+          (key) => {
+            if (study) {
+              this.db.ref(`datasets/${study}/sampleCounts`).child(key).set(0).then(() => {
+                current += 1;
+                this.progress += 1;
+                if (current === target) {
+                    // We then have treated all the objects
+                  return ('done');
+                }
+              })
+              .catch(() => {
+                return ('error');
+              });
+            }
+          });
+      }
+    },
+    /* eslint-enable */
     /**
      * choose which study's data to modify
      */
