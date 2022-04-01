@@ -1,4 +1,8 @@
 # Swipes For Science Dev
+
+![Swipes app flow](./swipes-flow.png "Standard flow for the swipes app")
+
+## Other Sowftware used by Swipes
 Original SFS Documentation: https://docs.swipesforscience.org/
 
 Travis CI (continuous integration): https://app.travis-ci.com/github/DCAN-Labs/SwipesForScience
@@ -7,7 +11,7 @@ Firebase (backend): https://console.firebase.google.com/project/brainswipes/over
 
 AWS Lightsail (hosting) https://lightsail.aws.amazon.com/ls/webapp/home/instances?#
 
-## Current DCAN SFS Apps:
+## Current DCAN SFS Apps
 https://github.com/DCAN-Labs/SwipesForScience : https://brainswipes.us/
 
 https://github.com/DCAN-Labs/abcd-t1reg : https://abcd-t1reg.braindr.us/ (disabled)
