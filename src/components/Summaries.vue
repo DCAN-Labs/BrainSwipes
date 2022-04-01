@@ -4,7 +4,7 @@
 
     <b-container>
       <div> 
-        <b-dropdown variant="warning" class="usersDropdown" text="Select Users to Exclude" ref="usersDropdown">
+        <b-dropdown variant="warning" class="usersDropdown" text="Users to Include" ref="usersDropdown">
           <b-dropdown-form>
             <b-button v-on:click="selectAll">{{selectedUsers.length === sortedUsersList.length? 'Unselect All' : 'Select All'}}</b-button>
             <b-dropdown-divider></b-dropdown-divider>
