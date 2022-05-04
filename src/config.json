@@ -67,6 +67,14 @@
     "appId": "1:518258041913:web:ae6cbc61a715d9941659e8",
     "measurementId": "G-YNZSDHFLC7"
   },
+  "globusKeys": {
+    "clientId": "d032f59c-b5a3-4c27-9c38-adbd94a63e9a",
+    "clientSecret": "h3XR7/f3YTFXi1i6cyGhPjUQ6mUQMP+E08giN+uWV1Q=",
+    "redirectUri": "http://localhost:8080/restricted",
+    "authorizationEndpoint": "https://auth.globus.org/v2/oauth2/authorize",
+    "tokenEndpoint": "https://auth.globus.org/v2/oauth2/token",
+    "requestedScopes": "openid profile email"
+  },
   "play": {
     "blankImage": "https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_blank_canvas.svg?sanitize=true"
   },
