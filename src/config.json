@@ -215,6 +215,10 @@
           "image": "/static/tutorial_imgs/passwithtexttest.JPG"
         },
         {
+          "text": "In this flipped example, which depicts the functional image as a greyscale image with the anatomical as a red overlaid trace, the functional image has some cutoff in the cerebellum. \nHowever, because the temporal lobe is minimally cutoff, the image would still be considered a PASS.",
+          "image": "/static/tutorial_imgs/passFOV.JPG"
+        },
+        {
           "text": "Signal dropout occurs where the scanner cannot acquire data during a scan. \nThere are many reasons this can occur.",
           "image": "/static/tutorial_imgs/signalfail.JPG"
         },
