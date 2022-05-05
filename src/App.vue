@@ -48,6 +48,8 @@
           :bucket="bucket"
           @login="activateDatasets"
           :key="$route.fullPath"
+          :globusToken="globusToken"
+          @globusLogin="globusLogin"
         />
       </div>
     </div>
@@ -163,6 +165,10 @@ export default {
        * s3 bucket where the images are stored
        */
       bucket: '',
+      /**
+       * Globus auth token
+       */
+      globusToken: '',
     };
   },
   /**
@@ -311,6 +317,9 @@ export default {
       this.db.ref('studies').on('value', (snap) => {
         this.studies = snap.val();
       });
+    },
+    globusLogin(token) {
+      this.globusToken = token;
     },
   },
   /**

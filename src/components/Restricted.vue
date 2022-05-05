@@ -4,7 +4,7 @@
   </div>
   <div v-else>
     <b-button class="btn btn-primary" @click="logoutOfGlobus">Logout of Globus</b-button>
-    <p>{{authToken}}</p>
+    <p>globusToken: {{globusToken}}</p>
     <b-button class="btn btn-warn" @click="getUserInfo">Get User Info</b-button>
   </div>
 </template>
@@ -17,12 +17,15 @@ export default {
   name: 'restricted',
   data() {
     return {
-      authToken: '',
-      rawIdToken: '',
-      idToken: '',
       authenticated: false,
       globusUserInfo: {},
     };
+  },
+  props: {
+    globusToken: {
+      type: String,
+      required: true,
+    },
   },
   methods: {
     loginWithGlobus() {
@@ -38,15 +41,8 @@ export default {
         const url = window.location.href;
         PkceAuth.exchangeForAccessToken(url).then((resp) => {
           console.log(resp);
-          // If you get back multiple tokens you'll need to make changes here.
           const accessToken = resp.access_token;
-          const idToken = resp.id_token;
-
-          // Set it in local storage - the are a number of alternatives for
-          // saving this that are arguably more secure but this is the simplest
-          // for demonstration purposes.
-          window.localStorage.setItem('authToken', accessToken);
-          window.localStorage.setItem('idToken', idToken);
+          this.$emit('globusLogin', accessToken);
 
           // This isn't strictly necessary but it ensures no code reuse.
           sessionStorage.removeItem('pkce_code_verifier');
@@ -60,23 +56,20 @@ export default {
     },
     logoutOfGlobus() {
       // Should revoke here
-      window.localStorage.removeItem('authToken');
-      window.localStorage.removeItem('idToken');
+      this.$emit('globusLogin', '');
       this.$router.push({ name: 'Home' });
     },
     allowAccess() {
-      this.authToken = localStorage.getItem('authToken');
-      this.rawIdToken = localStorage.getItem('idToken');
-      if (this.authToken) {
+      if (this.globusToken) {
         this.authenticated = true;
       }
     },
     getUserInfo() {
-      if (this.authToken) {
+      if (this.globusToken) {
         console.log('Getting user information with token !');
         fetch('https://auth.globus.org/p/whoami?include=identity_provider', {
           headers: new Headers({
-            Authorization: `Bearer ${this.authToken}`,
+            Authorization: `Bearer ${this.globusToken}`,
           }),
         }).then(response => response.json())
         .then((responseData) => {
