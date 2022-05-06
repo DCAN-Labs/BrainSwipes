@@ -44,6 +44,14 @@ export default {
       type: Object,
       required: true,
     },
+    globusToken: {
+      type: String,
+      required: true,
+    },
+    userInfo: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -52,8 +60,12 @@ export default {
   },
   methods: {
     routeToPlay(label) {
-      this.$emit('changeDataset', label);
-      this.$router.push({ name: 'Play', params: { dataset: label }, query: this.routerQuery });
+      if (!this.studies[label].available && (!this.globusToken || !this.userInfo.emailVerified)) {
+        this.$router.push({ name: 'Restricted' });
+      } else {
+        this.$emit('changeDataset', label);
+        this.$router.push({ name: 'Play', params: { dataset: label }, query: this.routerQuery });
+      }
     },
   },
 };

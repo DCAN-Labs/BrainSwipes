@@ -50,6 +50,7 @@
           :key="$route.fullPath"
           :globusToken="globusToken"
           @globusLogin="globusLogin"
+          :getGlobusIdentities="getGlobusIdentities"
         />
       </div>
     </div>
@@ -266,6 +267,7 @@ export default {
      * log out of firebase
      */
     logout() {
+      this.globusToken = '';
       firebase
         .auth()
         .signOut()
@@ -320,6 +322,22 @@ export default {
     },
     globusLogin(token) {
       this.globusToken = token;
+    },
+    async getGlobusIdentities() {
+      let identities = {};
+      if (this.globusToken) {
+        const response = await fetch('https://auth.globus.org/p/whoami?include=identity_provider', {
+          headers: new Headers({
+            Authorization: `Bearer ${this.globusToken}`,
+          }),
+        });
+        const responseJSON = await response.json();
+        identities = _.reduce(responseJSON.identities, function (r, v) {
+          r[v.organization] = v.email;
+          return r;
+        }, {});
+      }
+      return identities;
     },
   },
   /**

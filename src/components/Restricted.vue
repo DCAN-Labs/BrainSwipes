@@ -1,11 +1,18 @@
 <template>
-  <div v-if="!authenticated">
-    <b-button class="btn btn-primary" @click="loginWithGlobus">Login with Globus</b-button>
-  </div>
-  <div v-else>
-    <b-button class="btn btn-primary" @click="logoutOfGlobus">Logout of Globus</b-button>
-    <p>globusToken: {{globusToken}}</p>
-    <b-button class="btn btn-warn" @click="getUserInfo">Get User Info</b-button>
+  <div id="restricted">
+    <div v-if="!authenticated">
+      <p>This dataset requires additional authentication. Please login with Globus.</p>
+      <b-button class="btn btn-primary" @click="loginWithGlobus">Login with Globus</b-button>
+    </div>
+    <div v-else>
+      <b-button class="btn btn-primary" @click="logoutOfGlobus">Logout of Globus</b-button>
+      <p>globusToken: {{globusToken}}</p>
+      <b-button class="btn btn-primary" @click="logIdentities">Get Globus Identities</b-button>
+    </div>
+    <div v-if="!userInfo.emailVerified">
+      <p>This dataset requires a verified email address.</p>
+      <b-button class="btn btn-primary" @click="verifyEmail">Verify Email</b-button>
+    </div>  
   </div>
 </template>
 
@@ -24,6 +31,14 @@ export default {
   props: {
     globusToken: {
       type: String,
+      required: true,
+    },
+    userInfo: {
+      type: Object,
+      required: true,
+    },
+    getGlobusIdentities: {
+      type: Function,
       required: true,
     },
   },
@@ -64,19 +79,12 @@ export default {
         this.authenticated = true;
       }
     },
-    getUserInfo() {
-      if (this.globusToken) {
-        console.log('Getting user information with token !');
-        fetch('https://auth.globus.org/p/whoami?include=identity_provider', {
-          headers: new Headers({
-            Authorization: `Bearer ${this.globusToken}`,
-          }),
-        }).then(response => response.json())
-        .then((responseData) => {
-          this.globusUserInfo = responseData.identities;
-          console.log(this.globusUserInfo);
-        });
-      }
+    async logIdentities() {
+      const result = await this.getGlobusIdentities();
+      console.log(result);
+    },
+    verifyEmail() {
+      this.$router.push({ name: 'Profile' });
     },
   },
   created() {
