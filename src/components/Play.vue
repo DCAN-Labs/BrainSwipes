@@ -173,6 +173,27 @@
         type: String,
         required: true,
       },
+      /**
+       * The auth token from Globus
+       */
+      globusToken: {
+        type: String,
+        required: true,
+      },
+      /**
+       * function that exchanges the Globus token for user information
+       */
+      getGlobusIdentities: {
+        type: Function,
+        required: true,
+      },
+      /**
+       * List of studies from the db
+       */
+      studies: {
+        type: Object,
+        required: true,
+      },
     },
     data() {
       return {
@@ -503,9 +524,16 @@
      * Prevents navigation to Play when the dataset prop does not match the route name
      */
     beforeRouteEnter(to, from, next) {
-      next((vm) => {
+      next(async (vm) => {
+        /* eslint-disable */
+        const result = await vm._props.getGlobusIdentities(vm._props.globusToken);
+        const email = vm._props.userInfo.email;
+        const restricted = !vm.dataset['available'];
+        /* eslint-enable */
         if (to.params.dataset !== vm.dataset) {
           vm.$router.push({ name: 'Home' });
+        } else if (restricted && result['University of Minnesota'] !== email) {
+          vm.$router.push({ name: 'Restricted' });
         }
       });
     },

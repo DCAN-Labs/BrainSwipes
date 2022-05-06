@@ -80,7 +80,7 @@ export default {
       }
     },
     async logIdentities() {
-      const result = await this.getGlobusIdentities();
+      const result = await this.getGlobusIdentities(this.globusToken);
       console.log(result);
     },
     verifyEmail() {

@@ -323,19 +323,21 @@ export default {
     globusLogin(token) {
       this.globusToken = token;
     },
-    async getGlobusIdentities() {
+    async getGlobusIdentities(token) {
       let identities = {};
-      if (this.globusToken) {
+      if (token) {
         const response = await fetch('https://auth.globus.org/p/whoami?include=identity_provider', {
           headers: new Headers({
-            Authorization: `Bearer ${this.globusToken}`,
+            Authorization: `Bearer ${token}`,
           }),
         });
         const responseJSON = await response.json();
+        /* eslint-disable */
         identities = _.reduce(responseJSON.identities, function (r, v) {
           r[v.organization] = v.email;
           return r;
         }, {});
+        /* eslint-enable */
       }
       return identities;
     },
