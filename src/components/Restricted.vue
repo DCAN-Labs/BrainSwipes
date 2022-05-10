@@ -33,12 +33,15 @@ export default {
       type: String,
       required: true,
     },
-    userInfo: {
-      type: Object,
-      required: true,
-    },
     getGlobusIdentities: {
       type: Function,
+      required: true,
+    },
+    /**
+     * the authenticated user object from firebase
+     */
+    userInfo: {
+      type: Object,
       required: true,
     },
   },

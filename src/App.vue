@@ -51,6 +51,7 @@
           :globusToken="globusToken"
           @globusLogin="globusLogin"
           :getGlobusIdentities="getGlobusIdentities"
+          :globusAllowedOrgs="globusAllowedOrgs"
         />
       </div>
     </div>
@@ -170,6 +171,10 @@ export default {
        * Globus auth token
        */
       globusToken: '',
+      /**
+       * List of organizations we trust from globus auth
+       */
+      globusAllowedOrgs: [],
     };
   },
   /**
@@ -320,6 +325,11 @@ export default {
         this.studies = snap.val();
       });
     },
+    async getGlobusAllowdOrgs() {
+      this.db.ref('config/allowedGlobusOrganizations').on('value', (snap) => {
+        this.globusAllowedOrgs = snap.val();
+      });
+    },
     globusLogin(token) {
       this.globusToken = token;
     },
@@ -334,7 +344,7 @@ export default {
         const responseJSON = await response.json();
         /* eslint-disable */
         identities = _.reduce(responseJSON.identities, function (r, v) {
-          r[v.organization] = v.email;
+          r[v.email] = [v.organization, v.status];
           return r;
         }, {});
         /* eslint-enable */
@@ -348,6 +358,7 @@ export default {
   async created() {
     await this.activateDatasets();
     await this.getStudies();
+    await this.getGlobusAllowdOrgs();
   },
 };
 </script>

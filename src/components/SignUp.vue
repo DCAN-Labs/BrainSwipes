@@ -250,6 +250,7 @@
           consentedOn: date,
           datasets: this.studyPermissions,
           username: firebase.auth().currentUser.displayName,
+          organization: 'No Organization',
         })
         .then(() => {
         })

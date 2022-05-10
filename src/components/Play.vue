@@ -104,6 +104,8 @@
        7. And then loading the next sample to view.
    */
   import _ from 'lodash';
+  import firebase from 'firebase/app';
+  import 'firebase/auth';
   import Vue from 'vue';
   import WidgetSelector from './WidgetSelector';
   import Flask from './Animations/Flask';
@@ -527,12 +529,16 @@
       next(async (vm) => {
         /* eslint-disable */
         const result = await vm._props.getGlobusIdentities(vm._props.globusToken);
-        const email = vm._props.userInfo.email;
+        const user = firebase.auth().currentUser;
+        const email = user.email;
+        const snap = await vm._props.db.ref(`uids/${user.uid}/organization`).once('value');
+        const organization = snap.val();
+        console.log(organization);
         const restricted = !vm.dataset['available'];
         /* eslint-enable */
         if (to.params.dataset !== vm.dataset) {
           vm.$router.push({ name: 'Home' });
-        } else if (restricted && result['University of Minnesota'] !== email) {
+        } else if (restricted && (result[email][0] !== organization || result[email][1] !== 'used')) {
           vm.$router.push({ name: 'Restricted' });
         }
       });
