@@ -144,6 +144,27 @@
         type: String,
         required: true,
       },
+      /**
+       * The auth token from Globus
+       */
+      globusToken: {
+        type: String,
+        required: true,
+      },
+      /**
+       * function that exchanges the Globus token for user information
+       */
+      getGlobusIdentities: {
+        type: Function,
+        required: true,
+      },
+      /**
+       * List of studies from the db
+       */
+      studies: {
+        type: Object,
+        required: true,
+      },
     },
     components: {
       WidgetSelector,
@@ -205,7 +226,6 @@
     mounted() {
       this.widgetPointer = this.$route.params.key;
       this.setSampleInfo(this.dataset);
-      this.checkPermissions();
     },
     methods: {
       /**
@@ -289,27 +309,44 @@
             this.widgetSummary = snap.val();
           });
       },
-      checkPermissions() {
-        const currentUser = firebase.auth().currentUser;
-        const dataset = this.dataset;
-        firebase.database().ref(`/uids/${currentUser.uid}/datasets`).once('value')
-          .then((snap) => {
-            const data = snap.val();
-            this.allowed = data[dataset];
-          });
-        this.loading = false;
-      },
     },
     /**
      * Prevents navigation to Review when the dataset prop does not match the route name
+     * or if globus authentication is incorrect
      */
     beforeRouteEnter(to, from, next) {
-      next((vm) => {
+      next(async (vm) => {
+        /* eslint-disable no-underscore-dangle */
+        const available = await vm._props.db.ref(`studies/${to.params.dataset}/available`).once('value');
+        const restricted = !available.val();
+        const errors = [];
+        const user = firebase.auth().currentUser;
+        const snap = await vm._props.db.ref(`uids/${user.uid}`).once('value');
+        const currentUserInfo = snap.val();
+        const userAllowed = currentUserInfo.datasets[to.params.dataset];
         if (to.params.dataset !== vm.dataset) {
-          /* eslint-disable */
-          vm.dataset = to.params.dataset;
-          vm.bucket = to.params.bucket;
-          /* eslint-enable */
+          vm.$router.push({ name: 'Home' });
+        } else if (restricted) {
+          const email = user.email;
+          const identities = await vm._props.getGlobusIdentities(vm._props.globusToken);
+          /* eslint-enable no-underscore-dangle */
+          const organization = currentUserInfo.organization;
+          if (Object.keys(identities).length === 0) {
+            errors.push(1);
+          } else if (!identities[email]) {
+            errors.push(2);
+          } else if (identities[email][0] !== organization) {
+            errors.push(3);
+          } else if (identities[email][1] !== 'used') {
+            errors.push(4);
+          }
+        } if (errors.length) {
+          vm.$router.push({ name: 'Restricted', query: { errors } });
+        } else if (userAllowed) {
+        /* eslint-disable */
+        vm.allowed = true;
+        vm.loading = false;
+        /* eslint-enable */
         }
       });
     },

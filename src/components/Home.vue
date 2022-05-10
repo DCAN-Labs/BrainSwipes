@@ -25,9 +25,6 @@
 export default {
   name: 'Home',
   props: {
-    routerQuery: {
-      type: Object,
-    },
     dataset: {
       type: String,
       required: true,
@@ -60,13 +57,31 @@ export default {
   },
   methods: {
     routeToPlay(label) {
-      if (!this.studies[label].available && (!this.globusToken || !this.userInfo.emailVerified)) {
-        this.$router.push({ name: 'Restricted' });
+      const errors = [];
+      if (!this.studies[label].available) {
+        if (!this.globusToken) {
+          errors.push(1);
+        }
+        if (!this.userInfo.emailVerified) {
+          errors.push(5);
+        }
+      }
+      if (errors.length) {
+        this.$router.push({ name: 'Restricted', query: { errors } });
       } else {
         this.$emit('changeDataset', label);
-        this.$router.push({ name: 'Play', params: { dataset: label }, query: this.routerQuery });
+        this.$router.push({ name: 'Play', params: { dataset: label } });
       }
     },
+    reroute() {
+      const query = this.$route.query;
+      if (query.reroute) {
+        this.$router.push({ path: query.reroute });
+      }
+    },
+  },
+  mounted() {
+    this.reroute();
   },
 };
 </script>
