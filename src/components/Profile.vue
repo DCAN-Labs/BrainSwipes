@@ -55,25 +55,25 @@
       not worth dealing with right now.
       Leaving here in case it matters later. -->
 
-      <div v-if="chats.length">
+      <!-- <div v-if="chats.length">
         <h2> Your Chats </h2>
         <p class="lead">
           Your discussions on specific samples
         </p>
 
-        <div v-for="study in Object.keys(studies)" :key="study">
-          <h2>{{study}}</h2>
-          <div v-for="c in chats[study]"  class="text-left" :key="c">
-            <p>{{c}}</p>
-            <div v-if="chatInfo[c]">
-              <b-alert :show="true" >
-                <router-link :to="'/BCP/review/' + c + '/brainswipes/'">{{c}}</router-link>:
-                <b>{{chatInfo[c].username}}</b>
-                {{chatInfo[c].message}}
-              </b-alert>
-            </div>
+        <div v-for="c in chats"  class="text-left" :key="c">
+          <div v-if="chatInfo[c]">
+            <b-alert :show="chatInfo[c].notify">
+              <router-link :to="'/listen/' + c">{{c}}</router-link>:
+              <b>{{chatInfo[c].username}}</b>
+              {{chatInfo[c].message}}
+            </b-alert>
+            <b-alert :show="!chatInfo[c].notify" variant="light">
+              <router-link :to="'/review/' + c">{{c}}</router-link>:
+              <b>{{chatInfo[c].username}}</b>
+              {{chatInfo[c].message}}
+            </b-alert>
           </div>
-          <hr>
         </div>
       </div>
       <div v-else>
@@ -82,7 +82,7 @@
           You haven't said anything yet! When you're ready, join the discussion.
         </p>
         <img :src="blankImage" class="blankImage"/>
-      </div>
+      </div> -->
     </b-container>
 
   </div>
@@ -205,44 +205,43 @@ export default {
       type: Object,
       required: true,
     },
-    /**
-     * available studies and their attributes
-     */
-    studies: {
-      type: Object,
-      required: true,
-    },
   },
   /**
    * when the component is mounted, it gets the user's chats.
    */
-  mounted() {
-    if (this.userData.username) {
-      this.getUserChats();
-    }
-  },
-  watch: {
-    chats() {
-      this.watchChats('BCP');
-    },
-  },
+  // mounted() {
+  //   if (this.userData['.key']) {
+  //     this.getUserChats('BCP');
+  //   }
+  // },
+  // watch: {
+  //   /**
+  //    * if the user is updated, get their chats. (is this necessary?)
+  //    */
+  //   userData() {
+  //     if (this.userData['.key']) {
+  //       this.getUserChats('BCP');
+  //     }
+  //   },
+  //   chats() {
+  //     this.watchChats('BCP');
+  //   },
+  // },
   methods: {
     /**
      * A method to read the firebase db ref /chats/<user_display_name>
      *
      */
-    getUserChats() {
-      Object.keys(this.studies).forEach((study) => {
-        this.db.ref(`datasets/${study}/chats`)
+    getUserChats(dataset) {
+      this.db.ref(`datasets/${dataset}/chats`)
         .child('userChat')
-        .child(this.userData.username)
+        .child(this.userData['.key'])
         .on('value', (snap) => {
           const data = snap.val();
           if (data) {
-            this.chats.push({ [study]: Object.keys(data) });
+            this.chats = Object.keys(data);
           }
         });
-      });
     },
     /**
      * for each chat key in the firebase database, update our local chatInfo data.
@@ -261,8 +260,7 @@ export default {
             this.getNotifications(c);
             this.$forceUpdate();
           });
-        });
-      console.log(this.chatInfo);
+      });
     },
     /**
      * In theory this method should set a flag to tell the UI
