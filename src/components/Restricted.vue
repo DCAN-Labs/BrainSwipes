@@ -64,16 +64,20 @@ export default {
     },
   },
   methods: {
+    /**
+     * create url params and redirect user to globus
+     */
     loginWithGlobus() {
       const authUrl = PkceAuth.authorizeUrl();
-      console.log(`Sending the user to ${authUrl}`);
       window.location.replace(authUrl);
     },
+    /**
+     * check if the user was redirected from globus with a token
+     */
     checkForGlobusAuthCode() {
       const params = new URLSearchParams(window.location.search);
       const authCode = params.get('code');
       if (authCode) {
-        console.log('Getting a token...');
         const url = window.location.href;
         PkceAuth.exchangeForAccessToken(url).then((resp) => {
           const accessToken = resp.access_token;
@@ -82,29 +86,43 @@ export default {
           // This isn't strictly necessary but it ensures no code reuse.
           sessionStorage.removeItem('pkce_code_verifier');
           sessionStorage.removeItem('pkce_state');
-          console.log('Cleared the PKCE state!');
 
           this.$router.push({ name: 'Home' });
         });
       }
     },
+    /**
+     * wipe globus token and redirect to home.
+     * should maybe be more robust.
+     */
     logoutOfGlobus() {
-      // Should revoke here
       this.$emit('globusLogin', '');
       this.$router.push({ name: 'Home' });
     },
+    /**
+     * show content that requires authentication
+     */
     allowAccess() {
       if (this.globusToken) {
         this.authenticated = true;
       }
     },
+    /**
+     * function for testing auth token, not in use.
+     */
     async logIdentities() {
       const result = await this.getGlobusIdentities(this.globusToken);
       console.log(result);
     },
+    /**
+     * route user to profile which already has a verify email function
+     */
     verifyEmail() {
       this.$router.push({ name: 'Profile' });
     },
+    /**
+     * check for incoming errors and display them
+     */
     parseErrors() {
       const errors = this.$route.query.errors;
       if (errors) {
@@ -112,8 +130,20 @@ export default {
         this.errors = errors;
       }
     },
+    /**
+     * The redirect uri should match the host currently running the app.
+     * https://auth.globus.org/v2/web/developers
+     */
+    setRedirect() {
+      let redirectUri = 'https://brainswipes.us/restricted';
+      if (process.env.NODE_ENV === 'development') {
+        redirectUri = 'http://localhost:8080/restricted';
+      }
+      PkceAuth.config.redirect_uri = redirectUri;
+    },
   },
   created() {
+    this.setRedirect();
     this.checkForGlobusAuthCode();
     this.allowAccess();
     this.parseErrors();
