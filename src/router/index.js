@@ -16,6 +16,7 @@ import Chats from '@/components/Chats';
 import Users from '@/components/Users';
 import Manifest from '@/components/Manifest';
 import Restricted from '@/components/Restricted';
+import Results from '@/components/Results';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -147,6 +148,7 @@ const router = new Router({
     {
       path: '/results',
       name: 'Results',
+      component: Results,
       meta: {
         requiresAuth: true,
       },
