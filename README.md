@@ -1,6 +1,6 @@
 # Swipes For Science Dev
 
-![Swipes app flow](./swipes-flow.png "Standard flow for the swipes app")
+![Swipes app flow](./src/assets/swipes-flow.png "Standard flow for the swipes app")
 
 ## Other Sowftware used by Swipes
 Original SFS Documentation: https://docs.swipesforscience.org/
