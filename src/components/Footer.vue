@@ -69,6 +69,7 @@ export default {
         { path: '/tutorial', name: 'Tutorial' },
         { path: '/leaderboard', name: 'Leaderboard' },
         { path: '/about', name: 'About' },
+        { path: '/results', name: 'Results' },
       ],
       isAdmin: false,
       loading: true,

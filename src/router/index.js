@@ -144,6 +144,13 @@ const router = new Router({
         requiresAuth: true,
       },
     },
+    {
+      path: '/results',
+      name: 'Results',
+      meta: {
+        requiresAuth: true,
+      },
+    },
   ],
 });
 
