@@ -9,7 +9,7 @@
       </div>
     </b-modal>
 
-    <div class="main">
+    <div v-if="allowed" class="main">
 
       <b-alert :show="dismissCountDown"
          :variant="feedback.variant"
@@ -104,6 +104,8 @@
        7. And then loading the next sample to view.
    */
   import _ from 'lodash';
+  import firebase from 'firebase/app';
+  import 'firebase/auth';
   import Vue from 'vue';
   import WidgetSelector from './WidgetSelector';
   import Flask from './Animations/Flask';
@@ -173,6 +175,27 @@
         type: String,
         required: true,
       },
+      /**
+       * The auth token from Globus
+       */
+      globusToken: {
+        type: String,
+        required: true,
+      },
+      /**
+       * function that exchanges the Globus token for user information
+       */
+      getGlobusIdentities: {
+        type: Function,
+        required: true,
+      },
+      /**
+       * List of studies from the db
+       */
+      studies: {
+        type: Object,
+        required: true,
+      },
     },
     data() {
       return {
@@ -224,6 +247,10 @@
          * widget summary comes from firebase when the widget Pointer is set.
          */
         widgetSummary: {},
+        /**
+         * whether the user is allowed to see this dataset
+         */
+        allowed: false,
       };
     },
     watch: {
@@ -501,11 +528,41 @@
     },
     /**
      * Prevents navigation to Play when the dataset prop does not match the route name
+     * or if globus authentication is incorrect
      */
     beforeRouteEnter(to, from, next) {
-      next((vm) => {
+      next(async (vm) => {
+        /* eslint-disable no-underscore-dangle */
+        const available = await vm._props.db.ref(`studies/${to.params.dataset}/available`).once('value');
+        const restricted = !available.val();
+        const errors = [];
+        const user = firebase.auth().currentUser;
+        const snap = await vm._props.db.ref(`uids/${user.uid}`).once('value');
+        const currentUserInfo = snap.val();
+        const userAllowed = currentUserInfo.datasets[to.params.dataset];
         if (to.params.dataset !== vm.dataset) {
           vm.$router.push({ name: 'Home' });
+        } else if (restricted) {
+          const email = user.email;
+          const identities = await vm._props.getGlobusIdentities(vm._props.globusToken);
+          /* eslint-enable no-underscore-dangle */
+          const organization = currentUserInfo.organization;
+          if (Object.keys(identities).length === 0) {
+            errors.push(1);
+            console.log(identities);
+          } else if (!identities[email]) {
+            errors.push(2);
+          } else if (identities[email][0] !== organization) {
+            errors.push(3);
+          } else if (identities[email][1] !== 'used') {
+            errors.push(4);
+          }
+        } if (errors.length) {
+          vm.$router.push({ name: 'Restricted', query: { errors } });
+        } else if (userAllowed) {
+        /* eslint-disable */
+        vm.allowed = true;
+        /* eslint-enable */
         }
       });
     },

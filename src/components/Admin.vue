@@ -4,8 +4,8 @@
 
     <b-container>
      <p class="buttons mt-3">
-        <router-link class="btn btn-warning" :to="{name: 'Users', query: routerQuery}"> Manage Users </router-link>
-        <router-link class="btn btn-warning" :to="{name: 'Manifest', query: routerQuery}">Manage Database</router-link>
+        <router-link class="btn btn-warning" :to="{name: 'Users'}"> Manage Users </router-link>
+        <router-link class="btn btn-warning" :to="{name: 'Manifest'}">Manage Database</router-link>
       </p>
 
     </b-container>
@@ -31,12 +31,6 @@ export default {
     return {
 
     };
-  },
-  props: {
-    routerQuery: {
-      type: Object,
-      required: true,
-    },
   },
 };
 </script>

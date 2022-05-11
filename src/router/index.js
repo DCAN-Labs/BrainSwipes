@@ -15,6 +15,7 @@ import Review from '@/components/Review';
 import Chats from '@/components/Chats';
 import Users from '@/components/Users';
 import Manifest from '@/components/Manifest';
+import Restricted from '@/components/Restricted';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -133,6 +134,14 @@ const router = new Router({
       meta: {
         requiresAuth: true,
         requiresAdmin: true,
+      },
+    },
+    {
+      path: '/restricted',
+      name: 'Restricted',
+      component: Restricted,
+      meta: {
+        requiresAuth: true,
       },
     },
   ],

@@ -46,7 +46,7 @@
       </b-form>
 
       <p class="mt-3">
-        Don't have an account? <router-link :to="{ name: 'SignUp', query: routerQuery}">Create one</router-link>
+        Don't have an account? <router-link :to="{ name: 'SignUp'}">Create one</router-link>
       </p>
       <p class='reset'>
         Forgot password? <b-button @click="resetPassword" id="passwordReset" size="sm" type="submit" variant="primary">Reset it</b-button>
@@ -77,11 +77,6 @@
 
   export default {
     name: 'login',
-    props: {
-      routerQuery: {
-        type: Object,
-      },
-    },
     data() {
       return {
         /**
@@ -113,7 +108,7 @@
         firebase.auth().signInWithEmailAndPassword(this.form.email, this.form.password).then(
                   (user) => {
                     this.$emit('login', user);
-                    this.$router.push({ name: 'Home', query: this.routerQuery });
+                    this.$router.push({ name: 'Home' });
                   },
                   (err) => {
                     this.errors.show = true;
