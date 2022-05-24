@@ -1,0 +1,52 @@
+{
+    "Brain Anatomy":{
+
+        "Axial Plane":"",
+        "Brainstem":"",
+        "Cerebellum":"",
+        "Cerebrum": "The cerebrum is the largest brain structure in humans, accounting for about two-thirds of the brain's mass and positioned over and around most other brain structures. The cerebrum is divided into left and right hemispheres, as well as specific areas called lobes that are associated with specialized functions.",
+        "Cortex": "The outer layer of the cerebrum. Sometimes referred to as the cerebral cortex.",
+        "Dura": "The tough outermost membrane enveloping the brain and spinal cord.",
+        "Frontal lobe":"",
+        "Gray matter": "The parts of the brain made up primarily of groups of neuron cell bodies.",
+        "Gyrus": "The ridges on the brain's outer surface. Pluarl: gyri",
+        "Prefrontal region":"",
+        "Sagittal Plane":"",
+        "Sulcus": "A shallow groove on the brain's cerebrum. Plural: sulci",
+        "Subcortical":"",
+        "Superior parietal":"",
+        "Temporal Lobes": "The parts of the cerebrum that are located on either side of the head, roughly beneath the temples in humans.",
+        "White matter": "Brain tissue consisting primarily of myelin-covered axons that extend from nerve cell bodies in the gray matter of the central nervous system."
+    },
+    "Imaging Terms":{
+
+        "Atlas Registration ":"",
+        "Anatomical Data": "Also known as Structural Data",
+        "Co-Registration":"",
+        "fMRI":"",
+        "fMRI Registration (functional registration)":"",
+        "Functional Data":"",
+        "Image Overlay":"",
+        "Surface Delineation":"",
+        "Structural Data": "See Anatomical Data",
+        "T1-weighted image":"",
+        "T2-weighted image":""
+    },
+    "Common Issues":{
+
+        "Blurriness - how it arises in the data, minimally blurry vs poorly blurry ":"",
+        "Ringing ":"",
+        "White matter extension ":"",
+        "Surface delineation going into dura or skull ":"",
+        "White and gray matter surface delineations overlap ":"",
+        "Warps ":"",
+        "Field of view (FOV) cutoff":"",
+        "Signal dropout":"",
+        "Movement artifacts ":""
+    },
+    "Other":{
+
+        "ABCD study participant ":"",
+        "Montreal neurological institute (MNI) atlas (common atlas?)":""
+    }
+}

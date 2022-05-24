@@ -11,6 +11,31 @@
       <b-progress :value="scrollPosition" :max="1" show-progress class="ml-3 mr-3"></b-progress>
     </div>
 
+    <b-button id="help" @click="openGlossary">?</b-button>
+
+    <!-- Glossary -->
+    <b-modal id="glossary" :title="'Glossary of Terms'"
+      ref="glossary" size="lg">
+      <div>
+        <h1>Brain Anatomy</h1>
+        <ul>
+          <li v-for="term in Object.keys(glossary['Brain Anatomy']).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary['Brain Anatomy'][term]}}</p></li>
+        </ul>
+        <h1>Imaging Terms</h1>
+        <ul>
+          <li v-for="term in Object.keys(glossary['Imaging Terms']).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary['Imaging Terms'][term]}}</p></li>
+        </ul>
+        <h1>Common Issues</h1>
+        <ul>
+          <li v-for="term in Object.keys(glossary['Common Issues']).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary['Common Issues'][term]}}</p></li>
+        </ul>
+        <h1>Other</h1>
+        <ul>
+          <li v-for="term in Object.keys(glossary['Other']).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary['Other'][term]}}</p></li>
+        </ul>
+      </div>
+    </b-modal>
+
     <!-- Introduction steps -->
     <div v-for="(step, index) in steps.intro" class="fullpage">
       <div class="" :id="'intro'+index">
@@ -84,6 +109,32 @@
     top: 0;
     z-index: 2;
   }
+
+  #glossary {
+    position: fixed;
+    top: 5vh;
+    font-family: Nunito, Helvetica, Arial, sans-serif;
+  }
+
+  #glossary li{
+    margin-left: 15px;
+  }
+
+  #glossary strong{
+    font-weight: bold;
+  }
+
+  #glossary p{
+    margin-left: 15px;
+  }
+
+  #help {
+    position: fixed;
+    top: 5vh;
+    right: 5vw;
+    z-index: 5;
+    border-radius: 50%;
+  }
 </style>
 
 <script>
@@ -95,6 +146,7 @@
   import Vue from 'vue';
   import Arrow from './Animations/ArrowDown';
   import WidgetSelector from './WidgetSelector';
+  import glossary from '../glossary';
 
   const VueScrollTo = require('vue-scrollto');
 
@@ -130,6 +182,10 @@
         * The sample IDs summary (not implemented yet)
         */
         widgetSummary: {}, // TODO: fill this properly
+        /**
+         * Glossary of terms
+         */
+        glossary,
       };
     },
     props: {
@@ -245,6 +301,9 @@
         } else {
           this.scrollPosition = scrollPosition;
         }
+      },
+      openGlossary() {
+        this.$refs.glossary.show();
       },
     },
     /**
