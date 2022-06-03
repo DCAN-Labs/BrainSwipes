@@ -69,7 +69,7 @@ export default {
      * create url params and redirect user to globus
      */
     loginWithGlobus() {
-      const additionalParams = { state: sessionStorage.getItem('pkce_state') };
+      const additionalParams = { state: localStorage.getItem('pkce_state') };
       const authUrl = PkceAuth.authorizeUrl(additionalParams);
       window.location.replace(authUrl);
     },
@@ -80,17 +80,21 @@ export default {
       const params = new URLSearchParams(window.location.search);
       const authCode = params.get('code');
       if (authCode) {
-        const url = window.location.href;
-        PkceAuth.exchangeForAccessToken(url).then((resp) => {
-          const accessToken = resp.access_token;
-          this.$emit('globusLogin', accessToken);
+        try {
+          const url = window.location.href;
+          PkceAuth.exchangeForAccessToken(url).then((resp) => {
+            const accessToken = resp.access_token;
+            this.$emit('globusLogin', accessToken);
 
-          // This isn't strictly necessary but it ensures no code reuse.
-          sessionStorage.removeItem('pkce_code_verifier');
-          sessionStorage.removeItem('pkce_state');
+            // This isn't strictly necessary but it ensures no code reuse.
+            localStorage.removeItem('pkce_code_verifier');
+            localStorage.removeItem('pkce_state');
 
-          this.$router.push({ name: 'Home' });
-        });
+            this.$router.push({ name: 'Home' });
+          });
+        } catch (e) {
+          console.log(e);
+        }
       }
     },
     /**
@@ -148,13 +152,13 @@ export default {
      */
     setPkceState() {
       console.log(PkceAuth);
-      if (sessionStorage.length === 0) {
-        sessionStorage.setItem('pkce_state', WordArray.random(64));
-        sessionStorage.setItem('pkce_code_verifier', WordArray.random(64));
+      if (localStorage.getItem('pkce_state') === null) {
+        localStorage.setItem('pkce_state', WordArray.random(64));
+        localStorage.setItem('pkce_code_verifier', WordArray.random(64));
         console.log('new state');
       }
-      PkceAuth.state = sessionStorage.getItem('pkce_state');
-      PkceAuth.codeVerifier = sessionStorage.getItem('pkce_code_verifier');
+      PkceAuth.state = localStorage.getItem('pkce_state');
+      PkceAuth.codeVerifier = localStorage.getItem('pkce_code_verifier');
       console.log(PkceAuth);
     },
   },
