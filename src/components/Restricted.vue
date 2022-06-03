@@ -16,6 +16,7 @@
 
 <script>
 // Reference: https://github.com/bpedroza/js-pkce
+import WordArray from 'crypto-js/lib-typedarrays';
 import PkceAuth from '../Auth';
 
 export default {
@@ -68,7 +69,8 @@ export default {
      * create url params and redirect user to globus
      */
     loginWithGlobus() {
-      const authUrl = PkceAuth.authorizeUrl();
+      const additionalParams = { state: WordArray.random(64) };
+      const authUrl = PkceAuth.authorizeUrl(additionalParams);
       window.location.replace(authUrl);
     },
     /**
