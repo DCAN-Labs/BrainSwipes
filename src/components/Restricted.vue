@@ -86,8 +86,8 @@ export default {
           this.$emit('globusLogin', accessToken);
 
           // This isn't strictly necessary but it ensures no code reuse.
-          // sessionStorage.removeItem('pkce_code_verifier');
-          // sessionStorage.removeItem('pkce_state');
+          sessionStorage.removeItem('pkce_code_verifier');
+          sessionStorage.removeItem('pkce_state');
 
           this.$router.push({ name: 'Home' });
         });
@@ -147,11 +147,11 @@ export default {
      * set state and add it to session storage
      */
     setPkceState() {
-      if (sessionStorage.getItem('pkce_state') == null) {
+      if (sessionStorage.length === 0) {
         sessionStorage.setItem('pkce_state', WordArray.random(64));
+        sessionStorage.setItem('pkce_code_verifier', WordArray.random(64));
         console.log('new state');
       }
-      console.log(sessionStorage);
     },
   },
   created() {
