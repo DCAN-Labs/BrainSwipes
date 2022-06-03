@@ -69,7 +69,7 @@ export default {
      * create url params and redirect user to globus
      */
     loginWithGlobus() {
-      const additionalParams = { state: WordArray.random(64) };
+      const additionalParams = { state: sessionStorage.getItem('pkce_state') };
       const authUrl = PkceAuth.authorizeUrl(additionalParams);
       window.location.replace(authUrl);
     },
@@ -143,9 +143,19 @@ export default {
       }
       PkceAuth.config.redirect_uri = redirectUri;
     },
+    /**
+     * set state and add it to session storage
+     */
+    setPkceState() {
+      if (sessionStorage.getItem('pkce_state') == null) {
+        sessionStorage.setItem('pkce_state', WordArray.random(64));
+      }
+      console.log(sessionStorage);
+    },
   },
   created() {
     this.setRedirect();
+    this.setPkceState();
     this.checkForGlobusAuthCode();
     this.allowAccess();
     this.parseErrors();
