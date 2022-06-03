@@ -147,11 +147,15 @@ export default {
      * set state and add it to session storage
      */
     setPkceState() {
+      console.log(PkceAuth);
       if (sessionStorage.length === 0) {
         sessionStorage.setItem('pkce_state', WordArray.random(64));
         sessionStorage.setItem('pkce_code_verifier', WordArray.random(64));
         console.log('new state');
       }
+      PkceAuth.state = sessionStorage.getItem('pkce_state');
+      PkceAuth.codeVerifier = sessionStorage.getItem('pkce_code_verifier');
+      console.log(PkceAuth);
     },
   },
   created() {
