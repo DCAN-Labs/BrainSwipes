@@ -1,6 +1,7 @@
 <template>
   <div id="restricted">
     <b-alert v-for="error in errors" :key="error" :show="showErrors" variant="danger">{{errorCodes[error]}}</b-alert>
+    <b-alert :show="showAuthError" variant="danger">Please attempt to login again. If this error persists contact an administrator.</b-alert>
     <div v-if="!authenticated">
       <b-button class="btn btn-primary" @click="loginWithGlobus">Login with Globus</b-button>
     </div>
@@ -32,6 +33,10 @@ export default {
        */
       errors: [],
       showErrors: false,
+      /**
+       * errors from globus auth
+       */
+      showAuthError: false,
     };
   },
   props: {
@@ -79,23 +84,21 @@ export default {
     checkForGlobusAuthCode() {
       const params = new URLSearchParams(window.location.search);
       const authCode = params.get('code');
-      console.log('checkAuth', PkceAuth);
       if (authCode) {
-        try {
-          const url = window.location.href;
-          PkceAuth.exchangeForAccessToken(url).then((resp) => {
-            const accessToken = resp.access_token;
-            this.$emit('globusLogin', accessToken);
+        const url = window.location.href;
+        PkceAuth.exchangeForAccessToken(url).then((resp) => {
+          const accessToken = resp.access_token;
+          this.$emit('globusLogin', accessToken);
 
-            // This isn't strictly necessary but it ensures no code reuse.
-            sessionStorage.removeItem('pkce_code_verifier');
-            sessionStorage.removeItem('pkce_state');
+          // This isn't strictly necessary but it ensures no code reuse.
+          sessionStorage.removeItem('pkce_code_verifier');
+          sessionStorage.removeItem('pkce_state');
 
-            this.$router.push({ name: 'Home' });
-          });
-        } catch (e) {
+          this.$router.push({ name: 'Home' });
+        }).catch(function(e){
           console.log(e);
-        }
+          this.showAuthError = true;
+        });
       }
     },
     /**
@@ -152,8 +155,6 @@ export default {
      * set state and add it to session storage
      */
     setPkceState() {
-      console.log(PkceAuth);
-      console.log(sessionStorage.getItem('pkce_state'));
       if (sessionStorage.getItem('pkce_state') === null) {
         sessionStorage.setItem('pkce_state', WordArray.random(64));
         sessionStorage.setItem('pkce_code_verifier', WordArray.random(64));
@@ -161,7 +162,6 @@ export default {
       }
       PkceAuth.state = sessionStorage.getItem('pkce_state');
       PkceAuth.codeVerifier = sessionStorage.getItem('pkce_code_verifier');
-      console.log(PkceAuth);
     },
   },
   created() {
