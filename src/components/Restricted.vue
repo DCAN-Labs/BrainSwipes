@@ -79,6 +79,7 @@ export default {
     checkForGlobusAuthCode() {
       const params = new URLSearchParams(window.location.search);
       const authCode = params.get('code');
+      console.log('checkAuth', PkceAuth);
       if (authCode) {
         try {
           const url = window.location.href;
