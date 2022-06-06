@@ -69,7 +69,7 @@ export default {
      * create url params and redirect user to globus
      */
     loginWithGlobus() {
-      const additionalParams = { state: localStorage.getItem('pkce_state') };
+      const additionalParams = { state: sessionStorage.getItem('pkce_state') };
       const authUrl = PkceAuth.authorizeUrl(additionalParams);
       window.location.replace(authUrl);
     },
@@ -87,8 +87,8 @@ export default {
             this.$emit('globusLogin', accessToken);
 
             // This isn't strictly necessary but it ensures no code reuse.
-            localStorage.removeItem('pkce_code_verifier');
-            localStorage.removeItem('pkce_state');
+            sessionStorage.removeItem('pkce_code_verifier');
+            sessionStorage.removeItem('pkce_state');
 
             this.$router.push({ name: 'Home' });
           });
@@ -152,13 +152,14 @@ export default {
      */
     setPkceState() {
       console.log(PkceAuth);
-      if (localStorage.getItem('pkce_state') === null) {
-        localStorage.setItem('pkce_state', WordArray.random(64));
-        localStorage.setItem('pkce_code_verifier', WordArray.random(64));
+      console.log(sessionStorage.getItem('pkce_state'));
+      if (sessionStorage.getItem('pkce_state') === null) {
+        sessionStorage.setItem('pkce_state', WordArray.random(64));
+        sessionStorage.setItem('pkce_code_verifier', WordArray.random(64));
         console.log('new state');
       }
-      PkceAuth.state = localStorage.getItem('pkce_state');
-      PkceAuth.codeVerifier = localStorage.getItem('pkce_code_verifier');
+      PkceAuth.state = sessionStorage.getItem('pkce_state');
+      PkceAuth.codeVerifier = sessionStorage.getItem('pkce_code_verifier');
       console.log(PkceAuth);
     },
   },
