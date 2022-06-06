@@ -146,13 +146,13 @@ export default {
      * The redirect uri should match the host currently running the app.
      * https://auth.globus.org/v2/web/developers
      */
-    setRedirect() {
-      let redirectUri = 'https://brainswipes.us/restricted';
-      if (process.env.NODE_ENV === 'development') {
-        redirectUri = 'http://localhost:8080/restricted';
-      }
-      PkceAuth.config.redirect_uri = redirectUri;
-    },
+    // setRedirect() {
+    //   let redirectUri = 'https://brainswipes.us/restricted';
+    //   if (process.env.NODE_ENV === 'development') {
+    //     redirectUri = 'http://localhost:8080/restricted';
+    //   }
+    //   PkceAuth.config.redirect_uri = redirectUri;
+    // },
     /**
      * set state and add it to session storage
      */
@@ -166,7 +166,7 @@ export default {
     },
   },
   created() {
-    this.setRedirect();
+    // this.setRedirect();
     this.setPkceState();
     this.checkForGlobusAuthCode();
     this.allowAccess();
