@@ -52,6 +52,8 @@
           :getGlobusIdentities="getGlobusIdentities"
           :globusAllowedOrgs="globusAllowedOrgs"
           :errorCodes="errorCodes"
+          :maintenanceDate="maintenanceDate"
+          :maintenanceStatus="maintenanceStatus"
         />
       </div>
     </div>
@@ -185,6 +187,11 @@ export default {
         4: 'The email associated with your BrainSwipes account is not active in Globus.',
         5: 'The email associated with your BrainSwipes account has not been verified. Please verify in your profile.',
       },
+      /**
+       * maintenance banner config from db
+       */
+      maintenanceDate: '',
+      maintenanceStatus: false,
     };
   },
   /**
@@ -355,6 +362,12 @@ export default {
       }
       return identities;
     },
+    async getMaintenanceStatus() {
+      this.db.ref('config/maintenance').on('value', (snap) => {
+        this.maintenanceDate = snap.val().date;
+        this.maintenanceStatus = snap.val().bannerStatus;
+      });
+    },
   },
   /**
    * intialize the animate on scroll library (for tutorial) and listen to authentication state
@@ -363,6 +376,7 @@ export default {
     await this.activateDatasets();
     await this.getStudies();
     await this.getGlobusAllowdOrgs();
+    await this.getMaintenanceStatus();
   },
 };
 </script>

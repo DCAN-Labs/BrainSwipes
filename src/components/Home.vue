@@ -1,5 +1,6 @@
 <template>
   <div class="home container">
+    <b-alert :show="maintenanceStatus" variant="danger">BrainSwipes will be unavailable on {{maintenanceDate}} for scheduled maintenance.</b-alert>
     <div class="jumbotron landing" :style="landingStyle">
       <div id="titles">
         <h1>BrainSwipes by DCAN</h1>
@@ -47,6 +48,14 @@ export default {
     },
     userInfo: {
       type: Object,
+      required: true,
+    },
+    maintenanceDate: {
+      type: String,
+      required: true,
+    },
+    maintenanceStatus: {
+      type: Boolean,
       required: true,
     },
   },
