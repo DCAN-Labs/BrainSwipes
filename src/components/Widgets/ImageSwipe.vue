@@ -127,6 +127,17 @@
         type: String,
         required: true,
       },
+      /**
+       * config for the catch trials
+       */
+      catchBucket: {
+        type: String,
+        required: true,
+      },
+      catchDataset: {
+        type: String,
+        required: true,
+      },
     },
     components: { VueHammer, GridLoader },
     directives: {
@@ -169,7 +180,7 @@
     },
     methods: {
       postRequest(pointer) {
-        const bucket = this.bucket;
+        const bucket = this.playMode === 'catch' ? this.catchBucket : this.bucket;
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.open('POST', '/', true);

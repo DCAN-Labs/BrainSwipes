@@ -36,10 +36,12 @@
          :widgetPointer="widgetPointer"
          :widgetSummary="widgetSummary"
          v-on:widgetRating="sendWidgetResponse"
-         :playMode="'play'"
+         :playMode="playMode"
          ref="widget"
          :dataset="dataset"
          :bucket="bucket"
+         :catchDataset="catchDataset"
+         :catchBucket="catchBucket"
         />
       </div>
 
@@ -196,6 +198,25 @@
         type: Object,
         required: true,
       },
+      /**
+       * catch trials configuration
+       */
+      catchDataset: {
+        type: String,
+        required: true,
+      },
+      catchFrequency: {
+        type: Number,
+        required: true,
+      },
+      catchBucket: {
+        type: String,
+        required: true,
+      },
+      catchTrials: {
+        type: Array,
+        required: true,
+      },
     },
     data() {
       return {
@@ -251,6 +272,10 @@
          * whether the user is allowed to see this dataset
          */
         allowed: false,
+        /**
+         * whether the widget should be in play mode or catch trial mode
+         */
+        playMode: 'play',
       };
     },
     watch: {
@@ -345,6 +370,7 @@
             });
         }
       },
+
       /**
        * A method to shuffle an array.
        */
@@ -444,13 +470,26 @@
       */
       setNextSampleId() {
         this.startTime = new Date();
+        this.playMode = 'play';
 
-        const sampleId = this.sampleUserPriority()[0];
+        let sampleId = this.sampleUserPriority()[0];
+
+        if (Math.random() < this.catchFrequency) {
+          sampleId = this.serveCatchTrial();
+        }
 
         // if sampleId isn't null, set the widgetPointer
         if (sampleId) {
           this.widgetPointer = sampleId['.key'];
         }
+      },
+      /**
+       * returns a sampleId for a catch trial
+       */
+      serveCatchTrial() {
+        this.playMode = 'catch';
+        const catchId = this.shuffle(this.catchTrials)[0];
+        return { '.key': catchId };
       },
       /**
       * the user's response for the sample is sent to the db

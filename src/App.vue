@@ -54,6 +54,10 @@
           :errorCodes="errorCodes"
           :maintenanceDate="maintenanceDate"
           :maintenanceStatus="maintenanceStatus"
+          :catchTrials="catchTrials"
+          :catchDataset="catchDataset"
+          :catchBucket="catchBucket"
+          :catchFrequency="catchFrequency"
         />
       </div>
     </div>
@@ -192,6 +196,13 @@ export default {
        */
       maintenanceDate: '',
       maintenanceStatus: false,
+      /**
+       * catch trials configuration
+       */
+      catchTrials: [],
+      catchDataset: '',
+      catchFrequency: 0,
+      catchBucket: '',
     };
   },
   /**
@@ -205,6 +216,7 @@ export default {
     firebase.auth().onAuthStateChanged((user) => {
       self.userInfo = user || {};
     });
+    this.initCatchTrials();
   },
   components: {
     Footer,
@@ -366,6 +378,18 @@ export default {
       this.db.ref('config/maintenance').on('value', (snap) => {
         this.maintenanceDate = snap.val().date;
         this.maintenanceStatus = snap.val().bannerStatus;
+      });
+    },
+    initCatchTrials() {
+      this.db.ref('config/catchTrials').once('value', (snap) => {
+        this.catchDataset = snap.val().dataset;
+        this.catchFrequency = snap.val().frequency;
+        this.db.ref(`datasets/${this.catchDataset}/sampleCounts`).once('value', (snap2) => {
+          this.catchTrials = Object.keys(snap2.val());
+        });
+        this.db.ref(`studies/${this.catchDataset}/bucket`).once('value', (snap3) => {
+          this.catchBucket = snap3.val();
+        });
       });
     },
   },
