@@ -149,7 +149,7 @@ a {
   color: #fff;
   background-color: maroon;
   border-color: maroon;
-  margin-right: .2em;
+  margin: 0.1em;
 }
 
 .jumbotron {
@@ -163,4 +163,9 @@ a {
   text-shadow: white 1px 1px, white 0 0 1px;
 }
 
+@media (max-width: 979px) {
+  .jumbotron {
+    background-size: 90%
+  }
+}
 </style>
