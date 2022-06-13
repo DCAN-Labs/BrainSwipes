@@ -450,16 +450,22 @@
           this.feedback = feedback;
           this.showAlert();
         }
+        console.log(this.playMode);
+
+        let currentDataset = this.dataset;
+        if (this.playMode === 'catch') {
+          currentDataset = this.catchDataset;
+        }
 
         // 2. send the widget data
         const timeDiff = new Date() - this.startTime;
-        this.sendVote(response, timeDiff, this.dataset);
+        this.sendVote(response, timeDiff, currentDataset);
 
         // 3. update the score and count for the sample
         this.updateScore(this.$refs.widget.getScore(response));
-        this.updateSummary(this.$refs.widget.getSummary(response), this.dataset);
-        this.updateCount(this.dataset);
-        this.updateSeen(this.dataset);
+        this.updateSummary(this.$refs.widget.getSummary(response), currentDataset);
+        this.updateCount(currentDataset);
+        this.updateSeen(currentDataset);
 
         // 3. set the next Sample
         this.setNextSampleId();
