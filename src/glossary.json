@@ -1,52 +1,35 @@
 {
     "Brain Anatomy":{
-
-        "Axial Plane":"",
-        "Brainstem":"",
-        "Cerebellum":"",
-        "Cerebrum": "The cerebrum is the largest brain structure in humans, accounting for about two-thirds of the brain's mass and positioned over and around most other brain structures. The cerebrum is divided into left and right hemispheres, as well as specific areas called lobes that are associated with specialized functions.",
-        "Cortex": "The outer layer of the cerebrum. Sometimes referred to as the cerebral cortex.",
-        "Dura": "The tough outermost membrane enveloping the brain and spinal cord.",
-        "Frontal lobe":"",
-        "Gray matter": "The parts of the brain made up primarily of groups of neuron cell bodies.",
-        "Gyrus": "The ridges on the brain's outer surface. Pluarl: gyri",
-        "Prefrontal region":"",
-        "Sagittal Plane":"",
-        "Sulcus": "A shallow groove on the brain's cerebrum. Plural: sulci",
-        "Subcortical":"",
-        "Superior parietal":"",
-        "Temporal Lobes": "The parts of the cerebrum that are located on either side of the head, roughly beneath the temples in humans.",
-        "White matter": "Brain tissue consisting primarily of myelin-covered axons that extend from nerve cell bodies in the gray matter of the central nervous system."
+        "Brainstem":"The portion of the brain that connects the brain to the spinal cord. It is made up of the pons, midbrain, and medulla oblongata. Its primary function is to regulate involuntary actions such as breathing, balance and heart rate.",
+        "Cerebellum":"Also referred to as “the little brain”, the portion of the brain located between the cerebrum and brainstem that consists of 2 hemispheres and controls complex voluntary motor functions such as maintaining posture, balance and walking.",
+        "Cerebral Cortex": "The coiled outer gray matter that covers the cerebrum. Cortex is the Latin for “bark”. This structure is involved in higher-level processes such as consciousness, language, memory, thought, learning, decision making, reasoning, intelligence, emotion, and personality.",
+        "Dura": "The outermost layer of connective tissue that makes up the meninges. It functions as a protective envelope for the central nervous system and supplies a system for venous drainage from the brain through the dural sinuses.",
+        "Frontal lobe":"The largest of the 4 major lobes, it is the anterior-most portion of the brain and is responsible for high-level cognitive functions including reasoning, problem solving, motor skills, attention, memory, emotional regulation, communication and social interaction.",
+        "Gray matter": "The outermost layer of the brain that contains a high concentration of neuronal cell bodies, axon terminals, and dendrites. Within the gray matter is where all synapses take place in the brain. Its functions include receiving information and regulating outgoing information.",
+        "Gyrus": "A raised ridge of gray matter found on the cerebral cortex that is responsible for increasing the surface area of the brain.",
+        "Prefrontal region":"The frontmost section of the frontal lobe. It is involved in a variety of complex functions including personality and planning.",
+        "Skull": "The skeletal structure that protects the brain from injury.",
+        "Sulcus": "Grooves or depressions in the cerebral cortex that surround gyri that help to increase the surface area of the brain and to form brain divisions",
+        "Subcortical":"A group of gray matter neural formations found below the cortex that include the diencephalon, pituitary gland, basal ganglia, and limbic structures which are responsible for the processing and relaying of neural inputs between different parts of the brain.",
+        "Superior parietal":"This is the region of the brain that forms the association of the parietal lobe and the cortex. It is involved in visuospatial perception/spatial reasoning and attention.",
+        "Temporal Lobe": "Often referred to as the “neocortex”, the temporal lobe is located in the middle cranial fossa and contains the hippocampus and amygdala. The temporal lobe responsible for preserving and processing memories and integrating them with sensations such as taste, sound, smell, and sight.",
+        "White matter": "Brain tissue consisting primarily of myelin-covered axons that extend from nerve cell bodies in the gray matter of the central nervous system. Its function is to transmit information to other parts of the brain, spinal cord, and body."
     },
     "Imaging Terms":{
-
-        "Atlas Registration ":"",
-        "Anatomical Data": "Also known as Structural Data",
-        "Co-Registration":"",
-        "fMRI":"",
-        "fMRI Registration (functional registration)":"",
-        "Functional Data":"",
-        "Image Overlay":"",
-        "Surface Delineation":"",
+        "Axial Plane":"A horizontal cross section view of the brain using MRI that primarily allows visualization of superior lobes of the cerebrum.",
+        "Atlas":"A mapping of the brain that provides a standardized set of coordinates to determine specific sites.",
+        "Atlas Registration":"A method of comparing a subject's images to a standard atlas. This allows for the pooling and comparison of experimental findings across laboratories.",
+        "Anatomical Data": "Also known as Structural Data. This is used to study the shape, integrity, volume and developmental changes in the brain.",
+        "Co-Registration":"The alignment and overlay of fMRI data from a single subject with that subject's own but separately acquired anatomic imaging study.",
+        "Coronal plane":"A frontal view of the brain using MRI that primarily allows visualization of the corpus callosum, frontal lobe, temporal lobes, lateral and 3rd ventricles, white matter structures and basal ganglia.",
+        "fMRI":"Functional Magnetic Resonance Imaging. A non-invasive imaging technique for mapping brain activity by measuring changes in metabolism, chemical composition, blood flow and absorption.",
+        "fMRI Registration (functional registration)":"The alignment and overlay of multiple fMRIs taken at different times from the same subject.",
+        "Image Overlay":"A computer display tactic that superimposes images over the viewer's direct view to create an augmented image.",
+        "Sagittal Plane":"A vertical cross view of the brain using MRI that divides the brain between left and right sides that primarily allows visualization of the 3 major parts of the brain: cerebrum, cerebellum and brainstem, gray and white matter, and the 3rd and 4th ventricles.",
+        "Delineation":"The action of indicating the exact position of a border or boundary.",
         "Structural Data": "See Anatomical Data",
-        "T1-weighted image":"",
-        "T2-weighted image":""
-    },
-    "Common Issues":{
-
-        "Blurriness - how it arises in the data, minimally blurry vs poorly blurry ":"",
-        "Ringing ":"",
-        "White matter extension ":"",
-        "Surface delineation going into dura or skull ":"",
-        "White and gray matter surface delineations overlap ":"",
-        "Warps ":"",
-        "Field of view (FOV) cutoff":"",
-        "Signal dropout":"",
-        "Movement artifacts ":""
-    },
-    "Other":{
-
-        "ABCD study participant ":"",
-        "Montreal neurological institute (MNI) atlas (common atlas?)":""
+        "T1-weighted image":"A structural image where data is collected with relatively short radio pulses. In adults these images are characterized by darker cerebrospinal fluid.",
+        "T2-weighted image":"A structural image where data is collected with relatively long radio pulses. In adults these images are characterized by lighter cerebrospinal fluid.",
+        "Montreal neurological institute (MNI) atlas (common atlas)":"An alternative atlas to be utilized that attempts to be more representative of the population."
     }
 }

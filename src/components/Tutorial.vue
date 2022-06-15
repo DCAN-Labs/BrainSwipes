@@ -25,14 +25,6 @@
         <ul>
           <li v-for="term in Object.keys(glossary['Imaging Terms']).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary['Imaging Terms'][term]}}</p></li>
         </ul>
-        <h1>Common Issues</h1>
-        <ul>
-          <li v-for="term in Object.keys(glossary['Common Issues']).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary['Common Issues'][term]}}</p></li>
-        </ul>
-        <h1>Other</h1>
-        <ul>
-          <li v-for="term in Object.keys(glossary['Other']).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary['Other'][term]}}</p></li>
-        </ul>
       </div>
     </b-modal>
 
@@ -134,6 +126,10 @@
     right: 5vw;
     z-index: 5;
     border-radius: 50%;
+  }
+
+  {
+
   }
 </style>
 
