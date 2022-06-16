@@ -295,8 +295,9 @@
        * When it changes, also update the `widgetSummary` to be from the new `widgetPointer`.
        */
       widgetPointer() {
+        const currentDataset = this.playMode === 'play' ? this.dataset : this.catchDataset;
         /* eslint-disable */
-        this.widgetPointer ? this.db.ref(`datasets/${this.dataset}/sampleSummary`).child(this.widgetPointer).once('value', (snap) => {
+        this.widgetPointer ? this.db.ref(`datasets/${currentDataset}/sampleSummary`).child(this.widgetPointer).once('value', (snap) => {
           this.widgetSummary = snap.val();
         }) : null;
         /* eslint-enable */
@@ -450,7 +451,6 @@
           this.feedback = feedback;
           this.showAlert();
         }
-        console.log(this.playMode);
 
         let currentDataset = this.dataset;
         if (this.playMode === 'catch') {
