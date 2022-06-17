@@ -27,40 +27,69 @@
         </ul>
       </div>
     </b-modal>
-
-    <!-- Introduction steps -->
-    <div v-for="(step, index) in steps.intro" class="fullpage">
-      <div class="" :id="'intro'+index">
-        <!-- <vue-typer v-if="currentBin.bin === index" :text='step.text' :repeat='0' class="message" :type-delay='50'></vue-typer> -->
-        <p v-html="step.text"></p>
-        <span class="invisible">{{step.text}}</span>
-      </div>
-      <img :src="step.image" class="mt-3 pt-3 img"/>
-    </div>
-
-    <!-- Example Steps -->
-    <div v-for="(step, index) in steps.examples" class="fullpage">
-      <div class="text-center message w-100" :id="'example'+index">
-        <!-- <vue-typer v-if="currentBin.bin === index+steps.intro.length" :text='step.text' :repeat='0' class="message" :type-delay='50'></vue-typer> -->
-        <p v-html="step.text"></p>
-        <span class="invisible">{{step.text}}</span>
-        <div v-if="step.pointer" class="mt-3">
-          <WidgetSelector
-           :widgetPointer="step.pointer"
-           :widgetSummary="widgetSummary"
-           :playMode="'tutorial'"
-           :tutorialStep="step.tutorialStep"
-           ref="widget"
-           :dataset="tutorialDataset"
-           :bucket="tutorialBucket"
-          />
+    <div class="tutorial-steps">
+      <!-- Introduction steps -->
+      <h1 id="mri-intro">MRI Introduction</h1>
+      <div v-for="(step, index) in steps.MRIintro" class="fullpage">
+        <div class="" :id="'intro'+index">
+          <!-- <vue-typer v-if="currentBin.bin === index" :text='step.text' :repeat='0' class="message" :type-delay='50'></vue-typer> -->
+          <p v-html="step.text"></p>
+          <span class="invisible">{{step.text}}</span>
         </div>
-        <div v-if="step.tutorialCompleted">
-          <b-button @click="tutorialComplete" class="mt-3">Play now</b-button>
+        <img :src="step.image" class="mt-3 pt-3 img"/>
+      </div>
+      <h1 id="qa-image-types">QA Image Types</h1>
+      <div v-for="(step, index) in steps.QAimagetypes" class="fullpage">
+        <div class="" :id="'intro'+index">
+          <!-- <vue-typer v-if="currentBin.bin === index" :text='step.text' :repeat='0' class="message" :type-delay='50'></vue-typer> -->
+          <p v-html="step.text"></p>
+          <span class="invisible">{{step.text}}</span>
+        </div>
+        <img :src="step.image" class="mt-3 pt-3 img"/>
+      </div>
+      <h1 id="structural-qa">How to perform structural QA</h1>
+      <div v-for="(step, index) in steps.structuralQA" class="fullpage">
+        <div class="" :id="'intro'+index">
+          <!-- <vue-typer v-if="currentBin.bin === index" :text='step.text' :repeat='0' class="message" :type-delay='50'></vue-typer> -->
+          <p v-html="step.text"></p>
+          <span class="invisible">{{step.text}}</span>
+        </div>
+        <img :src="step.image" class="mt-3 pt-3 img"/>
+      </div>
+      <h1 id="functional-qa">How to perform functional QA</h1>
+      <div v-for="(step, index) in steps.functionalQA" class="fullpage">
+        <div class="" :id="'intro'+index">
+          <!-- <vue-typer v-if="currentBin.bin === index" :text='step.text' :repeat='0' class="message" :type-delay='50'></vue-typer> -->
+          <p v-html="step.text"></p>
+          <span class="invisible">{{step.text}}</span>
+        </div>
+        <img :src="step.image" class="mt-3 pt-3 img"/>
+      </div>
+
+      <!-- Example Steps -->
+      <h1 id="using-swipes">Using the BrainSwipes interface</h1>
+      <div v-for="(step, index) in steps.examples" class="fullpage">
+        <div class="text-center message w-100" :id="'example'+index">
+          <!-- <vue-typer v-if="currentBin.bin === index+steps.intro.length" :text='step.text' :repeat='0' class="message" :type-delay='50'></vue-typer> -->
+          <p v-html="step.text"></p>
+          <span class="invisible">{{step.text}}</span>
+          <div v-if="step.pointer" class="mt-3">
+            <WidgetSelector
+            :widgetPointer="step.pointer"
+            :widgetSummary="widgetSummary"
+            :playMode="'tutorial'"
+            :tutorialStep="step.tutorialStep"
+            ref="widget"
+            :dataset="tutorialDataset"
+            :bucket="tutorialBucket"
+            />
+          </div>
+          <div v-if="step.tutorialCompleted">
+            <b-button @click="tutorialComplete" class="mt-3">Play now</b-button>
+          </div>
         </div>
       </div>
     </div>
-
     <div v-if="bins.length-1 != currentBin.bin" v-scroll-to="nextStep">
       <Arrow />
     </div>
@@ -128,8 +157,10 @@
     border-radius: 50%;
   }
 
-  {
-
+  .tutorial-steps h1{
+    padding-top: 50px;
+    margin-bottom: 15px;
+    font-size: 2em;
   }
 </style>
 
