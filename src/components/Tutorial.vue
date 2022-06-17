@@ -31,37 +31,37 @@
       <!-- Introduction steps -->
       <h1 id="mri-intro">MRI Introduction</h1>
       <div v-for="(step, index) in steps.MRIintro" class="fullpage">
-        <div class="" :id="'intro'+index">
-          <!-- <vue-typer v-if="currentBin.bin === index" :text='step.text' :repeat='0' class="message" :type-delay='50'></vue-typer> -->
+        <div class="tutorial-step" :id="'MRIintro'+index">
+
           <p v-html="step.text"></p>
-          <span class="invisible">{{step.text}}</span>
+
         </div>
         <img :src="step.image" class="mt-3 pt-3 img"/>
       </div>
       <h1 id="qa-image-types">QA Image Types</h1>
       <div v-for="(step, index) in steps.QAimagetypes" class="fullpage">
-        <div class="" :id="'intro'+index">
-          <!-- <vue-typer v-if="currentBin.bin === index" :text='step.text' :repeat='0' class="message" :type-delay='50'></vue-typer> -->
+        <div class="tutorial-step" :id="'QAimagetypes'+index">
+
           <p v-html="step.text"></p>
-          <span class="invisible">{{step.text}}</span>
+
         </div>
         <img :src="step.image" class="mt-3 pt-3 img"/>
       </div>
       <h1 id="structural-qa">How to perform structural QA</h1>
       <div v-for="(step, index) in steps.structuralQA" class="fullpage">
-        <div class="" :id="'intro'+index">
-          <!-- <vue-typer v-if="currentBin.bin === index" :text='step.text' :repeat='0' class="message" :type-delay='50'></vue-typer> -->
+        <div class="tutorial-step" :id="'structuralQA'+index">
+
           <p v-html="step.text"></p>
-          <span class="invisible">{{step.text}}</span>
+
         </div>
         <img :src="step.image" class="mt-3 pt-3 img"/>
       </div>
       <h1 id="functional-qa">How to perform functional QA</h1>
       <div v-for="(step, index) in steps.functionalQA" class="fullpage">
-        <div class="" :id="'intro'+index">
-          <!-- <vue-typer v-if="currentBin.bin === index" :text='step.text' :repeat='0' class="message" :type-delay='50'></vue-typer> -->
+        <div class="tutorial-step" :id="'functonalQA'+index">
+
           <p v-html="step.text"></p>
-          <span class="invisible">{{step.text}}</span>
+
         </div>
         <img :src="step.image" class="mt-3 pt-3 img"/>
       </div>
@@ -70,9 +70,8 @@
       <h1 id="using-swipes">Using the BrainSwipes interface</h1>
       <div v-for="(step, index) in steps.examples" class="fullpage">
         <div class="text-center message w-100" :id="'example'+index">
-          <!-- <vue-typer v-if="currentBin.bin === index+steps.intro.length" :text='step.text' :repeat='0' class="message" :type-delay='50'></vue-typer> -->
           <p v-html="step.text"></p>
-          <span class="invisible">{{step.text}}</span>
+
           <div v-if="step.pointer" class="mt-3">
             <WidgetSelector
             :widgetPointer="step.pointer"
@@ -90,7 +89,7 @@
         </div>
       </div>
     </div>
-    <div v-if="bins.length-1 != currentBin.bin" v-scroll-to="nextStep">
+    <div class="arrow" v-if="bins.length-1 != currentBin.bin" v-scroll-to="nextStep">
       <Arrow />
     </div>
 
@@ -105,9 +104,6 @@
     max-height: 80vh;
     width: 100%;
     max-width: 500px;
-  }
-  .tutorial {
-    /* height: 500vh; */
   }
 
   .fullpage {
@@ -162,6 +158,21 @@
     margin-bottom: 15px;
     font-size: 2em;
   }
+
+  .tutorial-step{
+    margin: 0 10vw;
+  }
+
+  .arrow{
+    display: block;
+  }
+
+  @media (min-width: 65em) {
+    .arrow {
+      display: none;
+    }
+  }
+
 </style>
 
 <script>
@@ -255,7 +266,10 @@
        * to help map scroll position to the step of the tutorial
        */
       bins() {
-        const Nsteps = this.steps.intro.length + this.steps.examples.length;
+        let Nsteps = 0;
+        Object.keys(this.steps).forEach((key) => {
+          Nsteps += this.steps[key].length;
+        });
         const binSize = 1 / Nsteps;
         const bins = [];
         for (let i = 0; i < Nsteps; i += 1) {
@@ -276,23 +290,24 @@
         return { bin: 0 };
       },
       /**
-       * The current stage, either the intro text stage,
-       * or the part that shows how the widget works.
-       */
-      currentStage() {
-        if (this.currentBin.bin < this.steps.intro.length) {
-          return { ...this.steps.intro[this.currentBin.bin], mode: 'intro' };
-        }
-        return { ...this.steps.examples[this.currentBin.bin - this.steps.intro.length], mode: 'examples' };
-      },
-      /**
        * The next step that should be displayed.
        */
       nextStep() {
-        if (this.currentBin.bin < this.steps.intro.length - 1) {
-          return `#intro${this.currentBin.bin + 1}`;
+        if (this.currentBin.bin < this.steps.MRIintro.length - 1) {
+          return `#MRIintro${this.currentBin.bin + 1}`;
+        } else if (this.currentBin.bin <
+          (this.steps.QAimagetypes.length + this.steps.MRIintro.length) - 1) {
+          return `#QAimagetypes${(this.currentBin.bin - this.steps.MRIintro.length) + 1}`;
+        } else if (this.currentBin.bin < (
+          this.steps.QAimagetypes.length + this.steps.MRIintro.length +
+          this.steps.structuralQA.length) - 1) {
+          return `#structuralQA${(this.currentBin.bin - this.steps.QAimagetypes.length - this.steps.MRIintro.length) + 1}`;
+        } else if (this.currentBin.bin < (
+          this.steps.QAimagetypes.length + this.steps.MRIintro.length +
+          this.steps.structuralQA.length + this.steps.functionalQA.length) - 1) {
+          return `#functonalQA${(this.currentBin.bin - this.steps.QAimagetypes.length - this.steps.MRIintro.length - this.steps.structuralQA.length) + 1}`;
         }
-        return `#example${(this.currentBin.bin - this.steps.intro.length) + 1}`;
+        return `#example${(this.currentBin.bin - this.steps.QAimagetypes.length - this.steps.MRIintro.length - this.steps.structuralQA.length - this.steps.functionalQA.length) + 1}`;
       },
       /**
        * dataset that the tutorial images are from
