@@ -30,6 +30,6 @@
         "Structural Data": "See Anatomical Data",
         "T1-weighted image":"A structural image where data is collected with relatively short radio pulses. In adults these images are characterized by darker cerebrospinal fluid.",
         "T2-weighted image":"A structural image where data is collected with relatively long radio pulses. In adults these images are characterized by lighter cerebrospinal fluid.",
-        "Montreal neurological institute (MNI) atlas (common atlas)":"An alternative atlas to be utilized that attempts to be more representative of the population."
+        "MNI":"Montreal Neuroligical Institue. A research and medical center dedicated to neuroscience. It is part of the McGill University Health Center network"
     }
 }
