@@ -398,6 +398,7 @@
       addDefinitions() {
         Object.keys(this.glossary).forEach((category) => {
           const terms = Object.keys(this.glossary[category]);
+          console.log(terms.join('|'));
           Object.keys(this.steps).forEach((section) => {
             Object.keys(section).forEach((step) => {
               if (Object.hasOwnProperty.call(this.steps[section], step)) {
