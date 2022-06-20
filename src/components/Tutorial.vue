@@ -32,13 +32,8 @@
     <b-modal id="glossary" :title="'Glossary of Terms'"
       ref="glossary" size="lg">
       <div>
-        <h1>Brain Anatomy</h1>
         <ul>
-          <li v-for="term in Object.keys(glossary['Brain Anatomy']).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary['Brain Anatomy'][term]}}</p></li>
-        </ul>
-        <h1>Imaging Terms</h1>
-        <ul>
-          <li v-for="term in Object.keys(glossary['Imaging Terms']).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary['Imaging Terms'][term]}}</p></li>
+          <li v-for="term in Object.keys(glossary).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary[term]}}</p></li>
         </ul>
       </div>
     </b-modal>
@@ -396,24 +391,31 @@
         this.showTOC = !this.showTOC;
       },
       addDefinitions() {
-        Object.keys(this.glossary).forEach((category) => {
-          const terms = Object.keys(this.glossary[category]);
-          console.log(terms.join('|'));
-          Object.keys(this.steps).forEach((section) => {
-            Object.keys(section).forEach((step) => {
-              if (Object.hasOwnProperty.call(this.steps[section], step)) {
-                terms.forEach((term) => {
-                  const match = this.steps[section][step].text.toString().toUpperCase().match(term.toString().toUpperCase());
-                  if (match) {
-                    const regex = new RegExp(term, 'gi');
-                    const result = this.steps[section][step].text.toString().replace(regex, `<dfn title="${this.glossary[category][term]}">${term}</dfn>`);
-                    this.steps[section][step].text = result;
-                  }
-                });
+        const terms = Object.keys(this.glossary);
+        Object.keys(this.steps).forEach((section) => {
+          Object.keys(section).forEach((step) => {
+            if (Object.hasOwnProperty.call(this.steps[section], step)) {
+              const text = this.steps[section][step].text.toString();
+              const termsRegex = new RegExp(`/${terms.join('|')}/`, 'gi');
+              const match = text.match(termsRegex);
+              if (match) {
+                this.steps[section][step].text = this.replaceSubstring(match, text);
               }
-            });
+            }
           });
         });
+      },
+      replaceSubstring(match, inputText) {
+        let output = '';
+        let text = inputText;
+        do {
+          const term = match.shift();
+          const regex = new RegExp(term, 'i');
+          output += text.substr(0, text.indexOf(term) + term.length).replace(regex, `<dfn title="${this.glossary[term.toUpperCase()]}">${term}</dfn>`);
+          text = text.substring(text.indexOf(term) + term.length);
+        } while (match.length);
+        output += text;
+        return output;
       },
     },
     /**

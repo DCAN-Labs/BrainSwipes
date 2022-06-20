@@ -133,7 +133,7 @@
           "image": "/static/tutorial_imgs/2sidebyside.JPG"
         },
         {
-          "text": "The fMRI image is much more blurry than the T1-weighted image (T1) and \nis more difficult to define the white and gray matter. \nSo image processing aligns the blurry fMRI image to the clearer T1. \nThis allows us to map the brain activity from the fMRI image to the precise regions defined in the T1.",
+          "text": "The fMRI image is blurrier than the T1-weighted image (T1) and \nis more difficult to define the white matter and gray matter. \nImage processing aligns the blurry fMRI image to the clearer T1. \nThis allows us to map the brain activity from the fMRI image to the precise regions defined in the T1.",
           "image": "/static/tutorial_imgs/fMRIalignsT1.JPG"
         }
       ],
@@ -143,7 +143,7 @@
           "image": "/static/tutorial_imgs/planes.JPG"
         },
         {
-          "text": "On the T1, you can classify white and gray matter. \nGray matter is made up of folds with the “hills” called gyri and “valleys” called sulci delineated by red lines. \nWhite matter is delineated by dark gray lines.",
+          "text": "On the T1, you can classify white matter and gray matter. \nGray matter is made up of folds with the “hills” called gyri and “valleys” called sulci delineated by red lines. \nWhite matter is delineated by dark gray lines.",
           "image": "/static/tutorial_imgs/GM_WM.JPG"
         },
         {
@@ -152,7 +152,7 @@
         },
 
         {
-          "text": "Each ABCD Study participant’s T1 is registered to the Montreal Neurological Institute (MNI) atlas. \nThe structural image is registered to a common atlas in order to compare subjects with different brain shapes.",
+          "text": "Each Study participant’s T1 is registered to the Montreal Neurological Institute (MNI) atlas. \nThe structural image is registered to a common atlas in order to compare subjects with different brain shapes.",
           "image": "/static/tutorial_imgs/mni_final.jpg"
         },
 
