@@ -17,11 +17,12 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></svg></b-button>
       <div id="table-of-contents" v-show="showTOC">
         <ul>
-          <li v-scroll-to="'#MRIintro0'" @click="hideTOC">Introduction to MRI</li>
-          <li v-scroll-to="'#qa-intro'" @click="hideTOC">Introduction to Quality Assessment</li>
-          <li v-scroll-to="'#qa-image-types'" @click="hideTOC">QA Image Types</li>
-          <li v-scroll-to="'#structural-qa'" @click="hideTOC">How to perform structural QA</li>
-          <li v-scroll-to="'#functional-qa'" @click="hideTOC">How to perform functional QA</li>
+          <li v-scroll-to="'#header-MR-Intro'" @click="hideTOC">Introduction to MRI</li>
+          <li v-scroll-to="'#header-qa-intro'" @click="hideTOC">Introduction to Quality Assessment</li>
+          <li v-scroll-to="'#header-Type-Imgs'" @click="hideTOC">Types of Images in BrainSwipes</li>
+          <li v-scroll-to="'#header-Surf-Delin'" @click="hideTOC">Assessing the Quality of Surface Delineations</li>
+          <li v-scroll-to="'#header-Atl-Reg'" @click="hideTOC">Assessing the Quality of Atlas Registration</li>
+          <li v-scroll-to="'#header-Func-Reg'" @click="hideTOC">Assesing the Quality of Functional Registration</li>
           <li v-scroll-to="'#using-swipes'" @click="hideTOC">Using the BrainSwipes interface</li>
         </ul>
       </div>
