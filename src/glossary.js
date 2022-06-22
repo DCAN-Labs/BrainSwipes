@@ -1,3 +1,4 @@
 import glossary from './glossary.json';
+import glossaryKeys from './glossaryKeys.json';
 
-export default glossary;
+export { glossary, glossaryKeys };

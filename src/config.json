@@ -80,98 +80,142 @@
     "bucket": "brainswipes",
     "dataset": "BCP",
     "steps": {
-      "examples": [
-        {
-          "text": "Swipe right when the image is good quality.\n The gray matter and white matter is properly delineated.",
-          "pointer": "sub-232633_ses-36mo_T2-Axial-BasalGangila-Putamen",
-          "answer": 1,
-          "tutorialStep": 0
-        },
-        {
-          "text": "Swipe right: Only minor gray matter cutoff around the perimeter of the brain.",
-          "pointer": "sub-583494_ses-20mo_T1-Sagittal-Insula-FrontoTemporal",
-          "answer": 1,
-          "tutorialStep": 0
-        },
-        {
-          "text": "Swipe right: Functional registration passes with only minor cutoff in functional data.",
-          "pointer": "sub-583494_ses-44mo_task-rest_run-002_desc-TaskInT1",
-          "answer": 1,
-          "tutorialStep": 0
-        },
-        {
-          "text": "Swipe left when its bad:\n Too much white matter cut off",
-          "pointer": "sub-752770_ses-9mo_T1-Coronal-OrbitoFrontal",
-          "answer": 0,
-          "tutorialStep": 1
-        },
-        {
-          "text": "Swipe left:\n Large areas where functional data is not registered to the atlas.",
-          "pointer": "sub-764612_ses-28mo_task-rest_run-001_desc-TaskInT1",
-          "answer": 0,
-          "tutorialStep": 1
-        },
-        {
-          "text": "if you're not sure, click 'help' \n to discuss with scientists ",
-          "pointer": "sub-675362_ses-42mo_task-rest_run-003_desc-TaskInT2",
-          "answer": 0,
-          "tutorialStep": 2
-        },
-        {
-          "text": "Are you ready to play?",
-          "tutorialCompleted": true
-        }
-      ],
       "MRIintro": [
         {
-          "text": "The structural image of the brain is the T1-weighted image (T1). \nThis image is a clear snapshot of the brain at one point in time and is used to measure physical characteristics like shape and size.",
+          "text":"<h1>Introduction to MRI</h1>"
+        },
+        {
+          "text":"Magnetic Resonance Imaging (MRI) is a non-invasive technique that uses strong magnets and radio waves to see organs and tissues inside the body. In the field of neuroscience researchers use MRI to gather images of subjects' brains. This is called neuroimaging."
+        },
+        {
+          "text":"3D images of the brain are examined one slice at a time resulting in a series of 2D images for every scan."
+        },
+        {
+          "text":"Researchers gather images while the subject is at rest or while performing a task."
+        },
+        {
+          "text":"Images gathered at rest are used to study the shape, size, organization and composition of the subject's brain. These images are called structural images or anatomical images."
+        },
+        {
+          "text":"Images gathered while performing a task are used to study how the subject used their brain during that task. These images are called functional images. Techniques that gather these images are called Functional MRI or fMRI."
+        },
+        {
+          "text": "The most widely used type of structural image is the T1-weighted image (T1). T1 images show the difference between gray matter and white matter in the brain. In T1 images of adult brains, white matter appears white and gray matter appears gray.",
           "image": "/static/tutorial_imgs/atlas_justimg.jpg"
         },
-
         {
-          "text": "Functional MRI (fMRI) is used to measure brain activity over time whereas \nstructural MRI (e.g. T1-weighted imaging) is used to measure brain structure at one point in time.",
+          "text": "Another commonly used type of structural image is the T2-weighted image (T2). T2 images highlight the brain differently than T1 images. In T2 images of adult brains, white matter appears darker than gray matter.",
+          "image":"/add/raw/T2"
+        },
+        {
+          "text": "The primary type of functional image is a Blood Oxygen Level Dependent signal image or BOLD image. These images show the change in oxygen levels in the brain's blood over time. In isolation, functional images appear blurry.",
           "image": "/static/tutorial_imgs/2sidebyside.JPG"
         },
         {
-          "text": "The fMRI image is blurrier than the T1-weighted image (T1) and \nis more difficult to define the white matter and gray matter. \nImage processing aligns the blurry fMRI image to the clearer T1. \nThis allows us to map the brain activity from the fMRI image to the precise regions defined in the T1.",
-          "image": "/static/tutorial_imgs/fMRIalignsT1.JPG"
+          "text":"After gathering MRI images they are processed by a supercomputer. This makes it possible to accurately map a subject's brain and compare images to one another. One image can be compared to another type of image from the same subject, and to the images of any other subject."
+        },
+        {
+          "text":"To help researchers map the structure of the cortical surface, the supercomputer draws lines to seperate gray matter and white matter. This is called surface delineation."
+        },
+        {
+          "text":"To help researchers compare an image to other images of the same subject the supercomputer overlays one image on the other. This is called co-registration."
+        },
+        {
+          "text":"To help researchers compare one subject's images to another subject's images the supercomputer slightly reshapes them and compares them and their surface delineations to a standardized map of the brain. This standardized map is called an atlas. Comparing an image to an atlas in this way is called atlas registration.",
+          "image":"/static/tutorial_imgs/mni_final.jpg"
+        }
+      ],
+      "QAintro":[
+        {
+          "text":"<h1 id='qa-intro'>Introduction to Quality Assessment</h1>"
+        },
+        {
+          "text":"Ideally all images that are gathered via MRI and processed by a supercomputer can be used for analyses. However, some images are low quality and using them in analysis would generate poor results."
+        },
+        {
+          "text":"Researchers have a standard set of metrics to determine whether the images are high enough quality to be used in analysis. The act of assesing the level of an image's quality is called Quality Assessment (QA)."
+        },
+        {
+          "text":"Though automated tools are being developed, the best way to perform QA is manually. This is a difficult task for datasets that include thousands of subjects. This task becomes acheivable when it is shared between many people."
+        },
+        {
+          "text":"We welcome you to BrainSwipes, a central platform for neuroimaging datasets that need quality assessment. Below you will learn how to perform QA on processed images of the brain acquired through MRI.",
+          "image":"/static/tutorial_imgs/action-swipe.png"
         }
       ],
       "QAimagetypes": [
         {
-          "text": "There are 7 types of images in 3 different planes to assess the surface delineation quality on the T1.",
+          "text":"<h1 id='qa-image-types'>QA Image Types</h1>"
+        },
+        {
+          "text":"You will be performing QA on 3 categories of images. Surface delineations of anatomical images, atlas registrations and functional registrations."
+        },
+        {
+          "text":"<h2>Surface Delineations of Anatomical Images</h2>"
+        },
+        {
+          "text":"You will perform QA on individual T1 and T2 slices to determine the quality of their surface delineations."
+        },
+        {
+          "text": "There are 3 standard angles used when researchers examine the brain. Image slices from each angle fall into a plane, the Coronal plane, Axial plane or Sagittal plane. The coronal plane is the plane seen when looking at a persons face or the back of their head. The axial plane is the plane seen looking at the top of their head. The sagittal plane is the plane seen looking at the sides of their head. Surface delineation is performed on all of these slices.",
           "image": "/static/tutorial_imgs/planes.JPG"
         },
         {
-          "text": "On the T1, you can classify white matter and gray matter. \nGray matter is made up of folds with the “hills” called gyri and “valleys” called sulci delineated by red lines. \nWhite matter is delineated by dark gray lines.",
-          "image": "/static/tutorial_imgs/GM_WM.JPG"
+          "text": "Here is an example of how an individual, delineated T1 slice will look in the app.",
+          "image":"/static/tutorial_imgs/sub-714783_ses-15mo_T1-Axial-BasalGangila-Putamen.png"
         },
         {
-          "text": "The lines separating the gray and white matter are called surface delineations. \nHow well the gray and white matter are delineated will signify the quality of the surface delineations. \nLook below for common errors in surface delineation.",
-          "image": "/static/tutorial_imgs/deline.JPG"
+          "text": "Here is an example of how an individual, delineated T2 slice will look in the app.",
+          "image":"/static/tutorial_imgs/sub-232633_ses-36mo_T2-Axial-BasalGangila-Putamen.png"
         },
-
         {
-          "text": "Each Study participant’s T1 is registered to the Montreal Neurological Institute (MNI) atlas. \nThe structural image is registered to a common atlas in order to compare subjects with different brain shapes.",
-          "image": "/static/tutorial_imgs/mni_final.jpg"
+          "text":"<h2>Atlas Registration</h2>"
         },
-
         {
-          "text": "There are two types of images to assess the quality of the T1 registration to the MNI atlas. \nThese images are the T1 and MNI atlas overlaid onto each other.",
+          "text":"You will perform QA on 9 slices of the same T1 to determine the quality of its registration to an atlas."
+        },
+        {
+          "text": "Atlas registration on structural data is done in two ways. A T1 can be overlayed onto an atlas or an atlas can be overlayed onto a T1. For whichever way this is done, surface delineations of the first image are drawn over the second image.",
           "image": "/static/tutorial_imgs/atlast1horizontal.JPG"
         },
-
         {
-          "text": "There are two types of images to assess the quality of the fMRI registration to the T1. \nThese images are the T1 and the fMRI overlaid onto each other.",
+          "text":"Here is an example of how a T1 registered to an atlas will look in the app.",
+          "image":"/static/tutorial_imgs/sub-198202_ses-8mo_desc-T1wInAtlas.png"
+        },
+        {
+          "text":"Here is an example of how an atlas registered to a T1 will look in the app. A registration of an atlas onto a T1 will have heavy red lines in the center sagittal slice.",
+          "image":"/static/tutorial_imgs/sub-0051322_ses-MaxMunb_desc-AtlasInT1w.png"
+        },
+        {
+          "text":"<h2>Functional Registration</h2>"
+        },
+        {
+          "text":"You will perform QA on 9 slices of the same functional image to determine the quality of its registration to a T1."
+        },
+        {
+          "text":"Functional Registration to a T1 is done in two ways. A functional image can be overlayed onto a structural image or structural image can be overlayed onto a functional image. For whichever way this is done, surface delineations of the first image are drawn over the second image.",
           "image": "/static/tutorial_imgs/sidebysiderest_testwidth.JPG"
+        },
+        {
+          "text": "Here is an example of how a functional image registered to a T1 will look in the app. A functional image registered to a T1 will have sparse or dotted red lines because functional images are blurrier leading to the supercomputer drawing less delineations.",
+          "image":"/static/tutorial_imgs/sub-0050397_ses-UM2_task-rest_run-01_desc-TaskInT1.png"
+        },
+        {
+          "text": "Here is an example of how a T1 registered to a functional image will look in the app. A T1 registered to a functional image will have a blurry background image because functional images are blurry.",
+          "image":"/static/tutorial_imgs/sub-470431_ses-9mo_task-rest_run-004_desc-T1InTask.png"
         }
       ],
       "structuralQA": [
         {
+          "text":"<h1 id='structural-qa'>Assessing the Quality of Surface Delineations</h1>"
+        },
+        {
+          "text":"A quality surface delineation will accurately delineate the cortical surface. White matter will be seperated from gray matter with a gray line. Gray matter will be seperated from the surrounding fluid with a red line. Each colored line will capture only one type of tissue."
+        },
+        {
           "text": "Ignore the subcortical regions highlighted between the temporal lobes in the coronal view. \nSurface delineation is only concerned with the outer area of the brain called the cortex.",
           "image": "/static/tutorial_imgs/subcort.JPG"
         },
-
         {
           "text": "Blurriness occurs when the participant is moving in the scanner and can make it difficult to delineate the surface.",
           "image": "/static/tutorial_imgs/blurryfail.JPG"
@@ -227,10 +271,13 @@
         {
           "text": "",
           "image": "/static/tutorial_imgs/20-T1Surf.jpg"
-        }
-
-      ],
-      "functionalQA": [
+        },
+        {
+          "text":"<h1>Assessing the Quality of Atlas Registration</h1>"
+        },
+        {
+          "text":"A quality atlas registration will correctly and accurately register an atlas to a T1 or a T1 to an atlas. All overlayed delineations will match the gray and white matter below. The boundaries of the underlying image will be the same size as the overlay, with no excess black space and no delineations that do not capture the whole underlying image."
+        },
         {
           "text": "The quality of the atlas registration depends on how well the T1 aligns to the boundaries of the MNI atlas.\nThe goal is to have all participants’ overlaid images look the same so their brain shapes are the same and can be compared.",
           "image": "/static/tutorial_imgs/innerboundary_screenshot.jpg"
@@ -251,6 +298,11 @@
         {
           "text": "However if the T1 extends minimally outside of the atlas boundaries it is not necessarily bad quality.",
           "image": "/static/tutorial_imgs/outsidepass.JPG"
+        }
+      ],
+      "functionalQA": [
+        {
+          "text":"<h1 id='functional-qa'>Assesing the Quality of Functional Registration</h1>"
         },
         {
           "text": "The quality of the fMRI registration depends on how well the fMRI image and T1 align. \nCommon functional registration errors include: \nfield of view cut off and signal dropout.",
@@ -277,11 +329,11 @@
           "image": "/static/tutorial_imgs/passsignal.JPG"
         },
         {
-          "text": "Ignore movement artifacts and warped brain shapes when assessing the quality of the functional registration. \nMovement artifacts occur when the participant is moving too much during the fMRI scan but still is a PASS if the T1 and fMRI align well.",
+          "text": "Ignore movement artifacts when assessing the quality of the functional registration. \nMovement artifacts occur when the participant is moving too much during the fMRI scan but still is a PASS if the T1 and fMRI align well.",
           "image": "/static/tutorial_imgs/movementpass.JPG"
         },
         {
-          "text": "Ignore warped brain shapes when assessing the quality of the functional registration. \nWarped brains are due to poor registration of the T1 to the MNI atlas and are not a problem with the functional scan. \nWarped brains will be quality checked in the ABCD Anatomical Swipes For Science app.",
+          "text": "Ignore warped brain shapes when assessing the quality of the functional registration. \nWarped brains are due to poor registration of the T1 to the MNI atlas and are not a problem with the functional scan.",
           "image": "/static/tutorial_imgs/ignorewarp.JPG"
         },
         {
@@ -299,6 +351,51 @@
         {
           "text": "",
           "image": "/static/tutorial_imgs/example4.JPG"
+        }
+      ],
+      "examples": [
+        {
+          "text":"<h1 id='using-swipes'>Using the BrainSwipes interface</h1>"
+        },
+        {
+          "text": "Swipe right when the image is good quality.\n The gray matter and white matter is properly delineated.",
+          "pointer": "sub-232633_ses-36mo_T2-Axial-BasalGangila-Putamen",
+          "answer": 1,
+          "tutorialStep": 0
+        },
+        {
+          "text": "Swipe left when its bad:\n Too much white matter cut off",
+          "pointer": "sub-752770_ses-9mo_T1-Coronal-OrbitoFrontal",
+          "answer": 0,
+          "tutorialStep": 1
+        },
+        {
+          "text": "Swipe right: Only minor gray matter cutoff around the perimeter of the brain.",
+          "pointer": "sub-583494_ses-20mo_T1-Sagittal-Insula-FrontoTemporal",
+          "answer": 1,
+          "tutorialStep": 0
+        },
+        {
+          "text": "Swipe right: Functional registration passes with only minor cutoff in functional data.",
+          "pointer": "sub-583494_ses-44mo_task-rest_run-002_desc-TaskInT1",
+          "answer": 1,
+          "tutorialStep": 0
+        },
+        {
+          "text": "Swipe left:\n Large areas where functional data is not registered to the atlas.",
+          "pointer": "sub-764612_ses-28mo_task-rest_run-001_desc-TaskInT1",
+          "answer": 0,
+          "tutorialStep": 1
+        },
+        {
+          "text": "if you're not sure, click 'help' \n to discuss with scientists ",
+          "pointer": "sub-675362_ses-42mo_task-rest_run-003_desc-TaskInT2",
+          "answer": 0,
+          "tutorialStep": 2
+        },
+        {
+          "text": "Thank you for helping perform QA on neuroimaging datasets. Every swipe helps!",
+          "tutorialCompleted": true
         }
       ]
     }

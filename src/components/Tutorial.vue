@@ -12,16 +12,19 @@
     </div>
 
     <!-- Table of Contents -->
-    <b-button type="button" class="btn btn-outline-primary btn-light" id="open-toc" @click="openTOC">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></svg></b-button>
-    <div id="table-of-contents" v-show="showTOC">
-      <ul>
-        <li v-scroll-to="'#mri-intro'">MRI Introduction</li>
-        <li v-scroll-to="'#qa-image-types'">QA Image Types</li>
-        <li v-scroll-to="'#structural-qa'">How to perform structural QA</li>
-        <li v-scroll-to="'#functional-qa'">How to perform functional QA</li>
-        <li v-scroll-to="'#using-swipes'">Using the BrainSwipes interface</li>
-      </ul>
+    <div v-click-outside="hideTOC">
+      <b-button type="button" class="btn btn-outline-primary btn-light" id="open-toc" @click="openTOC">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></svg></b-button>
+      <div id="table-of-contents" v-show="showTOC">
+        <ul>
+          <li v-scroll-to="'#MRIintro0'" @click="hideTOC">Introduction to MRI</li>
+          <li v-scroll-to="'#qa-intro'" @click="hideTOC">Introduction to Quality Assessment</li>
+          <li v-scroll-to="'#qa-image-types'" @click="hideTOC">QA Image Types</li>
+          <li v-scroll-to="'#structural-qa'" @click="hideTOC">How to perform structural QA</li>
+          <li v-scroll-to="'#functional-qa'" @click="hideTOC">How to perform functional QA</li>
+          <li v-scroll-to="'#using-swipes'" @click="hideTOC">Using the BrainSwipes interface</li>
+        </ul>
+      </div>
     </div>
 
     <b-button id="help" class="btn btn-outline-primary btn-light" @click="openGlossary">
@@ -32,15 +35,22 @@
     <b-modal id="glossary" :title="'Glossary of Terms'"
       ref="glossary" size="lg">
       <div>
+        <h1>Brain Anatomy</h1>
         <ul>
-          <li v-for="term in Object.keys(glossary).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary[term]}}</p></li>
+          <li v-for="term in Object.keys(glossary['Brain Anatomy']).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary['Brain Anatomy'][term]}}</p></li>
+        </ul>
+        <hr>
+        <h1>Neuroimaging Terms</h1>
+        <ul>
+          <li v-for="term in Object.keys(glossary['Neuroimaging Terms']).sort()" :key="term"><strong>{{term}}</strong><p>{{glossary['Neuroimaging Terms'][term]}}</p></li>
         </ul>
       </div>
     </b-modal>
     <div class="tutorial-steps">
       <!-- Introduction steps -->
-      <h1 id="mri-intro">MRI Introduction</h1>
+
       <div v-for="(step, index) in steps.MRIintro" class="fullpage">
+        <hr><!--Hidden. This adds just enough width to make the arrow v-scroll work when the p-bar first pops up-->
         <div class="tutorial-step" :id="'MRIintro'+index">
 
           <p v-html="step.text"></p>
@@ -48,7 +58,16 @@
         </div>
         <img :src="step.image" class="mt-3 pt-3 img"/>
       </div>
-      <h1 id="qa-image-types">QA Image Types</h1>
+      
+      <div v-for="(step, index) in steps.QAintro" class="fullpage">
+        <div class="tutorial-step" :id="'QAintro'+index">
+
+          <p v-html="step.text"></p>
+
+        </div>
+        <img :src="step.image" class="mt-3 pt-3 img"/>
+      </div>
+
       <div v-for="(step, index) in steps.QAimagetypes" class="fullpage">
         <div class="tutorial-step" :id="'QAimagetypes'+index">
 
@@ -57,7 +76,7 @@
         </div>
         <img :src="step.image" class="mt-3 pt-3 img"/>
       </div>
-      <h1 id="structural-qa">How to perform structural QA</h1>
+      
       <div v-for="(step, index) in steps.structuralQA" class="fullpage">
         <div class="tutorial-step" :id="'structuralQA'+index">
 
@@ -66,7 +85,7 @@
         </div>
         <img :src="step.image" class="mt-3 pt-3 img"/>
       </div>
-      <h1 id="functional-qa">How to perform functional QA</h1>
+      
       <div v-for="(step, index) in steps.functionalQA" class="fullpage">
         <div class="tutorial-step" :id="'functonalQA'+index">
 
@@ -77,8 +96,8 @@
       </div>
 
       <!-- Example Steps -->
-      <h1 id="using-swipes">Using the BrainSwipes interface</h1>
-      <div v-for="(step, index) in steps.examples" class="fullpage">
+      
+      <div v-for="(step, index) in steps.examples" class="widget">
         <div class="text-center message w-100" :id="'example'+index">
           <p v-html="step.text"></p>
 
@@ -114,9 +133,14 @@
     max-height: 80vh;
     width: 100%;
     max-width: 500px;
+    margin-bottom: 35px;
   }
 
   .fullpage {
+    height: 100vh;
+  }
+
+  .widget {
     height: 100vh;
   }
 
@@ -189,6 +213,10 @@
     margin-bottom: 15px;
     font-size: 2em;
   }
+  
+  .tutorial-step h2{
+    font-size: 1.6em;
+  }
 
   .tutorial-step{
     margin: 0 10vw;
@@ -203,10 +231,19 @@
     cursor: help;
   }
 
+  .fullpage hr{
+    opacity: 0;
+  }
+
   @media (min-width: 65em) {
     .arrow {
       display: none;
     }
+
+    #help {
+      display: none;
+    }
+
   }
 
 </style>
@@ -220,7 +257,7 @@
   import Vue from 'vue';
   import Arrow from './Animations/ArrowDown';
   import WidgetSelector from './WidgetSelector';
-  import glossary from '../glossary';
+  import { glossary, glossaryKeys } from '../glossary';
 
   const VueScrollTo = require('vue-scrollto');
 
@@ -238,6 +275,25 @@
     x: false,
     y: true,
   });
+
+  /* eslint-disable */
+  // https://stackoverflow.com/a/42389266
+  Vue.directive('click-outside', {
+    bind: function (el, binding, vnode) {
+      el.clickOutsideEvent = function (event) {
+        // here I check that click was outside the el and its children
+        if (!(el == event.target || el.contains(event.target))) {
+          // and if it did, call method provided in attribute value
+          vnode.context[binding.expression](event);
+        }
+      };
+      document.body.addEventListener('click', el.clickOutsideEvent);
+    },
+    unbind: function (el) {
+      document.body.removeEventListener('click', el.clickOutsideEvent);
+    },
+  });
+  /* eslint-enable */
 
   export default {
     name: 'tutorial',
@@ -257,9 +313,10 @@
         */
         widgetSummary: {}, // TODO: fill this properly
         /**
-         * Glossary of terms
+         * Glossary of terms and linking keys
          */
         glossary,
+        glossaryKeys,
         /**
          * variable that opens and closes the table of contents
          */
@@ -283,6 +340,13 @@
        */
       config: {
         type: Object,
+        required: true,
+      },
+      /**
+       * prevents addDefinitions from running more than once
+       */
+      definitionsAdded: {
+        type: Boolean,
         required: true,
       },
     },
@@ -336,18 +400,22 @@
         if (this.currentBin.bin < this.steps.MRIintro.length - 1) {
           return `#MRIintro${this.currentBin.bin + 1}`;
         } else if (this.currentBin.bin <
-          (this.steps.QAimagetypes.length + this.steps.MRIintro.length) - 1) {
-          return `#QAimagetypes${(this.currentBin.bin - this.steps.MRIintro.length) + 1}`;
+          (this.steps.QAintro.length + this.steps.MRIintro.length) - 1) {
+          return `#QAintro${(this.currentBin.bin - this.steps.MRIintro.length) + 1}`;
+        } else if (this.currentBin.bin <
+          (this.steps.QAimagetypes.length +
+          this.steps.QAintro.length + this.steps.MRIintro.length) - 1) {
+          return `#QAimagetypes${(this.currentBin.bin - this.steps.QAintro.length - this.steps.MRIintro.length) + 1}`;
         } else if (this.currentBin.bin < (
-          this.steps.QAimagetypes.length + this.steps.MRIintro.length +
+          this.steps.QAimagetypes.length + this.steps.QAintro.length + this.steps.MRIintro.length +
           this.steps.structuralQA.length) - 1) {
-          return `#structuralQA${(this.currentBin.bin - this.steps.QAimagetypes.length - this.steps.MRIintro.length) + 1}`;
+          return `#structuralQA${(this.currentBin.bin - this.steps.QAimagetypes.length - this.steps.QAintro.length - this.steps.MRIintro.length) + 1}`;
         } else if (this.currentBin.bin < (
-          this.steps.QAimagetypes.length + this.steps.MRIintro.length +
+          this.steps.QAimagetypes.length + this.steps.QAintro.length + this.steps.MRIintro.length +
           this.steps.structuralQA.length + this.steps.functionalQA.length) - 1) {
-          return `#functonalQA${(this.currentBin.bin - this.steps.QAimagetypes.length - this.steps.MRIintro.length - this.steps.structuralQA.length) + 1}`;
+          return `#functonalQA${(this.currentBin.bin - this.steps.QAimagetypes.length - this.steps.QAintro.length - this.steps.MRIintro.length - this.steps.structuralQA.length) + 1}`;
         }
-        return `#example${(this.currentBin.bin - this.steps.QAimagetypes.length - this.steps.MRIintro.length - this.steps.structuralQA.length - this.steps.functionalQA.length) + 1}`;
+        return `#example${(this.currentBin.bin - this.steps.QAimagetypes.length - this.steps.QAintro.length - this.steps.MRIintro.length - this.steps.structuralQA.length - this.steps.functionalQA.length) + 1}`;
       },
       /**
        * dataset that the tutorial images are from
@@ -391,31 +459,39 @@
         this.showTOC = !this.showTOC;
       },
       addDefinitions() {
-        const terms = Object.keys(this.glossary);
-        Object.keys(this.steps).forEach((section) => {
-          Object.keys(section).forEach((step) => {
-            if (Object.hasOwnProperty.call(this.steps[section], step)) {
-              const text = this.steps[section][step].text.toString();
-              const termsRegex = new RegExp(`/${terms.join('|')}/`, 'gi');
+        if (!this.definitionsAdded) {
+          const terms = Object.keys(this.glossaryKeys);
+          const termsRegex = new RegExp(`${terms.join('|')}`, 'gi');
+          // const steps = JSON.parse(JSON.stringify(this.steps));
+          Object.keys(this.steps).forEach((section) => {
+            // TODO probs make this a for loop with length of this.steps.section
+            for (let index = 0; index < this.steps[section].length; index += 1) {
+              const text = this.steps[section][index].text;
               const match = text.match(termsRegex);
               if (match) {
-                this.steps[section][step].text = this.replaceSubstring(match, text);
+                this.steps[section][index].text = this.replaceSubstring(match, text);
               }
             }
           });
-        });
+          this.$emit('markDefinitionsAdded');
+        }
       },
       replaceSubstring(match, inputText) {
         let output = '';
         let text = inputText;
         do {
           const term = match.shift();
+          const definition = this.glossary[this.glossaryKeys[term.toUpperCase()]
+            .Category][[this.glossaryKeys[term.toUpperCase()].Term]];
           const regex = new RegExp(term, 'i');
-          output += text.substr(0, text.indexOf(term) + term.length).replace(regex, `<dfn title="${this.glossary[term.toUpperCase()]}">${term}</dfn>`);
+          output += text.substr(0, text.indexOf(term) + term.length).replace(regex, `<dfn title="${definition}">${term}</dfn>`);
           text = text.substring(text.indexOf(term) + term.length);
         } while (match.length);
         output += text;
         return output;
+      },
+      hideTOC() {
+        this.showTOC = false;
       },
     },
     /**

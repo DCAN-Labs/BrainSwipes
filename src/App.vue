@@ -52,6 +52,8 @@
           :getGlobusIdentities="getGlobusIdentities"
           :globusAllowedOrgs="globusAllowedOrgs"
           :errorCodes="errorCodes"
+          :definitionsAdded="definitionsAdded"
+          @markDefinitionsAdded="markDefinitionsAdded"
         />
       </div>
     </div>
@@ -185,6 +187,10 @@ export default {
         4: 'The email associated with your BrainSwipes account is not active in Globus.',
         5: 'The email associated with your BrainSwipes account has not been verified. Please verify in your profile.',
       },
+      /**
+       * prevents the tutorial addDefinitions function from running more than once
+       */
+      definitionsAdded: false,
     };
   },
   /**
@@ -354,6 +360,9 @@ export default {
         /* eslint-enable */
       }
       return identities;
+    },
+    markDefinitionsAdded() {
+      this.definitionsAdded = true;
     },
   },
   /**
