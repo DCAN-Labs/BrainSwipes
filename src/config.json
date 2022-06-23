@@ -88,16 +88,11 @@
           "text":"Magnetic Resonance Imaging (MRI) is a non-invasive technique that uses strong magnets and radio waves to see organs and tissues inside the body. In the field of neuroscience researchers use MRI to gather images of subjects' brains. This is called neuroimaging."
         },
         {
-          "text":"3D images of the brain are examined one slice at a time resulting in a series of 2D images for every scan."
+          "text":"Researchers gather images while the subject is at rest or while performing a task.<hr>Images gathered at rest are used to study the shape, size, organization and composition of the subject's brain. These images are called structural images or anatomical images.<hr>Images gathered while performing a task are used to study how the subject used their brain during that task. These images are called functional images. Techniques that gather these images are called Functional MRI or fMRI."
         },
         {
-          "text":"Researchers gather images while the subject is at rest or while performing a task."
-        },
-        {
-          "text":"Images gathered at rest are used to study the shape, size, organization and composition of the subject's brain. These images are called structural images or anatomical images."
-        },
-        {
-          "text":"Images gathered while performing a task are used to study how the subject used their brain during that task. These images are called functional images. Techniques that gather these images are called Functional MRI or fMRI."
+          "text":"MRI images are gathered as a series of cross-sectional images called slices resulting in a series of 2D images for every scan.",
+          "image":"/add/series/of/raw/slices"
         },
         {
           "text": "The most widely used type of structural image is the T1-weighted image (T1). T1 images show the difference between gray matter and white matter in the brain. In T1 images of adult brains, white matter appears white and gray matter appears gray.",
@@ -109,19 +104,17 @@
         },
         {
           "text": "The primary type of functional image is a Blood Oxygen Level Dependent signal image or BOLD image. These images show the change in oxygen levels in the brain's blood over time. In isolation, functional images appear blurry.",
-          "image": "/static/tutorial_imgs/2sidebyside.JPG"
+          "image": "/add/raw/BOLD"
         },
         {
           "text":"After gathering MRI images they are processed by a supercomputer. This makes it possible to accurately map a subject's brain and compare images to one another. One image can be compared to another type of image from the same subject, and to the images of any other subject."
         },
         {
-          "text":"To help researchers map the structure of the cortical surface, the supercomputer draws lines to seperate gray matter and white matter. This is called surface delineation."
+          "text":"To help researchers map the structure of the cortical surface, the supercomputer draws lines to seperate gray matter and white matter. This is called surface delineation.",
+          "image":"/add/before/after/delineation"
         },
         {
-          "text":"To help researchers compare an image to other images of the same subject the supercomputer overlays one image on the other. This is called co-registration."
-        },
-        {
-          "text":"To help researchers compare one subject's images to another subject's images the supercomputer slightly reshapes them and compares them and their surface delineations to a standardized map of the brain. This standardized map is called an atlas. Comparing an image to an atlas in this way is called atlas registration.",
+          "text":"To help researchers compare an image to other images of the same subject the supercomputer overlays one image on the other. This is called co-registration.<hr>To help researchers compare one subject's images to another subject's images the supercomputer slightly reshapes them and compares them and their surface delineations to a standardized map of the brain. This standardized map is called an atlas. Comparing an image to an atlas in this way is called atlas registration.",
           "image":"/static/tutorial_imgs/mni_final.jpg"
         }
       ],
@@ -130,13 +123,7 @@
           "text":"<h1 id='header-qa-intro'>Introduction to Quality Assessment</h1>"
         },
         {
-          "text":"Ideally all images that are gathered via MRI and processed by a supercomputer can be used for analyses. However, some images are low quality and using them in analysis would generate poor results."
-        },
-        {
-          "text":"Researchers have a standard set of metrics to determine whether the images are high enough quality to be used in analysis. The act of assesing the level of an image's quality is called Quality Assessment (QA)."
-        },
-        {
-          "text":"Though automated tools are being developed, the best way to perform QA is manually. This is a difficult task for datasets that include thousands of subjects. This task becomes acheivable when it is shared between many people."
+          "text":"Ideally all images that are gathered via MRI and processed by a supercomputer can be used for analyses. However, some images are low quality and using them in analysis would generate poor results.<hr>Researchers have a standard set of metrics to determine whether the images are high enough quality to be used in analysis. The act of assesing the level of an image's quality is called Quality Assessment (QA).<hr>Though automated tools are being developed, the best way to perform QA is manually. This is a difficult task for datasets that include thousands of subjects. This task becomes acheivable when it is shared between many people."
         },
         {
           "text":"We welcome you to BrainSwipes, a central platform for neuroimaging datasets that need quality assessment. Below you will learn how to perform QA on processed images of the brain acquired through MRI.",
@@ -203,6 +190,42 @@
         {
           "text": "Here is an example of how a T1 registered to a functional image will look in the app. A T1 registered to a functional image will have a blurry background image because functional images are blurry.",
           "image":"/static/tutorial_imgs/sub-470431_ses-9mo_task-rest_run-004_desc-T1InTask.png"
+        },
+        {
+          "text":"<h1 id='header-overall-QA'>Assessing the Quality of Images</h1>"
+        },
+        {
+          "text":"In the next sections you will learn how to assess the quality of a processed image. We will define QA metrics for the three image types defined above, and some overall metrics.<hr>Issues that cause poor quality images can happen when gathering images during a scan, or while processing the images on a supercomputer. Errors in image acquisition occur in all types of images."
+        },
+        {
+          "text":"<h1 id='header-Acq-Err'>Understanding Acquisition Errors</h1>"
+        },
+        {
+          "text":"Hardware issues"
+        },
+        {
+          "text":"Warping"
+        },
+        {
+          "text":"FOV cutoff"
+        },
+        {
+          "text":"Signal dropout"
+        },
+        {
+          "text":"Blurriness"
+        },
+        {
+          "text":"Ghosting"
+        },
+        {
+          "text":"Ringing"
+        },
+        {
+          "text":"Movement Artifacts"
+        },
+        {
+          "text":"Dimness"
         }
       ],
       "structuralQA": [
@@ -298,6 +321,10 @@
         {
           "text": "However if the T1 extends minimally outside of the atlas boundaries it is not necessarily bad quality.",
           "image": "/static/tutorial_imgs/outsidepass.JPG"
+        },
+        {
+          "text": "If an image has no red overlay click the HELP button and type 'no overlay'. This is a problem with how the overlaid image was created, not the registration.",
+          "image": "/static/tutorial_imgs/blank_help_arrow.JPG"
         }
       ],
       "functionalQA": [

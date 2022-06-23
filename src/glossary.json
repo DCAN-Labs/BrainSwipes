@@ -36,6 +36,7 @@
         "Networks":"",
         "Imaging Pipeline":"",
         "Functional Image":"Images acquired through functional MRI. Used to measure changes in metabolism, chemical composition, blood flow and absorption.",
-        "Anatomical Image":"Images of the anatomical structure of the brain. Used to study the shape, integrity, volume and developmental changes in the brain."
+        "Anatomical Image":"Images of the anatomical structure of the brain. Used to study the shape, integrity, volume and developmental changes in the brain.",
+        "Slice":"A two dimensional image of a cross section of tissue collected during MRI."
     }
 }
