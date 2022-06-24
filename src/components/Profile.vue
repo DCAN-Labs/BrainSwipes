@@ -27,6 +27,9 @@
         <b-button id="verifyEmail" type="submit" variant="primary">Verify Email</b-button>
       </b-form>
       <hr>
+      <h1>{{userData.showTips? 'Tips are on. Click below to turn them off.': 'Tips are off. Click below to turn them on.' }}</h1>
+      <b-button @click="toggleTips">{{userData.showTips? 'ON':'OFF'}}</b-button>
+      <hr>
       <h3>Level {{currentLevel.level}}</h3>
       <p class="lead">
         Keep playing to unlock the remaining animals!
@@ -280,6 +283,11 @@ export default {
     },
     verifyEmail() {
       firebase.auth().currentUser.sendEmailVerification();
+    },
+    toggleTips() {
+      const updates = {};
+      updates[`/uids/${this.userInfo.uid}/showTips`] = !this.userData.showTips;
+      this.db.ref().update(updates);
     },
   },
 };

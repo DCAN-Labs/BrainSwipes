@@ -26,6 +26,12 @@
       </div>
 
       <div v-else>
+        <div id="tutorial-tips" v-if="userData.showTips">
+          <h2>This image is a{{imageTypeText}}.</h2>
+          <b-button @click="toTutorial">Review QA Criteria 
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/><path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/></svg>
+          </b-button>
+        </div>
         <div v-if="!widgetPointer">
           <Flask />
           <p class="mt-3 pt-3 lead">loading...</p>
@@ -70,6 +76,15 @@
 
   .blankImage {
     max-width: 500px;
+  }
+
+  #tutorial-tips {
+    margin: 0.5em;
+  }
+
+  #tutorial-tips h2 {
+    margin-bottom: 0.5em;
+    font-size: 1.3em;
   }
 
   @media (max-height: 683px){
@@ -251,6 +266,11 @@
          * whether the user is allowed to see this dataset
          */
         allowed: false,
+        /**
+         * Idenfities the class of image to assist in routing to the tutorial
+         */
+        imageType: '',
+        imageTypeText: '',
       };
     },
     watch: {
@@ -446,10 +466,10 @@
         this.startTime = new Date();
 
         const sampleId = this.sampleUserPriority()[0];
-
         // if sampleId isn't null, set the widgetPointer
         if (sampleId) {
           this.widgetPointer = sampleId['.key'];
+          this.getImageType();
         }
       },
       /**
@@ -524,6 +544,22 @@
        */
       showAlert() {
         this.dismissCountDown = this.dismissSecs;
+      },
+      getImageType() {
+        if (this.widgetPointer.match(/atlas/i)) {
+          this.imageTypeText = 'n Atlas Registration';
+          this.imageType = 'AtlReg';
+        } else if (this.widgetPointer.match(/task/i)) {
+          this.imageTypeText = ' Functional Registration';
+          this.imageType = 'FuncReg';
+        } else {
+          this.imageTypeText = ' Structural image';
+          this.imageType = 'StrucImg';
+        }
+      },
+      toTutorial() {
+        const routeData = this.$router.resolve({ name: 'Tutorial', query: { section: this.imageType } });
+        window.open(routeData.href, '_blank');
       },
     },
     /**

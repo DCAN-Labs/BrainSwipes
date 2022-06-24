@@ -125,6 +125,7 @@
 
     <p>
     </p>
+      <div id="test"></div>
   </div>
 </template>
 
@@ -459,7 +460,7 @@
       openTOC() {
         this.showTOC = !this.showTOC;
       },
-      addDefinitions() {
+      async addDefinitions() {
         if (!this.definitionsAdded) {
           const terms = Object.keys(this.glossaryKeys);
           const termsRegex = new RegExp(`${terms.join('|')}`, 'gi');
@@ -494,6 +495,25 @@
       hideTOC() {
         this.showTOC = false;
       },
+      handleRouterQuery() {
+        const query = this.$route.query;
+        if (query.section) {
+          let section = '';
+          switch (query.section) {
+            case 'AtlReg':
+              section = 'header-Atl-Reg';
+              break;
+            case 'FuncReg':
+              section = 'header-Func-Reg';
+              break;
+            default:
+              section = 'header-Surf-Delin';
+          }
+          const element = document.getElementById(section);
+          console.log(element);
+          element.scrollIntoView();
+        }
+      },
     },
     /**
      * Add a scroll listener when the component is created.
@@ -507,8 +527,9 @@
     destroyed() {
       window.removeEventListener('scroll', this.handleScroll);
     },
-    mounted() {
-      this.addDefinitions();
+    async mounted() {
+      await this.addDefinitions();
+      this.handleRouterQuery();
     },
   };
 </script>
