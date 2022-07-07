@@ -47,11 +47,11 @@
         :loading="survivingSessionsloading"
         />
         <UserCorrectness
-        :dataset="dataset"
+        :dataset="selectedDataset"
+        :threshold="threshold"
+        :minVotes="minSwipes"
         :db="db"
         :gradientArray="gradientArray"
-        :parentLoading="userCorrectnessLoading"
-        :chartData="userCorrectnessData"
         />
       </div>
     </b-container>
@@ -137,13 +137,6 @@
     },
     props: {
       /**
-       * the dataset to swipe on
-       */
-      dataset: {
-        type: String,
-        required: true,
-      },
-      /**
        * the intialized firebase database
        */
       db: {
@@ -194,7 +187,6 @@
         this.submitDisabled = true;
         this.excludedUsers = _.difference(this.sortedUsersList, this.selectedUsers);
         this.getSurvivingSessions(this.selectedDataset, this.excludedUsers, this.minSwipes);
-        this.getUserCorrectness(this.selectedDataset, this.threshold, this.minSwipes);
         this.showCharts = true;
         this.submitDisabled = false;
       },
@@ -204,8 +196,8 @@
       },
       async getSurvivingSessions(dataset, excludedUsers, minSwipes) {
         /* eslint-disable */
-        console.time('function');
-        console.log('function start');
+        console.time('survivingSessions');
+        console.log('survivingSessions start');
         this.survivingSessionsloading = true;
         // RegEx
         const sessionRegEx = RegExp('sub-[0-9]{6}_ses-[0-9]*mo');
@@ -215,8 +207,8 @@
         // db
         const dbRef = this.db.ref(`datasets/${dataset}/votes`);
         const snap = await dbRef.once('value');
-        console.timeLog('function');
-        console.log('db snapshot created');
+        console.timeLog('survivingSessions');
+        console.log('db snapshot created: survivingSessions');
         // format excluded users for use in jsonQuery
         const userQuery = excludedUsers.map(user => `user!=${user}`).join(' && ');
         // query db snapshot
@@ -317,68 +309,8 @@
           data: thresholdsAsInt.All,
         }];
         this.survivingSessionsloading = false;
-        console.timeEnd('function');
+        console.timeEnd('survivingSessions');
         /* eslint-enable */
-      },
-      async getUserCorrectness(dataset, threshold, minVotes) {
-        this.userCorrectnessLoading = true;
-        const sampleSummaryRef = this.db.ref(`datasets/${dataset}/sampleSummary`);
-        const votesRef = this.db.ref(`datasets/${dataset}/votes`);
-        const sampleSnap = await sampleSummaryRef.once('value');
-        const votesSnap = await votesRef.once('value');
-        const samples = sampleSnap.val();
-        const votes = votesSnap.val();
-        // eslint-disable-next-line no-unused-vars
-        const votesByUser = _.reduce(votes, (result, value, key) => {
-          const user = value.user;
-          const sample = value.sample;
-          const response = value.response;
-          // eslint-disable-next-line
-          result[user] ? result[user][sample] = response : result[user] = { [sample]: response };
-          return result;
-        }, {});
-        const votesOverThreshold = _.reduce(votesByUser, (result, value, key) => {
-          const correctVotes = _.reduce(value, (VOTresult, VOTvalue, VOTkey) => {
-            const sampleSummaryAveVote = samples[VOTkey].aveVote;
-            const sampleSummaryCount = samples[VOTkey].count;
-            if (sampleSummaryCount >= minVotes &&
-            (sampleSummaryAveVote >= threshold || sampleSummaryAveVote <= 1 - threshold)) {
-              let correct;
-              if (sampleSummaryAveVote >= threshold) {
-                if (VOTvalue) {
-                  correct = 1;
-                } else {
-                  correct = 0;
-                }
-              } else if (sampleSummaryAveVote <= 1 - threshold) {
-                if (!VOTvalue) {
-                  correct = 1;
-                } else {
-                  correct = 0;
-                }
-              }
-              VOTresult.push(correct);
-            }
-            return VOTresult;
-          }, []);
-          // eslint-disable-next-line no-param-reassign
-          result[key] = correctVotes;
-          return result;
-        }, {});
-        const userTotals = _.reduce(votesOverThreshold, (result, value, key) => {
-          // eslint-disable-next-line no-unused-vars
-          const userTotal = _.reduce(value, (UTresult, UTvalue, UTkey) => {
-            // eslint-disable-next-line no-param-reassign
-            UTresult += UTvalue;
-            return UTresult;
-          }, 0);
-          // eslint-disable-next-line
-          value.length ? result[key] = [userTotal, value.length] : null;
-          return result;
-        }, {});
-
-        this.userCorrectnessData = userTotals;
-        this.userCorrectnessLoading = false;
       },
     },
   };

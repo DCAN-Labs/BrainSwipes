@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loading || parentLoading">
+  <div v-if="loading">
     LOADING
   </div>
   <div v-else id="userCorrectness">
@@ -34,6 +34,7 @@ strong{
 <script>
   import Vue from 'vue';
   import VueApexCharts from 'vue-apexcharts';
+  import _ from 'lodash';
   import Legend from './Legend/Legend';
 
   Vue.use(VueApexCharts);
@@ -97,6 +98,20 @@ strong{
         required: true,
       },
       /**
+       * ratio of pass/fail swipes to consider the sample passed
+       */
+      threshold: {
+        type: Number,
+        required: true,
+      },
+      /**
+       * minimum number of votes on a sample to be included in the chart
+       */
+      minVotes: {
+        type: Number,
+        required: true,
+      },
+      /**
        * the intialized firebase database
        */
       db: {
@@ -108,20 +123,6 @@ strong{
        */
       gradientArray: {
         type: Array,
-        required: true,
-      },
-      /**
-       * data for the chart
-       */
-      chartData: {
-        type: Object,
-        required: true,
-      },
-      /**
-       * whether the data is loading
-       */
-      parentLoading: {
-        type: Boolean,
         required: true,
       },
     },
@@ -136,11 +137,68 @@ strong{
       },
     },
     methods: {
-      async getData() {
-      //   const ref = this.db.ref('datasets/BCP/visualizations/userCorrectness');
-      //   const snap = await ref.once('value');
-      //   const input = JSON.parse(JSON.stringify(snap.val()));
-        const input = this.chartData;
+      async getUserCorrectness(dataset, threshold, minVotes) {
+        const sampleSummaryRef = this.db.ref(`datasets/${dataset}/sampleSummary`);
+        const votesRef = this.db.ref(`datasets/${dataset}/votes`);
+        const sampleSnap = await sampleSummaryRef.once('value');
+        const votesSnap = await votesRef.once('value');
+        const samples = sampleSnap.val();
+        const votes = votesSnap.val();
+        // eslint-disable-next-line no-unused-vars
+        const votesByUser = _.reduce(votes, (result, value, key) => {
+          const user = value.user;
+          const sample = value.sample;
+          const response = value.response;
+          // eslint-disable-next-line
+          result[user] ? result[user][sample] = response : result[user] = { [sample]: response };
+          return result;
+        }, {});
+        const votesOverThreshold = _.reduce(votesByUser, (result, value, key) => {
+          const correctVotes = _.reduce(value, (VOTresult, VOTvalue, VOTkey) => {
+            const sampleSummaryAveVote = samples[VOTkey].aveVote;
+            const sampleSummaryCount = samples[VOTkey].count;
+            if (sampleSummaryCount >= minVotes &&
+            (sampleSummaryAveVote >= threshold || sampleSummaryAveVote <= 1 - threshold)) {
+              let correct;
+              if (sampleSummaryAveVote >= threshold) {
+                if (VOTvalue) {
+                  correct = 1;
+                } else {
+                  correct = 0;
+                }
+              } else if (sampleSummaryAveVote <= 1 - threshold) {
+                if (!VOTvalue) {
+                  correct = 1;
+                } else {
+                  correct = 0;
+                }
+              }
+              VOTresult.push(correct);
+            }
+            return VOTresult;
+          }, []);
+          // eslint-disable-next-line no-param-reassign
+          result[key] = correctVotes;
+          return result;
+        }, {});
+        const userTotals = _.reduce(votesOverThreshold, (result, value, key) => {
+          // eslint-disable-next-line no-unused-vars
+          const userTotal = _.reduce(value, (UTresult, UTvalue, UTkey) => {
+            // eslint-disable-next-line no-param-reassign
+            UTresult += UTvalue;
+            return UTresult;
+          }, 0);
+          // eslint-disable-next-line
+          value.length ? result[key] = [userTotal, value.length] : null;
+          return result;
+        }, {});
+        return userTotals;
+      },
+      async createChart(dataset, threshold, minVotes) {
+        console.time('userCorrectness');
+        console.log('userCorrectness start');
+        this.loading = true;
+        const input = await this.getUserCorrectness(dataset, threshold, minVotes);
         const sortable = [];
         const swipes = [];
         Object.keys(input).forEach((user) => {
@@ -179,6 +237,7 @@ strong{
             },
           },
         };
+        console.timeEnd('userCorrectness');
         this.loading = false;
       },
       formatMarkers(numRatings, index) {
@@ -202,8 +261,13 @@ strong{
         return this.categories[chosenCategory];
       },
     },
-    created() {
-      this.getData();
+    watch: {
+      $props: {
+        handler() {
+          this.createChart(this.dataset, this.threshold, this.minVotes);
+        },
+        immediate: true,
+      },
     },
   };
 </script>
