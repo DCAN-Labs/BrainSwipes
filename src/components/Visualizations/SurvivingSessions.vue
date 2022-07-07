@@ -91,7 +91,6 @@
         console.log('survivingSessions start');
         this.loading = true;
         // RegEx
-        const sessionRegEx = RegExp('sub-[0-9]{6}_ses-[0-9]*mo');
         const t1RegEx = RegExp('T1');
         const t2RegEx = RegExp('T2');
         const restRegEx = RegExp('rest');
