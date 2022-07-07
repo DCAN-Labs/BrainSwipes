@@ -1,6 +1,5 @@
 <template>
   <div>
-    <p>{{minVotes}}</p>
     <div v-if="loading">
       LOADING
     </div>
@@ -269,8 +268,7 @@ strong{
     },
     watch: {
       propsToWatch: {
-        handler(newValue, oldValue) {
-          console.log(newValue, oldValue);
+        handler() {
           this.createChart(this.dataset, this.threshold, this.minVotes);
         },
         immediate: true,
