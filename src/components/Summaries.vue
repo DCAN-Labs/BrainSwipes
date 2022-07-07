@@ -3,6 +3,19 @@
     <h1> Summary </h1>
 
     <b-container>
+      <div>
+        <b-dropdown variant="warning" class="datasetsDropdown" text="Select Study" ref="datasetDropdown">
+          <b-dropdown-form>
+            <b-form-radio-group
+              id="radio-datasets"
+              v-model="selectedDataset"
+              :options="Object.keys(studies)"
+              name="chooseDataset"
+              stacked
+            ></b-form-radio-group>
+          </b-dropdown-form>
+        </b-dropdown>
+      </div>
       <div> 
         <b-dropdown variant="warning" class="usersDropdown" text="Users to Include" ref="usersDropdown">
           <b-dropdown-form>
@@ -22,21 +35,25 @@
         <b-form-input id="range-minSwipes" v-model="minSwipes" type="range" min="1" :max="maxSwipes"></b-form-input>
         <div class="mt-2">Minimum number of swipes: {{ minSwipes }}</div>
       </div>
-      <div class="submit-div"><b-button variant="danger" :disabled="survivingSessionsloading" v-on:click="updateExcludedUsers">Submit</b-button></div>
-      <!-- <InterraterConcordance
-      :dataset="dataset"
-      :db="db"
-      :gradientArray="gradientArray"
-      /> -->
-      <SurvivingSessions
-      :series="survivingSessionsSeries"
-      :loading="survivingSessionsloading"
-      />
-      <UserCorrectness
-      :dataset="dataset"
-      :db="db"
-      :gradientArray="gradientArray"
-      />
+      <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
+      <div id="charts" v-if="showCharts">
+        <!-- <InterraterConcordance
+        :dataset="dataset"
+        :db="db"
+        :gradientArray="gradientArray"
+        /> -->
+        <SurvivingSessions
+        :series="survivingSessionsSeries"
+        :loading="survivingSessionsloading"
+        />
+        <UserCorrectness
+        :dataset="dataset"
+        :db="db"
+        :gradientArray="gradientArray"
+        :parentLoading="userCorrectnessLoading"
+        :chartData="userCorrectnessData"
+        />
+      </div>
     </b-container>
 
   </div>
@@ -56,6 +73,9 @@
   }
   #range-minSwipes {
     max-width: 300px;
+  }
+  .datasetsDropdown{
+    margin-bottom: 0.5em;
   }
 </style>
 
@@ -83,9 +103,36 @@
         selectedUsers: [],
         excludedUsers: [],
         survivingSessionsSeries: [],
+        /**
+         * tracks whether each chart is loading
+         */
         survivingSessionsloading: true,
+        userCorrectnessLoading: true,
+        /**
+         * default values for min/max swipes for a sample to show in charts
+         */
         minSwipes: 1,
         maxSwipes: 1,
+        /**
+         * the dataset selected to view
+         */
+        selectedDataset: '',
+        /**
+         * prevents charts from showing until a study is selected
+         */
+        showCharts: false,
+        /**
+         * data for the UserCorrectness chart
+         */
+        userCorrectnessData: {},
+        /**
+         * default value selected as the threshold for a sample to pass
+         */
+        threshold: 0.7,
+        /**
+         * submit button lockout
+         */
+        submitDisabled: false,
       };
     },
     props: {
@@ -107,6 +154,13 @@
        * it comes directly from the `/uids` document in Firebase.
        */
       allUsers: {
+        type: Object,
+        required: true,
+      },
+      /**
+       * the list of datasets available to QC
+       */
+      studies: {
         type: Object,
         required: true,
       },
@@ -136,15 +190,19 @@
       },
     },
     methods: {
-      updateExcludedUsers() {
+      updateCharts() {
+        this.submitDisabled = true;
         this.excludedUsers = _.difference(this.sortedUsersList, this.selectedUsers);
-        this.getData('BCP', this.excludedUsers, this.minSwipes);
+        this.getSurvivingSessions(this.selectedDataset, this.excludedUsers, this.minSwipes);
+        this.getUserCorrectness(this.selectedDataset, this.threshold, this.minSwipes);
+        this.showCharts = true;
+        this.submitDisabled = false;
       },
       selectAll() {
         this.selectedUsers = this.selectedUsers.length === this.sortedUsersList.length ?
           [] : _.clone(this.sortedUsersList);
       },
-      async getData(dataset, excludedUsers, minSwipes) {
+      async getSurvivingSessions(dataset, excludedUsers, minSwipes) {
         /* eslint-disable */
         console.time('function');
         console.log('function start');
@@ -262,9 +320,66 @@
         console.timeEnd('function');
         /* eslint-enable */
       },
-    },
-    created() {
-      this.getData('BCP', this.excludedUsers, this.minSwipes);
+      async getUserCorrectness(dataset, threshold, minVotes) {
+        this.userCorrectnessLoading = true;
+        const sampleSummaryRef = this.db.ref(`datasets/${dataset}/sampleSummary`);
+        const votesRef = this.db.ref(`datasets/${dataset}/votes`);
+        const sampleSnap = await sampleSummaryRef.once('value');
+        const votesSnap = await votesRef.once('value');
+        const samples = sampleSnap.val();
+        const votes = votesSnap.val();
+        // eslint-disable-next-line no-unused-vars
+        const votesByUser = _.reduce(votes, (result, value, key) => {
+          const user = value.user;
+          const sample = value.sample;
+          const response = value.response;
+          // eslint-disable-next-line
+          result[user] ? result[user][sample] = response : result[user] = { [sample]: response };
+          return result;
+        }, {});
+        const votesOverThreshold = _.reduce(votesByUser, (result, value, key) => {
+          const correctVotes = _.reduce(value, (VOTresult, VOTvalue, VOTkey) => {
+            const sampleSummaryAveVote = samples[VOTkey].aveVote;
+            const sampleSummaryCount = samples[VOTkey].count;
+            if (sampleSummaryCount >= minVotes &&
+            (sampleSummaryAveVote >= threshold || sampleSummaryAveVote <= 1 - threshold)) {
+              let correct;
+              if (sampleSummaryAveVote >= threshold) {
+                if (VOTvalue) {
+                  correct = 1;
+                } else {
+                  correct = 0;
+                }
+              } else if (sampleSummaryAveVote <= 1 - threshold) {
+                if (!VOTvalue) {
+                  correct = 1;
+                } else {
+                  correct = 0;
+                }
+              }
+              VOTresult.push(correct);
+            }
+            return VOTresult;
+          }, []);
+          // eslint-disable-next-line no-param-reassign
+          result[key] = correctVotes;
+          return result;
+        }, {});
+        const userTotals = _.reduce(votesOverThreshold, (result, value, key) => {
+          // eslint-disable-next-line no-unused-vars
+          const userTotal = _.reduce(value, (UTresult, UTvalue, UTkey) => {
+            // eslint-disable-next-line no-param-reassign
+            UTresult += UTvalue;
+            return UTresult;
+          }, 0);
+          // eslint-disable-next-line
+          value.length ? result[key] = [userTotal, value.length] : null;
+          return result;
+        }, {});
+
+        this.userCorrectnessData = userTotals;
+        this.userCorrectnessLoading = false;
+      },
     },
   };
 </script>

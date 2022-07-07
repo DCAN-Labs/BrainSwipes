@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loading">
+  <div v-if="loading || parentLoading">
     LOADING
   </div>
   <div v-else id="userCorrectness">
@@ -110,6 +110,20 @@ strong{
         type: Array,
         required: true,
       },
+      /**
+       * data for the chart
+       */
+      chartData: {
+        type: Object,
+        required: true,
+      },
+      /**
+       * whether the data is loading
+       */
+      parentLoading: {
+        type: Boolean,
+        required: true,
+      },
     },
     computed: {
       categories() {
@@ -123,9 +137,10 @@ strong{
     },
     methods: {
       async getData() {
-        const ref = this.db.ref('datasets/BCP/visualizations/userCorrectness');
-        const snap = await ref.once('value');
-        const input = JSON.parse(JSON.stringify(snap.val()));
+      //   const ref = this.db.ref('datasets/BCP/visualizations/userCorrectness');
+      //   const snap = await ref.once('value');
+      //   const input = JSON.parse(JSON.stringify(snap.val()));
+        const input = this.chartData;
         const sortable = [];
         const swipes = [];
         Object.keys(input).forEach((user) => {
