@@ -1,19 +1,21 @@
 <template>
-  <div v-if="loading">
-    LOADING
-  </div>
-  <div v-else id="userCorrectness">
-    <div class="chart-wrapper">
-      <apexchart type="scatter" height="500" :options="chartOptions" :series="series"></apexchart>
+  <div>
+    <p>{{minVotes}}</p>
+    <div v-if="loading">
+      LOADING
     </div>
-    <Legend
-      :max="maxSwipes"
-      :min="0"
-      :gradientArray="gradientArray"
-      :label="' Samples Swiped'"
-    />
+    <div v-else id="userCorrectness">
+      <div class="chart-wrapper">
+        <apexchart type="scatter" height="500" :options="chartOptions" :series="series"></apexchart>
+      </div>
+      <Legend
+        :max="maxSwipes"
+        :min="0"
+        :gradientArray="gradientArray"
+        :label="' Samples Swiped'"
+      />
+    </div>
   </div>
-
 </template>
 
 <style scoped>
@@ -70,6 +72,7 @@ strong{
           xaxis: {
             type: 'category',
             categories: [],
+            labels: {},
           },
           markers: {},
           legend: {
@@ -134,6 +137,9 @@ strong{
           categories.push([cutoff, color, (index + 1) * 1.5]);
         });
         return categories;
+      },
+      propsToWatch() {
+        return [this.dataset, this.threshold, this.minVotes];
       },
     },
     methods: {
@@ -221,7 +227,7 @@ strong{
         });
         // setting the chart options
         this.series = [{ name: 'Correctness Ratio', data }];
-        this.chartOptions.xaxis = { type: 'category', categories: names };
+        this.chartOptions.xaxis = { type: 'category', categories: names, labels: { rotate: -60, rotateAlways: true } };
         this.chartOptions.markers = { hover: { size: 20 }, discrete: markers };
         this.swipes = sortedSwipes;
         // setting the tooltip
@@ -262,11 +268,13 @@ strong{
       },
     },
     watch: {
-      $props: {
-        handler() {
+      propsToWatch: {
+        handler(newValue, oldValue) {
+          console.log(newValue, oldValue);
           this.createChart(this.dataset, this.threshold, this.minVotes);
         },
         immediate: true,
+        deep: true,
       },
     },
   };

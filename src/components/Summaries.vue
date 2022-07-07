@@ -4,7 +4,7 @@
 
     <b-container>
       <div>
-        <b-dropdown variant="warning" class="datasetsDropdown" text="Select Study" ref="datasetDropdown">
+        <b-dropdown variant="warning" class="datasetsDropdown" :text="submittedDataset ? submittedDataset : 'Select Study'" ref="datasetDropdown">
           <b-dropdown-form>
             <b-form-radio-group
               id="radio-datasets"
@@ -32,8 +32,8 @@
         </b-dropdown>
       </div>
       <div>        
-        <b-form-input id="range-minSwipes" v-model="minSwipes" type="range" min="1" :max="maxSwipes"></b-form-input>
-        <div class="mt-2">Minimum number of swipes: {{ minSwipes }}</div>
+        <b-form-input id="range-minSwipes" v-model="minSwipes" type="range" min="1" :max="maxSwipes" :number="true"></b-form-input>
+        <div class="mt-2">Include samples with a minimum of <span class="data-value">{{ minSwipes }}</span> swipes</div>
       </div>
       <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
       <div id="charts" v-if="showCharts">
@@ -47,9 +47,9 @@
         :loading="survivingSessionsloading"
         />
         <UserCorrectness
-        :dataset="selectedDataset"
+        :dataset="submittedDataset"
         :threshold="threshold"
-        :minVotes="minSwipes"
+        :minVotes="submittedMinSwipes"
         :db="db"
         :gradientArray="gradientArray"
         />
@@ -76,6 +76,10 @@
   }
   .datasetsDropdown{
     margin-bottom: 0.5em;
+  }
+  .data-value{
+    font-weight: bold;
+    font-size: 1.2em;
   }
 </style>
 
@@ -133,6 +137,12 @@
          * submit button lockout
          */
         submitDisabled: false,
+        /**
+         * versions of variables from the selectors that are only set after submit
+         * this seperates chart loading and selecting options
+         */
+        submittedMinSwipes: 1,
+        submittedDataset: '',
       };
     },
     props: {
@@ -185,6 +195,8 @@
     methods: {
       updateCharts() {
         this.submitDisabled = true;
+        this.submittedMinSwipes = this.minSwipes;
+        this.submittedDataset = this.selectedDataset;
         this.excludedUsers = _.difference(this.sortedUsersList, this.selectedUsers);
         this.getSurvivingSessions(this.selectedDataset, this.excludedUsers, this.minSwipes);
         this.showCharts = true;
@@ -207,8 +219,6 @@
         // db
         const dbRef = this.db.ref(`datasets/${dataset}/votes`);
         const snap = await dbRef.once('value');
-        console.timeLog('survivingSessions');
-        console.log('db snapshot created: survivingSessions');
         // format excluded users for use in jsonQuery
         const userQuery = excludedUsers.map(user => `user!=${user}`).join(' && ');
         // query db snapshot
