@@ -1,11 +1,13 @@
 <template>
-  <div v-if="loading">
-    LOADING
+  <div>
+    <!-- <p>{{labels}}</p> -->
+    <div v-if="loading">
+      LOADING
+    </div>
+    <div v-else id="survivingSessions">
+      <apexchart type="line" height="350" :options="chartOptions" :series="series"></apexchart>
+    </div>
   </div>
-  <div v-else id="survivingSessions">
-    <apexchart type="line" height="350" :options="chartOptions" :series="series"></apexchart>
-  </div>
-
 </template>
 
 <style>
@@ -17,6 +19,9 @@
   import VueApexCharts from 'vue-apexcharts';
   import _ from 'lodash';
   import jsonQuery from 'json-query';
+  import { labels } from '../../labels';
+  
+  console.log(labels);
 
   Vue.use(VueApexCharts);
 

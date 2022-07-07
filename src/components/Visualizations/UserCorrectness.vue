@@ -66,7 +66,7 @@ strong{
             enabled: false,
           },
           title: {
-            text: 'Correct Decision Rate for Passed Samples by User',
+            text: 'Correct Decision Rate for Samples by User',
           },
           xaxis: {
             type: 'category',
