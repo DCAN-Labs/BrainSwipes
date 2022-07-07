@@ -20,8 +20,6 @@
   import _ from 'lodash';
   import jsonQuery from 'json-query';
   import { labels } from '../../labels';
-  
-  console.log(labels);
 
   Vue.use(VueApexCharts);
 
@@ -121,7 +119,14 @@
         const averageScoreBySample = _.mapValues(removeLowSwipeCounts, o => _.mean(o));
 
         const reducedBySession = _.reduce(averageScoreBySample, (result, value, key) => {
-          const ses = key.match(sessionRegEx)[0];
+          let ses = '';
+          try {
+            ses = key.substring(0, key.match(this.labelsRegex).index);
+          } catch (error) {
+            console.log(key);
+            console.log(error);
+          }
+
           let modality = '';
           if (key.match(restRegEx)) {
             modality = 'Rest';
@@ -132,7 +137,7 @@
           } else {
             modality = 'Other';
           }
-          (result[ses] || (result[ses] = [])).push({ [modality]: value });
+          ses ? (result[ses] || (result[ses] = [])).push({ [modality]: value }) : null;
           return result;
         }, {});
 
@@ -203,6 +208,9 @@
     computed: {
       propsToWatch() {
         return [this.dataset, this.excludedUsers, this.minSwipes];
+      },
+      labelsRegex() {
+        return new RegExp(labels.join('|'));
       },
     },
     watch: {
