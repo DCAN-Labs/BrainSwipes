@@ -37,28 +37,41 @@
       </div>
       <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
       <div id="charts" v-if="showCharts">
+          <b-card no-body fill>
+            <b-tabs card lazy>
+              <b-tab title="Track Progress" active>
+                <NumberOfVotes
+                :dataset="submittedDataset"
+                :db="db"
+                />
+              </b-tab>
+              <b-tab title="Evaluate Users">
+                <UserCorrectness
+                :dataset="submittedDataset"
+                :threshold="threshold"
+                :minVotes="submittedMinSwipes"
+                :db="db"
+                :gradientArray="gradientArray"
+                />
+              </b-tab>              
+              <b-tab title="Evaluate Samples">
+                <SurvivingSessions
+                :dataset="submittedDataset"
+                :minSwipes="submittedMinSwipes"
+                :excludedUsers="excludedUsers"
+                :db="db"
+                />
+              </b-tab>
+
+            </b-tabs>
+          </b-card>
         <!-- <InterraterConcordance
         :dataset="dataset"
         :db="db"
         :gradientArray="gradientArray"
         /> -->
-        <NumberOfVotes
-        :dataset="submittedDataset"
-        :db="db"
-        />
-        <SurvivingSessions
-        :dataset="submittedDataset"
-        :minSwipes="submittedMinSwipes"
-        :excludedUsers="excludedUsers"
-        :db="db"
-        />
-        <UserCorrectness
-        :dataset="submittedDataset"
-        :threshold="threshold"
-        :minVotes="submittedMinSwipes"
-        :db="db"
-        :gradientArray="gradientArray"
-        />
+
+
       </div>
     </b-container>
 
