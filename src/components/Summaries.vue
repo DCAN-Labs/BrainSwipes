@@ -42,6 +42,10 @@
         :db="db"
         :gradientArray="gradientArray"
         /> -->
+        <NumberOfVotes
+        :dataset="submittedDataset"
+        :db="db"
+        />
         <SurvivingSessions
         :dataset="submittedDataset"
         :minSwipes="submittedMinSwipes"
@@ -54,10 +58,6 @@
         :minVotes="submittedMinSwipes"
         :db="db"
         :gradientArray="gradientArray"
-        />
-        <NumberOfVotes
-        :dataset="submittedDataset"
-        :db="db"
         />
       </div>
     </b-container>
