@@ -3,12 +3,18 @@
     <div v-if="loading">
       LOADING
     </div>
-    <div v-else id="numberOfVotes">
-      <div id="parentChart" :class="{ split: showChild }">
-        <apexchart type="bar" height="350" :options="parentChartOptions" :series="parentChartSeries"></apexchart>
+    <div v-else id="recentSwipes">
+      <div id="datePicker">
+        <b-form-datepicker v-model="startDate" :min="earliestDate" :max="today" locale="en"></b-form-datepicker>
+        <b-form-datepicker v-model="endDate" :min="earliestDate" :max="today" locale="en"></b-form-datepicker>
       </div>
-      <div id="childChart" :class="{ childActive: showChild }">
-        <apexchart type="bar" height="350" :options="childChartOptions" :series="childChartSeries"></apexchart>
+      <div id="recentSwipesCharts">
+        <div id="parentChart" :class="{ split: showChild }">
+          <apexchart type="bar" height="350" :options="parentChartOptions" :series="parentChartSeries"></apexchart>
+        </div>
+        <div id="childChart" :class="{ childActive: showChild }">
+          <apexchart type="bar" height="350" :options="childChartOptions" :series="childChartSeries"></apexchart>
+        </div>
       </div>
     </div>
   </div>
@@ -28,7 +34,10 @@
   #parentChart{
     width: 100%
   }
-  #numberOfVotes{
+  #recentSwipesCharts{
+    display: flex;
+  }
+  #datePicker{
     display: flex;
   }
 </style>
@@ -38,14 +47,13 @@
   import VueApexCharts from 'vue-apexcharts';
   import _ from 'lodash';
   import colorGradient from 'javascript-color-gradient';
-  import { labels } from '../../labels';
 
   Vue.use(VueApexCharts);
 
   Vue.component('apexchart', VueApexCharts);
 
   export default {
-    name: 'numberOfVotes',
+    name: 'recentSwipes',
     data() {
       return {
         /**
@@ -65,9 +73,10 @@
         showChild: 0,
         selectedCategory: '',
         /**
-         * elements for getting the child chart's data
+         * setting date parameter
          */
-        samplesByModality: {},
+        startDate: '',
+        endDate: '',
       };
     },
     props: {
@@ -89,8 +98,8 @@
     methods: {
       async createParentChart(dataset) {
         /* eslint-disable */
-        console.time('numberOfVotes');
-        console.log('numberOfVotes start');
+        console.time('recentSwipes');
+        console.log('recentSwipes start');
         this.loading = true;
         // RegEx
         const t1RegEx = RegExp('T1');
@@ -160,11 +169,11 @@
             }
           },
           dataLabels: {
-            enabled: true,
+            enabled: true
           },
           colors: colorsArray,
           title: {
-            text: 'Number of Samples with N votes',
+            text: 'Number of Samples Voted on vs Day',
           },
           subtitle: {
             text: '(Click on bar to see details)',
@@ -193,7 +202,7 @@
         this.parentChartSeries = series;
 
         this.loading = false;
-        console.timeEnd('numberOfVotes');
+        console.timeEnd('recentSwipes');
         /* eslint-enable */
       },
       createChildChart(dataPoint, color) {
@@ -214,7 +223,7 @@
             },
           },
           dataLabels: {
-            enabled: true,
+            enabled: false,
           },
           colors: color,
           title: {
@@ -248,13 +257,26 @@
         this.showChild ? this.selectedCategory = selectedCategory : this.selectedCategory = '';
         this.createChildChart(selectedCategory, color);
       },
+      initDates() {
+        const startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - 1);
+
+        this.startDate = startDate < this.earliestDate ? this.earliestDate : startDate;
+
+        const endDate = new Date();
+        this.endDate = endDate;
+      },
     },
     computed: {
       propsToWatch() {
         return [this.dataset];
       },
-      labelsRegex() {
-        return new RegExp(labels.join('|'));
+      today() {
+        return new Date();
+      },
+      earliestDate() {
+        // July 8 2022 was the first day datetime was tracked on votes
+        return new Date(1657311267608);
       },
     },
     watch: {
@@ -265,6 +287,9 @@
         immediate: true,
         deep: true,
       },
+    },
+    mounted() {
+      this.initDates();
     },
   };
 </script>

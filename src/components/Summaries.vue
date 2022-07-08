@@ -37,41 +37,43 @@
       </div>
       <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
       <div id="charts" v-if="showCharts">
-          <b-card no-body fill>
-            <b-tabs card lazy>
-              <b-tab title="Track Progress" active>
-                <NumberOfVotes
-                :dataset="submittedDataset"
-                :db="db"
-                />
-              </b-tab>
-              <b-tab title="Evaluate Users">
-                <UserCorrectness
-                :dataset="submittedDataset"
-                :threshold="threshold"
-                :minVotes="submittedMinSwipes"
-                :db="db"
-                :gradientArray="gradientArray"
-                />
-              </b-tab>              
-              <b-tab title="Evaluate Samples">
-                <SurvivingSessions
-                :dataset="submittedDataset"
-                :minSwipes="submittedMinSwipes"
-                :excludedUsers="excludedUsers"
-                :db="db"
-                />
-              </b-tab>
-
-            </b-tabs>
-          </b-card>
-        <!-- <InterraterConcordance
-        :dataset="dataset"
-        :db="db"
-        :gradientArray="gradientArray"
-        /> -->
-
-
+        <b-card no-body fill>
+          <b-tabs card lazy>
+            <b-tab title="Track Progress" active>
+              <NumberOfVotes
+              :dataset="submittedDataset"
+              :db="db"
+              />
+              <RecentSwipes
+              :dataset="submittedDataset"
+              :db="db"
+              />
+              <!-- calculate needed swipes -->
+            </b-tab>
+            <b-tab title="Evaluate Users">
+              <UserCorrectness
+              :dataset="submittedDataset"
+              :threshold="threshold"
+              :minVotes="submittedMinSwipes"
+              :db="db"
+              :gradientArray="gradientArray"
+              />
+              <!-- <InterraterConcordance
+              :dataset="dataset"
+              :db="db"
+              :gradientArray="gradientArray"
+              /> -->
+            </b-tab>              
+            <b-tab title="Evaluate Samples">
+              <SurvivingSessions
+              :dataset="submittedDataset"
+              :minSwipes="submittedMinSwipes"
+              :excludedUsers="excludedUsers"
+              :db="db"
+              />
+            </b-tab>
+          </b-tabs>
+        </b-card>
       </div>
     </b-container>
 
@@ -110,12 +112,14 @@
   import SurvivngSessions from './Visualizations/SurvivingSessions';
   import UserCorrectness from './Visualizations/UserCorrectness';
   import NumberOfVotes from './Visualizations/NumberOfVotes';
+  import RecentSwipes from './Visualizations/RecentSwipes';
 
 
   Vue.component('InterraterConcordance', InterraterConcordance);
   Vue.component('SurvivingSessions', SurvivngSessions);
   Vue.component('UserCorrectness', UserCorrectness);
   Vue.component('NumberOfVotes', NumberOfVotes);
+  Vue.component('RecentSwipes', RecentSwipes);
 
   /**
    * Visualizations of summary information.
