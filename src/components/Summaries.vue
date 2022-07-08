@@ -55,6 +55,10 @@
         :db="db"
         :gradientArray="gradientArray"
         />
+        <NumberOfVotes
+        :dataset="submittedDataset"
+        :db="db"
+        />
       </div>
     </b-container>
 
@@ -92,11 +96,13 @@
   import InterraterConcordance from './Visualizations/InterraterConcordance';
   import SurvivngSessions from './Visualizations/SurvivingSessions';
   import UserCorrectness from './Visualizations/UserCorrectness';
+  import NumberOfVotes from './Visualizations/NumberOfVotes';
 
 
   Vue.component('InterraterConcordance', InterraterConcordance);
   Vue.component('SurvivingSessions', SurvivngSessions);
   Vue.component('UserCorrectness', UserCorrectness);
+  Vue.component('NumberOfVotes', NumberOfVotes);
 
   /**
    * Visualizations of summary information.

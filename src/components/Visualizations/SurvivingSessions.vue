@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- <p>{{labels}}</p> -->
     <div v-if="loading">
       LOADING
     </div>
@@ -126,9 +125,9 @@
             console.log(error);
           }
 
-          let modality = '';
+          let modality = ''; // do we want atlas registrations seperate?
           if (key.match(restRegEx)) {
-            modality = 'Rest';
+            modality = 'Rest'; // should this be 'Task'?
           } else if (key.match(t1RegEx)) {
             modality = 'T1';
           } else if (key.match(t2RegEx)) {
