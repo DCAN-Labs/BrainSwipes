@@ -141,7 +141,7 @@
 
         const minBySessionModality = _.reduce(reducedBySession, (result, modalities, session) => {
           const reducedSample = _.reduce(modalities, (minimum, value) => {
-            minimum[Object.keys(value)] = _.min([(minimum[Object.keys(value)] || 9), Object.values(value)[0]]);
+            minimum[Object.keys(value)] = minimum.hasOwnProperty(Object.keys(value)) ? _.min([minimum[Object.keys(value)], Object.values(value)[0]]): Object.values(value)[0];
             return minimum;
           }, {});
           const sessionFloor = _.reduce(reducedSample, (innerResult, value) => _.min([innerResult, value]), 9);

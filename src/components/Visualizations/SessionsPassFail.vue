@@ -134,7 +134,7 @@
 
         const meetsThreshold = _.reduce(reducedBySession, (result, modalities, session) => {
           const reducedSample = _.reduce(modalities, (sampleResult, value) => {
-            sampleResult[Object.keys(value)] = Object.values(value) >= threshold;
+            sampleResult[Object.keys(value)] = sampleResult.hasOwnProperty(Object.keys(value)) ? sampleResult[Object.keys(value)] && Object.values(value) >= threshold : Object.values(value) >= threshold;
             return sampleResult;
           }, {});
           const hasFalse = Object.values(reducedSample).some(value => !value);
