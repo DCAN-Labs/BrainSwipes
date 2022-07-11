@@ -5,8 +5,8 @@
     </div>
     <div v-else id="recentSwipes">
       <div id="datePicker">
-        <b-form-datepicker v-model="startDate" :min="earliestDate" :max="today" locale="en"></b-form-datepicker>
-        <b-form-datepicker v-model="endDate" :min="earliestDate" :max="today" locale="en"></b-form-datepicker>
+        <b-form-datepicker v-model="startDate" :min="earliestDate" :max="today" :value-as-date="true"></b-form-datepicker>
+        <b-form-datepicker v-model="endDate" :min="earliestDate" :max="today" :value-as-date="true"></b-form-datepicker>
       </div>
       <div id="recentSwipesCharts">
         <div id="parentChart" :class="{ split: showChild }">
@@ -110,14 +110,17 @@
         const votesSnap = await votesRef.once('value');
         const votes = votesSnap.val();
         // parse data
+        const dateRangeObject = this.makeDateRangeObject();
         const reducedVotes = _.reduce(votes, function(result, value, key){
           if( value.hasOwnProperty('datetime')) {
             const date = new Date(value.datetime);
             const day = date.toLocaleDateString();
-            (result[day] || (result[day] = [])).push(value.user);
+            if (dateRangeObject.hasOwnProperty(day)){
+              (result[day] || (result[day] = [])).push(value.user);
+            }
           }
           return result;
-        },this.makeDateRangeObject());
+        }, dateRangeObject);
         this.votesByDay = reducedVotes;
 
         const votesPerDay = _.reduce(reducedVotes, function(result, value, key){
@@ -267,7 +270,7 @@
       makeDateRangeObject() {
         const dateRangeObject = {};
         const date = new Date(this.startDate);
-        while (date < this.endDate) {
+        while (date <= this.endDate) {
           const key = date.toLocaleDateString();
           dateRangeObject[key] = [];
           date.setDate(date.getDate() + 1);
@@ -277,14 +280,16 @@
     },
     computed: {
       propsToWatch() {
-        return [this.dataset];
+        return [this.dataset, this.startDate, this.endDate];
       },
       today() {
         return new Date();
       },
       earliestDate() {
         // July 8 2022 was the first day datetime was tracked on votes
-        return new Date(1657311267608);
+        const earliestDate = new Date(1657311267608);
+        earliestDate.setHours(0, 0, 0, 0);
+        return earliestDate;
       },
     },
     watch: {
@@ -292,7 +297,7 @@
         handler() {
           this.createParentChart(this.dataset);
         },
-        immediate: true,
+        // immediate: true,
         deep: true,
       },
     },
