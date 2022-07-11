@@ -35,6 +35,10 @@
         <b-form-input id="range-minSwipes" v-model="minSwipes" type="range" min="1" :max="maxSwipes" :number="true"></b-form-input>
         <div class="mt-2">Include samples with a minimum of <span class="data-value">{{ minSwipes }}</span> swipes</div>
       </div>
+      <div>
+        <b-form-input id="range-threshold" v-model="threshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
+        <div class="mt-2">Samples with a minimum pass percentage of <span class="data-value">{{threshold}}%</span> will be considered a pass</div>
+      </div>
       <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
       <div id="charts" v-if="showCharts">
         <b-card no-body fill>
@@ -54,7 +58,7 @@
             <b-tab title="Evaluate Users">
               <UserCorrectness
               :dataset="submittedDataset"
-              :threshold="threshold"
+              :threshold="submittedThreshold"
               :minVotes="submittedMinSwipes"
               :db="db"
               :gradientArray="gradientArray"
@@ -74,7 +78,13 @@
               />
             </b-tab>
             <b-tab title="See Results">
-
+              <SessionsPassFail
+              :dataset="submittedDataset"
+              :threshold="submittedThreshold"
+              :minSwipes="submittedMinSwipes"
+              :excludedUsers="excludedUsers"
+              :db="db"
+              />
             </b-tab>
           </b-tabs>
         </b-card>
@@ -96,7 +106,7 @@
   .submit-div {
     margin-top: 3px;
   }
-  #range-minSwipes {
+  #range-minSwipes, #range-threshold {
     max-width: 300px;
   }
   .datasetsDropdown{
@@ -114,6 +124,7 @@
   import _ from 'lodash';
   import InterraterConcordance from './Visualizations/InterraterConcordance';
   import SurvivngSessions from './Visualizations/SurvivingSessions';
+  import SessionsPassFail from './Visualizations/SessionsPassFail';
   import UserCorrectness from './Visualizations/UserCorrectness';
   import NumberOfVotes from './Visualizations/NumberOfVotes';
   import RecentSwipes from './Visualizations/RecentSwipes';
@@ -121,6 +132,7 @@
 
   Vue.component('InterraterConcordance', InterraterConcordance);
   Vue.component('SurvivingSessions', SurvivngSessions);
+  Vue.component('SessionsPassFail', SessionsPassFail);
   Vue.component('UserCorrectness', UserCorrectness);
   Vue.component('NumberOfVotes', NumberOfVotes);
   Vue.component('RecentSwipes', RecentSwipes);
@@ -160,7 +172,7 @@
         /**
          * default value selected as the threshold for a sample to pass
          */
-        threshold: 0.7,
+        threshold: 100,
         /**
          * submit button lockout
          */
@@ -171,6 +183,7 @@
          */
         submittedMinSwipes: 1,
         submittedDataset: '',
+        submittedThreshold: '',
       };
     },
     props: {
@@ -232,6 +245,7 @@
         this.submitDisabled = true;
         this.submittedMinSwipes = this.minSwipes;
         this.submittedDataset = this.selectedDataset;
+        this.submittedThreshold = this.threshold / 100;
         this.excludedUsers = _.difference(this.sortedUsersList, this.selectedUsers);
         this.showCharts = true;
         this.submitDisabled = false;
