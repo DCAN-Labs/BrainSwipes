@@ -77,6 +77,10 @@
          */
         startDate: '',
         endDate: '',
+        /**
+         * data from the db
+         */
+        votesByDay: {},
       };
     },
     props: {
@@ -101,43 +105,32 @@
         console.time('recentSwipes');
         console.log('recentSwipes start');
         this.loading = true;
-        // RegEx
-        const t1RegEx = RegExp('T1');
-        const t2RegEx = RegExp('T2');
-        const restRegEx = RegExp('rest');
         // get data from db
-        const sampleCountsRef = this.db.ref(`datasets/${dataset}/sampleCounts`);
-        const sampleCountsSnap = await sampleCountsRef.once('value');
-        const sampleCounts = sampleCountsSnap.val();
+        const votesRef = this.db.ref(`datasets/${dataset}/votes`);
+        const votesSnap = await votesRef.once('value');
+        const votes = votesSnap.val();
         // parse data
-        const reducedSampleCounts = _.reduce(sampleCounts, function(result, value, key){
-          result[value] ? result[value] = result[value] + 1 : result[value] = 1;
-          return result;
-        },{});
-        const sampleKeys = Object.keys(reducedSampleCounts);
-        const sampleValues = Object.values(reducedSampleCounts);
-
-
-        const reducedSampleCountsByModality = _.reduce(sampleCounts, function(result, value, key){
-          let modality = ''; // do we want atlas registrations seperate?
-          if (key.match(restRegEx)) {
-            modality = 'Rest'; // should this be 'Task'?
-          } else if (key.match(t1RegEx)) {
-            modality = 'T1';
-          } else if (key.match(t2RegEx)) {
-            modality = 'T2';
-          } else {
-            modality = 'Other';
+        const reducedVotes = _.reduce(votes, function(result, value, key){
+          if( value.hasOwnProperty('datetime')) {
+            const date = new Date(value.datetime);
+            const day = date.toLocaleDateString();
+            (result[day] || (result[day] = [])).push(value.user);
           }
-          result[value] ? result[value][modality] ? result[value][modality] += 1 : result[value][modality] = 1 : result[value] = {[modality]: 1 };
+          return result;
+        },this.makeDateRangeObject());
+        this.votesByDay = reducedVotes;
+
+        const votesPerDay = _.reduce(reducedVotes, function(result, value, key){
+          result[key] = value.length
           return result;
         },{});
-        this.samplesByModality = reducedSampleCountsByModality;
+        const votesPerDayKeys = Object.keys(votesPerDay);
+        const votesPerDayValues = Object.values(votesPerDay);
 
         // set colors
         const colorsArray = colorGradient
           .setGradient('#FF0000', '#FFFF00', '#00FF00', '#0000FF')
-          .setMidpoint(sampleValues.length)
+          .setMidpoint(votesPerDayKeys.length)
           .getArray();
 
         // create the chart
@@ -180,7 +173,7 @@
             offsetX: 15
           },
           xaxis: {
-            categories: sampleKeys,
+            categories: votesPerDayKeys,
           },
           states: {
             active: {
@@ -194,9 +187,8 @@
 
         const series = [{
           name: 'Number of votes',
-          data: sampleValues,
+          data: votesPerDayValues,
         }];
-        console.log(typeof series);
 
         this.parentChartOptions = options;
         this.parentChartSeries = series;
@@ -206,8 +198,14 @@
         /* eslint-enable */
       },
       createChildChart(dataPoint, color) {
-        const dataKeys = Object.keys(this.samplesByModality[dataPoint]);
-        const dataValues = Object.values(this.samplesByModality[dataPoint]);
+        /* eslint-disable */
+        const votesPerUser = _.reduce(this.votesByDay[dataPoint], function(result, value, key){
+          result[value] = result[value] ? result[value] + 1 : 1;
+          return result;
+        }, {});
+        /* eslint-enable */
+        const dataKeys = Object.keys(votesPerUser);
+        const dataValues = Object.values(votesPerUser);
         const options = {
           chart: {
             type: 'bar',
@@ -223,12 +221,12 @@
             },
           },
           dataLabels: {
-            enabled: false,
+            enabled: true,
           },
           colors: color,
           title: {
             // eslint-disable-next-line
-            text: `Number of images with ${dataPoint} vote${dataPoint == 1 ? '' : 's'} by image type`,
+            text: `Number of sample swiped on ${dataPoint} by user`,
           },
           stroke: {
             show: true,
@@ -244,7 +242,7 @@
         };
         const series = [
           {
-            name: 'Number of samples',
+            name: 'Number of swipes',
             data: dataValues,
           },
         ];
@@ -265,6 +263,16 @@
 
         const endDate = new Date();
         this.endDate = endDate;
+      },
+      makeDateRangeObject() {
+        const dateRangeObject = {};
+        const date = new Date(this.startDate);
+        while (date < this.endDate) {
+          const key = date.toLocaleDateString();
+          dateRangeObject[key] = [];
+          date.setDate(date.getDate() + 1);
+        }
+        return dateRangeObject;
       },
     },
     computed: {

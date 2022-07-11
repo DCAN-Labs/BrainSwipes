@@ -187,7 +187,7 @@
           name: 'Number of votes',
           data: sampleValues,
         }];
-        console.log(typeof series);
+
 
         this.parentChartOptions = options;
         this.parentChartSeries = series;
