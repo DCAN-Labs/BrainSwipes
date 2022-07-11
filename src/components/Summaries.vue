@@ -9,7 +9,7 @@
             <b-form-radio-group
               id="radio-datasets"
               v-model="selectedDataset"
-              :options="Object.keys(studies)"
+              :options="availableDatasets"
               name="chooseDataset"
               stacked
             ></b-form-radio-group>
@@ -44,6 +44,7 @@
               :dataset="submittedDataset"
               :db="db"
               />
+              <hr>
               <RecentSwipes
               :dataset="submittedDataset"
               :db="db"
@@ -71,6 +72,9 @@
               :excludedUsers="excludedUsers"
               :db="db"
               />
+            </b-tab>
+            <b-tab title="See Results">
+
             </b-tab>
           </b-tabs>
         </b-card>
@@ -191,6 +195,10 @@
         type: Object,
         required: true,
       },
+      datasetPrivileges: {
+        type: Object,
+        required: true,
+      },
     },
     computed: {
       gradientArray() {
@@ -214,6 +222,9 @@
         });
         this.selectedUsers = usernameArray;
         return usernameArray.sort();
+      },
+      availableDatasets() {
+        return Object.keys(this.datasetPrivileges).filter(key => this.datasetPrivileges[key]);
       },
     },
     methods: {
