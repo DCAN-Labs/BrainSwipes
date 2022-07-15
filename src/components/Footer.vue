@@ -49,10 +49,6 @@ export default {
       type: Object,
       required: true,
     },
-    routerQuery: {
-      type: Object,
-      required: true,
-    },
     dataset: {
       type: String,
       requred: true,
@@ -73,6 +69,7 @@ export default {
         { path: '/tutorial', name: 'Tutorial' },
         { path: '/leaderboard', name: 'Leaderboard' },
         { path: '/about', name: 'About' },
+        { path: '/results', name: 'Results' },
       ],
       isAdmin: false,
       loading: true,
@@ -107,7 +104,7 @@ export default {
      */
     routeToChats(label) {
       this.$emit('changeDataset', label);
-      this.$router.push({ name: 'Chats', params: { dataset: label }, query: this.routerQuery });
+      this.$router.push({ name: 'Chats', params: { dataset: label } });
     },
   },
 };

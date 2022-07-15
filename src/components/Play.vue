@@ -9,7 +9,7 @@
       </div>
     </b-modal>
 
-    <div class="main">
+    <div v-if="allowed" class="main">
 
       <b-alert :show="dismissCountDown"
          :variant="feedback.variant"
@@ -36,10 +36,12 @@
          :widgetPointer="widgetPointer"
          :widgetSummary="widgetSummary"
          v-on:widgetRating="sendWidgetResponse"
-         :playMode="'play'"
+         :playMode="playMode"
          ref="widget"
          :dataset="dataset"
          :bucket="bucket"
+         :catchDataset="catchDataset"
+         :catchBucket="catchBucket"
         />
       </div>
 
@@ -104,6 +106,8 @@
        7. And then loading the next sample to view.
    */
   import _ from 'lodash';
+  import firebase from 'firebase/app';
+  import 'firebase/auth';
   import Vue from 'vue';
   import WidgetSelector from './WidgetSelector';
   import Flask from './Animations/Flask';
@@ -173,6 +177,46 @@
         type: String,
         required: true,
       },
+      /**
+       * The auth token from Globus
+       */
+      globusToken: {
+        type: String,
+        required: true,
+      },
+      /**
+       * function that exchanges the Globus token for user information
+       */
+      getGlobusIdentities: {
+        type: Function,
+        required: true,
+      },
+      /**
+       * List of studies from the db
+       */
+      studies: {
+        type: Object,
+        required: true,
+      },
+      /**
+       * catch trials configuration
+       */
+      catchDataset: {
+        type: String,
+        required: true,
+      },
+      catchFrequency: {
+        type: Number,
+        required: true,
+      },
+      catchBucket: {
+        type: String,
+        required: true,
+      },
+      catchTrials: {
+        type: Array,
+        required: true,
+      },
     },
     data() {
       return {
@@ -224,6 +268,14 @@
          * widget summary comes from firebase when the widget Pointer is set.
          */
         widgetSummary: {},
+        /**
+         * whether the user is allowed to see this dataset
+         */
+        allowed: false,
+        /**
+         * whether the widget should be in play mode or catch trial mode
+         */
+        playMode: 'play',
       };
     },
     watch: {
@@ -243,8 +295,9 @@
        * When it changes, also update the `widgetSummary` to be from the new `widgetPointer`.
        */
       widgetPointer() {
+        const currentDataset = this.playMode === 'play' ? this.dataset : this.catchDataset;
         /* eslint-disable */
-        this.widgetPointer ? this.db.ref(`datasets/${this.dataset}/sampleSummary`).child(this.widgetPointer).once('value', (snap) => {
+        this.widgetPointer ? this.db.ref(`datasets/${currentDataset}/sampleSummary`).child(this.widgetPointer).once('value', (snap) => {
           this.widgetSummary = snap.val();
         }) : null;
         /* eslint-enable */
@@ -318,6 +371,7 @@
             });
         }
       },
+
       /**
        * A method to shuffle an array.
        */
@@ -398,15 +452,20 @@
           this.showAlert();
         }
 
+        let currentDataset = this.dataset;
+        if (this.playMode === 'catch') {
+          currentDataset = this.catchDataset;
+        }
+
         // 2. send the widget data
         const timeDiff = new Date() - this.startTime;
-        this.sendVote(response, timeDiff, this.dataset);
+        this.sendVote(response, timeDiff, currentDataset);
 
         // 3. update the score and count for the sample
         this.updateScore(this.$refs.widget.getScore(response));
-        this.updateSummary(this.$refs.widget.getSummary(response), this.dataset);
-        this.updateCount(this.dataset);
-        this.updateSeen(this.dataset);
+        this.updateSummary(this.$refs.widget.getSummary(response), currentDataset);
+        this.updateCount(currentDataset);
+        this.updateSeen(currentDataset);
 
         // 3. set the next Sample
         this.setNextSampleId();
@@ -417,13 +476,26 @@
       */
       setNextSampleId() {
         this.startTime = new Date();
+        this.playMode = 'play';
 
-        const sampleId = this.sampleUserPriority()[0];
+        let sampleId = this.sampleUserPriority()[0];
+
+        if (Math.random() < this.catchFrequency) {
+          sampleId = this.serveCatchTrial();
+        }
 
         // if sampleId isn't null, set the widgetPointer
         if (sampleId) {
           this.widgetPointer = sampleId['.key'];
         }
+      },
+      /**
+       * returns a sampleId for a catch trial
+       */
+      serveCatchTrial() {
+        this.playMode = 'catch';
+        const catchId = this.shuffle(this.catchTrials)[0];
+        return { '.key': catchId };
       },
       /**
       * the user's response for the sample is sent to the db
@@ -435,6 +507,7 @@
           sample: this.widgetPointer,
           response,
           time,
+          datetime: Date.now(),
         });
       },
       /**
@@ -501,11 +574,41 @@
     },
     /**
      * Prevents navigation to Play when the dataset prop does not match the route name
+     * or if globus authentication is incorrect
      */
     beforeRouteEnter(to, from, next) {
-      next((vm) => {
+      next(async (vm) => {
+        /* eslint-disable no-underscore-dangle */
+        const available = await vm._props.db.ref(`config/studies/${to.params.dataset}/available`).once('value');
+        const restricted = !available.val();
+        const errors = [];
+        const user = firebase.auth().currentUser;
+        const snap = await vm._props.db.ref(`uids/${user.uid}`).once('value');
+        const currentUserInfo = snap.val();
+        const userAllowed = currentUserInfo.datasets[to.params.dataset];
         if (to.params.dataset !== vm.dataset) {
           vm.$router.push({ name: 'Home' });
+        } else if (restricted) {
+          const email = user.email;
+          const identities = await vm._props.getGlobusIdentities(vm._props.globusToken);
+          /* eslint-enable no-underscore-dangle */
+          const organization = currentUserInfo.organization;
+          if (Object.keys(identities).length === 0) {
+            errors.push(1);
+            console.log(identities);
+          } else if (!identities[email]) {
+            errors.push(2);
+          } else if (identities[email][0] !== organization) {
+            errors.push(3);
+          } else if (identities[email][1] !== 'used') {
+            errors.push(4);
+          }
+        } if (errors.length) {
+          vm.$router.push({ name: 'Restricted', query: { errors } });
+        } else if (userAllowed) {
+        /* eslint-disable */
+        vm.allowed = true;
+        /* eslint-enable */
         }
       });
     },

@@ -18,6 +18,13 @@
             </td>
           </tr>
         </table>
+        <br>
+        <div id="organizations">
+          <h2>Associated Organization</h2>
+          <b-dropdown id="orgdropdown" :text="userModified.org" class="m-md-2">
+            <b-dropdown-item v-for="org in globusAllowedOrgs" :key="org" @click="changeOrg(org)">{{org}}</b-dropdown-item>
+          </b-dropdown>
+        </div>
       </div>
       <div slot="modal-footer" class="w-100">
           <b-button @click="closeDialogSubmit" type="submit" variant="primary">Submit</b-button>
@@ -113,6 +120,7 @@ export default {
         name: '',
         isAdmin: '',
         datasets: {},
+        org: '',
       },
     };
   },
@@ -129,6 +137,13 @@ export default {
      */
     studies: {
       type: Object,
+      required: true,
+    },
+    /**
+     * List of trusted organizations from globus auth
+     */
+    globusAllowedOrgs: {
+      type: Array,
       required: true,
     },
   },
@@ -160,6 +175,7 @@ export default {
       this.userModified.name = valueCopy.username;
       this.userModified.isAdmin = valueCopy.admin;
       this.userModified.datasets = valueCopy.datasets;
+      this.userModified.org = valueCopy.organization;
       this.$refs.modifyuser.show();
     },
     /**
@@ -205,14 +221,22 @@ export default {
       }
     },
     /**
+     * Switches the user's globus auth organization
+     */
+    changeOrg(value) {
+      this.userModified.org = value;
+    },
+    /**
      * Modifies the database with the prepared user data
      */
     async updateFirebase(obj) {
       const uid = obj.uid;
       const admin = obj.isAdmin;
       const datasets = obj.datasets;
+      const organization = obj.org;
       const updates = {};
       updates[`/uids/${uid}/datasets`] = datasets;
+      updates[`/uids/${uid}/organization`] = organization;
       updates[`/uids/${uid}/admin`] = admin;
       this.db.ref().update(updates);
     },

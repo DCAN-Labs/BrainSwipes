@@ -39,7 +39,6 @@
           :config="config"
           :db="db"
           v-on:taken_tutorial="setTutorial"
-          :routerQuery="routerQuery"
           :dataset="dataset"
           @changeDataset="updateDataset"
           :datasetPrivileges="datasetPrivileges"
@@ -48,13 +47,23 @@
           :bucket="bucket"
           @login="activateDatasets"
           :key="$route.fullPath"
+          :globusToken="globusToken"
+          @globusLogin="globusLogin"
+          :getGlobusIdentities="getGlobusIdentities"
+          :globusAllowedOrgs="globusAllowedOrgs"
+          :errorCodes="errorCodes"
+          :maintenanceDate="maintenanceDate"
+          :maintenanceStatus="maintenanceStatus"
+          :catchTrials="catchTrials"
+          :catchDataset="catchDataset"
+          :catchBucket="catchBucket"
+          :catchFrequency="catchFrequency"
         />
       </div>
     </div>
     <div class="foot">
       <Footer 
         :config="config" 
-        :routerQuery="routerQuery"
         @changeDataset="updateDataset"
         :dataset="dataset"
         :studies="studies"
@@ -163,6 +172,37 @@ export default {
        * s3 bucket where the images are stored
        */
       bucket: '',
+      /**
+       * Globus auth token
+       */
+      globusToken: '',
+      /**
+       * List of organizations we trust from globus auth
+       */
+      globusAllowedOrgs: [],
+      /**
+       * Errors thrown by brainswipes
+       */
+      errorCodes: {
+        0: 'Test Error',
+        1: 'This dataset requires additional authentication. Please login with Globus.',
+        2: 'The email associated with your BrainSwipes account is not associated with your Globus account. Please visit globus.org to add this identity.',
+        3: 'The organization associated with your BrainSwipes email does not match the organization associated with this email in Globus. Please contact a BrainSwipes administrator',
+        4: 'The email associated with your BrainSwipes account is not active in Globus.',
+        5: 'The email associated with your BrainSwipes account has not been verified. Please verify in your profile.',
+      },
+      /**
+       * maintenance banner config from db
+       */
+      maintenanceDate: '',
+      maintenanceStatus: false,
+      /**
+       * catch trials configuration
+       */
+      catchTrials: [],
+      catchDataset: '',
+      catchFrequency: 0,
+      catchBucket: '',
     };
   },
   /**
@@ -176,6 +216,7 @@ export default {
     firebase.auth().onAuthStateChanged((user) => {
       self.userInfo = user || {};
     });
+    this.initCatchTrials();
   },
   components: {
     Footer,
@@ -248,18 +289,13 @@ export default {
       }
       return !!Object.keys(this.userInfo).length;
     },
-    /**
-     * router query
-     */
-    routerQuery() {
-      return this.$route.query;
-    },
   },
   methods: {
     /**
      * log out of firebase
      */
     logout() {
+      this.globusToken = '';
       firebase
         .auth()
         .signOut()
@@ -308,8 +344,52 @@ export default {
       this.activateDatasets();
     },
     async getStudies() {
-      this.db.ref('studies').on('value', (snap) => {
+      this.db.ref('config/studies').on('value', (snap) => {
         this.studies = snap.val();
+      });
+    },
+    async getGlobusAllowdOrgs() {
+      this.db.ref('config/allowedGlobusOrganizations').on('value', (snap) => {
+        this.globusAllowedOrgs = snap.val();
+      });
+    },
+    globusLogin(token) {
+      this.globusToken = token;
+    },
+    async getGlobusIdentities(token) {
+      let identities = {};
+      if (token) {
+        const response = await fetch('https://auth.globus.org/p/whoami?include=identity_provider', {
+          headers: new Headers({
+            Authorization: `Bearer ${token}`,
+          }),
+        });
+        const responseJSON = await response.json();
+        /* eslint-disable */
+        identities = _.reduce(responseJSON.identities, function (r, v) {
+          r[v.email] = [v.organization, v.status];
+          return r;
+        }, {});
+        /* eslint-enable */
+      }
+      return identities;
+    },
+    async getMaintenanceStatus() {
+      this.db.ref('config/maintenance').on('value', (snap) => {
+        this.maintenanceDate = snap.val().date;
+        this.maintenanceStatus = snap.val().bannerStatus;
+      });
+    },
+    initCatchTrials() {
+      this.db.ref('config/catchTrials').once('value', (snap) => {
+        this.catchDataset = snap.val().dataset;
+        this.catchFrequency = snap.val().frequency;
+        this.db.ref(`datasets/${this.catchDataset}/sampleCounts`).once('value', (snap2) => {
+          this.catchTrials = Object.keys(snap2.val());
+        });
+        this.db.ref(`config/studies/${this.catchDataset}/bucket`).once('value', (snap3) => {
+          this.catchBucket = snap3.val();
+        });
       });
     },
   },
@@ -319,6 +399,8 @@ export default {
   async created() {
     await this.activateDatasets();
     await this.getStudies();
+    await this.getGlobusAllowdOrgs();
+    await this.getMaintenanceStatus();
   },
 };
 </script>

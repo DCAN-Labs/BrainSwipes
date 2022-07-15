@@ -318,7 +318,7 @@ export default {
       const newStudy = this.$refs['new-study-text'].localValue;
       const newBucket = this.$refs['new-bucket-text'].localValue;
       studies[newStudy] = { available: this.available, bucket: newBucket };
-      this.db.ref('/studies').set(studies);
+      this.db.ref('/config/studies').set(studies);
     },
     /**
      * set default permissions for the new study for all users

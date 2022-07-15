@@ -1,5 +1,6 @@
 <template>
   <div class="home container">
+    <b-alert :show="maintenanceStatus" variant="danger">BrainSwipes will be unavailable on {{maintenanceDate}} for scheduled maintenance.</b-alert>
     <div class="jumbotron landing" :style="landingStyle">
       <div id="titles">
         <h1>BrainSwipes by DCAN</h1>
@@ -25,9 +26,6 @@
 export default {
   name: 'Home',
   props: {
-    routerQuery: {
-      type: Object,
-    },
     dataset: {
       type: String,
       required: true,
@@ -44,6 +42,22 @@ export default {
       type: Object,
       required: true,
     },
+    globusToken: {
+      type: String,
+      required: true,
+    },
+    userInfo: {
+      type: Object,
+      required: true,
+    },
+    maintenanceDate: {
+      type: String,
+      required: true,
+    },
+    maintenanceStatus: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -52,9 +66,31 @@ export default {
   },
   methods: {
     routeToPlay(label) {
-      this.$emit('changeDataset', label);
-      this.$router.push({ name: 'Play', params: { dataset: label }, query: this.routerQuery });
+      const errors = [];
+      if (!this.studies[label].available) {
+        if (!this.globusToken) {
+          errors.push(1);
+        }
+        if (!this.userInfo.emailVerified) {
+          errors.push(5);
+        }
+      }
+      if (errors.length) {
+        this.$router.push({ name: 'Restricted', query: { errors } });
+      } else {
+        this.$emit('changeDataset', label);
+        this.$router.push({ name: 'Play', params: { dataset: label } });
+      }
     },
+    reroute() {
+      const query = this.$route.query;
+      if (query.reroute) {
+        this.$router.push({ path: query.reroute });
+      }
+    },
+  },
+  mounted() {
+    this.reroute();
   },
 };
 </script>
@@ -113,7 +149,7 @@ a {
   color: #fff;
   background-color: maroon;
   border-color: maroon;
-  margin-right: .2em;
+  margin: 0.1em;
 }
 
 .jumbotron {
@@ -127,4 +163,9 @@ a {
   text-shadow: white 1px 1px, white 0 0 1px;
 }
 
+@media (max-width: 979px) {
+  .jumbotron {
+    background-size: 90%
+  }
+}
 </style>

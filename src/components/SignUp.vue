@@ -174,24 +174,30 @@
        */
       onSubmit(e) {
         e.preventDefault();
-        // check for a unique username
-        firebase.database().ref('uids').once('value')
-          .then((snapshot) => {
-            let usernameExists = false;
-            const val = snapshot.val();
-            Object.keys(val).forEach((uid) => {
-              if (val[uid].username === this.form.username) {
-                usernameExists = true;
+        const specialChars = ['.', '#', '$', '[', ']'];
+        if (specialChars.some(specialChar => this.form.username.includes(specialChar))) {
+          this.errors.show = true;
+          this.errors.message = `Username cannot contain the following characters: ${specialChars}`;
+        } else {
+          // check for a unique username
+          firebase.database().ref('uids').once('value')
+            .then((snapshot) => {
+              let usernameExists = false;
+              const val = snapshot.val();
+              Object.keys(val).forEach((uid) => {
+                if (val[uid].username === this.form.username) {
+                  usernameExists = true;
+                }
+              });
+              if (!usernameExists) {
+                this.verifying = this.form.email;
+                this.createAccount();
+              } else {
+                this.errors.show = true;
+                this.errors.message = 'Username already exists! Please choose a unique username';
               }
             });
-            if (!usernameExists) {
-              this.verifying = this.form.email;
-              this.createAccount();
-            } else {
-              this.errors.show = true;
-              this.errors.message = 'Username already exists! Please choose a unique username';
-            }
-          });
+        }
       },
       /**
        * Save that the user has consented.
@@ -244,6 +250,7 @@
           consentedOn: date,
           datasets: this.studyPermissions,
           username: firebase.auth().currentUser.displayName,
+          organization: 'No Organization',
         })
         .then(() => {
         })
