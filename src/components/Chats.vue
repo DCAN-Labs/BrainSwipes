@@ -76,6 +76,11 @@ export default {
        * if the user is allowed to see this dataset
        */
       allowed: false,
+      /**
+       * A blank image from the original SwipesForScience.
+       * If this.noData is true, this image is rendered.
+       */
+      blankChatImage: 'https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_no_data.svg?sanitize=true',
     };
   },
   props: {
@@ -139,12 +144,6 @@ export default {
     orderedPosts() {
       const chats = this.sampleChat;
       return chats.reverse();
-    },
-    /**
-     * A blank image from the config file. If this.noData is true, this image is rendered.
-     */
-    blankChatImage() {
-      return this.config.chats.blankImage;
     },
     btoaBucket() {
       return btoa(this.bucket);

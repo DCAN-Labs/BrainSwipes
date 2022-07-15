@@ -276,6 +276,10 @@
          * whether the widget should be in play mode or catch trial mode
          */
         playMode: 'play',
+        /**
+         * if there is nothing in the database, display a blank image
+         */
+        blankImage: 'https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_blank_canvas.svg?sanitize=true',
       };
     },
     watch: {
@@ -321,12 +325,6 @@
        */
       samplePriority() {
         return _.sortBy(this.sampleCounts, '.value');
-      },
-      /**
-       * if there is nothing in the database, display a blank image
-       */
-      blankImage() {
-        return this.config.play.blankImage;
       },
     },
     methods: {
