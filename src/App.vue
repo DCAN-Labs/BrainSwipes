@@ -384,9 +384,11 @@ export default {
       this.db.ref('config/catchTrials').once('value', (snap) => {
         this.catchDataset = snap.val().dataset;
         this.catchFrequency = snap.val().frequency;
-        this.catchBucket = snap.val().bucket;
         this.db.ref(`datasets/${this.catchDataset}/sampleCounts`).once('value', (snap2) => {
           this.catchTrials = Object.keys(snap2.val());
+        });
+        this.db.ref(`config/studies/${this.catchDataset}/bucket`).once('value', (snap3) => {
+          this.catchBucket = snap3.val();
         });
       });
     },
