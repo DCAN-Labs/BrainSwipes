@@ -54,7 +54,6 @@
           :errorCodes="errorCodes"
           :maintenanceDate="maintenanceDate"
           :maintenanceStatus="maintenanceStatus"
-          :catchTrials="catchTrials"
           :catchDataset="catchDataset"
           :catchBucket="catchBucket"
           :catchFrequency="catchFrequency"
@@ -199,7 +198,6 @@ export default {
       /**
        * catch trials configuration
        */
-      catchTrials: [],
       catchDataset: '',
       catchFrequency: 0,
       catchBucket: '',
@@ -384,9 +382,6 @@ export default {
       this.db.ref('config/catchTrials').once('value', (snap) => {
         this.catchDataset = snap.val().dataset;
         this.catchFrequency = snap.val().frequency;
-        this.db.ref(`datasets/${this.catchDataset}/sampleCounts`).once('value', (snap2) => {
-          this.catchTrials = Object.keys(snap2.val());
-        });
         this.db.ref(`config/studies/${this.catchDataset}/bucket`).once('value', (snap3) => {
           this.catchBucket = snap3.val();
         });

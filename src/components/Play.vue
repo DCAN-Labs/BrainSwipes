@@ -213,10 +213,6 @@
         type: String,
         required: true,
       },
-      catchTrials: {
-        type: Array,
-        required: true,
-      },
     },
     data() {
       return {
@@ -252,6 +248,7 @@
          */
         sampleCounts: [],
         userSeenSamples: [],
+        catchTrials: [],
 
         /**
          * if sampleCounts is empty after its fetched from the db, then noData
@@ -314,6 +311,7 @@
     mounted() {
       this.initSampleCounts(this.dataset);
       this.initSeenSamples(this.dataset);
+      this.initCatchTrialSamples(this.dataset);
     },
     components: {
       // WidgetSelector,
@@ -369,7 +367,17 @@
             });
         }
       },
-
+      /**
+       * Initialize the samples the current dataset will use as catch trials
+       */
+      initCatchTrialSamples(dataset) {
+        this.db.ref(`config/studies/${dataset}/catchTrials`).once('value', (snap) => {
+          if (snap.val()) {
+            this.catchTrials = Object.values(snap.val());
+          }
+        });
+        console.log(this.catchTrials);
+      },
       /**
        * A method to shuffle an array.
        */
@@ -478,7 +486,7 @@
 
         let sampleId = this.sampleUserPriority()[0];
 
-        if (Math.random() < this.catchFrequency) {
+        if (Math.random() < this.catchFrequency && this.catchTrials.length) {
           sampleId = this.serveCatchTrial();
         }
 
