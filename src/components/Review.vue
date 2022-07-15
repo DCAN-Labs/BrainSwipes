@@ -317,7 +317,7 @@
     beforeRouteEnter(to, from, next) {
       next(async (vm) => {
         /* eslint-disable no-underscore-dangle */
-        const available = await vm._props.db.ref(`studies/${to.params.dataset}/available`).once('value');
+        const available = await vm._props.db.ref(`config/studies/${to.params.dataset}/available`).once('value');
         const restricted = !available.val();
         const errors = [];
         const user = firebase.auth().currentUser;

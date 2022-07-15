@@ -344,7 +344,7 @@ export default {
       this.activateDatasets();
     },
     async getStudies() {
-      this.db.ref('studies').on('value', (snap) => {
+      this.db.ref('config/studies').on('value', (snap) => {
         this.studies = snap.val();
       });
     },
@@ -387,7 +387,7 @@ export default {
         this.db.ref(`datasets/${this.catchDataset}/sampleCounts`).once('value', (snap2) => {
           this.catchTrials = Object.keys(snap2.val());
         });
-        this.db.ref(`studies/${this.catchDataset}/bucket`).once('value', (snap3) => {
+        this.db.ref(`config/studies/${this.catchDataset}/bucket`).once('value', (snap3) => {
           this.catchBucket = snap3.val();
         });
       });
