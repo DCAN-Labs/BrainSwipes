@@ -54,6 +54,12 @@
           :errorCodes="errorCodes"
           :definitionsAdded="definitionsAdded"
           @markDefinitionsAdded="markDefinitionsAdded"
+          :maintenanceDate="maintenanceDate"
+          :maintenanceStatus="maintenanceStatus"
+          :catchTrials="catchTrials"
+          :catchDataset="catchDataset"
+          :catchBucket="catchBucket"
+          :catchFrequency="catchFrequency"
         />
       </div>
     </div>
@@ -191,6 +197,18 @@ export default {
        * prevents the tutorial addDefinitions function from running more than once
        */
       definitionsAdded: false,
+      /**
+       * maintenance banner config from db
+       */
+      maintenanceDate: '',
+      maintenanceStatus: false,
+      /**
+       * catch trials configuration
+       */
+      catchTrials: [],
+      catchDataset: '',
+      catchFrequency: 0,
+      catchBucket: '',
     };
   },
   /**
@@ -204,6 +222,7 @@ export default {
     firebase.auth().onAuthStateChanged((user) => {
       self.userInfo = user || {};
     });
+    this.initCatchTrials();
   },
   components: {
     Footer,
@@ -331,7 +350,7 @@ export default {
       this.activateDatasets();
     },
     async getStudies() {
-      this.db.ref('studies').on('value', (snap) => {
+      this.db.ref('config/studies').on('value', (snap) => {
         this.studies = snap.val();
       });
     },
@@ -364,6 +383,24 @@ export default {
     markDefinitionsAdded() {
       this.definitionsAdded = true;
     },
+    async getMaintenanceStatus() {
+      this.db.ref('config/maintenance').on('value', (snap) => {
+        this.maintenanceDate = snap.val().date;
+        this.maintenanceStatus = snap.val().bannerStatus;
+      });
+    },
+    initCatchTrials() {
+      this.db.ref('config/catchTrials').once('value', (snap) => {
+        this.catchDataset = snap.val().dataset;
+        this.catchFrequency = snap.val().frequency;
+        this.db.ref(`datasets/${this.catchDataset}/sampleCounts`).once('value', (snap2) => {
+          this.catchTrials = Object.keys(snap2.val());
+        });
+        this.db.ref(`config/studies/${this.catchDataset}/bucket`).once('value', (snap3) => {
+          this.catchBucket = snap3.val();
+        });
+      });
+    },
   },
   /**
    * intialize the animate on scroll library (for tutorial) and listen to authentication state
@@ -372,6 +409,7 @@ export default {
     await this.activateDatasets();
     await this.getStudies();
     await this.getGlobusAllowdOrgs();
+    await this.getMaintenanceStatus();
   },
 };
 </script>

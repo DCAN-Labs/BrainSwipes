@@ -1,6 +1,7 @@
 <template>
   <div id="restricted">
     <b-alert v-for="error in errors" :key="error" :show="showErrors" variant="danger">{{errorCodes[error]}}</b-alert>
+    <b-alert :show="showAuthError" variant="danger">Please attempt to login again. If this error persists contact an administrator.</b-alert>
     <div v-if="!authenticated">
       <b-button class="btn btn-primary" @click="loginWithGlobus">Login with Globus</b-button>
     </div>
@@ -16,6 +17,7 @@
 
 <script>
 // Reference: https://github.com/bpedroza/js-pkce
+import WordArray from 'crypto-js/lib-typedarrays';
 import PkceAuth from '../Auth';
 
 export default {
@@ -31,6 +33,10 @@ export default {
        */
       errors: [],
       showErrors: false,
+      /**
+       * errors from globus auth
+       */
+      showAuthError: false,
     };
   },
   props: {
@@ -68,7 +74,8 @@ export default {
      * create url params and redirect user to globus
      */
     loginWithGlobus() {
-      const authUrl = PkceAuth.authorizeUrl();
+      const additionalParams = { state: sessionStorage.getItem('pkce_state') };
+      const authUrl = PkceAuth.authorizeUrl(additionalParams);
       window.location.replace(authUrl);
     },
     /**
@@ -88,7 +95,12 @@ export default {
           sessionStorage.removeItem('pkce_state');
 
           this.$router.push({ name: 'Home' });
+          /* eslint-disable */
+        }).catch(function (e) {
+          console.log(e);
+          this.showAuthError = true;
         });
+        /* eslint-enable */
       }
     },
     /**
@@ -141,9 +153,21 @@ export default {
       }
       PkceAuth.config.redirect_uri = redirectUri;
     },
+    /**
+     * set state and add it to session storage
+     */
+    setPkceState() {
+      if (sessionStorage.getItem('pkce_state') === null) {
+        sessionStorage.setItem('pkce_state', WordArray.random(64));
+        sessionStorage.setItem('pkce_code_verifier', WordArray.random(64));
+      }
+      PkceAuth.state = sessionStorage.getItem('pkce_state');
+      PkceAuth.codeVerifier = sessionStorage.getItem('pkce_code_verifier');
+    },
   },
   created() {
     this.setRedirect();
+    this.setPkceState();
     this.checkForGlobusAuthCode();
     this.allowAccess();
     this.parseErrors();

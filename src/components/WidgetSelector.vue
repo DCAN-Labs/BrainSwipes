@@ -9,6 +9,8 @@
     :playMode="playMode"
     :dataset="dataset"
     :bucket="bucket"
+    :catchDataset="catchDataset"
+    :catchBucket="catchBucket"
     />
   </div>
 </template>
@@ -65,6 +67,17 @@
        * the s3 bucket where the images for the dataset are held
        */
       bucket: {
+        type: String,
+        required: true,
+      },
+      /**
+       * config for the catch trials
+       */
+      catchBucket: {
+        type: String,
+        required: true,
+      },
+      catchDataset: {
         type: String,
         required: true,
       },
