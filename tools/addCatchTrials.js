@@ -11,21 +11,9 @@ var database = admin.database();
 
 async function addTrialsToStudy(study, data){
     const dbRef = database.ref(`config/studies/${study}/catchTrials`);
-    const snap = await dbRef.once('value');
-    const catchTrials = snap.val();
-    if (snap.val()) {
-        data.forEach(sample => {
-            if (!Object.values(catchTrials).includes(sample)) {
-                dbRef.push(sample);            
-            }
-        });  
-    } else {
-        data.forEach(sample => {
-            dbRef.push(sample);            
-        });
-    }
-
-
+    Object.keys(data).forEach(sample => {
+        dbRef.update({[sample]:data[sample]});
+    });  
 }
 
 async function addTrialsToCatch(data){
@@ -33,7 +21,7 @@ async function addTrialsToCatch(data){
     const snap = await dbRef.once('value');
     const sampleCounts = snap.val();
     const samples = Object.keys(sampleCounts);
-    data.forEach(sample =>{
+    Object.keys(data).forEach(sample =>{
         if (!samples.includes(sample)) {
             dbRef.update({[sample]: 0});
             console.log(`Adding sample to catch trials: ${sample}`);
