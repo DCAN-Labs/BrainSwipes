@@ -373,7 +373,7 @@
       initCatchTrialSamples(dataset) {
         this.db.ref(`config/studies/${dataset}/catchTrials`).once('value', (snap) => {
           if (snap.val()) {
-            this.catchTrials = Object.values(snap.val());
+            this.catchTrials = Object.keys(snap.val());
           }
         });
         console.log(this.catchTrials);
