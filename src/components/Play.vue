@@ -376,7 +376,6 @@
             this.catchTrials = Object.keys(snap.val());
           }
         });
-        console.log(this.catchTrials);
       },
       /**
        * A method to shuffle an array.
@@ -601,7 +600,6 @@
           const organization = currentUserInfo.organization;
           if (Object.keys(identities).length === 0) {
             errors.push(1);
-            console.log(identities);
           } else if (!identities[email]) {
             errors.push(2);
           } else if (identities[email][0] !== organization) {
