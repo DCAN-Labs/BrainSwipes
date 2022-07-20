@@ -167,6 +167,9 @@
           dataLabels: {
             enabled: true
           },
+          legend: {
+            show: false
+          },
           colors: colorsArray,
           title: {
             text: 'Number of Samples Voted on vs Day',
