@@ -116,9 +116,7 @@
         {
           "text":"To help researchers compare an image to other images of the same subject the supercomputer overlays one image on the other. This is called co-registration.<hr>To help researchers compare one subject's images to another subject's images the supercomputer slightly reshapes them and compares them and their surface delineations to a standardized map of the brain. This standardized map is called an atlas. Comparing an image to an atlas in this way is called atlas registration.",
           "image":"/static/tutorial_imgs/mni_final.jpg"
-        }
-      ],
-      "QAintro":[
+        },
         {
           "text":"<h1 id='header-qa-intro'>Introduction to Quality Assessment</h1>"
         },
@@ -128,9 +126,7 @@
         {
           "text":"We welcome you to BrainSwipes, a central platform for neuroimaging datasets that need quality assessment. Below you will learn how to perform QA on processed images of the brain acquired through MRI.",
           "image":"/static/tutorial_imgs/action-swipe.png"
-        }
-      ],
-      "QAimagetypes": [
+        },
         {
           "text":"<h1 id='header-Type-Imgs'>Types of Images in BrainSwipes</h1>"
         },
@@ -201,34 +197,8 @@
           "text":"<h1 id='header-Acq-Err'>Understanding Acquisition Errors</h1>"
         },
         {
-          "text":"Hardware issues"
+          "text":"Hardware issues, Warping, FOV cutoff, Signal dropout, Blurriness, Ghosting, Ringing, Movement Artifacts, Dimness"
         },
-        {
-          "text":"Warping"
-        },
-        {
-          "text":"FOV cutoff"
-        },
-        {
-          "text":"Signal dropout"
-        },
-        {
-          "text":"Blurriness"
-        },
-        {
-          "text":"Ghosting"
-        },
-        {
-          "text":"Ringing"
-        },
-        {
-          "text":"Movement Artifacts"
-        },
-        {
-          "text":"Dimness"
-        }
-      ],
-      "structuralQA": [
         {
           "text":"<h1 id='header-Surf-Delin'>Assessing the Quality of Surface Delineations</h1>"
         },
@@ -325,9 +295,7 @@
         {
           "text": "If an image has no red overlay click the HELP button and type 'no overlay'. This is a problem with how the overlaid image was created, not the registration.",
           "image": "/static/tutorial_imgs/blank_help_arrow.JPG"
-        }
-      ],
-      "functionalQA": [
+        },
         {
           "text":"<h1 id='header-Func-Reg'>Assesing the Quality of Functional Registration</h1>"
         },

@@ -60,42 +60,6 @@
         <img :src="step.image" class="mt-3 pt-3 img"/>
       </div>
       
-      <div v-for="(step, index) in steps.QAintro" class="fullpage">
-        <div class="tutorial-step" :id="'QAintro'+index">
-
-          <p v-html="step.text"></p>
-
-        </div>
-        <img :src="step.image" class="mt-3 pt-3 img"/>
-      </div>
-
-      <div v-for="(step, index) in steps.QAimagetypes" class="fullpage">
-        <div class="tutorial-step" :id="'QAimagetypes'+index">
-
-          <p v-html="step.text"></p>
-
-        </div>
-        <img :src="step.image" class="mt-3 pt-3 img"/>
-      </div>
-      
-      <div v-for="(step, index) in steps.structuralQA" class="fullpage">
-        <div class="tutorial-step" :id="'structuralQA'+index">
-
-          <p v-html="step.text"></p>
-
-        </div>
-        <img :src="step.image" class="mt-3 pt-3 img"/>
-      </div>
-      
-      <div v-for="(step, index) in steps.functionalQA" class="fullpage">
-        <div class="tutorial-step" :id="'functonalQA'+index">
-
-          <p v-html="step.text"></p>
-
-        </div>
-        <img :src="step.image" class="mt-3 pt-3 img"/>
-      </div>
-
       <!-- Example Steps -->
       
       <div v-for="(step, index) in steps.examples" class="widget">
@@ -387,23 +351,8 @@
       nextStep() {
         if (this.currentBin.bin < this.steps.MRIintro.length - 1) {
           return `#MRIintro${this.currentBin.bin + 1}`;
-        } else if (this.currentBin.bin <
-          (this.steps.QAintro.length + this.steps.MRIintro.length) - 1) {
-          return `#QAintro${(this.currentBin.bin - this.steps.MRIintro.length) + 1}`;
-        } else if (this.currentBin.bin <
-          (this.steps.QAimagetypes.length +
-          this.steps.QAintro.length + this.steps.MRIintro.length) - 1) {
-          return `#QAimagetypes${(this.currentBin.bin - this.steps.QAintro.length - this.steps.MRIintro.length) + 1}`;
-        } else if (this.currentBin.bin < (
-          this.steps.QAimagetypes.length + this.steps.QAintro.length + this.steps.MRIintro.length +
-          this.steps.structuralQA.length) - 1) {
-          return `#structuralQA${(this.currentBin.bin - this.steps.QAimagetypes.length - this.steps.QAintro.length - this.steps.MRIintro.length) + 1}`;
-        } else if (this.currentBin.bin < (
-          this.steps.QAimagetypes.length + this.steps.QAintro.length + this.steps.MRIintro.length +
-          this.steps.structuralQA.length + this.steps.functionalQA.length) - 1) {
-          return `#functonalQA${(this.currentBin.bin - this.steps.QAimagetypes.length - this.steps.QAintro.length - this.steps.MRIintro.length - this.steps.structuralQA.length) + 1}`;
         }
-        return `#example${(this.currentBin.bin - this.steps.QAimagetypes.length - this.steps.QAintro.length - this.steps.MRIintro.length - this.steps.structuralQA.length - this.steps.functionalQA.length) + 1}`;
+        return `#example${(this.currentBin.bin - this.steps.MRIintro.length) + 1}`;
       },
       /**
        * dataset that the tutorial images are from
