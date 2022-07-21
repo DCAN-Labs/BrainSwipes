@@ -354,12 +354,6 @@
         return this.config.tutorial.steps;
       },
       /**
-       * The type of background animation to show.
-       */
-      backgroundAnimation() {
-        return this.config.tutorial.customBackgroundAnimation;
-      },
-      /**
        * The cutoffs of scrolling,
        * to help map scroll position to the step of the tutorial
        */
