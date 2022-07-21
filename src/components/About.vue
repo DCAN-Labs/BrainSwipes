@@ -52,15 +52,5 @@ export default {
     return {
     };
   },
-  props: {
-    /**
-     * the various levels, the points need to reach the levels,
-     * and the badges (colored and greyed out) to display
-     */
-    levels: {
-      type: Object,
-      required: false,
-    },
-  },
 };
 </script>

@@ -140,14 +140,6 @@ export default {
   },
   props: {
     /**
-     * the various levels, the points need to reach the levels,
-     * and the badges (colored and greyed out) to display
-     */
-    levels: {
-      type: Object,
-      required: true,
-    },
-    /**
      * The config object that is loaded from src/config.js.
      * It defines how the app is configured, including
      * any content that needs to be displayed (app title, images, etc)

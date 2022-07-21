@@ -163,14 +163,6 @@ export default {
   name: 'leaderboard',
   props: {
     /**
-     * the various levels, the points need to reach the levels,
-     * and the badges (colored and greyed out) to display
-     */
-    levels: {
-      type: Object,
-      required: true,
-    },
-    /**
      * it comes directly from the `/uids` document in Firebase.
      */
     allUsers: {

@@ -99,14 +99,6 @@
         required: true,
       },
       /**
-       * the various levels, the points need to reach the levels,
-       * and the badges (colored and greyed out) to display
-       */
-      levels: {
-        type: Object,
-        required: true,
-      },
-      /**
        * the user's current level
        */
       currentLevel: {
