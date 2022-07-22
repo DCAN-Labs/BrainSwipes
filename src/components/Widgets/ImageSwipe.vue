@@ -220,11 +220,11 @@
         switch (stepNumber) {
           case 0:
             // highlight the pass button
-            this.rightFocused = true;
+            this.leftFocused = true;
             break;
           case 1:
             // highlight the fail button
-            this.leftFocused = true;
+            this.rightFocused = true;
             break;
           case 2:
             // highlight the help button
@@ -330,7 +330,7 @@
        */
       vote(val) {
         if (this.playMode === 'tutorial') {
-          this.$emit('widgetRating', [val, this.identifier]);
+          this.$emit('widgetRating', [val, this.identifier, this.tutorialStep]);
         } else {
           this.$emit('widgetRating', val);
         }

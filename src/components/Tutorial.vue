@@ -57,6 +57,11 @@
           <p v-html="step.text"></p>
 
         </div>
+        <div class="checklist-wrapper" v-if="step.checks">
+          <div class="checklist">
+            <p v-for="checkText in Object.keys(step.checks)" :key="checkText">{{step.checks[checkText] ? '✔️': '❌' }} {{checkText}}</p>
+          </div>
+        </div>
         <img :src="step.image" class="mt-3 pt-3 img"/>
       </div>
       
@@ -201,6 +206,24 @@
 
   .fullpage hr{
     opacity: 0;
+  }
+
+  .checklist p{
+    font-size: 1.1em;
+    border-style: outset;
+    padding: 2px 4px;
+    border-width: 1px;
+    text-align: left;
+  }
+
+  .checklist{
+    max-width: 500px;
+  }
+
+  .checklist-wrapper{
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
   }
 
   @media (min-width: 65em) {
@@ -454,10 +477,13 @@
       simulateSwipe(response) {
         const vote = response[0];
         const identifier = response[1];
+        const answer = response[2];
         const direction = vote ? 'swipe-right' : 'swipe-left';
         const element = document.getElementById(identifier).getElementsByClassName('user-card')[0];
-        element.classList.add(direction);
-        setTimeout(() => { this.removeClass(element, direction); }, 600);
+        if (answer === vote) {
+          element.classList.add(direction);
+          setTimeout(() => { this.removeClass(element, direction); }, 600);
+        }
       },
       removeClass(element, className) {
         element.classList.remove(className);

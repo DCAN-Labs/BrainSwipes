@@ -191,46 +191,55 @@
           "text":"<h1 id='header-overall-QA'>Assessing the Quality of Images</h1>"
         },
         {
-          "text":"In the next sections you will learn how to assess the quality of a processed image. We will define QA metrics for the three image types defined above, and some overall metrics.<hr>Issues that cause poor quality images can happen when gathering images during a scan, or while processing the images on a supercomputer. Errors in image acquisition occur in all types of images."
-        },
-        {
-          "text":"<h1 id='header-Acq-Err'>Understanding Acquisition Errors</h1>"
-        },
-        {
-          "text":"Hardware issues, Warping, FOV cutoff, Signal dropout, Blurriness, Ghosting, Ringing, Movement Artifacts, Dimness"
+          "text":"In the next sections you will learn how to assess the quality of a processed image. We will define QA metrics for the three image types defined above, and some overall metrics."
         },
         {
           "text":"<h1 id='header-Surf-Delin'>Assessing the Quality of Surface Delineations</h1>"
         },
         {
-          "text":"A quality surface delineation will accurately delineate the cortical surface. White matter will be seperated from gray matter with a gray line. Gray matter will be seperated from the surrounding fluid with a red line. Each colored line will capture only one type of tissue."
+          "text":"A quality surface delineation will accurately delineate the cortical surface. White matter will be seperated from gray matter with a black line. Gray matter will be seperated from the surrounding fluid with a red line. Lines will not seperate the same type of tissue from itself.",
+          "checks":{
+            "Black lines seperate white matter from gray matter":true,
+            "Red lines seperate gray matter from surrounding fluid":true,
+            "Lines do not seperate white matter from other white matter":true,
+            "Lines do not seperate gray matter from other gray matter":true
+          }
         },
         {
-          "text": "Ignore the subcortical regions highlighted between the temporal lobes in the coronal view. \nSurface delineation is only concerned with the outer area of the brain called the cortical surface.",
-          "image": "/static/tutorial_imgs/subcort.JPG"
+          "text":"This image has accurate surface delineation.",
+          "image":"/perfect/surface/delineation",
+          "checks":{
+            "Black lines seperate white matter from gray matter":true,
+            "Red lines seperate gray matter from surrounding fluid":true,
+            "Lines do not seperate white matter from other white matter":true,
+            "Lines do not seperate gray matter from other gray matter":true
+          }
         },
-        {
-          "text": "Blurriness occurs when the participant is moving in the scanner and can make it difficult to delineate the surface.",
-          "image": "/static/tutorial_imgs/blurryfail.JPG"
-        },
-
-        {
-          "text": "Blurriness in the T1 does not always make the surface delineation bad quality.",
-          "image": "/static/tutorial_imgs/blurrypass.JPG"
-        },
-
-        {
-          "text": "Ringing occurs when the participant is moving in the scanner and can disrupt the surface delineation \nbecause the rings can be mistaken as brain or make the brain unrecognizable.",
-          "image": "/static/tutorial_imgs/ringingfail.JPG"
-        },
-        {
-          "text": "Ringing in the T1 does not always make the surface delineation bad quality.",
-          "image": "/static/tutorial_imgs/ringingpass.JPG"
-        },
-
         {
           "text": "White matter extension is when the white matter is poorly delineated and extends to the gray matter line.",
-          "image": "/static/tutorial_imgs/whitematter.PNG"
+          "image": "/static/tutorial_imgs/whitematter.PNG",
+          "checks":{
+            "Black lines seperate white matter from gray matter":false,
+            "Red lines seperate gray matter from surrounding fluid":true,
+            "Lines do not seperate white matter from other white matter":true,
+            "Lines do not seperate gray matter from other gray matter":false
+          }
+        },
+        {
+          "text": "Surface delineation is only concerned with the outer area of the brain called the cortical surface. A quality surface delineation does not depend on the subcortical regions highlighted below.",
+          "image": "/thisOneButHighlightWithBrushNotCircle/static/tutorial_imgs/subcort.JPG"
+        },
+        {
+          "text": "Motion artifacts occur when the participant is moving in the scanner. Motion artifacts do not cause an image to fail QA, but can lead to the algorithm drawing lines that capture multple types of tissue or seperate the same type of tissue from itself. Motion artifacts include blurriness (left) and ringing (center). A clear image is included for comparison (right).",
+          "image":"/clear/blurry/ringing"
+        },
+        {  
+          "text": "Here is a comparison of a clear image, an image that is blurry but still has good delineation, and an image where blurriness causes poor delineation.",
+          "image": "/static/tutorial_imgs/blurriness.gif"
+        },
+        {
+          "text": "Here is a comparison of a clear image, an image that has minor ringing but is still accurately delineated, and an image where ringing causes poor delineation.",
+          "image": "/compare/ringing"
         },
         {
           "text": "Another error is when the surface delineation goes outside of the brain and into the dura or skull. \nThe dura is the faint gray line between the brain and the skull. The skull is the thick white line.",
@@ -346,6 +355,12 @@
         {
           "text": "",
           "image": "/static/tutorial_imgs/example4.JPG"
+        },
+        {
+          "text":"<h1 id='header-Acq-Err'>Understanding Acquisition Errors</h1>"
+        },
+        {
+          "text":"Hardware issues, Warping, FOV cutoff, Signal dropout, Blurriness, Ghosting, Ringing, Movement Artifacts, Dimness"
         }
       ],
       "examples": [
@@ -353,39 +368,18 @@
           "text":"<h1 id='using-swipes'>Using the BrainSwipes interface</h1>"
         },
         {
-          "text": "Swipe right when the image is good quality.\n The gray matter and white matter is properly delineated.",
+          "text": "Pass an image by clicking the 'Pass' button. On a touch screen you can swipe the image to the right.",
           "pointer": "sub-232633_ses-36mo_T2-Axial-BasalGangila-Putamen",
-          "answer": 1,
-          "tutorialStep": 0
-        },
-        {
-          "text": "Swipe left when its bad:\n Too much gray matter cut off",
-          "pointer": "sub-752770_ses-9mo_T1-Coronal-OrbitoFrontal",
-          "answer": 0,
           "tutorialStep": 1
         },
         {
-          "text": "Swipe right: Only minor gray matter cutoff around the perimeter of the brain.",
-          "pointer": "sub-583494_ses-20mo_T1-Sagittal-Insula-FrontoTemporal",
-          "answer": 1,
-          "tutorialStep": 0
-        },
-        {
-          "text": "Swipe right: Functional registration passes with only minor cutoff in functional data.",
-          "pointer": "sub-583494_ses-44mo_task-rest_run-002_desc-TaskInT1",
-          "answer": 1,
-          "tutorialStep": 0
-        },
-        {
-          "text": "Swipe left:\n Large areas where functional data is not registered to the atlas.",
+          "text": "Fail an image by clicking the 'Fail' button. On a touch screen you can swipe the image to the left.",
           "pointer": "sub-764612_ses-28mo_task-rest_run-001_desc-TaskInT1",
-          "answer": 0,
-          "tutorialStep": 1
+          "tutorialStep": 0
         },
         {
-          "text": "if you're not sure, click 'help' \n to discuss with scientists ",
-          "pointer": "sub-675362_ses-42mo_task-rest_run-003_desc-TaskInT2",
-          "answer": 0,
+          "text": "If you are unsure, click help for guidance or to flag an image for further review.",
+          "pointer": "sub-764612_ses-28mo_task-rest_run-001_desc-TaskInT1",
           "tutorialStep": 2
         },
         {
