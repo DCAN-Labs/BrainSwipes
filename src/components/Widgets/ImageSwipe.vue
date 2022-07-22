@@ -32,7 +32,7 @@
              </span>
 
              <b-button v-if="playMode"
-              :to="`/${dataset}/review/${widgetPointer}/${btoaBucket}`"
+              :to="playMode == 'tutorial' ? '' : `/${dataset}/review/${widgetPointer}/${btoaBucket}`"
               ref="helpButton"
               class="helpbtn"
               v-bind:class="{ focus: helpFocused }"
@@ -135,6 +135,13 @@
         required: false,
       },
       catchDataset: {
+        type: String,
+        required: false,
+      },
+      /**
+       * id for tutorial images
+       */
+      identifier: {
         type: String,
         required: false,
       },
@@ -322,7 +329,11 @@
        * emit an annotation to the parent.
        */
       vote(val) {
-        this.$emit('widgetRating', val);
+        if (this.playMode === 'tutorial') {
+          this.$emit('widgetRating', [val, this.identifier]);
+        } else {
+          this.$emit('widgetRating', val);
+        }
       },
       /**
        * set the swipe-left animation and vote 0

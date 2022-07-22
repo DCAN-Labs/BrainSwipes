@@ -11,6 +11,7 @@
     :bucket="bucket"
     :catchDataset="catchDataset"
     :catchBucket="catchBucket"
+    :identifier="identifier"
     />
   </div>
 </template>
@@ -78,6 +79,13 @@
         required: false,
       },
       catchDataset: {
+        type: String,
+        required: false,
+      },
+      /**
+       * id for tutorial images
+       */
+      identifier: {
         type: String,
         required: false,
       },

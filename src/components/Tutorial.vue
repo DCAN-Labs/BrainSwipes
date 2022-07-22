@@ -70,11 +70,13 @@
             <WidgetSelector
             :widgetPointer="step.pointer"
             :widgetSummary="widgetSummary"
+            v-on:widgetRating="simulateSwipe"
             :playMode="'tutorial'"
             :tutorialStep="step.tutorialStep"
             ref="widget"
             :dataset="tutorialDataset"
             :bucket="tutorialBucket"
+            :identifier="'example'+index"
             />
           </div>
           <div v-if="step.tutorialCompleted">
@@ -448,6 +450,17 @@
           console.log(element);
           element.scrollIntoView();
         }
+      },
+      simulateSwipe(response) {
+        const vote = response[0];
+        const identifier = response[1];
+        const direction = vote ? 'swipe-right' : 'swipe-left';
+        const element = document.getElementById(identifier).getElementsByClassName('user-card')[0];
+        element.classList.add(direction);
+        setTimeout(() => { this.removeClass(element, direction); }, 600);
+      },
+      removeClass(element, className) {
+        element.classList.remove(className);
       },
     },
     /**
