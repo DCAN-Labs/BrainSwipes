@@ -30,6 +30,8 @@
     "SAGITTAL PLANE":{"Category":"Brain Anatomy", "Term":"Sagittal Plane"},
     "SURFACE DELINEATIONS":{"Category":"Neuroimaging Terms", "Term":"Surface Delineation"},
     "SURFACE DELINEATION":{"Category":"Neuroimaging Terms", "Term":"Surface Delineation"},
+    "DELINEATIONS":{"Category":"Neuroimaging Terms", "Term":"Surface Delineation"},
+    "DELINEATION":{"Category":"Neuroimaging Terms", "Term":"Surface Delineation"},
     "STRUCTURAL IMAGES":{"Category":"Neuroimaging Terms", "Term":"Anatomical Image"},    
     "STRUCTURAL IMAGE":{"Category":"Neuroimaging Terms", "Term":"Anatomical Image"},
     "STRUCTURAL DATA":{"Category":"Neuroimaging Terms", "Term":"Anatomical Image"},

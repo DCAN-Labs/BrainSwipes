@@ -1,9 +1,68 @@
 <template name="review">
   <div id="review" class="container">
+    <!-- Modal Component -->
+    <b-modal
+      id="flagwarning" 
+      title="WARNING"
+      ref="flagwarning"
+      size="lg"
+      @ok="flagImage"
+    >
+      <h2>Flagging an image will remove it from circulation until it has been reviewed.</h2>
+      <h4>Only flag images where issues are present.</h4>
+      <hr>
+      <div class="flag-reasons">
+        <h3>Flag the image if</h3>
+        <ul>
+          <li>There is no overlay</li>
+          <li>There is an issue with the image not discussed in the tutorial</li>
+        </ul>
+        <h3>Do not flag the image if</h3>
+        <ul>
+          <li>You are unsure how to swipe, and have not reviewed the tutorial</li>
+        </ul>
+      </div>
+      <hr>
+      <b-input-group prepend="Description of issue" class="mt-3">
+        <b-form-input id="flag-comment" ref="flag-comment" autocomplete="off" v-on:keyup="enableForm()" v-model="chatMessage"></b-form-input>
+      </b-input-group>
+      <div slot="modal-footer" class="w-100">
+        <b-button @click="flagImage" :disabled="formDisabled" type="submit" variant="primary">Submit</b-button>
+        <b-button @click="closeFlagWarning" type="submit" variant="primary">Cancel</b-button>
+      </div>
+    </b-modal>
     <div v-if="loading">
       LOADING
     </div>
     <div v-else-if="allowed">
+      <div id="tutorial-tips">
+        <div class="information-wrapper">
+          <div id="information">
+            <h2>This image is a{{imageType[1]}}.</h2>
+            <div class="information" @click="toTutorial"></div>
+          </div>
+        </div>
+        <div class="checklist-wrapper">
+          <div class="checklist">
+            <div class="check-item" v-for="(value, index) in config.tutorial.checklists[imageType[0]]" :key="index"><div :class="'checked'"></div><p>{{value}}</p></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <WidgetSelector
+        :widgetPointer="widgetPointer"
+        :widgetSummary="widgetSummary"
+        :playMode="''"
+        ref="widget"
+        :dataset="dataset"
+        :bucket="bucket"
+        />
+      </div>
+      <div id="review-controls">
+        <b-button variant="danger" @click="openFlagWarning" :disabled="flagged">{{flagged ? 'This sample is flagged' : 'Flag for Expert Review'}}</b-button>
+        <b-button variant="primary" @click="toPlay">Back to Swiping</b-button>
+      </div>
+      <hr>
       <div class="chat container">
         <h3 class="mb-2">Chat</h3>
         <div class="chatHistory pl-3 pr-3 pt-3 pb-3 mb-3" v-if="chatOrder.length">
@@ -28,17 +87,6 @@
             <b-button class="mt-2" variant="primary" @click="sendChat">Send</b-button>
           </b-form-group>
         </b-form>
-
-      </div>
-      <div>
-        <WidgetSelector
-        :widgetPointer="widgetPointer"
-        :widgetSummary="widgetSummary"
-        :playMode="''"
-        ref="widget"
-        :dataset="dataset"
-        :bucket="bucket"
-        />
       </div>
     </div>
 
@@ -72,6 +120,100 @@
 
   .progressive-image-main {
     z-index: 0 !important;
+  }
+
+  #tutorial-tips {
+    margin: 0.5em;
+  }
+
+  #tutorial-tips h2 {
+    margin-bottom: 0.5em;
+    font-size: 1.3em;
+  }
+
+    .check-item{
+    display: flex;
+    font-size: 1.1em;
+    border-style: outset;
+    padding: 2px 4px;
+    border-width: 1px;
+    text-align: left;
+  }
+
+  .checklist{
+    max-width: 500px;
+  }
+
+  .checklist-wrapper{
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .checked, .unchecked{
+    margin-right: 5px;
+  }
+
+  .checked::before{
+    display: block;
+    content: ' ';
+    background-image: url('../assets/check-square.svg');
+    background-repeat: no-repeat;
+    background-size: 28px 28px;
+    height: 28px;
+    width: 28px;
+  }
+
+  .unchecked::before{
+    display: block;
+    content: ' ';
+    background-image: url('../assets/square.svg');
+    background-repeat: no-repeat;
+    background-size: 28px 28px;
+    height: 28px;
+    width: 28px;
+  }
+
+  .information{
+    display: block;
+    content: ' ';
+    background-image: url('../assets/info-circle.svg');
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    height: 16px;
+    width: 16px;
+    cursor: help;
+  }
+
+  #information{
+    display: flex;
+  }
+
+  .information-wrapper{
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+  }
+
+  #flagwarning h5{
+    font-size: 2em;
+    font-weight: bold;
+    color: red;
+  }
+
+  #flagwarning h2{
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  #flagwarning h3{
+    font-size: 1.2em;
+  }
+
+  #flagwarning ul{
+    list-style-type: disc;
+    margin-left: 3em;
   }
 
 </style>
@@ -187,6 +329,14 @@
          * if the component is loading
          */
         loading: true,
+        /**
+         * Disbales flagging without a comment
+         */
+        formDisabled: true,
+        /**
+         * disables flagging if the sample is already flagged
+         */
+        flagged: false,
       };
     },
     computed: {
@@ -200,6 +350,12 @@
         });
         chats.reverse();
         return chats;
+      },
+      /**
+       * Idenfities the class of image to assist in routing to the tutorial
+       */
+      imageType() {
+        return this.getImageType();
       },
     },
     watch: {
@@ -218,6 +374,7 @@
     mounted() {
       this.widgetPointer = this.$route.params.key;
       this.setSampleInfo(this.dataset);
+      this.checkFlaggedStatus();
     },
     methods: {
       /**
@@ -300,6 +457,54 @@
           .on('value', (snap) => {
             this.widgetSummary = snap.val();
           });
+      },
+      getImageType() {
+        const imageType = [];
+        if (this.widgetPointer.match(/atlas/i)) {
+          imageType[0] = 'atlasRegistration';
+          imageType[1] = 'n Atlas Registration';
+        } else if (this.widgetPointer.match(/task/i)) {
+          imageType[0] = 'functionalRegistration';
+          imageType[1] = ' Functional Registration';
+        } else {
+          imageType[0] = 'surfaceDelineation';
+          imageType[1] = ' Structural image';
+        }
+        return imageType;
+      },
+      toTutorial() {
+        const routeData = this.$router.resolve({ name: 'Tutorial', query: { section: this.imageType[0] } });
+        window.open(routeData.href, '_blank');
+      },
+      toPlay() {
+        this.$router.push({ name: 'Play', params: { dataset: this.dataset } });
+      },
+      openFlagWarning() {
+        this.$refs.flagwarning.show();
+      },
+      closeFlagWarning() {
+        this.$refs.flagwarning.hide();
+        this.formDisabled = true;
+      },
+      flagImage(e) {
+        this.sendChat(e);
+        this.addToFlagged();
+        this.closeFlagWarning();
+      },
+      enableForm() {
+        this.formDisabled = this.$refs['flag-comment'].localValue.length === 0;
+      },
+      addToFlagged() {
+        this.db.ref(`datasets/${this.dataset}/flaggedSamples`)
+          .child(this.widgetPointer)
+          .set(this.userData.username);
+      },
+      checkFlaggedStatus() {
+        this.db.ref(`datasets/${this.dataset}/flaggedSamples`).on('value', (snap) => {
+          if (Object.keys(snap.val()).includes(this.widgetPointer)) {
+            this.flagged = true;
+          }
+        });
       },
     },
     /**

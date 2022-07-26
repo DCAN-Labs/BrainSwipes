@@ -197,37 +197,34 @@
           "text":"<h1 id='header-Surf-Delin'>Assessing the Quality of Surface Delineations</h1>"
         },
         {
-          "text":"A quality surface delineation will accurately delineate the cortical surface. White matter will be seperated from gray matter with a black line. Gray matter will be seperated from the surrounding fluid with a red line. Lines will not seperate the same type of tissue from itself.",
-          "checks":{
-            "Black lines seperate white matter from gray matter":true,
-            "Red lines seperate gray matter from surrounding fluid":true,
-            "Lines do not seperate white matter from other white matter":true,
-            "Lines do not seperate gray matter from other gray matter":true
-          }
+          "text":"<h2>Basic Criteria</h1>"
+        },
+        {
+          "text":"A quality surface delineation will accurately delineate the cortical surface. White matter will be seperated from gray matter with a black line. Gray matter will be seperated from the surrounding fluid with a red line. Lines will not seperate the same type of tissue from itself.<hr>We will use the following checklist to assess the quality of images. All four boxes must be checked for it to pass.",
+          "checks": { "surfaceDelineation": [true, true, true, true] }
         },
         {
           "text":"This image has accurate surface delineation.",
           "image":"/perfect/surface/delineation",
-          "checks":{
-            "Black lines seperate white matter from gray matter":true,
-            "Red lines seperate gray matter from surrounding fluid":true,
-            "Lines do not seperate white matter from other white matter":true,
-            "Lines do not seperate gray matter from other gray matter":true
-          }
+          "checks": { "surfaceDelineation": [true, true, true, true] }
         },
         {
-          "text": "White matter extension is when the white matter is poorly delineated and extends to the gray matter line.",
+          "text": "Surface delineation is only concerned with the outer area of the brain called the cortical surface. A quality surface delineation does not depend on the subcortical regions highlighted below. In this image, delineation of gray matter is not accurate in the subcortical region, but is accurate on the cortical surface so it passes.",
+          "image": "/static/tutorial_imgs/subcort.JPG",
+          "checks": { "surfaceDelineation": [true, true, true, true] }
+        },
+        {
+          "text":"<h2>Common Errors</h1>"
+        },
+        {
+          "text": "White matter extension is when the black line misidentifies gray matter that neighbors white matter as white matter, extending the boudary of white matter into the gray matter. This image has white matter extension in the front of the brain and fails QC.",
           "image": "/static/tutorial_imgs/whitematter.PNG",
-          "checks":{
-            "Black lines seperate white matter from gray matter":false,
-            "Red lines seperate gray matter from surrounding fluid":true,
-            "Lines do not seperate white matter from other white matter":true,
-            "Lines do not seperate gray matter from other gray matter":false
-          }
+          "checks": { "surfaceDelineation": [false, true, true, false] }
         },
         {
-          "text": "Surface delineation is only concerned with the outer area of the brain called the cortical surface. A quality surface delineation does not depend on the subcortical regions highlighted below.",
-          "image": "/thisOneButHighlightWithBrushNotCircle/static/tutorial_imgs/subcort.JPG"
+          "text": "A surface delineation can be drawn outside of the brain and extend into the dura or skull. When this happens, an image fails QC.",
+          "image": "/static/tutorial_imgs/duraskull.JPG",
+          "checks": { "surfaceDelineation": [false, false, true, false] }
         },
         {
           "text": "Motion artifacts occur when the participant is moving in the scanner. Motion artifacts do not cause an image to fail QA, but can lead to the algorithm drawing lines that capture multple types of tissue or seperate the same type of tissue from itself. Motion artifacts include blurriness (left) and ringing (center). A clear image is included for comparison (right).",
@@ -242,14 +239,9 @@
           "image": "/compare/ringing"
         },
         {
-          "text": "Another error is when the surface delineation goes outside of the brain and into the dura or skull. \nThe dura is the faint gray line between the brain and the skull. The skull is the thick white line.",
-          "image": "/static/tutorial_imgs/duraskull.JPG"
-        },
-        {
           "text": "The image is also bad quality when the white and gray matter surface delineations cross over each other.",
           "image": "/static/tutorial_imgs/14-T1Surf.jpg"
         },
-
         {
           "text": "Warps of the brain, skull, and surface delineations are caused by poor atlas registration. \nThese warps appear to 'pull' the brain and surface delineations.",
           "image": "/static/tutorial_imgs/15-T1Surf.jpg"
@@ -278,16 +270,22 @@
           "text":"<h1 id='header-Atl-Reg'>Assessing the Quality of Atlas Registration</h1>"
         },
         {
-          "text":"A quality atlas registration will correctly and accurately register an atlas to a T1 or a T1 to an atlas. All overlayed delineations will match the gray matter and white matter on the underlay. The boundaries of the underlying image will be the same size as the overlay, with no excess black space and no delineations that do not capture the whole underlying image."
+          "text":"<h2>Basic Criteria</h1>"
         },
         {
-          "text": "The quality of the atlas registration depends on how well the T1 aligns to the boundaries of the MNI atlas.\nThe goal is to have all participants’ overlaid images look the same so their brain shapes are the same and can be compared.",
+          "text":"A quality atlas registration will correctly and accurately register an atlas to a T1 or a T1 to an atlas. All overlayed delineations will match the gray matter and white matter on the underlay. The overlying delineations will be the same size as the underlying image.",
+          "checks":{"atlasRegistration":[true, true, true]}
+        },
+        {
+          "text": "The quality of the atlas registration depends on how well the T1 aligns to the boundaries of the MNI atlas.\nThe goal is to have all participants' overlaid images look the same so their brain shapes are the same and can be compared.",
           "image": "/static/tutorial_imgs/innerboundary_screenshot.jpg"
+        },
+        {
+          "text":"<h2>Common Errors</h1>"
         },
         {
           "text": "The T1 may not align to the atlas due to not extending to the atlas boundaries.",
           "image": "/static/tutorial_imgs/insidefail.JPG"
-
         },
         {
           "text": "However if the T1 is minimally inside the atlas boundaries it is not necessarily bad quality.",
@@ -386,6 +384,24 @@
           "text": "Thank you for helping perform QA on neuroimaging datasets. Every swipe helps!",
           "tutorialCompleted": true
         }
+      ]
+    },
+    "checklists": {
+      "surfaceDelineation":[
+        "Black lines seperate white matter from gray matter on the cortical surface",
+        "Red lines seperate gray matter from surrounding fluid on the cortical surface",
+        "Lines do not seperate white matter from other white matter on the cortical surface",
+        "Lines do not seperate gray matter from other gray matter on the cortical surface"
+      ],
+      "atlasRegistration":[
+        "Overlayed delineations match the gray and white matter boundaries of the underlying image",
+        "Outer edge of the overlying delineation matches the outer edge of the underlying image",
+        "No missing sections of the brain"
+      ],
+      "functionalRegistration":[
+        "Overlayed delineations match the gray and white matter boundaries of the underlying image",
+        "Outer edge of the overlying delineation matches the outer edge of the underlying image",
+        "No missing sections of the brain"
       ]
     }
   }

@@ -59,7 +59,7 @@
         </div>
         <div class="checklist-wrapper" v-if="step.checks">
           <div class="checklist">
-            <p v-for="checkText in Object.keys(step.checks)" :key="checkText">{{step.checks[checkText] ? '✔️': '❌' }} {{checkText}}</p>
+            <div class="check-item" v-for="(value, index) in step.checks[Object.keys(step.checks)[0]]" :key="index"><div :class="value ? 'checked' : 'unchecked'"></div><p>{{config.tutorial.checklists[Object.keys(step.checks)[0]][index]}}</p></div>
           </div>
         </div>
         <img :src="step.image" class="mt-3 pt-3 img"/>
@@ -208,7 +208,8 @@
     opacity: 0;
   }
 
-  .checklist p{
+  .check-item{
+    display: flex;
     font-size: 1.1em;
     border-style: outset;
     padding: 2px 4px;
@@ -224,6 +225,29 @@
     margin-top: 5px;
     display: flex;
     justify-content: center;
+  }
+
+  .checked, .unchecked{
+    margin-right: 5px;
+  }
+
+  .checked::before{
+    display: block;
+    content: ' ';
+    background-image: url('../assets/check-square.svg');
+    background-repeat: no-repeat;
+    background-size: 28px 28px;
+    height: 28px;
+    width: 28px;
+  }
+  .unchecked::before{
+    display: block;
+    content: ' ';
+    background-image: url('../assets/square.svg');
+    background-repeat: no-repeat;
+    background-size: 28px 28px;
+    height: 28px;
+    width: 28px;
   }
 
   @media (min-width: 65em) {
@@ -460,10 +484,10 @@
         if (query.section) {
           let section = '';
           switch (query.section) {
-            case 'AtlReg':
+            case 'atlasRegistration':
               section = 'header-Atl-Reg';
               break;
-            case 'FuncReg':
+            case 'functionalRegistration':
               section = 'header-Func-Reg';
               break;
             default:
