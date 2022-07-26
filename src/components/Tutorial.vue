@@ -62,6 +62,22 @@
             <div class="check-item" v-for="(value, index) in step.checks[Object.keys(step.checks)[0]]" :key="index"><div :class="value ? 'checked' : 'unchecked'"></div><p>{{config.tutorial.checklists[Object.keys(step.checks)[0]][index]}}</p></div>
           </div>
         </div>
+        <div class="tutorial-tabs-wrapper">
+          <div class="tutorial-tabs" v-if="step.tabs">
+            <b-card>
+              <b-tabs card pills fill>
+                <b-tab v-for="(tab, index) in step.tabs" :key="index" :title="tab.title" :active="!index">
+                  <div class="checklist-wrapper" v-if="tab.checks">
+                    <div class="checklist">
+                      <div class="check-item" v-for="(value, index) in tab.checks[Object.keys(tab.checks)[0]]" :key="index"><div :class="value ? 'checked' : 'unchecked'"></div><p>{{config.tutorial.checklists[Object.keys(tab.checks)[0]][index]}}</p></div>
+                    </div>
+                  </div>
+                  <img :src="tab.image" class="mt-s pt-3 img"/>
+                </b-tab>
+              </b-tabs>
+            </b-card>
+          </div>
+        </div>
         <img :src="step.image" class="mt-3 pt-3 img"/>
       </div>
       
@@ -110,7 +126,7 @@
   }
 
   .fullpage {
-    height: 100vh;
+    min-height: 100vh;
   }
 
   .widget {
@@ -253,6 +269,16 @@
     background-size: 28px 28px;
     height: 28px;
     width: 28px;
+  }
+
+  .tutorial-tabs-wrapper{
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .tutorial-tabs{
+    width: 500px;
   }
 
   @media (min-width: 65em) {

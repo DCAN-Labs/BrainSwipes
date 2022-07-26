@@ -38,7 +38,7 @@
       <div id="tutorial-tips">
         <div class="information-wrapper">
           <div id="information">
-            <h2>This image is a{{imageType[1]}}.</h2>
+            <h2>This is a{{imageType[1]}}.</h2>
             <div class="information" @click="toTutorial"></div>
           </div>
         </div>

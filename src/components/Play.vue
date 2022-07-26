@@ -485,7 +485,6 @@
         } else {
           sampleId = this.sampleUserPriority()[0];
         }
-        console.log(sampleId);
         // if sampleId isn't null, set the widgetPointer
         if (sampleId) {
           this.widgetPointer = sampleId['.key'];

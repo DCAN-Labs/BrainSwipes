@@ -191,7 +191,7 @@
           "text":"<h1 id='header-overall-QA'>Assessing the Quality of Images</h1>"
         },
         {
-          "text":"In the next sections you will learn how to assess the quality of a processed image. We will define QA metrics for the three image types defined above, and some overall metrics."
+          "text":"In the next sections you will learn how to assess the quality of a processed image. We will define QA metrics for the three image types defined above, and some overall metrics.<hr>We will use short checklists to assess the quality of images. All boxes must be checked for an image to pass."
         },
         {
           "text":"<h1 id='header-Surf-Delin'>Assessing the Quality of Surface Delineations</h1>"
@@ -200,71 +200,65 @@
           "text":"<h2>Basic Criteria</h1>"
         },
         {
-          "text":"A quality surface delineation will accurately delineate the cortical surface. White matter will be seperated from gray matter with a black line. Gray matter will be seperated from the surrounding fluid with a red line. Lines will not seperate the same type of tissue from itself.<hr>We will use the following checklist to assess the quality of images. All four boxes must be checked for it to pass.",
-          "checks": { "surfaceDelineation": [true, true, true, true] }
+          "text":"A quality surface delineation will accurately delineate the cortical surface. Black lines will be drawn between white matter and gray matter and nowhere else. Red lines will be drawn between gray matter and cerebrospinal fluid and nowhere else. Brain images will not appear warped.",
+          "checks": { "surfaceDelineation": [true, true, true] }
         },
         {
           "text":"This image has accurate surface delineation.",
           "image":"/perfect/surface/delineation",
-          "checks": { "surfaceDelineation": [true, true, true, true] }
+          "checks": { "surfaceDelineation": [true, true, true] }
         },
         {
           "text": "Surface delineation is only concerned with the outer area of the brain called the cortical surface. A quality surface delineation does not depend on the subcortical regions highlighted below. In this image, delineation of gray matter is not accurate in the subcortical region, but is accurate on the cortical surface so it passes.",
           "image": "/static/tutorial_imgs/subcort.JPG",
-          "checks": { "surfaceDelineation": [true, true, true, true] }
+          "checks": { "surfaceDelineation": [true, true, true] }
         },
         {
           "text":"<h2>Common Errors</h1>"
         },
         {
-          "text": "White matter extension is when the black line misidentifies gray matter that neighbors white matter as white matter, extending the boudary of white matter into the gray matter. This image has white matter extension in the front of the brain and fails QC.",
+          "text": "Warps of the brain, skull, and surface delineations are caused by poor atlas registration. These warps appear to 'pull' the brain and surface delineations. Warped images fail QC.",
+          "image": "/static/tutorial_imgs/15-T1Surf.jpg",
+          "checks": { "surfaceDelineation": [true, true, false] }
+        },
+        {
+          "text": "White matter extension is when the black line misidentifies gray matter that neighbors white matter as white matter, extending the boundary of white matter into the gray matter. This image has white matter extension in the front of the brain and fails QC.",
           "image": "/static/tutorial_imgs/whitematter.PNG",
-          "checks": { "surfaceDelineation": [false, true, true, false] }
+          "checks": { "surfaceDelineation": [false, true, true] }
         },
         {
           "text": "A surface delineation can be drawn outside of the brain and extend into the dura or skull. When this happens, an image fails QC.",
           "image": "/static/tutorial_imgs/duraskull.JPG",
-          "checks": { "surfaceDelineation": [false, false, true, false] }
+          "checks": { "surfaceDelineation": [false, false, true] }
         },
         {
-          "text": "Motion artifacts occur when the participant is moving in the scanner. Motion artifacts do not cause an image to fail QA, but can lead to the algorithm drawing lines that capture multple types of tissue or seperate the same type of tissue from itself. Motion artifacts include blurriness (left) and ringing (center). A clear image is included for comparison (right).",
-          "image":"/clear/blurry/ringing"
+          "text": "Motion artifacts occur when the participant is moving in the scanner. Motion artifacts do not cause an image to fail QA, but can lead to innacurate surface delineation. Motion artifacts include blurriness and ringing. A clear image is included for comparison.",
+          "tabs": [
+            {"title": "Clear", "image": "/static/tutorial_imgs/14-T1Surf.jpg" },
+            {"title": "Blurry", "image": "/blurry/image" },
+            {"title": "Ringing", "image": "/ringing/image" }
+          ]
         },
         {  
           "text": "Here is a comparison of a clear image, an image that is blurry but still has good delineation, and an image where blurriness causes poor delineation.",
-          "image": "/static/tutorial_imgs/blurriness.gif"
+          "tabs": [
+            {"title": "Clear", "image": "/static/tutorial_imgs/blurriness.gif", "checks": { "surfaceDelineation": [true, true, true] } },
+            {"title": "Slightly Blurry", "image": "/medium/blurry/image", "checks": { "surfaceDelineation": [true, true, true] } },
+            {"title": "Very Blurry", "image": "/heavy/blurry/image", "checks": { "surfaceDelineation": [false, false, true] } }
+          ]
         },
         {
           "text": "Here is a comparison of a clear image, an image that has minor ringing but is still accurately delineated, and an image where ringing causes poor delineation.",
-          "image": "/compare/ringing"
+          "tabs": [
+            {"title": "Clear", "image": "/static/tutorial_imgs/blurriness.gif", "checks": { "surfaceDelineation": [true, true, true] } },
+            {"title": "Slight Ringing", "image": "/medium/ringing/image", "checks": { "surfaceDelineation": [true, true, true] } },
+            {"title": "Heavy Ringing", "image": "/heavy/ringing/image", "checks": { "surfaceDelineation": [false, false, true] } }
+          ]
         },
         {
-          "text": "The image is also bad quality when the white and gray matter surface delineations cross over each other.",
-          "image": "/static/tutorial_imgs/14-T1Surf.jpg"
-        },
-        {
-          "text": "Warps of the brain, skull, and surface delineations are caused by poor atlas registration. \nThese warps appear to 'pull' the brain and surface delineations.",
-          "image": "/static/tutorial_imgs/15-T1Surf.jpg"
-        },
-        {
-          "text": "Below are examples of good and bad quality surface delineation:",
-          "image": "/static/tutorial_imgs/17-T1Surf.jpg"
-        },
-        {
-          "text": "",
-          "image": "/static/tutorial_imgs/18-T1Surf.jpg"
-        },
-        {
-          "text": "",
-          "image": "/static/tutorial_imgs/16-T1Surf.jpg"
-        },
-        {
-          "text": "",
-          "image": "/static/tutorial_imgs/19-T1Surf.jpg"
-        },
-        {
-          "text": "",
-          "image": "/static/tutorial_imgs/20-T1Surf.jpg"
+          "text": "An image is bad quality when the white and gray matter surface delineations cross over each other.",
+          "image": "/static/tutorial_imgs/14-T1Surf.jpg",
+          "checks": { "surfaceDelineation": [false, false, true] }
         },
         {
           "text":"<h1 id='header-Atl-Reg'>Assessing the Quality of Atlas Registration</h1>"
@@ -307,8 +301,18 @@
           "text":"<h1 id='header-Func-Reg'>Assesing the Quality of Functional Registration</h1>"
         },
         {
+          "text":"<h2>Basic Criteria</h1>"
+        },
+        {
+          "text":"A quality functional registration will correctly and accurately register a functional image to a T1 or a T1 to a functional image. The overlying delineations will be the same size as the underlying image. There will be no missing pieces of the brain image.",
+          "checks":{"atlasRegistration":[true, true]}
+        },
+        {
           "text": "The quality of the fMRI registration depends on how well the fMRI image and T1 align. \nCommon functional registration errors include: \nfield of view cut off and signal dropout.",
           "image": "/static/tutorial_imgs/alignexample.JPG"
+        },
+        {
+          "text":"<h2>Common Errors</h1>"
         },
         {
           "text": "Field of view cut-off occurs when the participant’s head is not fully in the image field of view and \neither the bottom or top of the brain appears cut off.",
@@ -388,10 +392,9 @@
     },
     "checklists": {
       "surfaceDelineation":[
-        "Black lines seperate white matter from gray matter on the cortical surface",
-        "Red lines seperate gray matter from surrounding fluid on the cortical surface",
-        "Lines do not seperate white matter from other white matter on the cortical surface",
-        "Lines do not seperate gray matter from other gray matter on the cortical surface"
+        "Black lines lie between white matter and gray matter on the cortical surface",
+        "Red lines lie between gray matter and cerebrospinal fluid on the cortical surface",
+        "There is no warping of the brain."
       ],
       "atlasRegistration":[
         "Overlayed delineations match the gray and white matter boundaries of the underlying image",
@@ -399,10 +402,31 @@
         "No missing sections of the brain"
       ],
       "functionalRegistration":[
-        "Overlayed delineations match the gray and white matter boundaries of the underlying image",
         "Outer edge of the overlying delineation matches the outer edge of the underlying image",
         "No missing sections of the brain"
       ]
-    }
+    },
+    "extraImages": [
+      {
+        "text": "Below are examples of good and bad quality surface delineation:",
+        "image": "/static/tutorial_imgs/17-T1Surf.jpg"
+      },
+      {
+        "text": "",
+        "image": "/static/tutorial_imgs/18-T1Surf.jpg"
+      },
+      {
+        "text": "",
+        "image": "/static/tutorial_imgs/16-T1Surf.jpg"
+      },
+      {
+        "text": "",
+        "image": "/static/tutorial_imgs/19-T1Surf.jpg"
+      },
+      {
+        "text": "",
+        "image": "/static/tutorial_imgs/20-T1Surf.jpg"
+      }
+    ]
   }
 }
