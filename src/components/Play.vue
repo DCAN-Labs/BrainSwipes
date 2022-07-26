@@ -265,11 +265,6 @@
          */
         allowed: false,
         /**
-         * Idenfities the class of image to assist in routing to the tutorial
-         */
-        imageType: '',
-        imageTypeText: '',
-        /**
          * whether the widget should be in play mode or catch trial mode
          */
         playMode: 'play',
@@ -333,17 +328,21 @@
        */
       initSampleCounts(dataset) {
         this.db.ref(`datasets/${dataset}/sampleCounts`).once('value', (snap) => {
-          /* eslint-disable */
-          this.sampleCounts = _.map(snap.val(), (val, key) => {
-            return { '.key': key, '.value': val };
+          this.db.ref(`datasets/${dataset}/flaggedSamples`).once('value', (snap2) => {
+            const flaggedSamples = Object.keys(snap2.val());
+            const sampleCounts = _.omit(snap.val(), flaggedSamples);
+            /* eslint-disable */
+            this.sampleCounts = _.map(sampleCounts, (val, key) => {
+              return { '.key': key, '.value': val };
+            });
+            /* eslint-enable */
+            if (!this.sampleCounts.length) {
+              this.noData = true;
+            } else {
+              this.startTime = new Date();
+              this.setNextSampleId();
+            }
           });
-          /* eslint-enable */
-          if (!this.sampleCounts.length) {
-            this.noData = true;
-          } else {
-            this.startTime = new Date();
-            this.setNextSampleId();
-          }
         });
       },
       /**
@@ -368,7 +367,6 @@
             });
         }
       },
-
       /**
        * A method to shuffle an array.
        */
@@ -484,7 +482,6 @@
         // if sampleId isn't null, set the widgetPointer
         if (sampleId) {
           this.widgetPointer = sampleId['.key'];
-          this.getImageType();
         }
       },
       /**
@@ -568,22 +565,6 @@
        */
       showAlert() {
         this.dismissCountDown = this.dismissSecs;
-      },
-      getImageType() {
-        if (this.widgetPointer.match(/atlas/i)) {
-          this.imageTypeText = 'n Atlas Registration';
-          this.imageType = 'AtlReg';
-        } else if (this.widgetPointer.match(/task/i)) {
-          this.imageTypeText = ' Functional Registration';
-          this.imageType = 'FuncReg';
-        } else {
-          this.imageTypeText = ' Structural image';
-          this.imageType = 'StrucImg';
-        }
-      },
-      toTutorial() {
-        const routeData = this.$router.resolve({ name: 'Tutorial', query: { section: this.imageType } });
-        window.open(routeData.href, '_blank');
       },
     },
     /**
