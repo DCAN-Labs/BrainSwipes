@@ -329,7 +329,10 @@
       initSampleCounts(dataset) {
         this.db.ref(`datasets/${dataset}/sampleCounts`).once('value', (snap) => {
           this.db.ref(`datasets/${dataset}/flaggedSamples`).once('value', (snap2) => {
-            const flaggedSamples = Object.keys(snap2.val());
+            let flaggedSamples = [];
+            if (snap2.val()) {
+              flaggedSamples = Object.keys(snap2.val());
+            }
             const sampleCounts = _.omit(snap.val(), flaggedSamples);
             /* eslint-disable */
             this.sampleCounts = _.map(sampleCounts, (val, key) => {
@@ -473,12 +476,16 @@
         this.startTime = new Date();
         this.playMode = 'play';
 
-        let sampleId = this.sampleUserPriority()[0];
+        let sampleId;
 
-        if (Math.random() < this.catchFrequency) {
+        if (this.$route.query.sample) {
+          sampleId = { '.key': this.$route.query.sample };
+        } else if (Math.random() < this.catchFrequency) {
           sampleId = this.serveCatchTrial();
+        } else {
+          sampleId = this.sampleUserPriority()[0];
         }
-
+        console.log(sampleId);
         // if sampleId isn't null, set the widgetPointer
         if (sampleId) {
           this.widgetPointer = sampleId['.key'];
@@ -590,7 +597,6 @@
           const organization = currentUserInfo.organization;
           if (Object.keys(identities).length === 0) {
             errors.push(1);
-            console.log(identities);
           } else if (!identities[email]) {
             errors.push(2);
           } else if (identities[email][0] !== organization) {

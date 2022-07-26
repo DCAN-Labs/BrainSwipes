@@ -215,6 +215,11 @@
     padding: 2px 4px;
     border-width: 1px;
     text-align: left;
+    align-items: center;
+  }
+
+  .check-item p{
+    padding-left: 5px;
   }
 
   .checklist{

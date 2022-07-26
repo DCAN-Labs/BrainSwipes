@@ -44,7 +44,7 @@
         </div>
         <div class="checklist-wrapper">
           <div class="checklist">
-            <div class="check-item" v-for="(value, index) in config.tutorial.checklists[imageType[0]]" :key="index"><div :class="'checked'"></div><p>{{value}}</p></div>
+            <div class="check-item" v-for="(value, index) in config.tutorial.checklists[imageType[0]]" :key="index"><div :class="'checked-question'"></div><p>{{value}}</p></div>
           </div>
         </div>
       </div>
@@ -131,13 +131,18 @@
     font-size: 1.3em;
   }
 
-    .check-item{
+  .check-item{
     display: flex;
     font-size: 1.1em;
     border-style: outset;
     padding: 2px 4px;
     border-width: 1px;
     text-align: left;
+    align-items: center;
+  }
+
+  .check-item p{
+    padding-left: 5px;
   }
 
   .checklist{
@@ -168,6 +173,16 @@
     display: block;
     content: ' ';
     background-image: url('../assets/square.svg');
+    background-repeat: no-repeat;
+    background-size: 28px 28px;
+    height: 28px;
+    width: 28px;
+  }
+
+  .checked-question::before{
+    display: block;
+    content: ' ';
+    background-image: url('../assets/question-square.svg');
     background-repeat: no-repeat;
     background-size: 28px 28px;
     height: 28px;
@@ -477,7 +492,8 @@
         window.open(routeData.href, '_blank');
       },
       toPlay() {
-        this.$router.push({ name: 'Play', params: { dataset: this.dataset } });
+        const query = this.flagged ? null : { sample: this.widgetPointer };
+        this.$router.push({ name: 'Play', params: { dataset: this.dataset }, query });
       },
       openFlagWarning() {
         this.$refs.flagwarning.show();
