@@ -82,9 +82,10 @@
                           type="text"
                           v-model="chatMessage"
                           required
-                          placeholder="Enter your message">
+                          placeholder="Enter your message"
+                          v-on:keyup="enableForm()">
             </b-form-input>
-            <b-button class="mt-2" variant="primary" @click="sendChat">Send</b-button>
+            <b-button class="mt-2" variant="primary" :disabled="formDisabled" @click="sendChat">Send</b-button>
           </b-form-group>
         </b-form>
       </div>
@@ -444,7 +445,6 @@
       },
       closeFlagWarning() {
         this.$refs.flagwarning.hide();
-        this.formDisabled = true;
       },
       flagImage(e) {
         this.sendChat(e);
@@ -452,7 +452,7 @@
         this.closeFlagWarning();
       },
       enableForm() {
-        this.formDisabled = this.$refs['flag-comment'].localValue.length === 0;
+        this.formDisabled = this.chatMessage.length === 0;
       },
       addToFlagged() {
         this.db.ref(`datasets/${this.dataset}/flaggedSamples`)
