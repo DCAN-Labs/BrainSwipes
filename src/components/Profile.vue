@@ -27,9 +27,10 @@
         <b-button id="verifyEmail" type="submit" variant="primary">Verify Email</b-button>
       </b-form>
       <hr>
-      <h1>{{userData.showTips? 'Tips are on. Click below to turn them off.': 'Tips are off. Click below to turn them on.' }}</h1>
+      <!-- put tips inside review, always on. leaving here because its still in the db and may get used later -->
+      <!-- <h1>{{userData.showTips? 'Tips are on. Click below to turn them off.': 'Tips are off. Click below to turn them on.' }}</h1>
       <b-button @click="toggleTips">{{userData.showTips? 'ON':'OFF'}}</b-button>
-      <hr>
+      <hr> -->
       <h3>Level {{currentLevel.level}}</h3>
       <p class="lead">
         Keep playing to unlock the remaining animals!
