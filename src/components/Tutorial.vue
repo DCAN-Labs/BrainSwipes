@@ -57,10 +57,12 @@
           <p v-html="step.text"></p>
 
         </div>
-        <div class="checklist-wrapper" v-if="step.checks">
-          <div class="checklist">
-            <div class="check-item" v-for="(value, index) in step.checks[Object.keys(step.checks)[0]]" :key="index"><div :class="value ? 'checked' : 'unchecked'"></div><p>{{config.tutorial.checklists[Object.keys(step.checks)[0]][index]}}</p></div>
-          </div>
+        <div v-if="step.checks">
+          <Checklist
+            :config="config"
+            :imageClass="Object.keys(step.checks)[0]"
+            :checks="Object.values(step.checks)[0]"
+          />
         </div>
         <div class="tutorial-tabs-wrapper">
           <div class="tutorial-tabs" v-if="step.tabs">
@@ -68,9 +70,11 @@
               <b-tabs card pills fill>
                 <b-tab v-for="(tab, index) in step.tabs" :key="index" :title="tab.title" :active="!index">
                   <div class="checklist-wrapper" v-if="tab.checks">
-                    <div class="checklist">
-                      <div class="check-item" v-for="(value, index) in tab.checks[Object.keys(tab.checks)[0]]" :key="index"><div :class="value ? 'checked' : 'unchecked'"></div><p>{{config.tutorial.checklists[Object.keys(tab.checks)[0]][index]}}</p></div>
-                    </div>
+                    <Checklist
+                    :config="config"
+                    :imageClass="Object.keys(tab.checks)[0]"
+                    :checks="Object.values(tab.checks)[0]"
+                    />
                   </div>
                   <img :src="tab.image" class="mt-s pt-3 img"/>
                 </b-tab>
@@ -89,15 +93,15 @@
 
           <div v-if="step.pointer" class="mt-3">
             <WidgetSelector
-            :widgetPointer="step.pointer"
-            :widgetSummary="widgetSummary"
-            v-on:widgetRating="simulateSwipe"
-            :playMode="'tutorial'"
-            :tutorialStep="step.tutorialStep"
-            ref="widget"
-            :dataset="tutorialDataset"
-            :bucket="tutorialBucket"
-            :identifier="'example'+index"
+              :widgetPointer="step.pointer"
+              :widgetSummary="widgetSummary"
+              v-on:widgetRating="simulateSwipe"
+              :playMode="'tutorial'"
+              :tutorialStep="step.tutorialStep"
+              ref="widget"
+              :dataset="tutorialDataset"
+              :bucket="tutorialBucket"
+              :identifier="'example'+index"
             />
           </div>
           <div v-if="step.tutorialCompleted">
@@ -224,53 +228,6 @@
     opacity: 0;
   }
 
-  .check-item{
-    display: flex;
-    font-size: 1.1em;
-    border-style: outset;
-    padding: 2px 4px;
-    border-width: 1px;
-    text-align: left;
-    align-items: center;
-  }
-
-  .check-item p{
-    padding-left: 5px;
-  }
-
-  .checklist{
-    max-width: 500px;
-  }
-
-  .checklist-wrapper{
-    margin-top: 5px;
-    display: flex;
-    justify-content: center;
-  }
-
-  .checked, .unchecked{
-    margin-right: 5px;
-  }
-
-  .checked::before{
-    display: block;
-    content: ' ';
-    background-image: url('../assets/check-square.svg');
-    background-repeat: no-repeat;
-    background-size: 28px 28px;
-    height: 28px;
-    width: 28px;
-  }
-  .unchecked::before{
-    display: block;
-    content: ' ';
-    background-image: url('../assets/square.svg');
-    background-repeat: no-repeat;
-    background-size: 28px 28px;
-    height: 28px;
-    width: 28px;
-  }
-
   .tutorial-tabs-wrapper{
     margin-top: 5px;
     display: flex;
@@ -304,6 +261,7 @@
   import Arrow from './Animations/ArrowDown';
   import WidgetSelector from './WidgetSelector';
   import { glossary, glossaryKeys } from '../glossary';
+  import Checklist from './Widgets/Checklist';
 
   const VueScrollTo = require('vue-scrollto');
 
@@ -347,6 +305,7 @@
       'vue-typer': VueTyper,
       Arrow,
       WidgetSelector,
+      Checklist,
     },
     data() {
       return {

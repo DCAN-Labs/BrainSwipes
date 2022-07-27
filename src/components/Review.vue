@@ -42,11 +42,11 @@
             <div class="information" @click="toTutorial"></div>
           </div>
         </div>
-        <div class="checklist-wrapper">
-          <div class="checklist">
-            <div class="check-item" v-for="(value, index) in config.tutorial.checklists[imageType[0]]" :key="index"><div :class="'checked-question'"></div><p>{{value}}</p></div>
-          </div>
-        </div>
+        <Checklist
+          :config="config"
+          :imageClass="imageType[0]"
+          :checks="Array(config.tutorial.checklists[imageType[0]].length).fill(true)"
+        />
       </div>
       <div>
         <WidgetSelector
@@ -131,64 +131,6 @@
     font-size: 1.3em;
   }
 
-  .check-item{
-    display: flex;
-    font-size: 1.1em;
-    border-style: outset;
-    padding: 2px 4px;
-    border-width: 1px;
-    text-align: left;
-    align-items: center;
-  }
-
-  .check-item p{
-    padding-left: 5px;
-  }
-
-  .checklist{
-    max-width: 500px;
-  }
-
-  .checklist-wrapper{
-    margin-top: 5px;
-    display: flex;
-    justify-content: center;
-  }
-
-  .checked, .unchecked{
-    margin-right: 5px;
-  }
-
-  .checked::before{
-    display: block;
-    content: ' ';
-    background-image: url('../assets/check-square.svg');
-    background-repeat: no-repeat;
-    background-size: 28px 28px;
-    height: 28px;
-    width: 28px;
-  }
-
-  .unchecked::before{
-    display: block;
-    content: ' ';
-    background-image: url('../assets/square.svg');
-    background-repeat: no-repeat;
-    background-size: 28px 28px;
-    height: 28px;
-    width: 28px;
-  }
-
-  .checked-question::before{
-    display: block;
-    content: ' ';
-    background-image: url('../assets/question-square.svg');
-    background-repeat: no-repeat;
-    background-size: 28px 28px;
-    height: 28px;
-    width: 28px;
-  }
-
   .information{
     display: block;
     content: ' ';
@@ -239,6 +181,7 @@
   import 'firebase/database';
   import _ from 'lodash';
   import WidgetSelector from './WidgetSelector';
+  import Checklist from './Widgets/Checklist'
 
   /**
    * The review component shows the widget for a pointer to a sample in its route,
@@ -317,6 +260,7 @@
     },
     components: {
       WidgetSelector,
+      Checklist,
     },
     data() {
       return {
