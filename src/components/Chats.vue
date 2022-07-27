@@ -5,7 +5,7 @@
         <h1>Chats</h1>
         <p class="lead">See which samples people are talking about</p>
         <p v-for="(c, index) in sampleChat" :key="index">
-          <b-alert show>
+          <b-alert :variant="flagged.includes(c['.key']) ? 'danger' : 'primary'" show>
             <router-link :to="'/' + dataset + '/review/' + c['.key'] + '/' + btoaBucket">{{c['.key']}}</router-link>
             <br>
             <span v-if="chatInfo[c['.key']]">
@@ -28,6 +28,7 @@
  * This is the component for the /chats route. It shows all the chat messages
  * for each sample.
  */
+import _ from 'lodash';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 
@@ -40,9 +41,8 @@ export default {
       sampleChat: {
         source: this.db.ref(`datasets/${this.dataset}/chats`).child('sampleChatIndex').orderByChild('time'),
         readyCallback() {
-          // this.sampleChat.reverse();
+          this.sampleChat.reverse();
           this.sampleChat.forEach((c) => {
-            // console.log('c is', c);
             this.db.ref(`datasets/${this.dataset}/chats`)
               .child('sampleChats')
               .child(c['.key'])
@@ -58,6 +58,15 @@ export default {
           if (!this.sampleChat.length) {
             this.noData = true;
           }
+        },
+      },
+      flagged: {
+        source: this.db.ref(`datasets/${this.dataset}/flaggedSamples`),
+        readyCallback() {
+          this.flagged = _.reduce(this.flagged, (r, v) => {
+            r.push(v['.key']);
+            return r;
+          }, []);
         },
       },
     };
@@ -133,13 +142,6 @@ export default {
     },
   },
   computed: {
-    /**
-     * Reverses the order of the chats.
-     */
-    orderedPosts() {
-      const chats = this.sampleChat;
-      return chats.reverse();
-    },
     /**
      * A blank image from the config file. If this.noData is true, this image is rendered.
      */

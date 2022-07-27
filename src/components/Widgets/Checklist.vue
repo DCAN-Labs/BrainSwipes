@@ -2,7 +2,7 @@
     <div class="checklist" ref="checklist">
         <div class="checklist-wrapper">
           <div class="checklist-list">
-            <div class="checklist-item" v-for="(value, index) in checks" :key="index"><div :class="value ? 'checked' : 'unchecked'"></div><p>{{config.tutorial.checklists[imageClass][index]}}</p></div>
+            <div class="checklist-item" v-for="(value, index) in checks" :key="index"><div :class="value === 'question' ? 'checked-question' : value ? 'checked' : 'unchecked'"></div><p>{{config.tutorial.checklists[imageClass][index]}}</p></div>
           </div>
         </div>
     </div>  
@@ -35,6 +35,7 @@
       },
       /**
        * Object contains the class of the image and an array of true/false values
+       * or 'question'
        */
       checks: {
         type: Array,

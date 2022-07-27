@@ -45,7 +45,7 @@
         <Checklist
           :config="config"
           :imageClass="imageType[0]"
-          :checks="Array(config.tutorial.checklists[imageType[0]].length).fill(true)"
+          :checks="Array(config.tutorial.checklists[imageType[0]].length).fill('question')"
         />
       </div>
       <div>
@@ -181,7 +181,7 @@
   import 'firebase/database';
   import _ from 'lodash';
   import WidgetSelector from './WidgetSelector';
-  import Checklist from './Widgets/Checklist'
+  import Checklist from './Widgets/Checklist';
 
   /**
    * The review component shows the widget for a pointer to a sample in its route,
