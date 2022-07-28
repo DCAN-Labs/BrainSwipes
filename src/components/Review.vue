@@ -467,11 +467,13 @@
       },
       checkFlaggedStatus() {
         this.db.ref(`datasets/${this.dataset}/flaggedSamples`).on('value', (snap) => {
-          if (Object.keys(snap.val()).includes(this.widgetPointer)) {
-            this.flagged = true;
-          } else {
-            this.flagged = false;
+          let flagged = false;
+          if (snap.val()) {
+            if (Object.keys(snap.val()).includes(this.widgetPointer)) {
+              flagged = true;
+            }
           }
+          this.flagged = flagged;
         });
       },
     },
