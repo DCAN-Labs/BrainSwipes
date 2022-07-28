@@ -484,13 +484,9 @@
 
         let sampleId;
 
-<<<<<<< HEAD
         if (this.$route.query.sample) {
           sampleId = { '.key': this.$route.query.sample };
-        } else if (Math.random() < this.catchFrequency) {
-=======
-        if (Math.random() < this.catchFrequency && this.catchTrials.length) {
->>>>>>> main
+        } else if (Math.random() < this.catchFrequency && this.catchTrials.length) {
           sampleId = this.serveCatchTrial();
         } else {
           sampleId = this.sampleUserPriority()[0];
