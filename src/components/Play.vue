@@ -205,10 +205,6 @@
         type: String,
         required: true,
       },
-      catchTrials: {
-        type: Array,
-        required: true,
-      },
     },
     data() {
       return {
@@ -244,6 +240,7 @@
          */
         sampleCounts: [],
         userSeenSamples: [],
+        catchTrials: [],
 
         /**
          * if sampleCounts is empty after its fetched from the db, then noData
@@ -268,6 +265,10 @@
          * whether the widget should be in play mode or catch trial mode
          */
         playMode: 'play',
+        /**
+         * if there is nothing in the database, display a blank image
+         */
+        blankImage: 'https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_blank_canvas.svg?sanitize=true',
       };
     },
     watch: {
@@ -302,6 +303,7 @@
     mounted() {
       this.initSampleCounts(this.dataset);
       this.initSeenSamples(this.dataset);
+      this.initCatchTrialSamples(this.dataset);
     },
     components: {
       // WidgetSelector,
@@ -313,12 +315,6 @@
        */
       samplePriority() {
         return _.sortBy(this.sampleCounts, '.value');
-      },
-      /**
-       * if there is nothing in the database, display a blank image
-       */
-      blankImage() {
-        return this.config.play.blankImage;
       },
     },
     methods: {
@@ -369,6 +365,16 @@
               /* eslint-enable */
             });
         }
+      },
+      /**
+       * Initialize the samples the current dataset will use as catch trials
+       */
+      initCatchTrialSamples(dataset) {
+        this.db.ref(`config/studies/${dataset}/catchTrials`).once('value', (snap) => {
+          if (snap.val()) {
+            this.catchTrials = Object.keys(snap.val());
+          }
+        });
       },
       /**
        * A method to shuffle an array.
@@ -478,9 +484,13 @@
 
         let sampleId;
 
+<<<<<<< HEAD
         if (this.$route.query.sample) {
           sampleId = { '.key': this.$route.query.sample };
         } else if (Math.random() < this.catchFrequency) {
+=======
+        if (Math.random() < this.catchFrequency && this.catchTrials.length) {
+>>>>>>> main
           sampleId = this.serveCatchTrial();
         } else {
           sampleId = this.sampleUserPriority()[0];

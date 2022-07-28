@@ -108,15 +108,13 @@ export default {
        * get the most recent discussion point from that chat and store it here.
        */
       chatInfo: {},
+      /**
+       * an image to display if the user hasn't said anything.
+       */
+      blankImage: 'https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_chatting.svg?sanitize=true',
     };
   },
   computed: {
-    /**
-     * an image to display if the user hasn't said anything. from config.profile.blankImage
-     */
-    blankImage() {
-      return this.config.profile.blankImage;
-    },
     yourEmail() {
       return firebase.auth().currentUser.email;
     },
