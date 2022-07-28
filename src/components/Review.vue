@@ -3,27 +3,33 @@
     <!-- Modal Component -->
     <b-modal
       id="flagwarning" 
-      title="WARNING"
+      :title="flagged? 'Resolve Flag' : 'WARNING'"
       ref="flagwarning"
       size="lg"
       @ok="flagImage"
     >
-      <h2>Flagging an image will remove it from circulation until it has been reviewed.</h2>
-      <h4>Only flag images where issues are present.</h4>
-      <hr>
-      <div class="flag-reasons">
-        <h3>Flag the image if</h3>
-        <ul>
-          <li>There is no overlay</li>
-          <li>There is an issue with the image not discussed in the tutorial</li>
-        </ul>
-        <h3>Do not flag the image if</h3>
-        <ul>
-          <li>You are unsure how to swipe, and have not reviewed the tutorial</li>
-        </ul>
+      <div v-if="flagged">
+        <h2>Pass or Fail?</h2>
+        <p>Describe why and unflag.</p>
+      </div>
+      <div v-else>
+        <h2>Flagging an image will remove it from circulation until it has been reviewed.</h2>
+        <h4>Only flag images where issues are present.</h4>
+        <hr>
+        <div class="flag-reasons">
+          <h3>Flag the image if</h3>
+          <ul>
+            <li>There is no overlay</li>
+            <li>There is an issue with the image not discussed in the tutorial</li>
+          </ul>
+          <h3>Do not flag the image if</h3>
+          <ul>
+            <li>You are unsure how to swipe, and have not reviewed the tutorial</li>
+          </ul>
+        </div>
       </div>
       <hr>
-      <b-input-group prepend="Description of issue" class="mt-3">
+      <b-input-group :prepend="flagged ? 'Explain your reasoning' : 'Description of issue'" class="mt-3">
         <b-form-input id="flag-comment" ref="flag-comment" autocomplete="off" v-on:keyup="enableForm()" v-model="chatMessage"></b-form-input>
       </b-input-group>
       <div slot="modal-footer" class="w-100">
@@ -59,7 +65,7 @@
         />
       </div>
       <div id="review-controls">
-        <b-button variant="danger" @click="openFlagWarning" :disabled="flagged">{{flagged ? 'This sample is flagged' : 'Flag for Expert Review'}}</b-button>
+        <b-button variant="danger" @click="openFlagWarning" :disabled="flagged && !userData.admin">{{flagged ? 'This sample is flagged' : 'Flag for Expert Review'}}</b-button>
         <b-button variant="primary" @click="toPlay">Back to Swiping</b-button>
       </div>
       <hr>
@@ -457,12 +463,14 @@
       addToFlagged() {
         this.db.ref(`datasets/${this.dataset}/flaggedSamples`)
           .child(this.widgetPointer)
-          .set(this.userData.username);
+          .set(this.flagged ? null : this.userData.username);
       },
       checkFlaggedStatus() {
         this.db.ref(`datasets/${this.dataset}/flaggedSamples`).on('value', (snap) => {
           if (Object.keys(snap.val()).includes(this.widgetPointer)) {
             this.flagged = true;
+          } else {
+            this.flagged = false;
           }
         });
       },
