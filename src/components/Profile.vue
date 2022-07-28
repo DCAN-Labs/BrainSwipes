@@ -4,12 +4,6 @@
     <b-container fluid>
       <!-- userInfo is a prop that was passed in from App -->
       <h1>
-        <b-img rounded="circle" width="75"
-          height="75" blank-color="#777"
-          alt="img" class="m-1"
-          :src="currentLevel.img"
-          v-if="currentLevel.img"
-          />
         {{userInfo.displayName}}
       </h1>
 
@@ -31,29 +25,6 @@
       <!-- <h1>{{userData.showTips? 'Tips are on. Click below to turn them off.': 'Tips are off. Click below to turn them on.' }}</h1>
       <b-button @click="toggleTips">{{userData.showTips? 'ON':'OFF'}}</b-button>
       <hr> -->
-      <h3>Level {{currentLevel.level}}</h3>
-      <p class="lead">
-        Keep playing to unlock the remaining animals!
-      </p>
-
-      <b-container fluid class="p-4">
-        <b-row>
-          <b-col v-for="lev in levels" v-if="lev.img" :key="lev.min">
-            <div >
-              <b-img fluid class="pokemon"
-               :src="lev.img" alt="Thumbnail" v-if="lev.level <= currentLevel.level"/>
-              <b-img fluid class="pokemon"
-               :src="lev.img_grey" alt="Thumbnail" v-else/>
-              <br>
-              Level {{lev.level}}
-              <br>
-              <span v-if="lev.level > currentLevel.level">{{lev.min}} points</span>
-            </div>
-          </b-col>
-        </b-row>
-      </b-container>
-
-      <hr>
 
       <!-- Chats don't currently work with multiple datasets,
       not worth dealing with right now.
@@ -174,21 +145,6 @@ export default {
      * the computed user data object based on userInfo
      */
     userData: {
-      type: Object,
-      required: true,
-    },
-    /**
-     * the various levels, the points need to reach the levels,
-     * and the badges (colored and greyed out) to display
-     */
-    levels: {
-      type: Object,
-      required: true,
-    },
-    /**
-     * the user's current level
-     */
-    currentLevel: {
       type: Object,
       required: true,
     },
