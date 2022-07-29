@@ -44,6 +44,24 @@ const firebaseApp = admin.initializeApp({
   databaseURL: "https://brainswipes-default-rtdb.firebaseio.com"
 });
 
+//find firebase user uid from displayname
+async function findUser(displayName){
+  let uid = '';
+  await admin.auth()
+    .listUsers(1000)
+    .then((listUsersResult) => {
+      listUsersResult.users.forEach((userRecord) => {
+        if (userRecord.displayName === displayName){
+          uid = userRecord.uid;
+        }
+      });
+    })
+    .catch((error) => {
+      console.log('Error fetching user data:', error);
+    });
+  return uid;
+}
+
 // standard webpack dev server config
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
@@ -92,29 +110,26 @@ const devWebpackConfig = merge(baseWebpackConfig, {
         (async () => {
           const obj = req.body.obj;
           const currentUser = req.body.currentUser;
+          const uid = await findUser(obj.name);
+          let success = false;
 
           admin.auth()
             .getUser(currentUser)
             .then((userRecord) => {
               if (userRecord.customClaims.admin) {
-                admin.auth().setCustomUserClaims(obj.uid, { admin: obj.isAdmin, datasets: obj.datasets, org: obj.org }).then(() => {
-                  admin.auth()
-                  .getUser(obj.uid)
-                  .then((userRecord) => {
-                    // See the UserRecord reference doc for the contents of userRecord.
-                    console.log(userRecord.customClaims);
-                  })
-                  .catch((error) => {
-                    console.log('Error fetching user data:', error);
-                  });
+                admin.auth().setCustomUserClaims(uid, { admin: obj.admin, datasets: obj.datasets, org: obj.org }).then(() => {
+                  res.send(obj);
+                })
+                .catch((error) => {
+                  console.log('Error setting custom claims:', error);
+                  res.send(null);
                 });
               }
             })
             .catch((error) => {
               console.log('Error fetching user data:', error);
+              res.send(null);
             });
-
-          res.send('res');
         })()
       });
       app.post('/getAllUsers', function (req, res) {
