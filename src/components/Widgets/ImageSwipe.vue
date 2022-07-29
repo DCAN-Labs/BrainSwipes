@@ -183,7 +183,7 @@
         const bucket = this.playMode === 'catch' ? this.catchBucket : this.bucket;
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
-          xhr.open('POST', '/', true);
+          xhr.open('POST', '/Image', true);
           xhr.setRequestHeader('Content-Type', 'application/json');
           xhr.onload = resolve;
           xhr.onerror = reject;
