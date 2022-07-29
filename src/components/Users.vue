@@ -245,6 +245,7 @@ export default {
      * Posts the user roles to the server
      */
     postUserRoles(obj) {
+      console.log('posting to setRoles');
       const uid = obj.uid;
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
