@@ -93,6 +93,7 @@ th {
 </style>
 
 <script>
+import firebase from 'firebase';
 import Flask from './Animations/Flask';
 
 /** User Management panel for the /user route.
@@ -246,7 +247,6 @@ export default {
      */
     postUserRoles(obj) {
       console.log('posting to setRoles');
-      const uid = obj.uid;
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/setRoles', true);
@@ -254,10 +254,11 @@ export default {
         xhr.onload = resolve;
         xhr.onerror = reject;
         xhr.send(JSON.stringify({
-          uid,
+          obj,
+          currentUser: firebase.auth().currentUser.uid,
         }));
       });
-    }
+    },
   },
 };
 </script>
