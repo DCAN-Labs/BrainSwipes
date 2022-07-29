@@ -39,6 +39,7 @@
         <p class="mt-3 pt-3 lead">loading...</p>
       </div>
       <div v-else class="user-div">
+        <p>{{userList}}</p>
         <table id="user-table">
           <tr>
             <th>User</th>
@@ -109,6 +110,7 @@ export default {
        * list of users in Firebase
        */
       usersObject: {},
+      userList: {},
       /**
        * Whether the user list is loading
        */
@@ -150,6 +152,7 @@ export default {
   },
   async created() {
     await this.loadUsers();
+    this.getAllUserRoles();
   },
   components: {
     Flask,
@@ -164,6 +167,7 @@ export default {
           this.usersObject[element.key] = element.val();
         });
         this.loading = false;
+        console.log(this.usersObject);
       });
     },
     /**
@@ -198,7 +202,7 @@ export default {
         this.loading = true;
         this.loadUsers();
       });
-      this.postUserRoles(obj);
+      this.setUserRoles(obj);
     },
     /**
      * Switches the user's admin status
@@ -245,8 +249,7 @@ export default {
     /**
      * Posts the user roles to the server
      */
-    postUserRoles(obj) {
-      console.log('posting to setRoles');
+    setUserRoles(obj) {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/setRoles', true);
@@ -258,6 +261,24 @@ export default {
           currentUser: firebase.auth().currentUser.uid,
         }));
       });
+    },
+    requestAllUserRoles() {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/getAllUsers', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = resolve;
+        xhr.onerror = reject;
+        xhr.send(JSON.stringify({
+          currentUser: firebase.auth().currentUser.uid,
+        }));
+      });
+    },
+    async getAllUserRoles() {
+      const userList = await this.requestAllUserRoles().then(data =>
+        data.currentTarget.responseText,
+      );
+      this.userList = userList;
     },
   },
 };

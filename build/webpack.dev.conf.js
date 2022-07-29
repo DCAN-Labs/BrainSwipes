@@ -117,6 +117,23 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           res.send('res');
         })()
       });
+      app.post('/getAllUsers', function (req, res) {
+        (async () => {
+          const currentUser = req.body.currentUser;
+          const allUsers = {};
+          await admin.auth()
+            .listUsers(1000)
+            .then((listUsersResult) => {
+              listUsersResult.users.forEach((userRecord) => {
+                allUsers[userRecord.displayName] = userRecord.customClaims;
+              });
+            })
+            .catch((error) => {
+              console.log('Error fetching user data:', error);
+            });
+          res.send(allUsers);
+        })()
+      });
     }
   },
   plugins: [
