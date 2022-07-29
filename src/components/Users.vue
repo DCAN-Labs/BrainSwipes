@@ -197,6 +197,7 @@ export default {
         this.loading = true;
         this.loadUsers();
       });
+      this.postUserRoles(obj);
     },
     /**
      * Switches the user's admin status
@@ -240,6 +241,22 @@ export default {
       updates[`/uids/${uid}/admin`] = admin;
       this.db.ref().update(updates);
     },
+    /**
+     * Posts the user roles to the server
+     */
+    postUserRoles(obj) {
+      const uid = obj.uid;
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/setRoles', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = resolve;
+        xhr.onerror = reject;
+        xhr.send(JSON.stringify({
+          uid,
+        }));
+      });
+    }
   },
 };
 </script>
