@@ -178,12 +178,9 @@ export default {
       e.preventDefault();
       const obj = JSON.parse(JSON.stringify(this.userModified));
       this.$refs.modifyuser.hide();
-      // this.updateFirebase(obj).then(() => {
-      //   this.$emit('changePermissions');
-      //   this.loading = true;
-      //   this.loadUsers();
-      // });
-      this.setUserRoles(obj);
+      this.setUserRoles(obj).then(() => {
+        this.$emit('changePermissions');
+      });
     },
     /**
      * Switches the user's admin status
@@ -212,20 +209,6 @@ export default {
      */
     changeOrg(value) {
       this.userModified.org = value;
-    },
-    /**
-     * Modifies the database with the prepared user data
-     */
-    async updateFirebase(obj) {
-      const uid = obj.uid;
-      const admin = obj.admin;
-      const datasets = obj.datasets;
-      const organization = obj.org;
-      const updates = {};
-      updates[`/uids/${uid}/datasets`] = datasets;
-      updates[`/uids/${uid}/organization`] = organization;
-      updates[`/uids/${uid}/admin`] = admin;
-      this.db.ref().update(updates);
     },
     /**
      * Posts the user roles to the server

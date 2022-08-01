@@ -335,7 +335,6 @@ export default {
           JSON.parse(data.currentTarget.responseText),
         );
         this.datasetPrivileges = userRoles.datasets;
-        console.log(userRoles.datasets);
       }
     },
     requestUserDatasets() {

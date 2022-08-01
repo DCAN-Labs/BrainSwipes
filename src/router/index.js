@@ -156,6 +156,31 @@ const router = new Router({
   ],
 });
 
+/**
+ * Check user roles and access
+ */
+function requestUserRoles() {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/getRoles', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = resolve;
+    xhr.onerror = reject;
+    xhr.send(JSON.stringify({
+      user: firebase.auth().currentUser.uid,
+    }));
+  });
+}
+async function getUserRoles() {
+  let userRoles = {};
+  if (firebase.auth().currentUser) {
+    userRoles = await requestUserRoles().then(data =>
+      JSON.parse(data.currentTarget.responseText),
+    );
+  }
+  return userRoles;
+}
+
 router.beforeEach((to, from, next) => {
   const currentUser = firebase.auth().currentUser;
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
@@ -182,22 +207,18 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAccess) {
     const dataset = to.params.dataset;
-    firebase.database().ref(`/uids/${currentUser.uid}/datasets`).once('value')
-      .then((snap) => {
-        const data = snap.val();
-        if (!data[dataset]) {
-          next({ path: '/unauthorized', query: from.query });
-        }
-      });
+    getUserRoles().then((userRoles) => {
+      if (!userRoles.datasets[dataset]) {
+        next({ path: '/unauthorized', query: from.query });
+      }
+    });
   }
 
   if (requiresAdmin) {
-    // console.log('requires admin');
-    firebase.database().ref(`/uids/${currentUser.uid}/admin`).once('value')
-    .then((snap) => {
-      // console.log('snap is', snap.val());
-      if (requiresAdmin && !snap.val()) next('unauthorized');
-      else next();
+    getUserRoles().then((userRoles) => {
+      if (!userRoles.admin) {
+        next({ path: '/unauthorized', query: from.query });
+      } else next();
     });
   } else {
     next();
