@@ -151,8 +151,8 @@ export default {
   },
   /**
    * Prevents navigation to Chats when the dataset prop does not match the route name
-    * or if globus authentication is incorrect
-    */
+  * or if globus authentication is incorrect
+  */
   beforeRouteEnter(to, from, next) {
     next(async (vm) => {
       /* eslint-disable no-underscore-dangle */
@@ -160,16 +160,27 @@ export default {
       const restricted = !available.val();
       const errors = [];
       const user = firebase.auth().currentUser;
-      const snap = await vm._props.db.ref(`uids/${user.uid}`).once('value');
-      const currentUserInfo = snap.val();
-      const userAllowed = currentUserInfo.datasets[to.params.dataset];
+      const userInfoRequest = new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/getRoles', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = resolve;
+        xhr.onerror = reject;
+        xhr.send(JSON.stringify({
+          user: user.uid,
+        }));
+      });
+      const userRoles = await userInfoRequest.then(data =>
+        JSON.parse(data.currentTarget.responseText),
+      );
+      const userAllowed = userRoles.datasets[to.params.dataset];
       if (to.params.dataset !== vm.dataset) {
-        vm.$router.replace({ name: 'Home' });
+        vm.$router.push({ name: 'Home' });
       } else if (restricted) {
         const email = user.email;
         const identities = await vm._props.getGlobusIdentities(vm._props.globusToken);
         /* eslint-enable no-underscore-dangle */
-        const organization = currentUserInfo.organization;
+        const organization = userRoles.org;
         if (Object.keys(identities).length === 0) {
           errors.push(1);
         } else if (!identities[email]) {
@@ -180,7 +191,7 @@ export default {
           errors.push(4);
         }
       } if (errors.length) {
-        vm.$router.replace({ name: 'Restricted', query: { errors } });
+        vm.$router.push({ name: 'Restricted', query: { errors } });
       } else if (userAllowed) {
       /* eslint-disable */
       vm.allowed = true;
