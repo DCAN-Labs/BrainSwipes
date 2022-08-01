@@ -132,6 +132,19 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             });
         })()
       });
+      app.post('/getRoles', function (req, res) {
+        (async () => {
+          const user = req.body.user;
+          admin.auth()
+            .getUser(user)
+            .then((userRecord) => {
+              res.send(userRecord.customClaims);
+            }).catch((error) => {
+              console.log('Error getting custom claims:', error);
+              res.send(null);
+            });
+        })()
+      });
       app.post('/getAllUsers', function (req, res) {
         (async () => {
           const currentUser = req.body.currentUser;

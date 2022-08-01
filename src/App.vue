@@ -45,7 +45,7 @@
           @changePermissions="updateDatasetPermissions"
           :studies="studies"
           :bucket="bucket"
-          @login="activateDatasets"
+          @login="getUserDatasets"
           :key="$route.fullPath"
           :globusToken="globusToken"
           @globusLogin="globusLogin"
@@ -329,17 +329,29 @@ export default {
     /**
      * What datasets the user can access
      */
-    async activateDatasets() {
-      const currentUser = firebase.auth().currentUser;
-      if (currentUser) {
-        firebase.database().ref(`/uids/${currentUser.uid}/datasets`).once('value')
-          .then((snap) => {
-            this.datasetPrivileges = snap.val();
-          });
+    async getUserDatasets() {
+      if (firebase.auth().currentUser) {
+        const userRoles = await this.requestUserDatasets().then(data =>
+          JSON.parse(data.currentTarget.responseText),
+        );
+        this.datasetPrivileges = userRoles.datasets;
+        console.log(userRoles.datasets);
       }
     },
+    requestUserDatasets() {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/getRoles', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = resolve;
+        xhr.onerror = reject;
+        xhr.send(JSON.stringify({
+          user: firebase.auth().currentUser.uid,
+        }));
+      });
+    },
     updateDatasetPermissions() {
-      this.activateDatasets();
+      this.getUserDatasets();
     },
     async getStudies() {
       this.db.ref('config/studies').on('value', (snap) => {
@@ -392,7 +404,7 @@ export default {
    * intialize the animate on scroll library (for tutorial) and listen to authentication state
    */
   async created() {
-    await this.activateDatasets();
+    await this.getUserDatasets();
     await this.getStudies();
     await this.getGlobusAllowdOrgs();
     await this.getMaintenanceStatus();

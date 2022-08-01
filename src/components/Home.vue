@@ -8,9 +8,11 @@
           Choose a dataset to QC
         </p>
       </div>
-      <p v-if="Object.keys(studies).length" class="buttons mt-3">
-        <b-button v-for="study in Object.keys(studies)" :key="study" class="btn btn-primary" v-show="datasetPrivileges[study]" @click="routeToPlay(study)">{{study}}</b-button>
-      </p>
+      <div v-if="Object.keys(studies).length" class="buttons mt-3">
+        <div v-for="study in Object.keys(studies)" :key="study">
+          <b-button class="btn btn-primary" v-if="datasetPrivileges[study]" @click="routeToPlay(study)">{{study}}</b-button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -122,11 +124,12 @@ a {
 
 .buttons {
   text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .landing {
   background-color: white;
-  /* background-image: url('../assets/whaldrStatic.png'); */
   background-repeat: no-repeat;
   background-position: center;
   height: 80vh;
