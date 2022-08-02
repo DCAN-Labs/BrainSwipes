@@ -6,12 +6,12 @@
       <div>
         <table>
           <tr>
-            <th>isAdmin</th>
+            <th>Admin</th>
             <th v-for="study in Object.keys(studies)" :key="study">{{study}}</th>
           </tr>
           <tr>
             <td>
-              <b-button variant="warning" @click="changeAdmin(userModified.isAdmin)">{{userModified.isAdmin}}</b-button>
+              <b-button variant="warning" @click="changeAdmin(userModified.admin)">{{userModified.admin}}</b-button>
             </td>
             <td v-for="(value, dataset) in userModified.datasets" :key="dataset">
               <b-button variant="danger" @click="changeDatasetAccess(dataset, userModified.datasets[dataset])">{{value}}</b-button>
@@ -42,18 +42,16 @@
         <table id="user-table">
           <tr>
             <th>User</th>
-            <th>isAdmin</th>
-            <th>Score</th>
+            <th>Admin</th>
             <th>Datasets</th>
           </tr>
-          <tr v-for="uid in Object.keys(usersObject).sort((a, b) => { return (usersObject[b].username > usersObject[a].username)? -1 : 1 })" :key="uid" v-if="usersObject[uid].taken_tutorial">
-            <td><b-button variant="outline-dark" @click="modifyUser(uid, usersObject[uid])">{{ usersObject[uid].username? usersObject[uid].username : '' }}</b-button></td>
-            <td>{{ usersObject[uid].admin? usersObject[uid].admin : false }}</td>
-            <td>{{ usersObject[uid].score? usersObject[uid].score : '' }}</td>
+          <tr v-for="user in Object.keys(userList).sort((a, b) => { return (b > a)? -1 : 1 })" :key="user">
+            <td><b-button variant="outline-dark" @click="modifyUser(user, userList[user])">{{user}}</b-button></td>
+            <td>{{ userList[user].admin }}</td>
             <td>
               <table>
                 <tr>
-                  <th v-for="study in Object.keys(studies)" :key="study" v-bind:class="{ red: usersObject[uid].datasets? !usersObject[uid].datasets[study] : false, green: usersObject[uid].datasets? usersObject[uid].datasets[study] : false }">{{study}}</th>
+                  <th v-for="study in Object.keys(studies)" :key="study" :class="{ red: userList[user].datasets? !userList[user].datasets[study] : false, green: userList[user].datasets? userList[user].datasets[study] : false }">{{study}}</th>
                 </tr>
               </table>
             </td>
@@ -93,6 +91,7 @@ th {
 </style>
 
 <script>
+import firebase from 'firebase/app';
 import Flask from './Animations/Flask';
 
 /** User Management panel for the /user route.
@@ -107,7 +106,7 @@ export default {
       /**
        * list of users in Firebase
        */
-      usersObject: {},
+      userList: {},
       /**
        * Whether the user list is loading
        */
@@ -116,9 +115,8 @@ export default {
        * Name of the user being modified
        */
       userModified: {
-        uid: '',
         name: '',
-        isAdmin: '',
+        admin: '',
         datasets: {},
         org: '',
       },
@@ -148,34 +146,22 @@ export default {
     },
   },
   async created() {
-    await this.loadUsers();
+    await this.getAllUserRoles();
   },
   components: {
     Flask,
   },
   methods: {
     /**
-     * Loads the users from Firebase
-     */
-    async loadUsers() {
-      this.db.ref('/uids').on('value', (snap) => {
-        snap.forEach((element) => {
-          this.usersObject[element.key] = element.val();
-        });
-        this.loading = false;
-      });
-    },
-    /**
      * Populates the userModified data element
      * Opens the modify user dialog
      */
-    modifyUser(uid, value) {
+    modifyUser(user, value) {
       const valueCopy = JSON.parse(JSON.stringify(value));
-      this.userModified.uid = uid;
-      this.userModified.name = valueCopy.username;
-      this.userModified.isAdmin = valueCopy.admin;
+      this.userModified.name = user;
+      this.userModified.admin = valueCopy.admin;
       this.userModified.datasets = valueCopy.datasets;
-      this.userModified.org = valueCopy.organization;
+      this.userModified.org = valueCopy.org;
       this.$refs.modifyuser.show();
     },
     /**
@@ -186,16 +172,14 @@ export default {
       this.$refs.modifyuser.hide();
     },
     /**
-     * Closes the modify user dialog and calls updateFirebase
+     * Closes the modify user dialog and update the user's custom claims
      */
     closeDialogSubmit(e) {
       e.preventDefault();
       const obj = JSON.parse(JSON.stringify(this.userModified));
       this.$refs.modifyuser.hide();
-      this.updateFirebase(obj).then(() => {
+      this.setUserRoles(obj).then(() => {
         this.$emit('changePermissions');
-        this.loading = true;
-        this.loadUsers();
       });
     },
     /**
@@ -204,9 +188,9 @@ export default {
      */
     changeAdmin(value) {
       if (value) {
-        this.userModified.isAdmin = false;
+        this.userModified.admin = false;
       } else {
-        this.userModified.isAdmin = true;
+        this.userModified.admin = true;
       }
     },
     /**
@@ -227,18 +211,49 @@ export default {
       this.userModified.org = value;
     },
     /**
-     * Modifies the database with the prepared user data
+     * Posts the user roles to the server
      */
-    async updateFirebase(obj) {
-      const uid = obj.uid;
-      const admin = obj.isAdmin;
-      const datasets = obj.datasets;
-      const organization = obj.org;
-      const updates = {};
-      updates[`/uids/${uid}/datasets`] = datasets;
-      updates[`/uids/${uid}/organization`] = organization;
-      updates[`/uids/${uid}/admin`] = admin;
-      this.db.ref().update(updates);
+    requestUserRolesUpdate(obj) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/setRoles', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = resolve;
+        xhr.onerror = reject;
+        xhr.send(JSON.stringify({
+          obj,
+          currentUser: firebase.auth().currentUser.uid,
+        }));
+      });
+    },
+    async setUserRoles(obj) {
+      const userRoles = await this.requestUserRolesUpdate(obj).then(data =>
+        JSON.parse(data.currentTarget.responseText),
+      );
+      this.userList[userRoles.name] = {
+        admin: userRoles.admin, datasets: userRoles.datasets, org: userRoles.org };
+    },
+    /**
+     * gets user roles from the server
+     */
+    requestAllUserRoles() {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/getAllUsers', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = resolve;
+        xhr.onerror = reject;
+        xhr.send(JSON.stringify({
+          currentUser: firebase.auth().currentUser.uid,
+        }));
+      });
+    },
+    async getAllUserRoles() {
+      const userList = await this.requestAllUserRoles().then(data =>
+        JSON.parse(data.currentTarget.responseText),
+      );
+      this.userList = userList;
+      this.loading = false;
     },
   },
 };

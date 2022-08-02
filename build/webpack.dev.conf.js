@@ -7,7 +7,63 @@ const baseWebpackConfig = require('./webpack.base.conf')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
+const bodyParser = require('body-parser');
+const S3Client = require('@aws-sdk/client-s3').S3Client;
+const GetObjectCommand = require('@aws-sdk/client-s3').GetObjectCommand;
+const getSignedUrl = require('@aws-sdk/s3-request-presigner').getSignedUrl;
+const msiKeys = require('../msiKeys.json');
+const serviceAccount = require('../brainswipes-firebase-adminsdk.json');
 
+const s3Client = new S3Client({
+  credentials: {
+    accessKeyId: msiKeys.accessKeyId,
+    secretAccessKey: msiKeys.secretAccessKey },
+  endpoint: 'https://s3.msi.umn.edu',
+  region: 'global',
+},
+);
+
+function createUrl(pointer, bucket) {
+  // choosing an image path from the firebase
+  const key = `${pointer}.png`;
+  // setting up the Get command
+  const getObjectParams = {
+    Bucket: bucket,
+    Key: key,
+  };
+  const command = new GetObjectCommand(getObjectParams);
+  // getting the signed URL
+  const url = getSignedUrl(s3Client, command, { expiresIn: 5 });
+  return url;
+}
+
+//init the firebase connection
+var admin = require("firebase-admin");
+const firebaseApp = admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://brainswipes-default-rtdb.firebaseio.com"
+});
+const database = admin.database();
+
+//find firebase user uid from displayname
+async function findUser(displayName){
+  let uid = '';
+  await admin.auth()
+    .listUsers(1000)
+    .then((listUsersResult) => {
+      listUsersResult.users.forEach((userRecord) => {
+        if (userRecord.displayName === displayName){
+          uid = userRecord.uid;
+        }
+      });
+    })
+    .catch((error) => {
+      console.log('Error fetching user data:', error);
+    });
+  return uid;
+}
+
+// standard webpack dev server config
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap, usePostCSS: true })
@@ -31,6 +87,138 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     quiet: true, // necessary for FriendlyErrorsPlugin
     watchOptions: {
       poll: config.dev.poll,
+    },
+    setup(app){ //https://stackoverflow.com/a/47443540
+      app.use(bodyParser.json());
+      app.post('/Image', function (req, res) {
+        (async () => {
+          try {
+            const pointer = req.body.pointer;
+            const bucket = req.body.bucket;
+            // console.log(req.body);
+            if (bucket && pointer) {
+              createUrl(pointer, bucket).then(imageUrl =>{
+                res.send(imageUrl);
+              });  
+            }
+          }
+          catch(err) {
+            console.log(err);
+          }
+        })()
+      });
+      app.post('/setRoles', function (req, res) {
+        (async () => {
+          const obj = req.body.obj;
+          const currentUser = req.body.currentUser;
+          const uid = await findUser(obj.name);
+          let success = false;
+
+          admin.auth()
+            .getUser(currentUser)
+            .then((userRecord) => {
+              if (userRecord.customClaims.admin) {
+                admin.auth().setCustomUserClaims(uid, { admin: obj.admin, datasets: obj.datasets, org: obj.org }).then(() => {
+                  res.send(obj);
+                })
+                .catch((error) => {
+                  console.log('Error setting custom claims:', error);
+                  res.send(null);
+                });
+              }
+            })
+            .catch((error) => {
+              console.log('Error fetching user data:', error);
+              res.send(null);
+            });
+        })()
+      });
+      app.post('/setNewUserRoles', function (req, res) {
+        (async () => {
+          const uid = req.body.uid;
+          const dbRef = database.ref('config/studies');
+          const snap = await dbRef.once('value');
+          const studies = snap.val();
+          const datasets = {};
+          Object.keys(studies).forEach(study => {
+            datasets[study] = studies[study].available;
+          });
+          const defaultRoles = {
+            admin: false,
+            datasets,
+            org: 'No Organization'
+          };
+          admin.auth().setCustomUserClaims(uid, defaultRoles).then(() => {
+            res.send('New user roles set');          
+          })
+          .catch((error) => {
+            console.log('Error setting new user custom claims', error);
+            res.send('Error setting new user roles');
+          });
+        })()
+      });
+      app.post('/getAllUsers', function (req, res) {
+        (async () => {
+          const currentUser = req.body.currentUser;
+          admin.auth()
+            .getUser(currentUser)
+            .then((userRecord) => {
+              if (userRecord.customClaims.admin) {
+                const allUsers = {};
+                admin.auth()
+                  .listUsers(1000)
+                  .then((listUsersResult) => {
+                    listUsersResult.users.forEach((userRecord) => {
+                      allUsers[userRecord.displayName] = userRecord.customClaims;
+                    });
+                    res.send(allUsers);
+                  })
+                  .catch((error) => {
+                    console.log('Error fetching user data:', error);
+                    res.send({});
+                  });
+              } else {
+                res.send({});
+              }
+            }).catch((error) => {
+              console.log('Error getting all users', error);
+              res.send({});
+            });
+        })()
+      });
+      app.post('/addStudy', function (req, res) {
+        (async () => {
+          const currentUser = req.body.currentUser;
+          const study = req.body.study;
+          const available = req.body.available;
+          admin.auth()
+            .getUser(currentUser)
+            .then((userRecord) => {
+              if (userRecord.customClaims.admin) {
+                admin.auth()
+                  .listUsers(1000)
+                  .then((listUsersResult) => {
+                    listUsersResult.users.forEach((userRecord) => {
+                      const uid = userRecord.uid;
+                      const claims = userRecord.customClaims;
+                      claims.datasets[study] = available;
+                      admin.auth().setCustomUserClaims(uid, claims);
+                    });
+                    res.send("Success");
+                  })
+                  .catch((error) => {
+                    console.log('Error updating users:', error);
+                    res.send({});
+                  });
+              } else {
+                res.send({});
+              }
+            }).catch((error) => {
+              console.log('Error getting all users', error);
+              res.send({});
+            });
+        })()
+      });
     }
   },
   plugins: [

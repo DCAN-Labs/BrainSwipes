@@ -195,7 +195,7 @@
        */
       catchDataset: {
         type: String,
-        required: true,
+        required: false,
       },
       catchFrequency: {
         type: Number,
@@ -203,7 +203,7 @@
       },
       catchBucket: {
         type: String,
-        required: true,
+        required: false,
       },
     },
     data() {
@@ -280,7 +280,7 @@
       currentLevel() {
         if (this.userData.score === this.currentLevel.min && this.currentLevel.min) {
           this.$refs.levelUp.show();
-          this.db.ref(`/uids/${this.userInfo.uid}`).child('level').set(this.currentLevel.level);
+          this.db.ref(`/users/${this.userInfo.displayName}`).child('level').set(this.currentLevel.level);
         }
       },
       /**
@@ -521,8 +521,8 @@
       * this method update's the user's score by scoreIncrement;
       */
       updateScore(scoreIncrement) {
-        this.db.ref('uids')
-          .child(this.userInfo.uid)
+        this.db.ref('users')
+          .child(this.userInfo.displayName)
           .child('score')
           .transaction(score => (score || 0) + scoreIncrement);
       },
@@ -590,16 +590,15 @@
         const restricted = !available.val();
         const errors = [];
         const user = firebase.auth().currentUser;
-        const snap = await vm._props.db.ref(`uids/${user.uid}`).once('value');
-        const currentUserInfo = snap.val();
-        const userAllowed = currentUserInfo.datasets[to.params.dataset];
+        const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+        const userAllowed = idTokenResult.claims.datasets[to.params.dataset];
         if (to.params.dataset !== vm.dataset) {
           vm.$router.push({ name: 'Home' });
         } else if (restricted) {
           const email = user.email;
           const identities = await vm._props.getGlobusIdentities(vm._props.globusToken);
           /* eslint-enable no-underscore-dangle */
-          const organization = currentUserInfo.organization;
+          const organization = idTokenResult.claims.org;
           if (Object.keys(identities).length === 0) {
             errors.push(1);
           } else if (!identities[email]) {
