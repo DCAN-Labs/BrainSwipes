@@ -67,15 +67,6 @@
     "appId": "1:518258041913:web:ae6cbc61a715d9941659e8",
     "measurementId": "G-YNZSDHFLC7"
   },
-  "play": {
-    "blankImage": "https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_blank_canvas.svg?sanitize=true"
-  },
-  "chats": {
-    "blankImage": "https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_no_data.svg?sanitize=true"
-  },
-  "profile": {
-    "blankImage": "https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_chatting.svg?sanitize=true"
-  },
   "tutorial": {
     "bucket": "brainswipes",
     "dataset": "BCP",

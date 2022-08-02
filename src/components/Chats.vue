@@ -76,6 +76,11 @@ export default {
        * if the user is allowed to see this dataset
        */
       allowed: false,
+      /**
+       * A blank image from the original SwipesForScience.
+       * If this.noData is true, this image is rendered.
+       */
+      blankChatImage: 'https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_no_data.svg?sanitize=true',
     };
   },
   props: {
@@ -140,20 +145,14 @@ export default {
       const chats = this.sampleChat;
       return chats.reverse();
     },
-    /**
-     * A blank image from the config file. If this.noData is true, this image is rendered.
-     */
-    blankChatImage() {
-      return this.config.chats.blankImage;
-    },
     btoaBucket() {
       return btoa(this.bucket);
     },
   },
   /**
    * Prevents navigation to Chats when the dataset prop does not match the route name
-    * or if globus authentication is incorrect
-    */
+  * or if globus authentication is incorrect
+  */
   beforeRouteEnter(to, from, next) {
     next(async (vm) => {
       /* eslint-disable no-underscore-dangle */
@@ -161,16 +160,15 @@ export default {
       const restricted = !available.val();
       const errors = [];
       const user = firebase.auth().currentUser;
-      const snap = await vm._props.db.ref(`uids/${user.uid}`).once('value');
-      const currentUserInfo = snap.val();
-      const userAllowed = currentUserInfo.datasets[to.params.dataset];
+      const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+      const userAllowed = idTokenResult.claims.datasets[to.params.dataset];
       if (to.params.dataset !== vm.dataset) {
-        vm.$router.replace({ name: 'Home' });
+        vm.$router.push({ name: 'Home' });
       } else if (restricted) {
         const email = user.email;
         const identities = await vm._props.getGlobusIdentities(vm._props.globusToken);
         /* eslint-enable no-underscore-dangle */
-        const organization = currentUserInfo.organization;
+        const organization = idTokenResult.claims.org;
         if (Object.keys(identities).length === 0) {
           errors.push(1);
         } else if (!identities[email]) {
@@ -181,7 +179,7 @@ export default {
           errors.push(4);
         }
       } if (errors.length) {
-        vm.$router.replace({ name: 'Restricted', query: { errors } });
+        vm.$router.push({ name: 'Restricted', query: { errors } });
       } else if (userAllowed) {
       /* eslint-disable */
       vm.allowed = true;

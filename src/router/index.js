@@ -162,6 +162,15 @@ const router = new Router({
   ],
 });
 
+/**
+ * Check user roles and access
+ */
+async function getUserRoles() {
+  const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+  const userRoles = idTokenResult.claims;
+  return userRoles;
+}
+
 router.beforeEach((to, from, next) => {
   const currentUser = firebase.auth().currentUser;
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
@@ -174,7 +183,7 @@ router.beforeEach((to, from, next) => {
   // make sure the user has take the tutorial
   if (to.name === 'Play') {
     if (currentUser) {
-      firebase.database().ref(`/uids/${currentUser.uid}`).once('value')
+      firebase.database().ref(`/users/${currentUser.displayName}`).once('value')
         .then((snap) => {
           const data = snap.val();
           if (!data.taken_tutorial) {
@@ -188,22 +197,18 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAccess) {
     const dataset = to.params.dataset;
-    firebase.database().ref(`/uids/${currentUser.uid}/datasets`).once('value')
-      .then((snap) => {
-        const data = snap.val();
-        if (!data[dataset]) {
-          next({ path: '/unauthorized', query: from.query });
-        }
-      });
+    getUserRoles().then((userRoles) => {
+      if (!userRoles.datasets[dataset]) {
+        next({ path: '/unauthorized', query: from.query });
+      }
+    });
   }
 
   if (requiresAdmin) {
-    // console.log('requires admin');
-    firebase.database().ref(`/uids/${currentUser.uid}/admin`).once('value')
-    .then((snap) => {
-      // console.log('snap is', snap.val());
-      if (requiresAdmin && !snap.val()) next('unauthorized');
-      else next();
+    getUserRoles().then((userRoles) => {
+      if (!userRoles.admin) {
+        next({ path: '/unauthorized', query: from.query });
+      } else next();
     });
   } else {
     next();

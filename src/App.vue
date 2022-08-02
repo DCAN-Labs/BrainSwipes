@@ -45,7 +45,7 @@
           @changePermissions="updateDatasetPermissions"
           :studies="studies"
           :bucket="bucket"
-          @login="activateDatasets"
+          @login="getUserDatasets"
           :key="$route.fullPath"
           :globusToken="globusToken"
           @globusLogin="globusLogin"
@@ -54,7 +54,6 @@
           :errorCodes="errorCodes"
           :maintenanceDate="maintenanceDate"
           :maintenanceStatus="maintenanceStatus"
-          :catchTrials="catchTrials"
           :catchDataset="catchDataset"
           :catchBucket="catchBucket"
           :catchFrequency="catchFrequency"
@@ -147,7 +146,7 @@ export default {
        */
       showConfig: false,
       /**
-       * All the users in the /uids document
+       * All the users in the /users document
        */
       allUsers: [],
       /**
@@ -199,7 +198,6 @@ export default {
       /**
        * catch trials configuration
        */
-      catchTrials: [],
       catchDataset: '',
       catchFrequency: 0,
       catchBucket: '',
@@ -227,7 +225,7 @@ export default {
   firebase() {
     return {
       allUsers: {
-        source: this.db.ref('/uids/').orderByChild('score'),
+        source: this.db.ref('/users/').orderByChild('score'),
         asObject: true,
       },
     };
@@ -241,7 +239,7 @@ export default {
     },
     /**
      * the current user's data, based on the userInfo from the firebase.auth.
-     * this matches the info in allUsers (/uids) to the firebase.auth user info.
+     * this matches the info in allUsers (/users) to the firebase.auth user info.
      */
     userData() {
       let data = {};
@@ -252,7 +250,7 @@ export default {
       }
 
       _.map(this.allUsers, (value, key) => {
-        if (value.username === this.userInfo.displayName) {
+        if (key === this.userInfo.displayName) {
           data = value;
           data['.key'] = key;
         }
@@ -316,7 +314,7 @@ export default {
      */
     setTutorial(val) {
       this.db
-        .ref(`/uids/${this.userInfo.uid}`)
+        .ref(`/users/${this.userInfo.displayName}`)
         .child('taken_tutorial')
         .set(val);
       this.$router.replace('play');
@@ -331,17 +329,15 @@ export default {
     /**
      * What datasets the user can access
      */
-    async activateDatasets() {
-      const currentUser = firebase.auth().currentUser;
-      if (currentUser) {
-        firebase.database().ref(`/uids/${currentUser.uid}/datasets`).once('value')
-          .then((snap) => {
-            this.datasetPrivileges = snap.val();
-          });
+    async getUserDatasets() {
+      if (firebase.auth().currentUser) {
+        firebase.auth().currentUser.getIdTokenResult(true).then((idTokenResult) => {
+          this.datasetPrivileges = idTokenResult.claims.datasets;
+        });
       }
     },
     updateDatasetPermissions() {
-      this.activateDatasets();
+      this.getUserDatasets();
     },
     async getStudies() {
       this.db.ref('config/studies').on('value', (snap) => {
@@ -384,9 +380,6 @@ export default {
       this.db.ref('config/catchTrials').once('value', (snap) => {
         this.catchDataset = snap.val().dataset;
         this.catchFrequency = snap.val().frequency;
-        this.db.ref(`datasets/${this.catchDataset}/sampleCounts`).once('value', (snap2) => {
-          this.catchTrials = Object.keys(snap2.val());
-        });
         this.db.ref(`config/studies/${this.catchDataset}/bucket`).once('value', (snap3) => {
           this.catchBucket = snap3.val();
         });
@@ -397,7 +390,7 @@ export default {
    * intialize the animate on scroll library (for tutorial) and listen to authentication state
    */
   async created() {
-    await this.activateDatasets();
+    await this.getUserDatasets();
     await this.getStudies();
     await this.getGlobusAllowdOrgs();
     await this.getMaintenanceStatus();

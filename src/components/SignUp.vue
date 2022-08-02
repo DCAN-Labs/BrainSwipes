@@ -180,12 +180,12 @@
           this.errors.message = `Username cannot contain the following characters: ${specialChars}`;
         } else {
           // check for a unique username
-          firebase.database().ref('uids').once('value')
+          firebase.database().ref('users').once('value')
             .then((snapshot) => {
               let usernameExists = false;
               const val = snapshot.val();
-              Object.keys(val).forEach((uid) => {
-                if (val[uid].username === this.form.username) {
+              Object.keys(val).forEach((user) => {
+                if (user === this.form.username) {
                   usernameExists = true;
                 }
               });
@@ -234,23 +234,19 @@
         });
       },
       /**
-       * A method to insert a new user into the `/uids` document of firebase.
+       * A method to insert a new user into the `/users` document of firebase.
        * This initializes the user's score, level, whether or not they've consented.
        * and when they consented.
        * **TODO**: set an error message if something goes wrong here.
        */
       insertUser() {
         const date = new Date();
-        firebase.database().ref('uids').child(firebase.auth().currentUser.uid).set({
+        firebase.database().ref('users').child(firebase.auth().currentUser.displayName).set({
           score: 0,
           level: 0,
-          admin: false,
           taken_tutorial: false,
           consent: this.form.consented,
           consentedOn: date,
-          datasets: this.studyPermissions,
-          username: firebase.auth().currentUser.displayName,
-          organization: 'No Organization',
         })
         .then(() => {
         })
@@ -265,16 +261,43 @@
         firebase.auth().currentUser.updateProfile({
           displayName: this.form.username,
         }).then(() => {
+          this.setUserRoles().then(() => {
             // Profile updated successfully!
-          this.insertUser();
-          firebase.auth().currentUser.sendEmailVerification();
-          this.$emit('changePermissions');
-          this.$router.replace('tutorial');
+            this.insertUser();
+            firebase.auth().currentUser.sendEmailVerification();
+            this.$emit('changePermissions');
+            this.$router.replace('tutorial');
+          }, (err) => {
+            this.errors.show = true;
+            this.errors.message = `SetRoles: ${err.message}`;
+          });
         }, (err) => {
             // An error happened.
           this.errors.show = true;
           this.errors.message = err.message;
         });
+      },
+      /**
+       * Posts the user roles to the server
+       */
+      requestUserRolesUpdate() {
+        const uid = firebase.auth().currentUser.uid;
+        return new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/setNewUserRoles', true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.onload = resolve;
+          xhr.onerror = reject;
+          xhr.send(JSON.stringify({
+            uid,
+          }));
+        });
+      },
+      async setUserRoles() {
+        const userRoles = await this.requestUserRolesUpdate().then(data =>
+          data.currentTarget.responseText,
+        );
+        return userRoles;
       },
     },
   };

@@ -88,6 +88,7 @@
 
 <script>
 import _ from 'lodash';
+import firebase from 'firebase/app';
 
 /** Manifest panel for the /manifest route.
  * The manifest panel syncs data from the uploaded file. Only people
@@ -325,17 +326,33 @@ export default {
      */
     setUserDatasetPermissions() {
       const newStudy = this.$refs['new-study-text'].localValue;
-      this.db.ref('/uids').once('value').then((snap) => {
-        snap.forEach((element) => {
-          const userRef = this.db.ref(`/uids/${element.key}/datasets`);
-          const update = {};
-          update[newStudy] = this.available;
-          userRef.update(update);
-        });
-      });
+      this.requestUserRolesUpdate(newStudy, this.available);
     },
     enableForm() {
       this.formDisabled = this.$refs['new-study-text'].localValue.length === 0 || this.$refs['new-bucket-text'].localValue.length === 0;
+    },
+    /**
+     * Request an update of user roles to include new dataset
+     */
+    requestUserRolesUpdate(study, available) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/addStudy', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = resolve;
+        xhr.onerror = reject;
+        xhr.send(JSON.stringify({
+          study,
+          available,
+          currentUser: firebase.auth().currentUser.uid,
+        }));
+      });
+    },
+    async setUserRoles(study, available) {
+      const response = await this.requestUserRolesUpdate(study, available).then(data =>
+        JSON.parse(data.currentTarget.responseText),
+      );
+      console.log(response);
     },
   },
 };

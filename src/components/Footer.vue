@@ -88,12 +88,10 @@ export default {
   methods: {
     async addAdminRoutes() {
       if (firebase.auth().currentUser) {
-        const uid = firebase.auth().currentUser.uid;
-        firebase.database().ref(`/uids/${uid}/admin`).once('value')
-          .then((snap) => {
-            this.isAdmin = snap.val();
-            this.loading = false;
-          });
+        firebase.auth().currentUser.getIdTokenResult(true).then((idTokenResult) => {
+          this.isAdmin = idTokenResult.claims.admin;
+          this.loading = false;
+        });
       } else {
         this.isAdmin = false;
         this.loading = false;
