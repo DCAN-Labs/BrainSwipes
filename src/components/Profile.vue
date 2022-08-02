@@ -21,10 +21,6 @@
         <b-button id="verifyEmail" type="submit" variant="primary">Verify Email</b-button>
       </b-form>
       <hr>
-      <!-- put tips inside review, always on. leaving here because its still in the db and may get used later -->
-      <!-- <h1>{{userData.showTips? 'Tips are on. Click below to turn them off.': 'Tips are off. Click below to turn them on.' }}</h1>
-      <b-button @click="toggleTips">{{userData.showTips? 'ON':'OFF'}}</b-button>
-      <hr> -->
 
       <!-- Chats don't currently work with multiple datasets,
       not worth dealing with right now.
@@ -238,11 +234,6 @@ export default {
     },
     verifyEmail() {
       firebase.auth().currentUser.sendEmailVerification();
-    },
-    toggleTips() {
-      const updates = {};
-      updates[`/uids/${this.userInfo.uid}/showTips`] = !this.userData.showTips;
-      this.db.ref().update(updates);
     },
   },
 };

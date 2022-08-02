@@ -114,6 +114,7 @@ footer {
   padding: 1.25em;
   height: 10vh;
   background-color: white;
+  z-index: 2;
 }
 .footer__container {
   margin: 0 auto;

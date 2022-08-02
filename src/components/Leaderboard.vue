@@ -163,7 +163,7 @@ export default {
   name: 'leaderboard',
   props: {
     /**
-     * it comes directly from the `/uids` document in Firebase.
+     * it comes directly from the `/users` document in Firebase.
      */
     allUsers: {
       type: Object,
