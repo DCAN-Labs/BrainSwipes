@@ -233,6 +233,9 @@ export default {
       this.userList[userRoles.name] = {
         admin: userRoles.admin, datasets: userRoles.datasets, org: userRoles.org };
     },
+    /**
+     * gets user roles from the server
+     */
     requestAllUserRoles() {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();

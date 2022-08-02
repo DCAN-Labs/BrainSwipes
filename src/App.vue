@@ -331,23 +331,10 @@ export default {
      */
     async getUserDatasets() {
       if (firebase.auth().currentUser) {
-        const userRoles = await this.requestUserDatasets().then(data =>
-          JSON.parse(data.currentTarget.responseText),
-        );
-        this.datasetPrivileges = userRoles.datasets;
+        firebase.auth().currentUser.getIdTokenResult(true).then((idTokenResult) => {
+          this.datasetPrivileges = idTokenResult.claims.datasets;
+        });
       }
-    },
-    requestUserDatasets() {
-      return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/getRoles', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onload = resolve;
-        xhr.onerror = reject;
-        xhr.send(JSON.stringify({
-          user: firebase.auth().currentUser.uid,
-        }));
-      });
     },
     updateDatasetPermissions() {
       this.getUserDatasets();

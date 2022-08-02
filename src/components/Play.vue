@@ -203,7 +203,7 @@
        */
       catchDataset: {
         type: String,
-        required: true,
+        required: false,
       },
       catchFrequency: {
         type: Number,
@@ -211,7 +211,7 @@
       },
       catchBucket: {
         type: String,
-        required: true,
+        required: false,
       },
     },
     data() {
@@ -588,27 +588,15 @@
         const restricted = !available.val();
         const errors = [];
         const user = firebase.auth().currentUser;
-        const userInfoRequest = new Promise((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open('POST', '/getRoles', true);
-          xhr.setRequestHeader('Content-Type', 'application/json');
-          xhr.onload = resolve;
-          xhr.onerror = reject;
-          xhr.send(JSON.stringify({
-            user: user.uid,
-          }));
-        });
-        const userRoles = await userInfoRequest.then(data =>
-          JSON.parse(data.currentTarget.responseText),
-        );
-        const userAllowed = userRoles.datasets[to.params.dataset];
+        const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+        const userAllowed = idTokenResult.claims.datasets[to.params.dataset];
         if (to.params.dataset !== vm.dataset) {
           vm.$router.push({ name: 'Home' });
         } else if (restricted) {
           const email = user.email;
           const identities = await vm._props.getGlobusIdentities(vm._props.globusToken);
           /* eslint-enable no-underscore-dangle */
-          const organization = userRoles.org;
+          const organization = idTokenResult.claims.org;
           if (Object.keys(identities).length === 0) {
             errors.push(1);
           } else if (!identities[email]) {

@@ -159,25 +159,9 @@ const router = new Router({
 /**
  * Check user roles and access
  */
-function requestUserRoles() {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/getRoles', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = resolve;
-    xhr.onerror = reject;
-    xhr.send(JSON.stringify({
-      user: firebase.auth().currentUser.uid,
-    }));
-  });
-}
 async function getUserRoles() {
-  let userRoles = {};
-  if (firebase.auth().currentUser) {
-    userRoles = await requestUserRoles().then(data =>
-      JSON.parse(data.currentTarget.responseText),
-    );
-  }
+  const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+  const userRoles = idTokenResult.claims;
   return userRoles;
 }
 

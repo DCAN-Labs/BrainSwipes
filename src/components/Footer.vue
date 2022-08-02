@@ -88,8 +88,8 @@ export default {
   methods: {
     async addAdminRoutes() {
       if (firebase.auth().currentUser) {
-        this.getUserRoles().then((userRoles) => {
-          this.isAdmin = userRoles.admin;
+        firebase.auth().currentUser.getIdTokenResult(true).then((idTokenResult) => {
+          this.isAdmin = idTokenResult.claims.admin;
           this.loading = false;
         });
       } else {
@@ -103,30 +103,6 @@ export default {
     routeToChats(label) {
       this.$emit('changeDataset', label);
       this.$router.push({ name: 'Chats', params: { dataset: label } });
-    },
-    /**
-     * Check user roles and access
-     */
-    requestUserRoles() {
-      return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/getRoles', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onload = resolve;
-        xhr.onerror = reject;
-        xhr.send(JSON.stringify({
-          user: firebase.auth().currentUser.uid,
-        }));
-      });
-    },
-    async getUserRoles() {
-      let userRoles = {};
-      if (firebase.auth().currentUser) {
-        userRoles = await this.requestUserRoles().then(data =>
-          JSON.parse(data.currentTarget.responseText),
-        );
-      }
-      return userRoles;
     },
   },
 };

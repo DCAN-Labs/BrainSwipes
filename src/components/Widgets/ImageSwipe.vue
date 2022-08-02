@@ -132,11 +132,11 @@
        */
       catchBucket: {
         type: String,
-        required: true,
+        required: false,
       },
       catchDataset: {
         type: String,
-        required: true,
+        required: false,
       },
     },
     components: { VueHammer, GridLoader },

@@ -244,13 +244,10 @@
         firebase.database().ref('uids').child(firebase.auth().currentUser.uid).set({
           score: 0,
           level: 0,
-          admin: false,
           taken_tutorial: false,
           consent: this.form.consented,
           consentedOn: date,
-          datasets: this.studyPermissions,
           username: firebase.auth().currentUser.displayName,
-          organization: 'No Organization',
         })
         .then(() => {
         })
@@ -265,16 +262,43 @@
         firebase.auth().currentUser.updateProfile({
           displayName: this.form.username,
         }).then(() => {
+          this.setUserRoles().then(() => {
             // Profile updated successfully!
-          this.insertUser();
-          firebase.auth().currentUser.sendEmailVerification();
-          this.$emit('changePermissions');
-          this.$router.replace('tutorial');
+            this.insertUser();
+            firebase.auth().currentUser.sendEmailVerification();
+            this.$emit('changePermissions');
+            this.$router.replace('tutorial');
+          }, (err) => {
+            this.errors.show = true;
+            this.errors.message = `SetRoles: ${err.message}`;
+          });
         }, (err) => {
             // An error happened.
           this.errors.show = true;
           this.errors.message = err.message;
         });
+      },
+      /**
+       * Posts the user roles to the server
+       */
+      requestUserRolesUpdate() {
+        const uid = firebase.auth().currentUser.uid;
+        return new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/setNewUserRoles', true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.onload = resolve;
+          xhr.onerror = reject;
+          xhr.send(JSON.stringify({
+            uid,
+          }));
+        });
+      },
+      async setUserRoles() {
+        const userRoles = await this.requestUserRolesUpdate().then(data =>
+          data.currentTarget.responseText,
+        );
+        return userRoles;
       },
     },
   };

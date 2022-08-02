@@ -43,6 +43,7 @@ const firebaseApp = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://brainswipes-default-rtdb.firebaseio.com"
 });
+const database = admin.database();
 
 //find firebase user uid from displayname
 async function findUser(displayName){
@@ -132,17 +133,28 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             });
         })()
       });
-      app.post('/getRoles', function (req, res) {
+      app.post('/setNewUserRoles', function (req, res) {
         (async () => {
-          const user = req.body.user;
-          admin.auth()
-            .getUser(user)
-            .then((userRecord) => {
-              res.send(userRecord.customClaims);
-            }).catch((error) => {
-              console.log('Error getting custom claims:', error);
-              res.send(null);
-            });
+          const uid = req.body.uid;
+          const dbRef = database.ref('config/studies');
+          const snap = await dbRef.once('value');
+          const studies = snap.val();
+          const datasets = {};
+          Object.keys(studies).forEach(study => {
+            datasets[study] = studies[study].available;
+          });
+          const defaultRoles = {
+            admin: false,
+            datasets,
+            org: 'No Organization'
+          };
+          admin.auth().setCustomUserClaims(uid, defaultRoles).then(() => {
+            res.send('New user roles set');          
+          })
+          .catch((error) => {
+            console.log('Error setting new user custom claims', error);
+            res.send('Error setting new user roles');
+          });
         })()
       });
       app.post('/getAllUsers', function (req, res) {
