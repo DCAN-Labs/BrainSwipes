@@ -160,18 +160,63 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       app.post('/getAllUsers', function (req, res) {
         (async () => {
           const currentUser = req.body.currentUser;
-          const allUsers = {};
-          await admin.auth()
-            .listUsers(1000)
-            .then((listUsersResult) => {
-              listUsersResult.users.forEach((userRecord) => {
-                allUsers[userRecord.displayName] = userRecord.customClaims;
-              });
-            })
-            .catch((error) => {
-              console.log('Error fetching user data:', error);
+          admin.auth()
+            .getUser(currentUser)
+            .then((userRecord) => {
+              if (userRecord.customClaims.admin) {
+                const allUsers = {};
+                admin.auth()
+                  .listUsers(1000)
+                  .then((listUsersResult) => {
+                    listUsersResult.users.forEach((userRecord) => {
+                      allUsers[userRecord.displayName] = userRecord.customClaims;
+                    });
+                    res.send(allUsers);
+                  })
+                  .catch((error) => {
+                    console.log('Error fetching user data:', error);
+                    res.send({});
+                  });
+              } else {
+                res.send({});
+              }
+            }).catch((error) => {
+              console.log('Error getting all users', error);
+              res.send({});
             });
-          res.send(allUsers);
+        })()
+      });
+      app.post('/addStudy', function (req, res) {
+        (async () => {
+          const currentUser = req.body.currentUser;
+          const study = req.body.study;
+          const available = req.body.available;
+          admin.auth()
+            .getUser(currentUser)
+            .then((userRecord) => {
+              if (userRecord.customClaims.admin) {
+                admin.auth()
+                  .listUsers(1000)
+                  .then((listUsersResult) => {
+                    listUsersResult.users.forEach((userRecord) => {
+                      const uid = userRecord.uid;
+                      const claims = userRecord.customClaims;
+                      claims.datasets[study] = available;
+                      admin.auth().setCustomUserClaims(uid, claims);
+                    });
+                    res.send("Success");
+                  })
+                  .catch((error) => {
+                    console.log('Error updating users:', error);
+                    res.send({});
+                  });
+              } else {
+                res.send({});
+              }
+            }).catch((error) => {
+              console.log('Error getting all users', error);
+              res.send({});
+            });
         })()
       });
     }
