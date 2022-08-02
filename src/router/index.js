@@ -177,7 +177,7 @@ router.beforeEach((to, from, next) => {
   // make sure the user has take the tutorial
   if (to.name === 'Play') {
     if (currentUser) {
-      firebase.database().ref(`/uids/${currentUser.uid}`).once('value')
+      firebase.database().ref(`/users/${currentUser.displayName}`).once('value')
         .then((snap) => {
           const data = snap.val();
           if (!data.taken_tutorial) {

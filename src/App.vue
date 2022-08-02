@@ -146,7 +146,7 @@ export default {
        */
       showConfig: false,
       /**
-       * All the users in the /uids document
+       * All the users in the /users document
        */
       allUsers: [],
       /**
@@ -225,7 +225,7 @@ export default {
   firebase() {
     return {
       allUsers: {
-        source: this.db.ref('/uids/').orderByChild('score'),
+        source: this.db.ref('/users/').orderByChild('score'),
         asObject: true,
       },
     };
@@ -239,7 +239,7 @@ export default {
     },
     /**
      * the current user's data, based on the userInfo from the firebase.auth.
-     * this matches the info in allUsers (/uids) to the firebase.auth user info.
+     * this matches the info in allUsers (/users) to the firebase.auth user info.
      */
     userData() {
       let data = {};
@@ -250,7 +250,7 @@ export default {
       }
 
       _.map(this.allUsers, (value, key) => {
-        if (value.username === this.userInfo.displayName) {
+        if (key === this.userInfo.displayName) {
           data = value;
           data['.key'] = key;
         }
@@ -314,7 +314,7 @@ export default {
      */
     setTutorial(val) {
       this.db
-        .ref(`/uids/${this.userInfo.uid}`)
+        .ref(`/users/${this.userInfo.displayName}`)
         .child('taken_tutorial')
         .set(val);
       this.$router.replace('play');

@@ -171,7 +171,7 @@ export default {
       required: true,
     },
     /**
-     * it comes directly from the `/uids` document in Firebase.
+     * it comes directly from the `/users` document in Firebase.
      */
     allUsers: {
       type: Object,
@@ -182,11 +182,11 @@ export default {
     sortedUsersList() {
       /* Removes '.key' property present on allUsers data */
       let allUsernames = Object.keys(this.allUsers).filter(
-        uid => uid !== '.key',
+        user => user !== '.key',
       );
       // eslint-disable-next-line
-      allUsernames = allUsernames.map((uid) => {
-        return { name: this.allUsers[uid].username, score: this.allUsers[uid].score };
+      allUsernames = allUsernames.map((user) => {
+        return { name: user, score: this.allUsers[user].score };
       });
       /* Sort descending by score */
       allUsernames.sort((a, b) => b.score - a.score);

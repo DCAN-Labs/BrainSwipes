@@ -288,7 +288,7 @@
       currentLevel() {
         if (this.userData.score === this.currentLevel.min && this.currentLevel.min) {
           this.$refs.levelUp.show();
-          this.db.ref(`/uids/${this.userInfo.uid}`).child('level').set(this.currentLevel.level);
+          this.db.ref(`/users/${this.userInfo.displayName}`).child('level').set(this.currentLevel.level);
         }
       },
       /**
@@ -519,8 +519,8 @@
       * this method update's the user's score by scoreIncrement;
       */
       updateScore(scoreIncrement) {
-        this.db.ref('uids')
-          .child(this.userInfo.uid)
+        this.db.ref('users')
+          .child(this.userInfo.displayName)
           .child('score')
           .transaction(score => (score || 0) + scoreIncrement);
       },

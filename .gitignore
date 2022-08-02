@@ -21,4 +21,5 @@ selenium-debug.log
 src/firebaseConfig.js
 brainswipes-firebase-adminsdk.json
 
+# MSI credentials
 msiKeys.json
