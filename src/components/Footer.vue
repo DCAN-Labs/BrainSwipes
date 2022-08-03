@@ -89,7 +89,8 @@ export default {
     async addAdminRoutes() {
       if (firebase.auth().currentUser) {
         firebase.auth().currentUser.getIdTokenResult(true).then((idTokenResult) => {
-          this.isAdmin = idTokenResult.claims.admin;
+          this.isAdmin = idTokenResult.claims.admin
+            || Object.values(idTokenResult.claims.studyAdmin).includes(true);
           this.loading = false;
         });
       } else {

@@ -4,31 +4,48 @@
     <b-modal id="modifyuser" :title="`Modifying permissions for ${userModified.name}`"
       ref="modifyuser" size="lg">
       <div>
-        <table>
-          <tr>
-            <th>Admin</th>
-            <th v-for="study in Object.keys(studies)" :key="study">{{study}}</th>
-          </tr>
-          <tr>
-            <td>
+        <div id="brainswipes-admin">
+          <h2>Admin Level</h2>
+          <div class="admin-buttons">
+            <div v-if="userList[userData.username].admin">
+              <h3>BrainSwipes Admin</h3>
               <b-button variant="warning" @click="changeAdmin(userModified.admin)">{{userModified.admin}}</b-button>
-            </td>
-            <td v-for="(value, dataset) in userModified.datasets" :key="dataset">
-              <b-button variant="danger" @click="changeDatasetAccess(dataset, userModified.datasets[dataset])">{{value}}</b-button>
-            </td>
-          </tr>
-        </table>
-        <br>
+            </div>
+            <div>
+              <h3>Study Admin</h3>
+              <div id="study-admin-list">
+                <div v-for="(value, dataset) in userModified.studyAdmin" :key="dataset" v-show="userList[userData.username].studyAdmin[dataset] || userList[userData.username].admin">
+                  <div v-if="userList[userData.username].studyAdmin[dataset] || userList[userData.username].admin">
+                    <b-button :variant="value ? 'success' : 'outline-danger'" @click="changeStudyAdmin(dataset, value)">{{dataset}}</b-button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr>
+        <div id="study-access">
+          <h2>Study Access</h2>
+          <div id="study-access-list">
+            <div v-for="(value, dataset) in userModified.datasets" :key="dataset" v-show="userList[userData.username].studyAdmin[dataset] || userList[userData.username].admin">
+              <div v-if="userList[userData.username].studyAdmin[dataset] || userList[userData.username].admin">
+                <b-button :variant="value ? 'success' : 'outline-danger'" @click="changeDatasetAccess(dataset, value)">{{dataset}}</b-button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr>
         <div id="organizations">
           <h2>Associated Organization</h2>
-          <b-dropdown id="orgdropdown" :text="userModified.org" class="m-md-2">
+          <b-dropdown id="orgdropdown" :disabled="!userList[userData.username].admin" :text="userModified.org" class="m-md-2">
             <b-dropdown-item v-for="org in globusAllowedOrgs" :key="org" @click="changeOrg(org)">{{org}}</b-dropdown-item>
           </b-dropdown>
+          <p>Contact a BrainSwipes site-wide admin to change this</p>
         </div>
       </div>
       <div slot="modal-footer" class="w-100">
-          <b-button @click="closeDialogSubmit" type="submit" variant="primary">Submit</b-button>
-          <b-button @click="closeDialogCancel" type="submit" variant="primary">Cancel</b-button>
+        <b-button @click="closeDialogSubmit" type="submit" variant="primary">Submit</b-button>
+        <b-button @click="closeDialogCancel" type="submit" variant="primary">Cancel</b-button>
       </div>
 
     </b-modal>
@@ -39,6 +56,7 @@
         <p class="mt-3 pt-3 lead">loading...</p>
       </div>
       <div v-else class="user-div">
+        <p>Users only appear here if they have completed the tutorial</p>
         <table id="user-table">
           <tr>
             <th>User</th>
@@ -47,11 +65,11 @@
           </tr>
           <tr v-for="user in Object.keys(userList).sort((a, b) => { return (b > a)? -1 : 1 })" :key="user">
             <td><b-button variant="outline-dark" @click="modifyUser(user, userList[user])">{{user}}</b-button></td>
-            <td>{{ userList[user].admin }}</td>
+            <td>{{ userList[user].admin ? 'BrainSwipes': Object.values(userList[user].studyAdmin).includes(true)? 'Study' : ''}}</td>
             <td>
-              <table>
+              <table class="studiesTable">
                 <tr>
-                  <th v-for="study in Object.keys(studies)" :key="study" :class="{ red: userList[user].datasets? !userList[user].datasets[study] : false, green: userList[user].datasets? userList[user].datasets[study] : false }">{{study}}</th>
+                  <th v-for="study in Object.keys(studies)" :key="study" v-show="userList[userData.username].studyAdmin[study] || userList[userData.username].admin" :class="{ red: userList[user].datasets? !userList[user].datasets[study] : false, green: userList[user].datasets? userList[user].datasets[study] : false }">{{study}}</th>
                 </tr>
               </table>
             </td>
@@ -88,10 +106,29 @@ th {
 .green {
   background-color: green;
 }
+.studiesTable th{
+  border: 2px solid black;
+}
+.admin-buttons{
+  display: flex;
+  justify-content: space-around;
+}
+#modifyuser h2{
+  font-weight: bold;
+  font-size: 1.3em;
+}
+#modifyuser h3{
+  font-size: 1.1em;
+}
+#study-access-list, #study-admin-list{
+  display: flex;
+  justify-content: space-around;
+}
 </style>
 
 <script>
 import firebase from 'firebase/app';
+import _ from 'lodash';
 import Flask from './Animations/Flask';
 
 /** User Management panel for the /user route.
@@ -104,7 +141,7 @@ export default {
   data() {
     return {
       /**
-       * list of users in Firebase
+       * list of users in Firebase auth
        */
       userList: {},
       /**
@@ -119,6 +156,7 @@ export default {
         admin: '',
         datasets: {},
         org: '',
+        studyAdmin: {},
       },
     };
   },
@@ -144,6 +182,17 @@ export default {
       type: Array,
       required: true,
     },
+    /**
+     * it comes directly from the `/users` document in Firebase.
+     */
+    allUsers: {
+      type: Object,
+      required: true,
+    },
+    userData: {
+      type: Object,
+      required: true,
+    },
   },
   async created() {
     await this.getAllUserRoles();
@@ -162,6 +211,7 @@ export default {
       this.userModified.admin = valueCopy.admin;
       this.userModified.datasets = valueCopy.datasets;
       this.userModified.org = valueCopy.org;
+      this.userModified.studyAdmin = valueCopy.studyAdmin;
       this.$refs.modifyuser.show();
     },
     /**
@@ -211,6 +261,16 @@ export default {
       this.userModified.org = value;
     },
     /**
+     * Adds or removes study specific admin status
+     */
+    changeStudyAdmin(study, value) {
+      if (value) {
+        this.userModified.studyAdmin[study] = false;
+      } else {
+        this.userModified.studyAdmin[study] = true;
+      }
+    },
+    /**
      * Posts the user roles to the server
      */
     requestUserRolesUpdate(obj) {
@@ -231,7 +291,10 @@ export default {
         JSON.parse(data.currentTarget.responseText),
       );
       this.userList[userRoles.name] = {
-        admin: userRoles.admin, datasets: userRoles.datasets, org: userRoles.org };
+        admin: userRoles.admin,
+        datasets: userRoles.datasets,
+        org: userRoles.org,
+        studyAdmin: userRoles.studyAdmin };
     },
     /**
      * gets user roles from the server
@@ -249,10 +312,13 @@ export default {
       });
     },
     async getAllUserRoles() {
-      const userList = await this.requestAllUserRoles().then(data =>
+      const authUserList = await this.requestAllUserRoles().then(data =>
         JSON.parse(data.currentTarget.responseText),
       );
-      this.userList = userList;
+      const filteredUserList = _.pick(authUserList, Object.keys(
+        _.pickBy(this.allUsers, user => user.taken_tutorial),
+      ));
+      this.userList = filteredUserList;
       this.loading = false;
     },
   },

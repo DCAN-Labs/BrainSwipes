@@ -118,7 +118,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             .getUser(currentUser)
             .then((userRecord) => {
               if (userRecord.customClaims.admin) {
-                admin.auth().setCustomUserClaims(uid, { admin: obj.admin, datasets: obj.datasets, org: obj.org }).then(() => {
+                admin.auth().setCustomUserClaims(uid, { admin: obj.admin, datasets: obj.datasets, org: obj.org, studyAdmin:obj.studyAdmin }).then(() => {
                   res.send(obj);
                 })
                 .catch((error) => {
@@ -163,7 +163,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           admin.auth()
             .getUser(currentUser)
             .then((userRecord) => {
-              if (userRecord.customClaims.admin) {
+              if (userRecord.customClaims.admin || Object.values(userRecord.customClaims.studyAdmin).includes(true)) {
                 const allUsers = {};
                 admin.auth()
                   .listUsers(1000)
