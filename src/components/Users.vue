@@ -1,7 +1,7 @@
 <template>
   <div id="users">
     <h1> Manage Users </h1>
-    <b-modal id="modifyuser" :title="`Modifying permissions for ${userModified.name}`"
+    <b-modal id="modifyuser" v-if="!loading" :title="`Modifying permissions for ${userModified.name}`"
       ref="modifyuser" size="lg">
       <div>
         <div id="brainswipes-admin">

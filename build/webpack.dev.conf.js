@@ -112,14 +112,31 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           const obj = req.body.obj;
           const currentUser = req.body.currentUser;
           const uid = await findUser(obj.name);
-          let success = false;
 
           admin.auth()
             .getUser(currentUser)
-            .then((userRecord) => {
-              if (userRecord.customClaims.admin) {
-                admin.auth().setCustomUserClaims(uid, { admin: obj.admin, datasets: obj.datasets, org: obj.org, studyAdmin:obj.studyAdmin }).then(() => {
+            .then((currentUserRecord) => {
+              if (currentUserRecord.customClaims.admin) {
+                admin.auth().setCustomUserClaims(uid, { admin: obj.admin, datasets: obj.datasets, org: obj.org, studyAdmin: obj.studyAdmin }).then(() => {
                   res.send(obj);
+                })
+                .catch((error) => {
+                  console.log('Error setting custom claims:', error);
+                  res.send(null);
+                });
+              } else if (Object.values(currentUserRecord.customClaims.studyAdmin).includes(true)) {
+                admin.auth().getUser(uid).then((updateUserRecord) => {
+                  const claims = updateUserRecord.customClaims;
+                  Object.keys(currentUserRecord.customClaims.studyAdmin).forEach(study => {
+                    if (currentUserRecord.customClaims.studyAdmin[study]) {
+                      claims.datasets[study] = obj.datasets[study];
+                      claims.studyAdmin[study] = obj.studyAdmin[study];
+                    }
+                  });
+                  console.log(claims);
+                  admin.auth().setCustomUserClaims(uid, { admin: claims.admin, datasets: claims.datasets, org: claims.org, studyAdmin: claims.studyAdmin }).then(() => {
+                    res.send({ ...{ name: obj.name }, ...claims });
+                  })
                 })
                 .catch((error) => {
                   console.log('Error setting custom claims:', error);
@@ -131,6 +148,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
               console.log('Error fetching user data:', error);
               res.send(null);
             });
+          console.log(currentUser, obj.name);
         })()
       });
       app.post('/setNewUserRoles', function (req, res) {
@@ -140,13 +158,16 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           const snap = await dbRef.once('value');
           const studies = snap.val();
           const datasets = {};
+          const studyAdmin = {};
           Object.keys(studies).forEach(study => {
             datasets[study] = studies[study].available;
+            studyAdmin[study] = false;
           });
           const defaultRoles = {
             admin: false,
             datasets,
-            org: 'No Organization'
+            org: 'No Organization',
+            studyAdmin
           };
           admin.auth().setCustomUserClaims(uid, defaultRoles).then(() => {
             res.send('New user roles set');          
