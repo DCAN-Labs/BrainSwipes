@@ -253,6 +253,7 @@ export default {
         if (key === this.userInfo.displayName) {
           data = value;
           data['.key'] = key;
+          data.username = key;
         }
       });
       return data;
