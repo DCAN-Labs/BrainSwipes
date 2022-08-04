@@ -15,6 +15,7 @@ import Review from '@/components/Review';
 import Chats from '@/components/Chats';
 import Users from '@/components/Users';
 import Manifest from '@/components/Manifest';
+import Visualization from '@/components/Visualization';
 import Restricted from '@/components/Restricted';
 import Results from '@/components/Results';
 import firebase from 'firebase/app';
@@ -91,6 +92,14 @@ const router = new Router({
       path: '/tutorial',
       name: 'Tutorial',
       component: Tutorial,
+    },
+    {
+      path: '/visualization',
+      name: 'Visualization',
+      component: Visualization,
+      meta: {
+        requiresAdmin: true,
+      },
     },
     {
       path: '/:dataset/chats',
@@ -200,7 +209,7 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAdmin) {
     getUserRoles().then((userRoles) => {
-      if (!userRoles.admin) {
+      if (!userRoles.admin && !Object.values(userRoles.studyAdmin).includes(true)) {
         next({ path: '/unauthorized', query: from.query });
       } else next();
     });

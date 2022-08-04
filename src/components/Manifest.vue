@@ -1,5 +1,5 @@
 <template>
-  <div id="manifest">
+  <div id="manifest" v-show="allowed">
     <h1 class="manifest-title"> Select a study to update in the database </h1>
     <b-modal id="newstudy" :title="'Add a New Study to BrainSwipes'" ref="newstudy" size="lg">
       <div>
@@ -137,6 +137,10 @@ export default {
        * if the new dataset form is locked out
        */
       formLockout: false,
+      /**
+       * if the user is allowed to see this component
+       */
+      allowed: false,
     };
   },
   props: {
@@ -346,6 +350,20 @@ export default {
       );
       console.log(response);
     },
+  },
+  beforeRouteEnter(to, from, next) {
+    next(async (vm) => {
+      const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+      const admin = idTokenResult.claims.admin;
+      if (admin) {
+        /* eslint-disable */
+        vm.allowed = true;
+        /* eslint-enable */
+        next();
+      } else {
+        vm.$router.push({ name: 'Unauthorized' });
+      }
+    });
   },
 };
 </script>
