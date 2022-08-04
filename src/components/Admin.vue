@@ -5,10 +5,10 @@
     <b-container>
       <p class="buttons mt-3">
         <router-link class="btn btn-warning" :to="{name: 'Users'}"> Manage Users </router-link>
-        <router-link class="btn btn-warning" :to="{name: 'Manifest'}">Manage Database</router-link>
+        <router-link class="btn btn-warning" v-if="fullAdmin" :to="{name: 'Manifest'}">Manage Database</router-link>
       </p>
       <hr>
-      <div id=maintenance>
+      <div id=maintenance v-if="fullAdmin">
         <h1 for="maintenance-datepicker">Choose a date to display in maintenance banner</h1>
         <b-form-datepicker id="maintenance-datepicker" v-model="tempMaintenanceDate"></b-form-datepicker>
         <p>Chosen Date: {{tempMaintenanceDate}}</p>
@@ -33,12 +33,22 @@
  * that are authorized can see this page. Authorization comes from
  * /user/<username>/admin
  */
+import firebase from 'firebase/app';
+import 'firebase/auth';
+
 export default {
   name: 'admin',
   data() {
     return {
+      /**
+       * vars for setting the maintenance banner
+       */
       tempMaintenanceDate: '',
       isBannerOn: '',
+      /**
+       * whether they are full admin or just a dataset admin
+       */
+      fullAdmin: false,
     };
   },
   methods: {
@@ -63,6 +73,11 @@ export default {
         this.isBannerOn = 'OFF';
       }
     },
+    async getUserRoles() {
+      const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+      const userRoles = idTokenResult.claims;
+      this.fullAdmin = userRoles.admin;
+    },
   },
   props: {
     maintenanceDate: {
@@ -81,6 +96,7 @@ export default {
   mounted() {
     this.getMaintenanceDate();
     this.getMaintenanceStatus();
+    this.getUserRoles();
   },
 };
 </script>

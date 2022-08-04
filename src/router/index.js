@@ -206,7 +206,7 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAdmin) {
     getUserRoles().then((userRoles) => {
-      if (!userRoles.admin) {
+      if (!userRoles.admin && !Object.values(userRoles.studyAdmin).includes(true)) {
         next({ path: '/unauthorized', query: from.query });
       } else next();
     });

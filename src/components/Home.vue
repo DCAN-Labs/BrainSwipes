@@ -5,7 +5,7 @@
       <div id="titles">
         <h1>BrainSwipes by DCAN</h1>
         <p class="lead mt-3">
-          Choose a dataset to QC
+          {{Object.keys(userInfo).length ? 'Choose a dataset to QC' : 'Login to begin'}}
         </p>
       </div>
       <div v-if="Object.keys(studies).length" class="buttons mt-3">
