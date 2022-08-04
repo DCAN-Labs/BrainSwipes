@@ -50,7 +50,7 @@
     <div class="tutorial-steps">
       <!-- Introduction steps -->
 
-      <div v-for="(step, index) in steps.MRIintro" class="fullpage">
+      <div v-for="(step, index) in steps.MRIintro" :key="`intro${index}`" class="fullpage">
         <hr><!--Hidden. This adds just enough width to make the arrow v-scroll work when the p-bar first pops up-->
         <div class="tutorial-step" :id="'MRIintro'+index">
 
@@ -87,7 +87,7 @@
       
       <!-- Example Steps -->
       
-      <div v-for="(step, index) in steps.examples" class="widget">
+      <div v-for="(step, index) in steps.examples" :key="`example${index}`" class="widget">
         <div class="text-center message w-100" :id="'example'+index">
           <p v-html="step.text"></p>
 

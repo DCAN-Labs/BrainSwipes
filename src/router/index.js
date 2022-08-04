@@ -18,6 +18,7 @@ import Manifest from '@/components/Manifest';
 import Visualization from '@/components/Visualization';
 import Restricted from '@/components/Restricted';
 import Results from '@/components/Results';
+import Practice from '@/components/Practice';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -161,6 +162,11 @@ const router = new Router({
       meta: {
         requiresAuth: true,
       },
+    },
+    {
+      path: '/practice',
+      name: 'Practice',
+      component: Practice,
     },
   ],
 });

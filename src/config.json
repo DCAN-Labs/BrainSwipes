@@ -410,6 +410,26 @@
         "Functional image captures the vast majority of the brain"
       ]
     },
+    "practice": [
+      {
+        "text": "Pass an image by clicking the 'Pass' button. On a touch screen you can swipe the image to the right.",
+        "pointer": "sub-232633_ses-36mo_T2-Axial-BasalGangila-Putamen",
+        "answer": 1,
+        "checks": [true, true, true]
+      },
+      {
+        "text": "Fail an image by clicking the 'Fail' button. On a touch screen you can swipe the image to the left.",
+        "pointer": "sub-662338_ses-6mo_task-rest_run-04_desc-TaskInT2",
+        "answer": 0,
+        "checks": [false, true, true]
+      },
+      {
+        "text": "If you are unsure, click help for guidance or to flag an image for further review.",
+        "pointer": "sub-764612_ses-28mo_task-rest_run-001_desc-TaskInT1",
+        "answer": 0,
+        "checks": [true, false, true]
+      }
+    ],
     "extraImages": [
       {
         "text": "Below are examples of good and bad quality surface delineation:",
