@@ -471,6 +471,10 @@
         this.updateCount(currentDataset);
         this.updateSeen(currentDataset);
 
+        // 3. clear router query if exists
+        if (this.$route.query.sample) {
+          this.clearRouterQuery();
+        }
         // 3. set the next Sample
         this.setNextSampleId();
       },
@@ -577,6 +581,12 @@
        */
       showAlert() {
         this.dismissCountDown = this.dismissSecs;
+      },
+      /**
+       * removes the router query
+       */
+      clearRouterQuery() {
+        this.$router.push({ name: 'Home', query: { reroute: `${this.dataset}/play` } });
       },
     },
     /**
