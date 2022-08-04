@@ -65,7 +65,7 @@
         />
       </div>
       <div id="review-controls">
-        <b-button variant="danger" @click="openFlagWarning" :disabled="flagged && !userData.admin">{{flagged ? 'This sample is flagged' : 'Flag for Expert Review'}}</b-button>
+        <b-button variant="danger" @click="openFlagWarning" :disabled="flagged && !isAdmin">{{flagged ? 'This sample is flagged' : 'Flag for Expert Review'}}</b-button>
         <b-button variant="primary" @click="toPlay">Back to Swiping</b-button>
       </div>
       <hr>
@@ -303,6 +303,10 @@
          * disables flagging if the sample is already flagged
          */
         flagged: false,
+        /**
+         * if the user is an admin, sitewide or study specific
+         */
+        isAdmin: false,
       };
     },
     computed: {
@@ -341,6 +345,7 @@
       this.widgetPointer = this.$route.params.key;
       this.setSampleInfo(this.dataset);
       this.checkFlaggedStatus();
+      this.getUserRoles();
     },
     methods: {
       /**
@@ -475,6 +480,14 @@
           }
           this.flagged = flagged;
         });
+      },
+      /**
+       * checks if the current user is an admin
+       */
+      async getUserRoles() {
+        const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+        const userRoles = idTokenResult.claims;
+        this.isAdmin = userRoles.admin || userRoles.studyAdmin[this.dataset];
       },
     },
     /**
