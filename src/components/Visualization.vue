@@ -1,6 +1,6 @@
 <template>
-  <div id="summaries">
-    <h1> Summary </h1>
+  <div id="visualization">
+    <h1> Study Visualizations </h1>
 
     <b-container>
       <div>
@@ -96,7 +96,7 @@
 </template>
 
 <style>
-  #summaries {
+  #visualization {
     padding-bottom: 12vh;
   }
   .usersDropdown .dropdown-menu {
@@ -138,10 +138,10 @@
   Vue.component('RecentSwipes', RecentSwipes);
 
   /**
-   * Visualizations of summary information.
+   * Visualizations of study information.
    */
   export default {
-    name: 'summaries',
+    name: 'visualization',
     data() {
       return {
         selectedUsers: [],

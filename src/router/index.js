@@ -15,7 +15,7 @@ import Review from '@/components/Review';
 import Chats from '@/components/Chats';
 import Users from '@/components/Users';
 import Manifest from '@/components/Manifest';
-import Summaries from '@/components/Summaries';
+import Visualization from '@/components/Visualization';
 import Restricted from '@/components/Restricted';
 import Results from '@/components/Results';
 import firebase from 'firebase/app';
@@ -94,9 +94,9 @@ const router = new Router({
       component: Tutorial,
     },
     {
-      path: '/summaries',
-      name: 'Summaries',
-      component: Summaries,
+      path: '/visualization',
+      name: 'Visualization',
+      component: Visualization,
     },
     {
       path: '/:dataset/chats',
