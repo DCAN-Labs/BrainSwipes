@@ -448,7 +448,7 @@
         window.open(routeData.href, '_blank');
       },
       toPlay() {
-        const query = this.flagged ? null : { sample: this.widgetPointer };
+        const query = this.flagged ? null : { s: Buffer.from(this.widgetPointer).toString('Base64') };
         this.$router.push({ name: 'Play', params: { dataset: this.dataset }, query });
       },
       openFlagWarning() {

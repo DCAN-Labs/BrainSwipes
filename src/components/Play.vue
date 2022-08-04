@@ -472,7 +472,7 @@
         this.updateSeen(currentDataset);
 
         // 3. clear router query if exists
-        if (this.$route.query.sample) {
+        if (this.$route.query.s) {
           this.clearRouterQuery();
         }
         // 3. set the next Sample
@@ -488,8 +488,8 @@
 
         let sampleId;
 
-        if (this.$route.query.sample) {
-          sampleId = { '.key': this.$route.query.sample };
+        if (this.$route.query.s) {
+          sampleId = { '.key': Buffer.from(this.$route.query.s, 'base64').toString('ascii') };
         } else if (Math.random() < this.catchFrequency && this.catchTrials.length) {
           sampleId = this.serveCatchTrial();
         } else {
