@@ -111,10 +111,10 @@ const router = new Router({
       },
     },
     {
-      path: '/:dataset/review/:key/:bucket',
+      path: '/:dataset/review/:key/',
       name: 'Review',
       component: Review,
-      props: route => ({ widgetPointer: route.params.key, bucket: Buffer.from(route.params.bucket, 'base64').toString(), dataset: route.params.dataset }),
+      props: route => ({ widgetPointer: route.params.key, dataset: route.params.dataset }),
       meta: {
         requiresAccess: true,
       },

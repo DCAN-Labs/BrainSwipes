@@ -32,7 +32,7 @@
              </span>
 
              <b-button v-if="playMode"
-              :to="playMode == 'tutorial' ? '' : `/${dataset}/review/${widgetPointer}/${btoaBucket}`"
+              :to="playMode == 'tutorial' ? '' : `/${dataset}/review/${widgetPointer}`"
               ref="helpButton"
               class="helpbtn"
               v-bind:class="{ focus: helpFocused }"
@@ -166,11 +166,6 @@
         leftFocused: false,
         helpFocused: false,
       };
-    },
-    computed: {
-      btoaBucket() {
-        return btoa(this.bucket);
-      },
     },
     /**
      * If the playMode === 'tutorial', show a tutorial step.

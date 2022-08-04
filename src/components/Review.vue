@@ -237,13 +237,6 @@
         required: true,
       },
       /**
-       * the s3 bucket where the images for the dataset are held
-       */
-      bucket: {
-        type: String,
-        required: true,
-      },
-      /**
        * The auth token from Globus
        */
       globusToken: {
@@ -326,6 +319,12 @@
        */
       imageType() {
         return this.getImageType();
+      },
+      /**
+       * the s3 bucket where the images for the dataset are held
+       */
+      bucket() {
+        return this.studies[this.dataset].bucket;
       },
     },
     watch: {
