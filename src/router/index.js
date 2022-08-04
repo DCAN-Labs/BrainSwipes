@@ -97,6 +97,9 @@ const router = new Router({
       path: '/visualization',
       name: 'Visualization',
       component: Visualization,
+      meta: {
+        requiresAdmin: true,
+      },
     },
     {
       path: '/:dataset/chats',

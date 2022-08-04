@@ -6,6 +6,7 @@
       <p class="buttons mt-3">
         <router-link class="btn btn-warning" :to="{name: 'Users'}"> Manage Users </router-link>
         <router-link class="btn btn-warning" v-if="fullAdmin" :to="{name: 'Manifest'}">Manage Database</router-link>
+        <router-link class="btn btn-warning" :to="{name: 'Visualization'}"> View Study Visualizations </router-link>
       </p>
       <hr>
       <div id=maintenance v-if="fullAdmin">
