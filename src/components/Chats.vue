@@ -6,7 +6,7 @@
         <p class="lead">See which samples people are talking about</p>
         <p v-for="(c, index) in sampleChat" :key="index">
           <b-alert :variant="flagged.includes(c['.key']) ? 'danger' : 'primary'" show>
-            <router-link :to="'/' + dataset + '/review/' + c['.key'] + '/' + btoaBucket">{{c['.key']}}</router-link>
+            <router-link :to="'/' + dataset + '/review/' + c['.key']">{{c['.key']}}</router-link>
             <br>
             <span v-if="chatInfo[c['.key']]">
               <b>{{chatInfo[c['.key']].username}}</b> : {{chatInfo[c['.key']].message}}
@@ -118,13 +118,6 @@ export default {
       required: true,
     },
     /**
-     * the s3 bucket where the images for the dataset are held
-     */
-    bucket: {
-      type: String,
-      required: true,
-    },
-    /**
      * The auth token from Globus
      */
     globusToken: {
@@ -144,11 +137,6 @@ export default {
     studies: {
       type: Object,
       required: true,
-    },
-  },
-  computed: {
-    btoaBucket() {
-      return btoa(this.bucket);
     },
   },
   /**
