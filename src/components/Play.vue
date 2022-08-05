@@ -1,13 +1,5 @@
 <template name="play">
   <div id="play" class="container">
-    <!-- Modal Component -->
-    <b-modal id="levelUp" ref="levelUp" title="You've Levelled Up!" ok-only>
-      <div class="my-4">
-        <h3>Level {{currentLevel.level}}</h3>
-        <img :src="currentLevel.img" width="120px" height="120px"/>
-        <p class="lead">You've unlocked: {{currentLevel.character}}</p>
-      </div>
-    </b-modal>
 
     <div v-if="allowed" class="main">
 
@@ -128,13 +120,6 @@
        * the computed user data object based on userInfo
        */
       userData: {
-        type: Object,
-        required: true,
-      },
-      /**
-       * the user's current level
-       */
-      currentLevel: {
         type: Object,
         required: true,
       },
@@ -272,17 +257,6 @@
       };
     },
     watch: {
-      /**
-       * Keep track of the user's current level.
-       * Update the database if their score pushes them up a level.
-       * This depends on the `level` prop that is passed from the parent (`App.vue`)
-       */
-      currentLevel() {
-        if (this.userData.score === this.currentLevel.min && this.currentLevel.min) {
-          this.$refs.levelUp.show();
-          this.db.ref(`/users/${this.userInfo.displayName}`).child('level').set(this.currentLevel.level);
-        }
-      },
       /**
        * Watch the widget pointer, which is from `/sampleCounts` document in firebase.
        * When it changes, also update the `widgetSummary` to be from the new `widgetPointer`.

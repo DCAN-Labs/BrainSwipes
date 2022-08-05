@@ -34,8 +34,6 @@
           :userInfo="userInfo"
           :userData="userData"
           :allUsers="allUsers"
-          :levels="levels"
-          :currentLevel="currentLevel"
           :config="config"
           :db="db"
           v-on:takenTutorial="setTutorial"
@@ -263,27 +261,6 @@ export default {
         }
       });
       return data;
-    },
-    /**
-     * The levels are defined based on score bins. Each level also defines
-     * a character image that a user can "unlock" when the annotate enough samples.
-     * eventually, this should be abstracted out into the config variable.
-     */
-    levels() {
-      return this.config.levels;
-    },
-    /**
-     * the current user's level.
-     */
-    currentLevel() {
-      let clev = {};
-      _.mapValues(this.levels, (val) => {
-        if (this.userData.score >= val.min && this.userData.score <= val.max) {
-          clev = val;
-        }
-      });
-
-      return clev;
     },
     /**
      * whether or not a user is authenticated and has a username.

@@ -206,13 +206,6 @@
         required: true,
       },
       /**
-       * the user's current level
-       */
-      currentLevel: {
-        type: Object,
-        required: true,
-      },
-      /**
        * The config object that is loaded from src/config.js.
        * It defines how the app is configured, including
        * any content that needs to be displayed (app title, images, etc)

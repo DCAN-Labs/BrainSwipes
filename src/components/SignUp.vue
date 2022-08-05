@@ -215,7 +215,7 @@
       },
       /**
        * A method to insert a new user into the `/users` document of firebase.
-       * This initializes the user's score, level, whether or not they've consented.
+       * This initializes the user's score, whether or not they've consented.
        * and when they consented.
        * **TODO**: set an error message if something goes wrong here.
        */
@@ -225,7 +225,6 @@
         const displayName = firebase.auth().currentUser.displayName;
         firebase.database().ref(`users/${displayName}`).set({
           score: 0,
-          level: 0,
           takenTutorial: 'none',
           consent: this.form.consented,
           consentedOn: date,
