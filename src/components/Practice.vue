@@ -12,7 +12,7 @@
       <b-progress :value="progress" :max="Object.keys(steps).length - 1" show-progress class="ml-3 mr-3"></b-progress>
     </div>
 
-    <div id="practice-sample" v-show="!swiped" :class="'fade-in'">
+    <div id="practice-sample" v-if="!swiped" :class="'fade-in'">
       <ImageSwipe
         :widgetPointer="steps[progress].pointer"
         v-on:widgetRating="simulateSwipe"
@@ -200,7 +200,8 @@
       },
       nextSample() {
         this.progress += 1;
-        this.swiped = !this.swiped;
+        this.swiped = this.progress >= Object.keys(this.steps).length - 1 ?
+          this.swiped : !this.swiped;
       },
       previousSample() {
         this.swiped = !this.swiped;
