@@ -55,7 +55,7 @@
         />
       </div>
       <div>
-        <WidgetSelector
+        <ImageSwipe
         :widgetPointer="widgetPointer"
         :widgetSummary="widgetSummary"
         :playMode="''"
@@ -187,7 +187,7 @@
   import 'firebase/auth';
   import 'firebase/database';
   import _ from 'lodash';
-  import WidgetSelector from './WidgetSelector';
+  import ImageSwipe from './Widgets/ImageSwipe';
   import Checklist from './Widgets/Checklist';
 
   /**
@@ -259,7 +259,7 @@
       },
     },
     components: {
-      WidgetSelector,
+      ImageSwipe,
       Checklist,
     },
     data() {

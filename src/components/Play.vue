@@ -31,7 +31,7 @@
           <p class="mt-3 pt-3 lead">loading...</p>
         </div>
 
-        <WidgetSelector
+        <ImageSwipe
          v-else
          :widgetPointer="widgetPointer"
          :widgetSummary="widgetSummary"
@@ -89,7 +89,7 @@
    * config property passed from the parent (`App.vue`).
    * It decides which sample will be presented (`widgetPointer`)
    * and passes the sample's summary (`widgetSummary`) to its
-   * widget component (`WidgetSelector`).
+   * widget component (`ImageSwipe`).
    *
    * This component is responsible for the following:
    * 1. Deciding which sample to present by choosing an item in `/sampleCounts`
@@ -109,10 +109,10 @@
   import firebase from 'firebase/app';
   import 'firebase/auth';
   import Vue from 'vue';
-  import WidgetSelector from './WidgetSelector';
+  import ImageSwipe from './Widgets/ImageSwipe';
   import Flask from './Animations/Flask';
 
-  Vue.component('WidgetSelector', WidgetSelector);
+  Vue.component('ImageSwipe', ImageSwipe);
 
   export default {
     name: 'play',
@@ -306,7 +306,6 @@
       this.initCatchTrialSamples(this.dataset);
     },
     components: {
-      // WidgetSelector,
       Flask,
     },
     computed: {

@@ -92,7 +92,7 @@
           <p v-html="step.text"></p>
 
           <div v-if="step.pointer" class="mt-3">
-            <WidgetSelector
+            <ImageSwipe
               :widgetPointer="step.pointer"
               :widgetSummary="widgetSummary"
               v-on:widgetRating="simulateSwipe"
@@ -259,7 +259,7 @@
   import _ from 'lodash';
   import Vue from 'vue';
   import Arrow from './Animations/ArrowDown';
-  import WidgetSelector from './WidgetSelector';
+  import ImageSwipe from './Widgets/ImageSwipe';
   import { glossary, glossaryKeys } from '../glossary';
   import Checklist from './Widgets/Checklist';
 
@@ -304,7 +304,7 @@
     components: {
       'vue-typer': VueTyper,
       Arrow,
-      WidgetSelector,
+      ImageSwipe,
       Checklist,
     },
     data() {

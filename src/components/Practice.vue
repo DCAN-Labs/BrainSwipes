@@ -13,7 +13,7 @@
     </div>
 
     <div id="practice-sample" v-show="!swiped" :class="'fade-in'">
-      <WidgetSelector
+      <ImageSwipe
         :widgetPointer="steps[progress].pointer"
         v-on:widgetRating="simulateSwipe"
         :playMode="'tutorial'"
@@ -108,7 +108,7 @@
 /**
  * TODO: fill this in.
  */
-  import WidgetSelector from './WidgetSelector';
+  import ImageSwipe from './Widgets/ImageSwipe';
   import Checklist from './Widgets/Checklist';
 
   /* eslint-enable */
@@ -116,7 +116,7 @@
   export default {
     name: 'practice',
     components: {
-      WidgetSelector,
+      ImageSwipe,
       Checklist,
     },
     data() {
