@@ -430,7 +430,7 @@
         "checks": [true, false, true]
       },
       {
-        "text": "<h2>Congratulations!</h2><br>You've finished your training and are ready to swipe on real data!<br>If you're ever unsure how to swipe click the help button for more information.",
+        "text": "<h2>Congratulations!</h2><br>You've finished your training and are ready to swipe on real data!<br>If you're ever unsure how to swipe click the help button for more information, or revisit the tutorial at any time.",
         "pointer": "hooray-party.gif",
         "finished": 1
       }

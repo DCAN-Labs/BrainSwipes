@@ -5,12 +5,17 @@
       <div id="titles">
         <h1>BrainSwipes by DCAN</h1>
         <p class="lead mt-3">
-          {{Object.keys(userInfo).length ? 'Choose a dataset to QC' : 'Login to begin'}}
+          {{Object.keys(userInfo).length ? userData.takenTutorial === 'complete' ? 'Choose a dataset to QC': 'Review our learning resources before you begin swiping' : 'Login to begin'}}
         </p>
       </div>
-      <div v-if="Object.keys(studies).length" class="buttons mt-3">
-        <div v-for="study in Object.keys(studies)" :key="study">
-          <b-button class="btn btn-primary" v-if="datasetPrivileges[study]" @click="routeToPlay(study)">{{study}}</b-button>
+      <div v-if="Object.keys(studies).length" class="mt-3">
+        <div v-if="userData.takenTutorial === 'complete'" class="buttons">
+          <div v-for="study in Object.keys(studies)" :key="study">
+            <b-button class="btn btn-primary" v-if="datasetPrivileges[study]" @click="routeToPlay(study)">{{study}}</b-button>
+          </div>
+        </div>
+        <div v-else>
+          <b-button class="btn btn-primary" @click="routeToTutorial">Learn</b-button>
         </div>
       </div>
     </div>
@@ -52,6 +57,10 @@ export default {
       type: Object,
       required: true,
     },
+    userData: {
+      type: Object,
+      required: true,
+    },
     maintenanceDate: {
       type: String,
       required: true,
@@ -83,6 +92,10 @@ export default {
         this.$emit('changeDataset', label);
         this.$router.push({ name: 'Play', params: { dataset: label } });
       }
+    },
+    routeToTutorial() {
+      const name = this.userData.takenTutorial === 'none' ? 'Tutorial' : 'Practice';
+      this.$router.push({ name });
     },
     reroute() {
       const query = this.$route.query;
