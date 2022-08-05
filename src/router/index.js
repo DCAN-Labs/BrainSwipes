@@ -62,6 +62,7 @@ const router = new Router({
       meta: {
         requiresAuth: true,
         requiresAccess: true,
+        requiresTutorial: true,
       },
     },
     {
@@ -109,6 +110,7 @@ const router = new Router({
       meta: {
         requiresAuth: true,
         requiresAccess: true,
+        requiresTutorial: true,
       },
     },
     {
@@ -118,6 +120,7 @@ const router = new Router({
       props: route => ({ widgetPointer: route.params.key, dataset: route.params.dataset }),
       meta: {
         requiresAccess: true,
+        requiresTutorial: true,
       },
     },
     {
@@ -185,12 +188,14 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
   const requiresAccess = to.matched.some(record => record.meta.requiresAccess);
+  const requiresTutorial = to.matched.some(record => record.meta.requiresTutorial);
+
 
   if (requiresAuth && !currentUser) {
     next({ path: '/login', query: from.query });
   }
   // make sure the user has take the tutorial
-  if (to.name === 'Play') {
+  if (requiresTutorial) {
     if (currentUser) {
       firebase.database().ref(`/users/${currentUser.displayName}`).once('value')
         .then((snap) => {
