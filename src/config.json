@@ -428,6 +428,11 @@
         "pointer": "sub-764612_ses-28mo_task-rest_run-001_desc-TaskInT1",
         "answer": 0,
         "checks": [true, false, true]
+      },
+      {
+        "text": "<h2>Congratulations!</h2><br>You've finished your training and are ready to swipe on real data!<br>If you're ever unsure how to swipe click the help button for more information.",
+        "pointer": "hooray-party.gif",
+        "finished": 1
       }
     ],
     "extraImages": [

@@ -38,7 +38,7 @@
           :currentLevel="currentLevel"
           :config="config"
           :db="db"
-          v-on:taken_tutorial="setTutorial"
+          v-on:takenTutorial="setTutorial"
           :dataset="dataset"
           @changeDataset="updateDataset"
           :datasetPrivileges="datasetPrivileges"
@@ -320,11 +320,39 @@ export default {
      * set the tutorial status of the current user
      */
     setTutorial(val) {
+      const currentValue = this.userData.takenTutorial;
+      let level = val;
+      let route = 'Home';
+      switch (true) {
+        case (currentValue === 'complete' && val === 'complete'):
+          route = 'Home';
+          level = 'complete';
+          break;
+        case (currentValue === 'complete' && val === 'needsPractice'):
+          route = 'Practice';
+          level = 'complete';
+          break;
+        case (currentValue === 'needsPractice' && val === 'complete'):
+          route = 'Home';
+          level = 'complete';
+          break;
+        case (currentValue === 'needsPractice' && val === 'needsPractice'):
+          route = 'Practice';
+          level = 'needsPractice';
+          break;
+        case (currentValue === 'none' && val === 'needsPractice'):
+          route = 'Practice';
+          level = 'needsPractice';
+          break;
+        default:
+          route = 'Home';
+          level = 'none';
+      }
       this.db
         .ref(`/users/${this.userInfo.displayName}`)
-        .child('taken_tutorial')
-        .set(val);
-      this.$router.replace('play');
+        .child('takenTutorial')
+        .set(level);
+      this.$router.push({ name: route });
     },
     /**
      * Passed to child to update dataset on event

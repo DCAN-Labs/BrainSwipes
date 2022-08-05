@@ -12,16 +12,6 @@
       </div>
 
     </b-modal>
-    <b-modal id="emailverification" title="Email Verification"
-      ref="emailverification" size="lg">
-      <p>An email has been sent to {{verifying}}. You will need to verify your email to access some datasets.</p>
-      <div slot="modal-footer" class="w-100">
-        <b-form @submit="verifiedClick">
-          <b-button type="submit" variant="primary">OK</b-button>
-        </b-form>
-      </div>
-
-    </b-modal>
 
     <div id="signupForm" class="container fluid">
       <b-form @submit="onSubmit" validated>
@@ -130,7 +120,6 @@
           show: false,
           message: null,
         },
-        verifying: 'test',
       };
     },
     props: {
@@ -190,7 +179,6 @@
                 }
               });
               if (!usernameExists) {
-                this.verifying = this.form.email;
                 this.createAccount();
               } else {
                 this.errors.show = true;
@@ -207,17 +195,9 @@
         this.form.consented = true;
         this.$refs.consentform.hide();
       },
-      verifiedClick(e) {
-        e.preventDefault();
-        console.log(firebase.auth().currentUser.emailVerified);
-        this.$router.replace('tutorial');
-      },
       /**
        * Open the consent form modal.
        */
-      openEmailVerificationModal() {
-        this.$refs.emailverification.show();
-      },
       openConsentModal() {
         this.$refs.consentform.show();
       },
@@ -240,17 +220,20 @@
        * **TODO**: set an error message if something goes wrong here.
        */
       insertUser() {
-        const date = new Date();
-        firebase.database().ref('users').child(firebase.auth().currentUser.displayName).set({
+        const newdate = new Date();
+        const date = newdate.toString();
+        const displayName = firebase.auth().currentUser.displayName;
+        firebase.database().ref(`users/${displayName}`).set({
           score: 0,
           level: 0,
-          taken_tutorial: false,
+          takenTutorial: 'none',
           consent: this.form.consented,
           consentedOn: date,
         })
         .then(() => {
         })
-        .catch(() => {
+        .catch((error) => {
+          console.log('error inserting user: ', error);
         });
       },
       /**
@@ -262,9 +245,8 @@
           displayName: this.form.username,
         }).then(() => {
           this.setUserRoles().then(() => {
-            // Profile updated successfully!
             this.insertUser();
-            firebase.auth().currentUser.sendEmailVerification();
+            // firebase.auth().currentUser.sendEmailVerification();
             this.$emit('changePermissions');
             this.$router.replace('tutorial');
           }, (err) => {

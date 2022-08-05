@@ -105,7 +105,7 @@
             />
           </div>
           <div v-if="step.tutorialCompleted">
-            <b-button @click="tutorialComplete" class="mt-3">Play now</b-button>
+            <b-button @click="tutorialComplete" class="mt-3">Test Your Knowledge</b-button>
           </div>
         </div>
       </div>
@@ -412,7 +412,7 @@
        * user has completed the tutorial.
        */
       tutorialComplete() {
-        this.$emit('taken_tutorial', true);
+        this.$emit('takenTutorial', 'needsPractice');
       },
       /**
        * Keep track of the scroll position and save it to the scrollPosition variable.

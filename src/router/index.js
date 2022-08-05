@@ -195,7 +195,9 @@ router.beforeEach((to, from, next) => {
       firebase.database().ref(`/users/${currentUser.displayName}`).once('value')
         .then((snap) => {
           const data = snap.val();
-          if (!data.taken_tutorial) {
+          if (data.takenTutorial === 'needsPractice') {
+            next({ path: '/practice', query: from.query });
+          } else if (data.takenTutorial !== 'complete') {
             next({ path: '/tutorial', query: from.query });
           }
         });

@@ -9,7 +9,7 @@
 
     <!-- Progress Bar -->
     <div class="pbar pt-3 pb-3">
-      <b-progress :value="progress" :max="Object.keys(steps).length" show-progress class="ml-3 mr-3"></b-progress>
+      <b-progress :value="progress" :max="Object.keys(steps).length - 1" show-progress class="ml-3 mr-3"></b-progress>
     </div>
 
     <div id="practice-sample" v-show="!swiped" :class="'fade-in'">
@@ -24,23 +24,31 @@
         :bucket="tutorialBucket"
       />
     </div>
+
     <div id="practice-feedback" v-show="swiped" :class="'fade-in'">
       <div class="feedback-body">
-        <h2> You responded {{userResponse ? 'Pass' : 'Fail'}} </h2>
-        <h2> This image should be {{steps[progress].answer ? 'Passed' : 'Failed'}} </h2>
-        <hr>
-        <h3>{{getImageType(steps[progress].pointer)[1]}}</h3>
-        <Checklist
-          :config="config"
-          :imageClass="getImageType(steps[progress].pointer)[0]"
-          :checks="steps[progress].checks"
-        />
+        <div v-if="!steps[progress].finished">
+          <h2> You responded {{userResponse ? 'Pass' : 'Fail'}} </h2>
+          <h2> This image should be {{steps[progress].answer ? 'Passed' : 'Failed'}} </h2>
+          <hr>
+          <h3>{{getImageType(steps[progress].pointer)[1]}}</h3>
+          <Checklist v-if="steps[progress].checks"
+            :config="config"
+            :imageClass="getImageType(steps[progress].pointer)[0]"
+            :checks="steps[progress].checks"
+          />
+        </div>
         <br>
-        <p>{{steps[progress].text}}</p>
+        <p v-html="steps[progress].text"></p>
       </div>
-      <div class="fade-in-slow">
-      <b-button @click="previousSample">Revisit This Image</b-button>
-      <b-button @click="nextSample" :disabled="userResponse !== steps[progress].answer">Next Sample</b-button>
+      <div class="fade-in" v-show="buttonDelay <= 0">
+        <div v-if="progress < Object.keys(steps).length -1">
+          <b-button @click="previousSample">Revisit This Image</b-button>
+          <b-button @click="nextSample" :disabled="userResponse !== steps[progress].answer">Next Sample</b-button>
+        </div>
+        <div v-else>
+          <b-button @click="tutorialComplete">Start Swiping!</b-button>
+        </div>
       </div>
     </div>
   </div>
@@ -67,10 +75,6 @@
     animation: fadeIn 2s;
   }
 
-  .fade-in-slow{
-    animation: fadeInSlow 4s;
-  }
-
   .feedback-body {
     min-height: 400px;
   }
@@ -87,16 +91,14 @@
     font-weight: 600;
     color: #640000;
     margin-bottom: 10px;
-  } 
+  }
+
+  #practice-sample {
+    padding-bottom: 15vh;
+  }
 
   @keyframes fadeIn {
     0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-
-  @keyframes fadeInSlow {
-    0% { opacity: 0; }
-    75% { opacity: 0 }
     100% { opacity: 1; }
   }
 
@@ -131,6 +133,14 @@
          * What the user responded to the last sample
          */
         userResponse: 0,
+        /**
+         * Used to set a timer for delaying button appearance
+         */
+        buttonDelay: 0,
+        /**
+         * How many seconds the buttons stay hidden
+         */
+        defaultButtonDelay: 2,
       };
     },
     props: {
@@ -171,7 +181,7 @@
        * user has completed the tutorial.
        */
       tutorialComplete() {
-        this.$emit('taken_tutorial', true);
+        this.$emit('takenTutorial', 'complete');
       },
       simulateSwipe(response) {
         const vote = response[0];
@@ -186,6 +196,7 @@
       removeClass(element, className) {
         element.classList.remove(className);
         this.swiped = !this.swiped;
+        this.buttonDelay = this.defaultButtonDelay;
       },
       nextSample() {
         this.progress += 1;
@@ -207,6 +218,18 @@
           imageType[1] = 'Structural Image';
         }
         return imageType;
+      },
+    },
+    watch: {
+      buttonDelay: {
+        handler(value) {
+          if (value > 0) {
+            setTimeout(() => {
+              this.buttonDelay -= 1;
+            }, 1000);
+          }
+        },
+        immediate: true,
       },
     },
   };
