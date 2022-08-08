@@ -2,7 +2,7 @@
     <div class="checklist" ref="checklist">
         <div class="checklist-wrapper">
           <div class="checklist-list">
-            <div class="checklist-item" v-for="(value, index) in checks" :key="index"><div :class="value === 'question' ? 'checked-question' : value ? 'checked' : 'unchecked'"></div><p>{{config.tutorial.checklists[imageClass][index]}}</p></div>
+            <div class="checklist-item" v-for="(value, index) in checks" :key="index"><div :class="value === 'question' ? 'checked-question' : value ? 'checked' : 'unchecked'"></div><p>{{config.learn.checklists[imageClass][index]}}</p></div>
           </div>
         </div>
     </div>  
@@ -17,10 +17,7 @@
     },
     props: {
       /**
-       * The config object that is loaded from src/config.js.
-       * It defines how the app is configured, including
-       * any content that needs to be displayed (app title, images, etc)
-       * and also the type of widget and where to update pointers to data
+       * The config object that is loaded from firebase
        */
       config: {
         type: Object,

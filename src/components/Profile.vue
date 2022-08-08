@@ -82,8 +82,7 @@
  * It displays the number of points a user has earned
  * It shows the badges they've earned and greys out the ones they still need to earn
  * It shows a chats section, which are the discussions this user has participated in
- * if the user hasn't said anything, then it shows a blank image,
- * defined in config.profile.blankImage
+ * if the user hasn't said anything, then it shows a blank image
  * @author Anisha Keshavan
  * @license Apache 2.0
  */
@@ -139,16 +138,6 @@ export default {
      * the computed user data object based on userInfo
      */
     userData: {
-      type: Object,
-      required: true,
-    },
-    /**
-     * The config object that is loaded from src/config.js.
-     * It defines how the app is configured, including
-     * any content that needs to be displayed (app title, images, etc)
-     * and also the type of widget and where to update pointers to data
-     */
-    config: {
       type: Object,
       required: true,
     },

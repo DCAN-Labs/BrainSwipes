@@ -145,10 +145,7 @@
     },
     props: {
       /**
-       * The config object that is loaded from src/config.js.
-       * It defines how the app is configured, including
-       * any content that needs to be displayed (app title, images, etc)
-       * and also the type of widget and where to update pointers to data
+       * The config object that is loaded from firebase
        */
       config: {
         type: Object,
@@ -160,19 +157,19 @@
        * The steps defined in config, with text and images to display.
        */
       steps() {
-        return this.config.tutorial.practice;
+        return this.config.learn.practice;
       },
       /**
        * dataset that the tutorial images are from
        */
       tutorialDataset() {
-        return this.config.tutorial.dataset;
+        return this.config.learn.tutorial.dataset;
       },
       /**
        * s3 bucket where the tutorial images are held
        */
       tutorialBucket() {
-        return this.config.tutorial.bucket;
+        return this.config.learn.tutorial.bucket;
       },
     },
     methods: {

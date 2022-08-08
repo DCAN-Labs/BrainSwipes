@@ -51,7 +51,7 @@
         <Checklist
           :config="config"
           :imageClass="imageType[0]"
-          :checks="Array(config.tutorial.checklists[imageType[0]].length).fill('question')"
+          :checks="Array(config.learn.checklists[imageType[0]].length).fill('question')"
         />
       </div>
       <div>

@@ -7,11 +7,7 @@
       <p>Have something you want added? Flag it by clicking the Help button.</p>
       <hr>
     </div>
-    <div v-if="loading">
-      LOADING...
-      <Flask/>
-    </div>
-    <div v-else>
+    <div>
       <div class="gallery-item" v-for="sample in Object.keys(gallery)" :key="sample">
         <div class="gallery-info">
           <h2>{{gallery[sample].label}}</h2>
@@ -68,7 +64,6 @@
  */
   import ImageSwipe from './Widgets/ImageSwipe';
   import Checklist from './Widgets/Checklist';
-  import Flask from './Animations/Flask';
 
   /* eslint-enable */
 
@@ -77,19 +72,10 @@
     components: {
       ImageSwipe,
       Checklist,
-      Flask,
     },
     data() {
       return {
-        /**
-         * The list of images for the gallery.
-         * Populated from firebase by getGallery()
-         */
-        gallery: {},
-        /**
-         * Whether the component's data is loading
-         */
-        loading: true,
+
       };
     },
     props: {
@@ -113,22 +99,19 @@
     },
     computed: {
       /**
-       * The steps defined in config, with text and images to display.
-       */
-      steps() {
-        return this.config.tutorial.practice;
-      },
-      /**
        * dataset that the tutorial images are from
        */
       tutorialDataset() {
-        return this.config.tutorial.dataset;
+        return this.config.learn.tutorial.dataset;
       },
       /**
        * s3 bucket where the tutorial images are held
        */
       tutorialBucket() {
-        return this.config.tutorial.bucket;
+        return this.config.learn.tutorial.bucket;
+      },
+      gallery() {
+        return this.config.learn.gallery;
       },
     },
     methods: {
@@ -146,15 +129,6 @@
         }
         return imageType;
       },
-      async getGallery() {
-        this.db.ref('config/learn/gallery').on('value', (snap) => {
-          this.gallery = snap.val();
-          this.loading = false;
-        });
-      },
-    },
-    async created() {
-      this.getGallery();
     },
   };
 </script>

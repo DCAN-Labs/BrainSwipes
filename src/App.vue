@@ -103,8 +103,8 @@ import '../src/css/globals.css';
 import '../src/css/typography.css';
 
 
-// config options
-import config from './config';
+// eslint-disable-next-line
+import firebaseKeys from './firebaseKeys';
 
 // components
 import SliderMenu from './components/Header/SliderMenu';
@@ -140,21 +140,11 @@ export default {
       /**
        * This is the config object, it defines the look of the app
        */
-      config,
-      /**
-       * Whether or not to show the configuration panel
-       */
-      showConfig: false,
+      // config,
       /**
        * All the users in the /users document
        */
       allUsers: [],
-      /**
-       * The configuration state, keeping track of the step number only.
-       */
-      configurationState: {
-        step: 0,
-      },
       /**
        * Whether or not to show Mobile menu, will be extracted into Header component later
        */
@@ -232,15 +222,13 @@ export default {
         source: this.db.ref('/users/').orderByChild('score'),
         asObject: true,
       },
+      config: {
+        source: this.db.ref('/config'),
+        asObject: true,
+      },
     };
   },
   computed: {
-    /**
-     * the firebase keys from the config file
-     */
-    firebaseKeys() {
-      return this.config.firebaseKeys;
-    },
     /**
      * the current user's data, based on the userInfo from the firebase.auth.
      * this matches the info in allUsers (/users) to the firebase.auth user info.
