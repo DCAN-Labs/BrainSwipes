@@ -19,6 +19,7 @@ import Visualization from '@/components/Visualization';
 import Restricted from '@/components/Restricted';
 import Results from '@/components/Results';
 import Practice from '@/components/Practice';
+import Gallery from '@/components/Gallery';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -170,6 +171,11 @@ const router = new Router({
       path: '/practice',
       name: 'Practice',
       component: Practice,
+    },
+    {
+      path: '/gallery',
+      name: 'Gallery',
+      component: Gallery,
     },
   ],
 });

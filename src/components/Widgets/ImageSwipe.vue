@@ -105,9 +105,9 @@
       },
      /**
      * Tells the widget to display a tutorial step.
+     * tutorialStep = 0 highlights/glows the fail button.
      * tutorialStep = 1 highlights/glows the pass button.
-     * tutorialStep = 2 highlights/glows the fail button.
-     * tutorialStep = 3 highlights/glows the help button.
+     * tutorialStep = 2 highlights/glows the help button.
      */
       tutorialStep: {
         type: Number,
