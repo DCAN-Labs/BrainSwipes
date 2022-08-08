@@ -100,8 +100,8 @@
               :tutorialStep="step.tutorialStep"
               ref="widget"
               :dataset="tutorialDataset"
-              :bucket="tutorialBucket"
               :identifier="'example'+index"
+              :config="config"
             />
           </div>
           <div v-if="step.tutorialCompleted">
@@ -395,12 +395,6 @@
        */
       tutorialDataset() {
         return this.config.learn.tutorial.dataset;
-      },
-      /**
-       * s3 bucket where the tutorial images are held
-       */
-      tutorialBucket() {
-        return this.config.learn.tutorial.bucket;
       },
     },
     methods: {

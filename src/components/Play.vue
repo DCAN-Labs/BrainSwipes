@@ -31,9 +31,7 @@
          :playMode="playMode"
          ref="widget"
          :dataset="dataset"
-         :bucket="bucket"
-         :catchDataset="catchDataset"
-         :catchBucket="catchBucket"
+         :config="config"
         />
       </div>
 
@@ -77,11 +75,7 @@
 
 <script>
   /**
-   * This is the component for the `/play` route. It's view depends on the
-   * config property passed from the parent (`App.vue`).
-   * It decides which sample will be presented (`widgetPointer`)
-   * and passes the sample's summary (`widgetSummary`) to its
-   * widget component (`ImageSwipe`).
+   * This is the component for the `/play` route.
    *
    * This component is responsible for the following:
    * 1. Deciding which sample to present by choosing an item in `/sampleCounts`
@@ -138,13 +132,6 @@
         required: true,
       },
       /**
-       * the s3 bucket where the images for the dataset are held
-       */
-      bucket: {
-        type: String,
-        required: true,
-      },
-      /**
        * The auth token from Globus
        */
       globusToken: {
@@ -168,17 +155,13 @@
       /**
        * catch trials configuration
        */
-      catchDataset: {
-        type: String,
-        required: false,
-      },
       catchFrequency: {
         type: Number,
         required: true,
       },
-      catchBucket: {
-        type: String,
-        required: false,
+      config: {
+        type: Object,
+        required: true,
       },
     },
     data() {
@@ -278,6 +261,12 @@
        */
       samplePriority() {
         return _.sortBy(this.sampleCounts, '.value');
+      },
+      /**
+       * the dataset for catch trials.
+       */
+      catchDataset() {
+        return this.config.catchTrials.dataset;
       },
     },
     methods: {

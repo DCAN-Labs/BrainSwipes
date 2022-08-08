@@ -121,22 +121,12 @@
         required: true,
       },
       /**
-       * the s3 bucket where the images for the dataset are held
+       * The config from firebase.
+       * Includes information necessary to access the correct image
        */
-      bucket: {
-        type: String,
+      config: {
+        type: Object,
         required: true,
-      },
-      /**
-       * config for the catch trials
-       */
-      catchBucket: {
-        type: String,
-        required: false,
-      },
-      catchDataset: {
-        type: String,
-        required: false,
       },
       /**
        * id for tutorial images
@@ -167,6 +157,11 @@
         helpFocused: false,
       };
     },
+    computed: {
+      bucket() {
+        return this.playMode === 'catch' ? this.config.studies[this.config.catchTrials.dataset].bucket : this.config.studies[this.dataset].bucket;
+      },
+    },
     /**
      * If the playMode === 'tutorial', show a tutorial step.
      */
@@ -182,7 +177,7 @@
     },
     methods: {
       postRequest(pointer) {
-        const bucket = this.playMode === 'catch' ? this.catchBucket : this.bucket;
+        const bucket = this.bucket;
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.open('POST', '/Image', true);

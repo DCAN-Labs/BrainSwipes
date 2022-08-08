@@ -42,7 +42,6 @@
           :datasetPrivileges="datasetPrivileges"
           @changePermissions="updateDatasetPermissions"
           :studies="studies"
-          :bucket="bucket"
           @login="getUserDatasets"
           :key="$route.fullPath"
           :globusToken="globusToken"
@@ -54,8 +53,6 @@
           @markDefinitionsAdded="markDefinitionsAdded"
           :maintenanceDate="maintenanceDate"
           :maintenanceStatus="maintenanceStatus"
-          :catchDataset="catchDataset"
-          :catchBucket="catchBucket"
           :catchFrequency="catchFrequency"
         />
       </div>
@@ -138,10 +135,6 @@ export default {
        */
       db: firebase.database(),
       /**
-       * This is the config object, it defines the look of the app
-       */
-      // config,
-      /**
        * All the users in the /users document
        */
       allUsers: [],
@@ -154,21 +147,9 @@ export default {
        */
       datasetPrivileges: {},
       /**
-       * List of studies available
-       */
-      studies: {},
-      /**
-       * s3 bucket where the images are stored
-       */
-      bucket: '',
-      /**
        * Globus auth token
        */
       globusToken: '',
-      /**
-       * List of organizations we trust from globus auth
-       */
-      globusAllowedOrgs: [],
       /**
        * Errors thrown by brainswipes
        */
@@ -184,17 +165,6 @@ export default {
        * prevents the tutorial addDefinitions function from running more than once
        */
       definitionsAdded: false,
-      /**
-       * maintenance banner config from db
-       */
-      maintenanceDate: '',
-      maintenanceStatus: false,
-      /**
-       * catch trials configuration
-       */
-      catchDataset: '',
-      catchFrequency: 0,
-      catchBucket: '',
     };
   },
   /**
@@ -208,7 +178,6 @@ export default {
     firebase.auth().onAuthStateChanged((user) => {
       self.userInfo = user || {};
     });
-    this.initCatchTrials();
   },
   components: {
     Footer,
@@ -258,6 +227,33 @@ export default {
         return false;
       }
       return !!Object.keys(this.userInfo).length;
+    },
+    /**
+     * Configuration for catch trials
+     */
+    catchDataset() {
+      return this.config.catchTrials.dataset;
+    },
+    catchFrequency() {
+      return this.config.catchTrials.frequency;
+    },
+    studies() {
+      return this.config.studies;
+    },
+    /**
+     * List of organizations we trust from globus auth
+    */
+    globusAllowedOrgs() {
+      return this.config.allowedGlobusOrganizations;
+    },
+    /**
+     * maintenance banner config from db
+     */
+    maintenanceDate() {
+      return this.config.maintenance.date;
+    },
+    maintenanceStatus() {
+      return this.config.maintenance.bannerStatus;
     },
   },
   methods: {
@@ -324,7 +320,6 @@ export default {
      */
     updateDataset(newDataset) {
       this.dataset = newDataset;
-      this.bucket = this.studies[newDataset].bucket;
     },
     /**
      * What datasets the user can access
@@ -338,16 +333,6 @@ export default {
     },
     updateDatasetPermissions() {
       this.getUserDatasets();
-    },
-    async getStudies() {
-      this.db.ref('config/studies').on('value', (snap) => {
-        this.studies = snap.val();
-      });
-    },
-    async getGlobusAllowdOrgs() {
-      this.db.ref('config/allowedGlobusOrganizations').on('value', (snap) => {
-        this.globusAllowedOrgs = snap.val();
-      });
     },
     globusLogin(token) {
       this.globusToken = token;
@@ -373,30 +358,12 @@ export default {
     markDefinitionsAdded() {
       this.definitionsAdded = true;
     },
-    async getMaintenanceStatus() {
-      this.db.ref('config/maintenance').on('value', (snap) => {
-        this.maintenanceDate = snap.val().date;
-        this.maintenanceStatus = snap.val().bannerStatus;
-      });
-    },
-    initCatchTrials() {
-      this.db.ref('config/catchTrials').once('value', (snap) => {
-        this.catchDataset = snap.val().dataset;
-        this.catchFrequency = snap.val().frequency;
-        this.db.ref(`config/studies/${this.catchDataset}/bucket`).once('value', (snap3) => {
-          this.catchBucket = snap3.val();
-        });
-      });
-    },
   },
   /**
    * intialize the animate on scroll library (for tutorial) and listen to authentication state
    */
   async created() {
     await this.getUserDatasets();
-    await this.getStudies();
-    await this.getGlobusAllowdOrgs();
-    await this.getMaintenanceStatus();
   },
 };
 </script>

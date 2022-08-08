@@ -61,7 +61,7 @@
         :playMode="''"
         ref="widget"
         :dataset="dataset"
-        :bucket="bucket"
+        :config="config"
         />
       </div>
       <div id="review-controls">
@@ -312,12 +312,6 @@
        */
       imageType() {
         return this.getImageType();
-      },
-      /**
-       * the s3 bucket where the images for the dataset are held
-       */
-      bucket() {
-        return this.studies[this.dataset].bucket;
       },
     },
     watch: {
