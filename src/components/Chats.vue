@@ -121,13 +121,6 @@ export default {
       type: Function,
       required: true,
     },
-    /**
-     * List of studies from the db
-     */
-    studies: {
-      type: Object,
-      required: true,
-    },
   },
   /**
    * Prevents navigation to Chats when the dataset prop does not match the route name

@@ -29,7 +29,8 @@
       </nav>
       
       <!-- The content is in the router view -->
-      <div class="router">
+      <div v-if="loading">LOADING</div>
+      <div class="router" v-else>
         <router-view
           :userInfo="userInfo"
           :userData="userData"
@@ -41,19 +42,14 @@
           @changeDataset="updateDataset"
           :datasetPrivileges="datasetPrivileges"
           @changePermissions="updateDatasetPermissions"
-          :studies="studies"
           @login="getUserDatasets"
           :key="$route.fullPath"
           :globusToken="globusToken"
           @globusLogin="globusLogin"
           :getGlobusIdentities="getGlobusIdentities"
-          :globusAllowedOrgs="globusAllowedOrgs"
           :errorCodes="errorCodes"
           :definitionsAdded="definitionsAdded"
           @markDefinitionsAdded="markDefinitionsAdded"
-          :maintenanceDate="maintenanceDate"
-          :maintenanceStatus="maintenanceStatus"
-          :catchFrequency="catchFrequency"
         />
       </div>
     </div>
@@ -62,7 +58,6 @@
         :config="config" 
         @changeDataset="updateDataset"
         :dataset="dataset"
-        :studies="studies"
         :datasetPrivileges="datasetPrivileges"
       />
     </div>
@@ -165,6 +160,11 @@ export default {
        * prevents the tutorial addDefinitions function from running more than once
        */
       definitionsAdded: false,
+      /**
+       * the config from firebase
+       */
+      config: {},
+      loading: true,
     };
   },
   /**
@@ -189,10 +189,6 @@ export default {
     return {
       allUsers: {
         source: this.db.ref('/users/').orderByChild('score'),
-        asObject: true,
-      },
-      config: {
-        source: this.db.ref('/config'),
         asObject: true,
       },
     };
@@ -227,33 +223,6 @@ export default {
         return false;
       }
       return !!Object.keys(this.userInfo).length;
-    },
-    /**
-     * Configuration for catch trials
-     */
-    catchDataset() {
-      return this.config.catchTrials.dataset;
-    },
-    catchFrequency() {
-      return this.config.catchTrials.frequency;
-    },
-    studies() {
-      return this.config.studies;
-    },
-    /**
-     * List of organizations we trust from globus auth
-    */
-    globusAllowedOrgs() {
-      return this.config.allowedGlobusOrganizations;
-    },
-    /**
-     * maintenance banner config from db
-     */
-    maintenanceDate() {
-      return this.config.maintenance.date;
-    },
-    maintenanceStatus() {
-      return this.config.maintenance.bannerStatus;
     },
   },
   methods: {
@@ -358,12 +327,20 @@ export default {
     markDefinitionsAdded() {
       this.definitionsAdded = true;
     },
+    async getConfig() {
+      this.db.ref('config').on('value', (snap) => {
+        const config = snap.val();
+        this.config = config;
+        this.loading = false;
+      });
+    },
   },
   /**
    * intialize the animate on scroll library (for tutorial) and listen to authentication state
    */
   async created() {
     await this.getUserDatasets();
+    await this.getConfig();
   },
 };
 </script>

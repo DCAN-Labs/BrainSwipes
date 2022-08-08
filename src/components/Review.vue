@@ -243,13 +243,6 @@
         type: Function,
         required: true,
       },
-      /**
-       * List of studies from the db
-       */
-      studies: {
-        type: Object,
-        required: true,
-      },
     },
     components: {
       ImageSwipe,

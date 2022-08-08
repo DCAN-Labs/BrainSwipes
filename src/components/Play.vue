@@ -145,20 +145,6 @@
         type: Function,
         required: true,
       },
-      /**
-       * List of studies from the db
-       */
-      studies: {
-        type: Object,
-        required: true,
-      },
-      /**
-       * catch trials configuration
-       */
-      catchFrequency: {
-        type: Number,
-        required: true,
-      },
       config: {
         type: Object,
         required: true,
@@ -198,8 +184,6 @@
          */
         sampleCounts: [],
         userSeenSamples: [],
-        catchTrials: [],
-
         /**
          * if sampleCounts is empty after its fetched from the db, then noData
          * flag is set to true. TODO: prompt the user to the setup instructions
@@ -250,7 +234,6 @@
     mounted() {
       this.initSampleCounts(this.dataset);
       this.initSeenSamples(this.dataset);
-      this.initCatchTrialSamples(this.dataset);
     },
     components: {
       Flask,
@@ -267,6 +250,12 @@
        */
       catchDataset() {
         return this.config.catchTrials.dataset;
+      },
+      /**
+       * the list of samples to be used as catch trials
+       */
+      catchTrials() {
+        return Object.keys(this.config.studies[this.dataset].catchTrials);
       },
     },
     methods: {
@@ -317,16 +306,6 @@
               /* eslint-enable */
             });
         }
-      },
-      /**
-       * Initialize the samples the current dataset will use as catch trials
-       */
-      initCatchTrialSamples(dataset) {
-        this.db.ref(`config/studies/${dataset}/catchTrials`).once('value', (snap) => {
-          if (snap.val()) {
-            this.catchTrials = Object.keys(snap.val());
-          }
-        });
       },
       /**
        * A method to shuffle an array.
@@ -439,10 +418,9 @@
         this.playMode = 'play';
 
         let sampleId;
-
         if (this.$route.query.s) {
           sampleId = { '.key': Buffer.from(this.$route.query.s, 'base64').toString('ascii') };
-        } else if (Math.random() < this.catchFrequency && this.catchTrials.length) {
+        } else if (Math.random() < this.config.catchTrials.frequency && this.catchTrials) {
           sampleId = this.serveCatchTrial();
         } else {
           sampleId = this.sampleUserPriority()[0];

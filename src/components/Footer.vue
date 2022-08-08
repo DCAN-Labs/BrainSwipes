@@ -2,7 +2,7 @@
   <footer>
     <div class="footer__container">
       <a href="https://innovation.umn.edu/developmental-cognition-and-neuroimaging-lab/" target="_blank"><img src="../assets/DCAN-logo.png" alt="DCAN logo" class="logo"></a>
-      <nav v-if="loading">
+      <nav v-if="loadingAdmin || loadingLearn">
       </nav>
       <nav v-else>
         <router-link
@@ -28,7 +28,7 @@
         <div class="dropdown" @mouseover="hoverChats = true" @mouseleave="hoverChats = false">
           <div v-show="hoverChats">
             <div class="dropdown-content">
-              <a v-for="study in Object.keys(studies)" :key="study" @click="routeToChats(study)" class="nav__link" v-show="datasetPrivileges[study]">{{study}}</a>
+              <a v-for="study in Object.keys(config.studies)" :key="study" @click="routeToChats(study)" class="nav__link" v-show="datasetPrivileges[study]">{{study}}</a>
             </div>
           </div>
           <a class="nav__link dropdown-button">Chats</a>
@@ -53,11 +53,11 @@ export default {
       type: String,
       requred: true,
     },
-    studies: {
+    datasetPrivileges: {
       type: Object,
       required: true,
     },
-    datasetPrivileges: {
+    config: {
       type: Object,
       required: true,
     },
@@ -71,7 +71,8 @@ export default {
         { path: '/results', name: 'Results' },
       ],
       isAdmin: false,
-      loading: true,
+      loadingAdmin: true,
+      loadingLearn: true,
       hoverChats: false,
       hoverLearn: false,
       tutorialLevel: 0,
@@ -79,13 +80,15 @@ export default {
   },
   mounted() {
     firebase.auth().onAuthStateChanged(() => {
-      this.loading = true;
+      this.loadingAdmin = true;
+      this.loadingLearn = true;
       this.addAdminRoutes();
+      this.setTutorialLevel();
     });
   },
   async created() {
-    await this.addAdminRoutes();
     await this.setTutorialLevel();
+    await this.addAdminRoutes();
   },
   methods: {
     async addAdminRoutes() {
@@ -97,11 +100,11 @@ export default {
           } else {
             this.isAdmin = false;
           }
-          this.loading = false;
+          this.loadingAdmin = false;
         });
       } else {
         this.isAdmin = false;
-        this.loading = false;
+        this.loadingAdmin = false;
       }
     },
     /**
@@ -131,6 +134,7 @@ export default {
             tutorialLevel = 0;
         }
         this.tutorialLevel = tutorialLevel;
+        this.loadingLearn = false;
       });
     },
   },

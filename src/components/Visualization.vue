@@ -201,13 +201,6 @@
         type: Object,
         required: true,
       },
-      /**
-       * the list of datasets available to QC
-       */
-      studies: {
-        type: Object,
-        required: true,
-      },
       datasetPrivileges: {
         type: Object,
         required: true,

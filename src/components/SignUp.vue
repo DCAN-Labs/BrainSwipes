@@ -124,9 +124,9 @@
     },
     props: {
       /**
-       * list of studies in the app
+       * config from firebase
        */
-      studies: {
+      config: {
         type: Object,
         required: true,
       },
@@ -144,16 +144,6 @@
        */
       consentFormLabel() {
         return this.form.consented ? 'You have consented!' : 'Click to read and sign the consent form';
-      },
-      /**
-       * default permissions for each dataset
-       */
-      studyPermissions() {
-        const studyPermissions = {};
-        Object.keys(this.studies).forEach((study) => {
-          studyPermissions[study] = this.studies[study].available;
-        });
-        return studyPermissions;
       },
     },
     methods: {
