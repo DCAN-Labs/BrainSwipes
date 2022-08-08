@@ -15,8 +15,18 @@
           :to="menuItem.path"
           class="nav__link"
         >{{menuItem.name}}</router-link>
-        <div class="dropdown" @mouseover="hover = true" @mouseleave="hover = false">
-          <div clas="dropdown-menu" v-show="hover">
+        <div class="dropdown" @mouseover="hoverLearn = true" @mouseleave="hoverLearn = false">
+          <div v-show="hoverLearn">
+            <div class="dropdown-content">
+              <a @click="routeTo('Tutorial')" v-show="tutorialLevel >= 0" class="nav__link">Tutorial</a>
+              <a @click="routeTo('Practice')" v-show="tutorialLevel >= 1" class="nav__link">Practice</a>
+              <a @click="routeTo('Gallery')" v-show="tutorialLevel >= 2" class="nav__link">Gallery</a>
+            </div>
+          </div>
+          <a class="nav__link dropdown-button">Learn</a>
+        </div>
+        <div class="dropdown" @mouseover="hoverChats = true" @mouseleave="hoverChats = false">
+          <div v-show="hoverChats">
             <div class="dropdown-content">
               <a v-for="study in Object.keys(studies)" :key="study" @click="routeToChats(study)" class="nav__link" v-show="datasetPrivileges[study]">{{study}}</a>
             </div>
@@ -66,14 +76,15 @@ export default {
     return {
       menuItems: [
         { path: '/', name: 'Home' },
-        { path: '/tutorial', name: 'Tutorial' },
         { path: '/leaderboard', name: 'Leaderboard' },
         { path: '/about', name: 'About' },
         { path: '/results', name: 'Results' },
       ],
       isAdmin: false,
       loading: true,
-      hover: false,
+      hoverChats: false,
+      hoverLearn: false,
+      tutorialLevel: 0,
     };
   },
   mounted() {
@@ -84,6 +95,7 @@ export default {
   },
   async created() {
     await this.addAdminRoutes();
+    await this.setTutorialLevel();
   },
   methods: {
     async addAdminRoutes() {
@@ -108,6 +120,28 @@ export default {
     routeToChats(label) {
       this.$emit('changeDataset', label);
       this.$router.push({ name: 'Chats', params: { dataset: label } });
+    },
+    routeTo(route) {
+      const path = { name: route };
+      this.$router.push(path);
+    },
+    async setTutorialLevel() {
+      const dbRef = firebase.database().ref(`users/${firebase.auth().currentUser.displayName}/takenTutorial`);
+      dbRef.on('value', (snap) => {
+        const takenTutorial = snap.val();
+        let tutorialLevel = 0;
+        switch (takenTutorial) {
+          case 'complete':
+            tutorialLevel = 2;
+            break;
+          case 'needsPractice':
+            tutorialLevel = 1;
+            break;
+          default:
+            tutorialLevel = 0;
+        }
+        this.tutorialLevel = tutorialLevel;
+      });
     },
   },
 };
