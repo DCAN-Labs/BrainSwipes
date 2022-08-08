@@ -8,14 +8,16 @@
           {{Object.keys(userInfo).length ? userData.takenTutorial === 'complete' ? 'Choose a dataset to QC': 'Review our learning resources before you begin swiping' : 'Login to begin'}}
         </p>
       </div>
-      <div v-if="Object.keys(config.studies).length" class="mt-3">
-        <div v-if="userData.takenTutorial === 'complete'" class="buttons">
-          <div v-for="study in Object.keys(config.studies)" :key="study">
-            <b-button class="btn btn-primary" v-if="datasetPrivileges[study]" @click="routeToPlay(study)">{{study}}</b-button>
+      <div v-if="Object.keys(userInfo).length">
+        <div v-if="Object.keys(config.studies).length" class="mt-3">
+          <div v-if="userData.takenTutorial === 'complete'" class="buttons">
+            <div v-for="study in Object.keys(config.studies)" :key="study">
+              <b-button class="btn btn-primary" v-if="datasetPrivileges[study]" @click="routeToPlay(study)">{{study}}</b-button>
+            </div>
           </div>
-        </div>
-        <div v-else>
-          <b-button class="btn btn-primary" @click="routeToTutorial">Learn</b-button>
+          <div v-else>
+            <b-button class="btn btn-primary" @click="routeToTutorial">Learn</b-button>
+          </div>
         </div>
       </div>
     </div>

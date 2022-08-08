@@ -75,13 +75,14 @@ export default {
       loadingLearn: true,
       hoverChats: false,
       hoverLearn: false,
-      tutorialLevel: 0,
+      tutorialLevel: -1,
     };
   },
   mounted() {
     firebase.auth().onAuthStateChanged(() => {
       this.loadingAdmin = true;
       this.loadingLearn = true;
+      this.tutorialLevel = -1;
       this.addAdminRoutes();
       this.setTutorialLevel();
     });
@@ -119,23 +120,28 @@ export default {
       this.$router.push(path);
     },
     async setTutorialLevel() {
-      const dbRef = firebase.database().ref(`users/${firebase.auth().currentUser.displayName}/takenTutorial`);
-      dbRef.on('value', (snap) => {
-        const takenTutorial = snap.val();
-        let tutorialLevel = 0;
-        switch (takenTutorial) {
-          case 'complete':
-            tutorialLevel = 2;
-            break;
-          case 'needsPractice':
-            tutorialLevel = 1;
-            break;
-          default:
-            tutorialLevel = 0;
-        }
-        this.tutorialLevel = tutorialLevel;
+      const currentUser = firebase.auth().currentUser;
+      if (currentUser) {
+        const dbRef = firebase.database().ref(`users/${currentUser.displayName}/takenTutorial`);
+        dbRef.on('value', (snap) => {
+          const takenTutorial = snap.val();
+          let tutorialLevel = 0;
+          switch (takenTutorial) {
+            case 'complete':
+              tutorialLevel = 2;
+              break;
+            case 'needsPractice':
+              tutorialLevel = 1;
+              break;
+            default:
+              tutorialLevel = 0;
+          }
+          this.tutorialLevel = tutorialLevel;
+          this.loadingLearn = false;
+        });
+      } else {
         this.loadingLearn = false;
-      });
+      }
     },
   },
 };
