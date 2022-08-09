@@ -51,7 +51,6 @@
         <Checklist
           :config="config"
           :imageClass="imageType[0]"
-          :checks="Array(config.learn.checklists[imageType[0]].length).fill('question')"
         />
       </div>
       <div>
@@ -67,6 +66,7 @@
       <div id="review-controls">
         <b-button variant="danger" @click="openFlagWarning" :disabled="flagged && !isAdmin">{{flagged ? 'This sample is flagged' : 'Flag for Expert Review'}}</b-button>
         <b-button variant="primary" @click="toPlay">Back to Swiping</b-button>
+        <b-button variant="warning" v-if="isAdmin" @click="addToGallery" :disabled="config.learn.gallery[widgetPointer]">Add Sample to Gallery</b-button>
       </div>
       <hr>
       <div class="chat container">
@@ -467,6 +467,17 @@
         const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
         const userRoles = idTokenResult.claims;
         this.isAdmin = userRoles.admin || userRoles.studyAdmin[this.dataset];
+      },
+      /**
+       * Adds the sample to the gallery
+       */
+      addToGallery() {
+        console.log('addToGallery');
+        const update = {
+          hidden: true,
+          dataset: this.dataset,
+        };
+        this.db.ref(`config/learn/gallery/${this.widgetPointer}`).set(update);
       },
     },
     /**

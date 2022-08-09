@@ -2,7 +2,10 @@
     <div class="checklist" ref="checklist">
         <div class="checklist-wrapper">
           <div class="checklist-list">
-            <div class="checklist-item" v-for="(value, index) in checks" :key="index"><div :class="value === 'question' ? 'checked-question' : value ? 'checked' : 'unchecked'"></div><p>{{config.learn.checklists[imageClass][index]}}</p></div>
+            <div class="checklist-item" v-for="(value, index) in config.learn.checklists[imageClass]" :key="index" @click="handleClick(index)">
+              <div :class="checks ? checks[index] ? 'checked' : 'unchecked' : userChecks[index] "></div>
+              <p>{{config.learn.checklists[imageClass][index]}}</p>
+            </div>
           </div>
         </div>
     </div>  
@@ -12,7 +15,10 @@
   export default {
     data() {
       return {
-
+        /**
+         * when no checks are given to the component a user can click the checks to set their own.
+         */
+        userChecks: [],
       };
     },
     props: {
@@ -36,8 +42,27 @@
        */
       checks: {
         type: Array,
-        required: true,
+        required: false,
       },
+    },
+    methods: {
+      handleClick(index) {
+        if (!this.checks) {
+          const userChecks = [...this.userChecks];
+          if (userChecks[index] === 'checked') {
+            userChecks[index] = 'unchecked';
+          } else {
+            userChecks[index] = 'checked';
+          }
+          this.userChecks = userChecks;
+        }
+      },
+      setUserDefinedChecks() {
+        this.userChecks = Array(this.config.learn.checklists[this.imageClass].length).fill('checked-question');
+      },
+    },
+    mounted() {
+      this.setUserDefinedChecks();
     },
   };
 </script>
