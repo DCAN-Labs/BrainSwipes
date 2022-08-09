@@ -28,7 +28,7 @@
         <div class="dropdown" @mouseover="hoverChats = true" @mouseleave="hoverChats = false">
           <div v-show="hoverChats">
             <div class="dropdown-content">
-              <a v-for="study in Object.keys(config.studies)" :key="study" @click="routeToChats(study)" class="nav__link" v-show="datasetPrivileges[study]">{{study}}</a>
+              <a v-for="study in Object.keys(datasetPrivileges)" :key="study" @click="routeToChats(study)" class="nav__link" v-show="datasetPrivileges[study]">{{study}}</a>
             </div>
           </div>
           <a class="nav__link dropdown-button">Chats</a>

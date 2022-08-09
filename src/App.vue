@@ -29,7 +29,7 @@
       </nav>
       
       <!-- The content is in the router view -->
-      <div v-if="loading">LOADING</div>
+      <div v-if="loading"></div>
       <div class="router" v-else>
         <router-view
           :userInfo="userInfo"
