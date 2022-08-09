@@ -44,6 +44,13 @@
         type: Array,
         required: false,
       },
+      /**
+       * for use with setting values in the parent component
+       */
+      sample: {
+        type: String,
+        required: false,
+      },
     },
     methods: {
       handleClick(index) {
@@ -55,6 +62,7 @@
             userChecks[index] = 'checked';
           }
           this.userChecks = userChecks;
+          this.$emit('checkBoxClick', this.sample, userChecks);
         }
       },
       setUserDefinedChecks() {

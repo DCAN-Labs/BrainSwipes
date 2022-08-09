@@ -7,33 +7,33 @@
       <p>Have something you want added? Flag it by clicking the Help button.</p>
       <hr>
     </div>
-    <div>
-      <div class="gallery-item" v-for="sample in Object.keys(gallery)" :key="sample">
-        <div :class="gallery[sample].hidden ? 'hidden-item' : ''">
+    <div v-if="!loading">
+      <div v-for="sample in Object.keys(gallery)" :key="sample">
+        <div v-if="!gallery[sample].hidden || adminRoles.studyAdmin[gallery[sample].dataset] || adminRoles.admin" :class="gallery[sample].hidden ? 'hidden-item' : ''" class="gallery-item" >
           <div v-if="gallery[sample].hidden" class="gallery-form-wrapper">
             <div class="gallery-form">
               <b-form>
                 <b-form-group
-                  id="input-group-1"
+                  :id="'issue-label-group-' + sample"
                   label="Issue Label:"
-                  label-for="input-1"
+                  :label-for="'issue-label-' + sample"
                   description="A breif description of the issue, the title of the gallery entry."
                 >
                   <b-form-input
-                    id="input-1"
+                    :id="'issue-label-' + sample"
                     v-model="form[sample].label"
                     placeholder="Enter issue label"
                     required
                   ></b-form-input>
                 </b-form-group>
                 <b-form-group
-                  id="input-group-2"
+                  :id="'issue-description-group-' + sample"
                   label="Issue Description:"
-                  label-for="input-1"
+                  :label-for="'issue-description-' + sample"
                   description="A full description of the issue including rational for why this image passes or fails."
                 >
                   <b-form-input
-                    id="input-2"
+                    :id="'issue-description-' + sample"
                     v-model="form[sample].text"
                     placeholder="Enter full issue description"
                     required
@@ -41,7 +41,7 @@
                 </b-form-group>
                 <b-form-group label="Does the sample Pass or Fail?">
                   <b-form-radio-group
-                    id="radio-group-1"
+                    :id="'radio-group-' + sample"
                     v-model="form[sample].answer"
                     :options="[{ text: 'Pass', value: 1 }, { text: 'Fail', value: 0 }, { text: 'Flag for Removal', value: 2 }]"
                     name="radio-options"
@@ -53,9 +53,12 @@
                     :config="config"
                     :imageClass="getImageType(sample)[0]"
                     :checks="gallery[sample].checks"
+                    :sample="sample"
+                    v-on:checkBoxClick="updateCheckBox"
                   />
                 </div>
                 <br>
+                <p class="submit-errors" v-for="error in submitErrors[sample]" :key="error">Please fill out the {{errorToName[error]}}</p>
                 <b-button @click="onSubmit(sample)" variant="primary">Submit</b-button>
                 <b-button @click="onReset(sample)" variant="danger">Reset</b-button>
               </b-form>
@@ -127,12 +130,15 @@
     background-color: whitesmoke;
   }
 
+  .submit-errors {
+    font-weight: bold;
+  }
+
 </style>
 
 <script>
-/**
- * TODO: fill this in.
- */
+  import firebase from 'firebase/app';
+  import Vue from 'vue';
   import ImageSwipe from './Widgets/ImageSwipe';
   import Checklist from './Widgets/Checklist';
 
@@ -150,6 +156,21 @@
          * The object that holds the input from the form for new gallery items
          */
         form: {},
+        /**
+         * Tracks if the user can see unfinished entries
+         */
+        adminRoles: {},
+        loading: true,
+        /**
+         * displays submit errors
+         */
+        submitErrors: {},
+        errorToName: {
+          label: 'Issue Label',
+          answer: 'Pass or Fail',
+          checks: 'Checklist',
+          text: 'Issue Description',
+        },
       };
     },
     props: {
@@ -198,8 +219,32 @@
         return imageType;
       },
       onSubmit(sample) {
-        this.form[sample].hidden = false;
-        this.db.ref(`config/learn/gallery/${sample}`).set(this.form[sample]);
+        const valid = this.validateSubmit(sample);
+        if (valid.length) {
+          console.log(valid);
+          Vue.set(this.submitErrors, sample, valid);
+        } else {
+          this.form[sample].hidden = false;
+          this.db.ref(`config/learn/gallery/${sample}`).set(this.form[sample]);
+        }
+      },
+      validateSubmit(sample) {
+        const missing = [];
+        if (!Object.prototype.hasOwnProperty.call(this.form[sample], 'label')) {
+          missing.push('label');
+        }
+        if (!Object.prototype.hasOwnProperty.call(this.form[sample], 'answer')) {
+          missing.push('answer');
+        }
+        if (!Object.prototype.hasOwnProperty.call(this.form[sample], 'checks')) {
+          missing.push('checks');
+        } else if (this.form[sample].checks.includes('')) {
+          missing.push('checks');
+        }
+        if (!Object.prototype.hasOwnProperty.call(this.form[sample], 'text')) {
+          missing.push('text');
+        }
+        return missing;
       },
       onReset(sample) {
         this.form[sample] = this.config.learn.gallery[sample];
@@ -208,9 +253,36 @@
         const copy = JSON.parse(JSON.stringify(this.config.learn.gallery));
         this.form = copy;
       },
+      getAdminRoles() {
+        firebase.auth().currentUser.getIdTokenResult(true).then((idTokenResult) => {
+          const adminRoles = {};
+          adminRoles.studyAdmin = idTokenResult.claims.studyAdmin;
+          adminRoles.admin = idTokenResult.claims.admin;
+          this.adminRoles = adminRoles;
+          this.loading = false;
+        });
+      },
+      updateCheckBox(sample, userChecks) {
+        const checks = [];
+        Object.values(userChecks).forEach((value) => {
+          switch (value) {
+            case 'checked':
+              checks.push(true);
+              break;
+            case 'unchecked':
+              checks.push(false);
+              break;
+            default:
+              checks.push('');
+              break;
+          }
+        });
+        Vue.set(this.form[sample], 'checks', checks);
+      },
     },
     mounted() {
       this.copyGalleryConfig();
+      this.getAdminRoles();
     },
   };
 </script>
