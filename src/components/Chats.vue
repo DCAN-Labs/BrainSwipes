@@ -4,12 +4,12 @@
       <div class="chats-div" v-if="!noData">
         <h1>Chats</h1>
         <p class="lead">See which samples people are talking about</p>
-        <p v-for="(c, index) in sampleChat" :key="index">
-          <b-alert :variant="flagged.includes(c['.key']) ? 'danger' : 'primary'" show>
-            <router-link :to="'/' + dataset + '/review/' + c['.key']">{{c['.key']}}</router-link>
+        <p v-for="c in sampleChats" :key="c.sample">
+          <b-alert :variant="flagged.includes(c.sample) ? 'danger' : 'primary'" show>
+            <router-link :to="'/' + dataset + '/review/' + c.sample">{{c.sample}}</router-link>
             <br>
-            <span v-if="chatInfo[c['.key']]">
-              <b>{{chatInfo[c['.key']].username}}</b> : {{chatInfo[c['.key']].message}}
+            <span >
+              <b>{{c.username}}</b> : {{c.message}}
             </span>
           </b-alert>
         </p>
@@ -38,24 +38,16 @@ export default {
       /**
       * keep track of all the samples that have been discussed.
       */
-      sampleChat: {
-        source: this.db.ref(`datasets/${this.dataset}/chats`).child('sampleChatIndex').orderByChild('time'),
+      sampleChats: {
+        source: this.db.ref(`datasets/${this.dataset}/chats/sampleChats`),
         readyCallback() {
-          this.sampleChat.reverse();
-          this.sampleChat.forEach((c) => {
-            this.db.ref(`datasets/${this.dataset}/chats`)
-              .child('sampleChats')
-              .child(c['.key'])
-              .orderByKey()
-              .limitToLast(1)
-              .on('value', (snap) => {
-                const data = snap.val();
-                this.chatInfo[c['.key']] = data[Object.keys(data)[0]];
-                this.$forceUpdate();
-              });
-          });
-
-          if (!this.sampleChat.length) {
+          const chats = _.reduce(this.sampleChats, (result, value) => {
+            const values = value[Object.keys(_.omit(value, '.key'))[Object.keys(value).length - 2]];
+            result.push({ sample: value['.key'], message: values.message, time: values.time, username: values.username });
+            return result;
+          }, []);
+          this.sampleChats = _.orderBy(chats, 'time', 'desc');
+          if (!this.sampleChats.length) {
             this.noData = true;
           }
         },
@@ -73,10 +65,6 @@ export default {
   },
   data() {
     return {
-      /**
-       *
-       */
-      chatInfo: {},
       /**
        * A flag to tell us if the /chats doc is empty on firebase.
        */
@@ -120,6 +108,21 @@ export default {
     getGlobusIdentities: {
       type: Function,
       required: true,
+    },
+  },
+  methods: {
+    getChats() {
+      this.db.ref(`datasets/${this.dataset}/chats/sampleChats`).on('value', (snap) => {
+        const samples = snap.val();
+        const chats = _.reduce(samples, (result, value, key) => {
+          const values = value[Object.keys(value)[Object.keys(value).length - 1]];
+          result.push({
+            sample: key, message: values.message, time: values.time, username: values.username });
+          return result;
+        }, []);
+        const sortedChats = _.orderBy(chats, 'time', 'desc');
+        console.log(sortedChats);
+      });
     },
   },
   /**

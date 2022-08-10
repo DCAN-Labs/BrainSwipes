@@ -330,7 +330,6 @@
       /**
        * Method to add a new chat message. Update
        * 1. push the username, message and timestamp to `chats/sampleChats`
-       * 2. set the most recent chat time for this sample to `chats/sampleChatIndex`
        * 3. set that the user has sent a chat for this sample to `chats/userChat/<username>`
        * 4. **TODO**: set that other users following this chat have something new to see.
        */
@@ -343,12 +342,6 @@
           .child(key).push({
             username: this.userData.username,
             message: this.chatMessage,
-            time: new Date().toISOString(),
-          });
-
-        this.db.ref(`datasets/${this.dataset}/chats`)
-          .child('sampleChatIndex')
-          .child(key).set({
             time: new Date().toISOString(),
           });
 
