@@ -1,7 +1,7 @@
 <template>
   <div id="profile">
     <!-- Only show stuff is the user is authenticated -->
-    <b-container fluid>
+    <b-container>
       <!-- userInfo is a prop that was passed in from App -->
       <h1>
         {{userInfo.displayName}}
@@ -21,51 +21,31 @@
         <b-button id="verifyEmail" type="submit" variant="primary">Verify Email</b-button>
       </b-form>
       <hr>
-
-      <!-- Chats don't currently work with multiple datasets,
-      not worth dealing with right now.
-      Leaving here in case it matters later. -->
-
-      <!-- <div v-if="chats.length">
-        <h2> Your Chats </h2>
-        <p class="lead">
-          Your discussions on specific samples
-        </p>
-
-        <div v-for="c in chats"  class="text-left" :key="c">
-          <div v-if="chatInfo[c]">
-            <b-alert :show="chatInfo[c].notify">
-              <router-link :to="'/listen/' + c">{{c}}</router-link>:
-              <b>{{chatInfo[c].username}}</b>
-              {{chatInfo[c].message}}
-            </b-alert>
-            <b-alert :show="!chatInfo[c].notify" variant="light">
-              <router-link :to="'/review/' + c">{{c}}</router-link>:
-              <b>{{chatInfo[c].username}}</b>
-              {{chatInfo[c].message}}
-            </b-alert>
+      <h1>Samples you've commented on</h1>
+      <div class="user-chats">
+        <div v-for="study in Object.keys(userChats)" :key="study" class="study-chats-wrapper">
+          <div class="study-chats">
+            <h2>{{study}}</h2>
+            <!-- <router-link :to="'/review/' + c">{{c}}</router-link>: -->
+            <router-link v-for="c in userChats[study]" :key="c.sample" class="single-chat" :to="`${study}/review/${c.sample}?f=p`">
+              <b-alert show>
+                <h3>{{c.sample}}</h3>
+                <br>
+                <span >
+                  <b>{{c.username}}</b> : {{c.message}}
+                </span>
+              </b-alert>
+            </router-link>
           </div>
         </div>
       </div>
-      <div v-else>
-        <h2> Chats </h2>
-        <p class="lead">
-          You haven't said anything yet! When you're ready, join the discussion.
-        </p>
-        <img :src="blankImage" class="blankImage"/>
-      </div> -->
+
     </b-container>
 
   </div>
 </template>
 
 <style>
-  .pokemon{
-    min-width: 25px;
-    min-height: 25px;
-    width: 100px;
-    height: 100px;
-  }
 
   #profile {
     min-height: 100vh;
@@ -73,6 +53,29 @@
 
   .blankImage {
     max-width: 500px;
+  }
+
+  .user-chats {
+    padding-bottom: 12vh;
+  }
+
+  .study-chats {
+    max-width: 500px;
+  }
+
+  .study-chats-wrapper {
+    display: flex;
+    justify-content: center;
+  }
+
+  .user-chats h2 {
+    font-weight: 600;
+    font-size: 1.2em;
+    padding: 0.4em;
+  }
+
+  .single-chat h3{
+    font-weight: 600;
   }
 </style>
 
@@ -88,25 +91,21 @@
  */
 import firebase from 'firebase/app';
 import 'firebase/auth';
+import _ from 'lodash';
+import Vue from 'vue';
 
 export default {
   name: 'profile',
   data() {
     return {
       /**
-       * chats is filled with pointers to samples that the user has discussed
-       * from the firebase database. It is a list.
-       */
-      chats: [],
-      /**
-       * chatInfo is filled from the firebase database. For each item in chats,
-       * get the most recent discussion point from that chat and store it here.
-       */
-      chatInfo: {},
-      /**
        * an image to display if the user hasn't said anything.
        */
       blankImage: 'https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_chatting.svg?sanitize=true',
+      /**
+       * collection of chats the current user has participated in
+       */
+      userChats: [],
     };
   },
   computed: {
@@ -148,82 +147,59 @@ export default {
       type: Object,
       required: true,
     },
+    /**
+     * which studies the user can see
+     */
+    datasetPrivileges: {
+      type: Object,
+      required: true,
+    },
   },
-  /**
-   * when the component is mounted, it gets the user's chats.
-   */
-  // mounted() {
-  //   if (this.userData['.key']) {
-  //     this.getUserChats('BCP');
-  //   }
-  // },
-  // watch: {
-  //   /**
-  //    * if the user is updated, get their chats. (is this necessary?)
-  //    */
-  //   userData() {
-  //     if (this.userData['.key']) {
-  //       this.getUserChats('BCP');
-  //     }
-  //   },
-  //   chats() {
-  //     this.watchChats('BCP');
-  //   },
-  // },
   methods: {
     /**
-     * A method to read the firebase db ref /chats/<user_display_name>
-     *
+     * calls the built in firebase auth function to send the email
+     * from the template in the firebase console
      */
-    getUserChats(dataset) {
-      this.db.ref(`datasets/${dataset}/chats`)
-        .child('userChat')
-        .child(this.userData['.key'])
-        .on('value', (snap) => {
-          const data = snap.val();
-          if (data) {
-            this.chats = Object.keys(data);
-          }
-        });
-    },
-    /**
-     * for each chat key in the firebase database, update our local chatInfo data.
-     * this watcher should update the chats ui in real time.
-     */
-    watchChats(dataset) {
-      this.chats.forEach((c) => {
-        this.db.ref(`datasets/${dataset}/chats`)
-          .child('sampleChats')
-          .child(c)
-          .orderByKey()
-          .limitToLast(1)
-          .on('value', (snap) => {
-            const data = snap.val();
-            this.chatInfo[c] = data[Object.keys(data)[0]];
-            this.getNotifications(c);
-            this.$forceUpdate();
-          });
-      });
-    },
-    /**
-     * In theory this method should set a flag to tell the UI
-     * to highlight any chats that have been updated since that last time the user
-     * saw their chats. I don't think this method is even called yet.
-     */
-    getNotifications(key) {
-      this.db.ref('notifications')
-        .child(this.userData['.key'])
-        .child(key)
-        .on('value', (snap) => {
-          if (snap.val()) {
-            this.chatInfo[key].notify = true;
-            this.$forceUpdate();
-          }
-        });
-    },
     verifyEmail() {
       firebase.auth().currentUser.sendEmailVerification();
     },
+    /**
+     * gets chats for samples the current user has chatted on
+     * for the specified dataset
+     */
+    getUserChats() {
+      // const userChats = {};
+      Object.keys(this.datasetPrivileges).forEach(async (study) => {
+        if (this.datasetPrivileges[study]) {
+          this.db.ref(`datasets/${study}/chats/sampleChats`).on('value', (snap) => {
+            const data = snap.val();
+            const currentUserChats = _.reduce(data, (result, value, key) => {
+              if (_.filter(Object.values(value), { username: this.userInfo.displayName }).length) {
+                // eslint-disable-next-line
+                result[key] = value;
+              }
+              return result;
+            }, {});
+            const mostRecentMessages = _.reduce(currentUserChats, (result, value, key) => {
+              const values = value[Object.keys(value)[Object.keys(value).length - 1]];
+              result.push({
+                sample: key,
+                message: values.message,
+                time: values.time,
+                username: values.username,
+              });
+              return result;
+            }, []);
+            const studyChats = _.orderBy(mostRecentMessages, 'time', 'desc');
+            // userChats[study] = studyChats;
+            Vue.set(this.userChats, study, studyChats);
+          });
+        }
+      });
+    },
+  },
+  mounted() {
+    this.getUserChats();
   },
 };
 </script>

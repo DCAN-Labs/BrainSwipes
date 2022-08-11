@@ -32,7 +32,7 @@
              </span>
 
              <b-button v-if="playMode"
-              :to="playMode == 'tutorial' ? '' : `/${dataset}/review/${widgetPointer}`"
+              :to="playMode == 'tutorial' ? '' : `/${dataset}/review/${widgetPointer}?f=h`"
               ref="helpButton"
               class="helpbtn"
               v-bind:class="{ focus: helpFocused }"

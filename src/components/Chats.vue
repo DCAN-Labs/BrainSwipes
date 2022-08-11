@@ -6,7 +6,7 @@
         <p class="lead">See which samples people are talking about</p>
         <p v-for="c in sampleChats" :key="c.sample">
           <b-alert :variant="flagged.includes(c.sample) ? 'danger' : 'primary'" show>
-            <router-link :to="'/' + dataset + '/review/' + c.sample">{{c.sample}}</router-link>
+            <router-link :to="`/${dataset}/review/${c.sample}?f=c`">{{c.sample}}</router-link>
             <br>
             <span >
               <b>{{c.username}}</b> : {{c.message}}

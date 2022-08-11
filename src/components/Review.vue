@@ -65,7 +65,7 @@
       </div>
       <div id="review-controls">
         <b-button variant="danger" @click="openFlagWarning" :disabled="flagged && !isAdmin">{{flagged ? 'This sample is flagged' : 'Flag for Expert Review'}}</b-button>
-        <b-button variant="primary" @click="toPlay">Back to Swiping</b-button>
+        <b-button v-if="source" variant="primary" @click="toSource">Back to {{source}}</b-button>
         <b-button variant="warning" v-if="isAdmin" @click="addToGallery" :disabled="config.learn.gallery[widgetPointer]">Add Sample to Gallery</b-button>
       </div>
       <hr>
@@ -286,6 +286,10 @@
          * if the user is an admin, sitewide or study specific
          */
         isAdmin: false,
+        /**
+         * the route the user was linked from
+         */
+        source: '',
       };
     },
     computed: {
@@ -325,6 +329,7 @@
       this.setSampleInfo(this.dataset);
       this.checkFlaggedStatus();
       this.getUserRoles();
+      this.getSource();
     },
     methods: {
       /**
@@ -419,6 +424,21 @@
         const routeData = this.$router.resolve({ name: 'Tutorial', query: { section: this.imageType[0] } });
         window.open(routeData.href, '_blank');
       },
+      toSource() {
+        switch (this.source) {
+          case 'Play':
+            this.toPlay();
+            break;
+          case 'Chats':
+            this.$router.push({ name: 'Chats', params: { dataset: this.dataset } });
+            break;
+          case 'Profile':
+            this.$router.push({ name: 'Profile' });
+            break;
+          default:
+            break;
+        }
+      },
       toPlay() {
         const query = this.flagged ? null : { s: Buffer.from(this.widgetPointer).toString('Base64') };
         this.$router.push({ name: 'Play', params: { dataset: this.dataset }, query });
@@ -471,6 +491,25 @@
           dataset: this.dataset,
         };
         this.db.ref(`config/learn/gallery/${this.widgetPointer}`).set(update);
+      },
+      getSource() {
+        if (this.$route.query.f) {
+          const from = this.$route.query.f;
+          switch (from) {
+            case 'h':
+              this.source = 'Play';
+              break;
+            case 'p':
+              this.source = 'Profile';
+              break;
+            case 'c':
+              this.source = 'Chats';
+              break;
+            default:
+              this.source = '';
+              break;
+          }
+        }
       },
     },
     /**
