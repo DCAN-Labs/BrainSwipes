@@ -22,12 +22,17 @@
             />
           </li>
           <li class="navSection account-details">
-            <AccountMenu :userInfo="userInfo" :userData="userData" :loggedIn="userIsDefined" @logout="logout" />
+            <AccountMenu
+              :userInfo="userInfo"
+              :userData="userData"
+              :loggedIn="userIsDefined"
+              @logout="logout"
+              :notification="notification"
+            />
           </li>
           <li class="navSection desktop-menu"></li>
         </ul>
       </nav>
-      
       <!-- The content is in the router view -->
       <div v-if="loading"></div>
       <div class="router" v-else>
@@ -50,6 +55,7 @@
           :errorCodes="errorCodes"
           :definitionsAdded="definitionsAdded"
           @markDefinitionsAdded="markDefinitionsAdded"
+          :notification="notification"
         />
       </div>
     </div>
@@ -165,6 +171,10 @@ export default {
        */
       config: {},
       loading: true,
+      /**
+       * if the user has notifications
+       */
+      notification: false,
     };
   },
   /**
@@ -297,6 +307,7 @@ export default {
       if (firebase.auth().currentUser) {
         firebase.auth().currentUser.getIdTokenResult(true).then((idTokenResult) => {
           this.datasetPrivileges = idTokenResult.claims.datasets;
+          this.getNotifications();
         });
       }
     },
@@ -332,6 +343,21 @@ export default {
         const config = snap.val();
         this.config = config;
         this.loading = false;
+      });
+    },
+    getNotifications() {
+      let notification = false;
+      Object.keys(_.pickBy(this.datasetPrivileges, _.identity)).forEach((study) => {
+        this.db.ref(`datasets/${study}/chats/chats`).on('value', (snap) => {
+          const chats = snap.val();
+          const studyNotification = _.reduce(chats, (result, value) => {
+            // eslint-disable-next-line
+            result = value.notify[firebase.auth().currentUser.displayName] || result;
+            return result;
+          }, false);
+          notification = notification || studyNotification;
+        });
+        this.notification = notification;
       });
     },
   },
@@ -416,5 +442,25 @@ export default {
   .foot{
     display: none;
   }
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 </style>

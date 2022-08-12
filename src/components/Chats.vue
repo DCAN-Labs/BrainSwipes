@@ -39,11 +39,14 @@ export default {
       * keep track of all the samples that have been discussed.
       */
       sampleChats: {
-        source: this.db.ref(`datasets/${this.dataset}/chats/sampleChats`),
+        source: this.db.ref(`datasets/${this.dataset}/chats/chats`),
         readyCallback() {
           const chats = _.reduce(this.sampleChats, (result, value) => {
-            const values = value[Object.keys(_.omit(value, '.key'))[Object.keys(value).length - 2]];
-            result.push({ sample: value['.key'], message: values.message, time: values.time, username: values.username });
+            const existingChats = _.filter(value.chats, { deleted: false });
+            if (existingChats.length) {
+              const values = Object.values(existingChats)[Object.keys(existingChats).length - 1];
+              result.push({ sample: value['.key'], message: values.message, time: values.time, username: values.username });
+            }
             return result;
           }, []);
           this.sampleChats = _.orderBy(chats, 'time', 'desc');

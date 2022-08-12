@@ -79,6 +79,7 @@
         <div v-else>
           <p>No one has said anything yet!</p>
         </div>
+        <p>{{notify}}</p>
         <b-form @submit="sendChat">
           <b-form-group id="exampleInputGroup1"
                   label="Enter chat message:"
@@ -290,6 +291,10 @@
          * the route the user was linked from
          */
         source: '',
+        /**
+         * the users to notify
+         */
+        notify: {},
       };
     },
     computed: {
@@ -342,39 +347,22 @@
         e.preventDefault();
         const key = this.$route.params.key;
 
-        this.db.ref(`datasets/${this.dataset}/chats`)
-          .child('sampleChats')
-          .child(key).push({
+        this.db.ref(`datasets/${this.dataset}/chats/chats/${key}/chats`)
+          .push({
             username: this.userData.username,
             message: this.chatMessage,
             time: new Date().toISOString(),
+            deleted: false,
           });
 
-        this.db.ref(`datasets/${this.dataset}/chats`)
-          .child('userChat')
-          .child(this.userData.username)
-          .child(key)
-          .set({
-            watch: 1,
-          });
+        Object.keys(this.notify).forEach((user) => {
+          this.notify[user] = true;
+        });
+        this.notify[this.userData.username] = false;
+        console.log(this.notify);
+        this.db.ref(`datasets/${this.dataset}/chats/chats/${key}/notify`).set(this.notify);
 
         this.chatMessage = '';
-
-        // add a flag to all other users following this chat.
-        const usersToNotify = [];
-        this.chatOrder.forEach((v) => {
-          if (usersToNotify.indexOf(v.username) < 0 && v.username !== this.userData.username) {
-            usersToNotify.push(v.username);
-          }
-        });
-
-        usersToNotify.forEach((u) => {
-          this.db.ref(`datasets/${this.dataset}/chats`)
-            .child('userNotifications')
-            .child(u)
-            .child(key)
-            .set(true);
-        });
       },
       /**
        * Take a firebase input object and make it a nice list.
@@ -391,12 +379,11 @@
        */
       setSampleInfo(dataset) {
         // get the chat for this sample
-        this.db.ref(`datasets/${dataset}/chats`)
-          .child('sampleChats')
-          .child(this.widgetPointer)
+        this.db.ref(`datasets/${dataset}/chats/chats/${this.widgetPointer}`)
           .on('value', (snap2) => {
-            const chatData = snap2.val();
+            const chatData = _.filter(snap2.val().chats, { deleted: false });
             this.chatHistory = chatData;
+            this.notify = snap2.val().notify;
           });
 
         // get the widget's summary info

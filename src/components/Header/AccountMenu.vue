@@ -61,6 +61,10 @@ export default {
       type: Object,
       required: true,
     },
+    notification: {
+      type: Boolean,
+      required: true,
+    },
   },
   methods: {
     onClose() {
@@ -116,6 +120,15 @@ export default {
   line-height: 50px;
   font-weight: 400;
   font-size: 1.125em;
+}
+.message::after {
+  display: block;
+  content: ' ';
+  background-image: url('../../assets/envelope.svg');
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+  height: 16px;
+  width: 16px;
 }
 
 @media (min-width: 65em) {
