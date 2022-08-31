@@ -20,7 +20,7 @@
         :identifier="`practice${progress}`"
         :tutorialStep="null"
         ref="widget"
-        :dataset="tutorialDataset"
+        :dataset="steps[progress].dataset"
         :config="config"
       />
     </div>
