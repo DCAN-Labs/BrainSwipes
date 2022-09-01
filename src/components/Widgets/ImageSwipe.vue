@@ -10,7 +10,6 @@
                 :aspect-ratio="1"
               >
               </progressive-img>
-              <p>{{lastClick}}</p>
             </div>
 
             <div class="user-card__name">
