@@ -10,6 +10,7 @@
                 :aspect-ratio="1"
               >
               </progressive-img>
+              <p>{{lastClick}}</p>
             </div>
 
             <div class="user-card__name">
@@ -155,6 +156,11 @@
         rightFocused: false,
         leftFocused: false,
         helpFocused: false,
+        /**
+         * sets a small delay to prevent double swipes
+         */
+        lastClick: 0,
+        delay: 500,
       };
     },
     computed: {
@@ -174,6 +180,7 @@
     },
     async created() {
       await this.createUrl(this.widgetPointer);
+      this.lastClick = Date.now();
     },
     methods: {
       postRequest(pointer) {
@@ -329,17 +336,23 @@
        * set the swipe-left animation and vote 0
        */
       swipeLeft() {
-        // set the transition style
-        this.setSwipe('swipe-left');
-        this.vote(0);
+        if ((Date.now() - this.lastClick) >= this.delay) {
+          // set the transition style
+          this.setSwipe('swipe-left');
+          this.vote(0);
+          this.lastClick = Date.now();
+        }
       },
       /**
        * set the swipe-right animation and vote 1
        */
       swipeRight() {
-        // set the transition style
-        this.setSwipe('swipe-right');
-        this.vote(1);
+        if ((Date.now() - this.lastClick) >= this.delay) {
+          // set the transition style
+          this.setSwipe('swipe-right');
+          this.vote(1);
+          this.lastClick = Date.now();
+        }
       },
       /**
        * set the swipe direction based on the mouse/touch event.
