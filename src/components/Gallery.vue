@@ -193,12 +193,6 @@
       },
     },
     computed: {
-      /**
-       * dataset that the tutorial images are from
-       */
-      tutorialDataset() {
-        return this.config.learn.tutorial.dataset;
-      },
       gallery() {
         return this.config.learn.gallery;
       },
