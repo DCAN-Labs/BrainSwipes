@@ -16,7 +16,8 @@
         "White Matter": "Brain tissue consisting primarily of myelin-covered axons that extend from nerve cell bodies in the gray matter of the central nervous system. Its function is to transmit information to other parts of the brain, spinal cord, and body.",
         "Axial Plane":"A horizontal cross section view of the brain using MRI that primarily allows visualization of superior lobes of the cerebrum.",
         "Coronal Plane":"A frontal view of the brain using MRI that primarily allows visualization of the corpus callosum, frontal lobe, temporal lobes, lateral and 3rd ventricles, white matter structures and basal ganglia.",
-        "Sagittal Plane":"A vertical cross view of the brain using MRI that divides the brain between left and right sides that primarily allows visualization of the 3 major parts of the brain; cerebrum, cerebellum and brainstem, gray and white matter, and the 3rd and 4th ventricles."
+        "Sagittal Plane":"A vertical cross view of the brain using MRI that divides the brain between left and right sides that primarily allows visualization of the 3 major parts of the brain; cerebrum, cerebellum and brainstem, gray and white matter, and the 3rd and 4th ventricles.",
+        "Cerebrospinal Fluid":"A clear, colorless, watery fluid that flows in and around your brain and spinal cord."
     },
     "Neuroimaging Terms":{
         "Atlas":"A mapping of the brain that provides a standardized set of coordinates to determine specific sites.",
@@ -25,16 +26,11 @@
         "Structural Image": "Also known as an Anatomical Image. This is used to study the shape, integrity, volume and developmental changes in the brain.",
         "T1-Weighted Image":"A structural image where data is collected with relatively short radio pulses. In adults these images are characterized by darker cerebrospinal fluid.",
         "T2-Weighted Image":"A structural image where data is collected with relatively long radio pulses. In adults these images are characterized by lighter cerebrospinal fluid.",
-        "MNI":"Montreal Neuroligical Institue. A research and medical center dedicated to neuroscience. It is part of the McGill University Health Center network",
         "Structural MRI":"Magnetic Resonance Imaging. A non-invasive imaging technique that provides static anatomical information.",
         "Functional MRI":"A non-invasive imaging technique for mapping brain activity by measuring changes in metabolism, chemical composition and blood flow.",
-        "Cerbrospinal Fluid":"",
         "Registration":"Comparing a subject's images to another image by geometrically aligning them. The image can be compared to functional or structural images of the same subject or to a common atlas.",
         "Field Of View":"The dimensions of the region included in a scan.",
         "BOLD":"Blood Oxygen Level Dependent signal. Detected in fMRI, BOLD measures how blood flow and oxygen levels in the brain change while performing tasks.",
-        "Functional Connectivity":"",
-        "Networks":"",
-        "Imaging Pipeline":"",
         "Functional Image":"Images acquired through functional MRI. Used to measure changes in metabolism, chemical composition, blood flow and absorption.",
         "Anatomical Image":"Images of the anatomical structure of the brain. Used to study the shape, integrity, volume and developmental changes in the brain.",
         "Slice":"A two dimensional image of a cross section of tissue collected during MRI."
