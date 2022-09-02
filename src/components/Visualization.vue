@@ -1,7 +1,6 @@
 <template>
   <div id="visualization">
     <h1> Study Visualizations </h1>
-
     <b-container>
       <div>
         <b-dropdown variant="warning" class="datasetsDropdown" :text="submittedDataset ? submittedDataset : 'Select Study'" ref="datasetDropdown">
@@ -195,7 +194,7 @@
         required: true,
       },
       /**
-       * it comes directly from the `/uids` document in Firebase.
+       * it comes directly from the `/userss` document in Firebase.
        */
       allUsers: {
         type: Object,
@@ -224,13 +223,13 @@
       sortedUsersList() {
         /* Removes '.key' property present on allUsers data */
         const allUsernames = Object.keys(this.allUsers).filter(
-          uid => uid !== '.key',
+          user => user !== '.key',
         );
         const usernameArray = [];
         // eslint-disable-next-line
-        allUsernames.map((uid) => {
-          if (this.allUsers[uid].score > 0) {
-            usernameArray.push(this.allUsers[uid].username);
+        allUsernames.map((user) => {
+          if (this.allUsers[user].score > 0) {
+            usernameArray.push(user);
           }
         });
         this.selectedUsers = usernameArray;
