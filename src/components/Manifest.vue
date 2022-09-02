@@ -21,7 +21,7 @@
     </b-modal>
     <b-container>
       <div v-if="!lockout" class="study-buttons-row">
-        <b-button v-for="study in Object.keys(studies)" :key="study" class="study-button" v-bind:class="{selected: study === selectedStudy}" @click="selectStudy(study)">{{study}}</b-button><b-button class="study-button" @click="newStudy">New Study</b-button>
+        <b-button v-for="study in Object.keys(config.studies)" :key="study" class="study-button" v-bind:class="{selected: study === selectedStudy}" @click="selectStudy(study)">{{study}}</b-button><b-button class="study-button" @click="newStudy">New Study</b-button>
       </div>
       <div v-if="selectedStudy">
         <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
@@ -145,24 +145,6 @@ export default {
   },
   props: {
     /**
-     * the various levels, the points need to reach the levels,
-     * and the badges (colored and greyed out) to display
-     */
-    levels: {
-      type: Object,
-      required: true,
-    },
-    /**
-     * The config object that is loaded from src/config.js.
-     * It defines how the app is configured, including
-     * any content that needs to be displayed (app title, images, etc)
-     * and also the type of widget and where to update pointers to data
-     */
-    config: {
-      type: Object,
-      required: true,
-    },
-    /**
      * the intialized firebase database
      */
     db: {
@@ -170,9 +152,9 @@ export default {
       required: true,
     },
     /**
-     * The list of studies from the db
+     * The config from the db
      */
-    studies: {
+    config: {
       type: Object,
       required: true,
     },
@@ -319,7 +301,7 @@ export default {
      * add the empty study to firebase
      */
     addStudyToFirebase() {
-      const studies = JSON.parse(JSON.stringify(this.studies));
+      const studies = JSON.parse(JSON.stringify(this.config.studies));
       const newStudy = this.$refs['new-study-text'].localValue;
       const newBucket = this.$refs['new-bucket-text'].localValue;
       studies[newStudy] = { available: this.available, bucket: newBucket };

@@ -18,6 +18,8 @@ import Manifest from '@/components/Manifest';
 import Visualization from '@/components/Visualization';
 import Restricted from '@/components/Restricted';
 import Results from '@/components/Results';
+import Practice from '@/components/Practice';
+import Gallery from '@/components/Gallery';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -61,6 +63,7 @@ const router = new Router({
       meta: {
         requiresAuth: true,
         requiresAccess: true,
+        requiresTutorial: true,
       },
     },
     {
@@ -108,15 +111,17 @@ const router = new Router({
       meta: {
         requiresAuth: true,
         requiresAccess: true,
+        requiresTutorial: true,
       },
     },
     {
-      path: '/:dataset/review/:key/:bucket',
+      path: '/:dataset/review/:key/',
       name: 'Review',
       component: Review,
-      props: route => ({ widgetPointer: route.params.key, bucket: Buffer.from(route.params.bucket, 'base64').toString(), dataset: route.params.dataset }),
+      props: route => ({ widgetPointer: route.params.key, dataset: route.params.dataset }),
       meta: {
         requiresAccess: true,
+        requiresTutorial: true,
       },
     },
     {
@@ -162,6 +167,16 @@ const router = new Router({
         requiresAuth: true,
       },
     },
+    {
+      path: '/practice',
+      name: 'Practice',
+      component: Practice,
+    },
+    {
+      path: '/gallery',
+      name: 'Gallery',
+      component: Gallery,
+    },
   ],
 });
 
@@ -179,17 +194,21 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
   const requiresAccess = to.matched.some(record => record.meta.requiresAccess);
+  const requiresTutorial = to.matched.some(record => record.meta.requiresTutorial);
+
 
   if (requiresAuth && !currentUser) {
     next({ path: '/login', query: from.query });
   }
   // make sure the user has take the tutorial
-  if (to.name === 'Play') {
+  if (requiresTutorial) {
     if (currentUser) {
       firebase.database().ref(`/users/${currentUser.displayName}`).once('value')
         .then((snap) => {
           const data = snap.val();
-          if (!data.taken_tutorial) {
+          if (data.takenTutorial === 'needsPractice') {
+            next({ path: '/practice', query: from.query });
+          } else if (data.takenTutorial !== 'complete') {
             next({ path: '/tutorial', query: from.query });
           }
         });

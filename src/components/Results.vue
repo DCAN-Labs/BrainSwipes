@@ -37,10 +37,6 @@ export default {
       type: Object,
       required: true,
     },
-    studies: {
-      type: Object,
-      required: true,
-    },
     globusToken: {
       type: String,
       required: true,

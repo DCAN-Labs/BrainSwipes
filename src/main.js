@@ -6,7 +6,7 @@ import 'firebase/app-check';
 import 'firebase/auth';
 import App from './App';
 import router from './router';
-import config from './config';
+import firebaseKeys from './firebaseKeys';
 
 
 Vue.config.productionTip = false;
@@ -22,7 +22,7 @@ This will make sure Firebase initializes before loading the app when a user refr
 - https://savvyapps.com/blog/definitive-guide-building-web-app-vuejs-firebase
 */
 
-firebase.initializeApp(config.firebaseKeys);
+firebase.initializeApp(firebaseKeys);
 // if (process.env.NODE_ENV === 'development') {
 //   console.log(`NODE_ENV=${process.env.NODE_ENV}`);
 //   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
