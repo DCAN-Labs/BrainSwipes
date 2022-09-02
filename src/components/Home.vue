@@ -1,16 +1,23 @@
 <template>
   <div class="home container">
-    <b-alert :show="maintenanceStatus" variant="danger">BrainSwipes will be unavailable on {{maintenanceDate}} for scheduled maintenance.</b-alert>
+    <b-alert :show="bannerStatus" variant="danger">BrainSwipes will be unavailable on {{config.maintenance.date}} for scheduled maintenance.</b-alert>
     <div class="jumbotron landing" :style="landingStyle">
       <div id="titles">
         <h1>BrainSwipes by DCAN</h1>
         <p class="lead mt-3">
-          {{Object.keys(userInfo).length ? 'Choose a dataset to QC' : 'Login to begin'}}
+          {{Object.keys(userInfo).length ? userData.takenTutorial === 'complete' ? 'Choose a dataset to QC': 'Review our learning resources before you begin swiping' : 'Login to begin'}}
         </p>
       </div>
-      <div v-if="Object.keys(studies).length" class="buttons mt-3">
-        <div v-for="study in Object.keys(studies)" :key="study">
-          <b-button class="btn btn-primary" v-if="datasetPrivileges[study]" @click="routeToPlay(study)">{{study}}</b-button>
+      <div v-if="Object.keys(userInfo).length">
+        <div v-if="Object.keys(config.studies).length" class="mt-3">
+          <div v-if="userData.takenTutorial === 'complete'" class="buttons">
+            <div v-for="study in Object.keys(config.studies)" :key="study">
+              <b-button class="btn btn-primary" v-if="datasetPrivileges[study]" @click="routeToPlay(study)">{{study}}</b-button>
+            </div>
+          </div>
+          <div v-else>
+            <b-button class="btn btn-primary" @click="routeToTutorial">Learn</b-button>
+          </div>
         </div>
       </div>
     </div>
@@ -40,10 +47,6 @@ export default {
       type: Object,
       required: true,
     },
-    studies: {
-      type: Object,
-      required: true,
-    },
     globusToken: {
       type: String,
       required: true,
@@ -52,12 +55,12 @@ export default {
       type: Object,
       required: true,
     },
-    maintenanceDate: {
-      type: String,
+    userData: {
+      type: Object,
       required: true,
     },
-    maintenanceStatus: {
-      type: Boolean,
+    config: {
+      type: Object,
       required: true,
     },
   },
@@ -69,7 +72,7 @@ export default {
   methods: {
     routeToPlay(label) {
       const errors = [];
-      if (!this.studies[label].available) {
+      if (!this.config.studies[label].available) {
         if (!this.globusToken) {
           errors.push(1);
         }
@@ -84,6 +87,10 @@ export default {
         this.$router.push({ name: 'Play', params: { dataset: label } });
       }
     },
+    routeToTutorial() {
+      const name = this.userData.takenTutorial === 'none' ? 'Tutorial' : 'Practice';
+      this.$router.push({ name });
+    },
     reroute() {
       const query = this.$route.query;
       if (query.reroute) {
@@ -93,6 +100,11 @@ export default {
   },
   mounted() {
     this.reroute();
+  },
+  computed: {
+    bannerStatus() {
+      return this.config.maintenance.bannerStatus;
+    },
   },
 };
 </script>

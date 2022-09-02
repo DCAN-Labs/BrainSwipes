@@ -81,12 +81,8 @@ export default {
     },
   },
   props: {
-    maintenanceDate: {
-      type: String,
-      required: true,
-    },
-    maintenanceStatus: {
-      type: Boolean,
+    config: {
+      type: Object,
       required: true,
     },
     db: {
@@ -98,6 +94,14 @@ export default {
     this.getMaintenanceDate();
     this.getMaintenanceStatus();
     this.getUserRoles();
+  },
+  calculated: {
+    maintenanceDate() {
+      return this.config.maintenance.date;
+    },
+    maintenanceStatus() {
+      return this.config.maintenance.bannerStatus;
+    },
   },
 };
 </script>

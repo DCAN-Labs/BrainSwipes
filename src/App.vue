@@ -29,34 +29,27 @@
       </nav>
       
       <!-- The content is in the router view -->
-      <div class="router">
+      <div v-if="loading"></div>
+      <div class="router" v-else>
         <router-view
           :userInfo="userInfo"
           :userData="userData"
           :allUsers="allUsers"
-          :levels="levels"
-          :currentLevel="currentLevel"
           :config="config"
           :db="db"
-          v-on:taken_tutorial="setTutorial"
+          v-on:takenTutorial="setTutorial"
           :dataset="dataset"
           @changeDataset="updateDataset"
           :datasetPrivileges="datasetPrivileges"
           @changePermissions="updateDatasetPermissions"
-          :studies="studies"
-          :bucket="bucket"
           @login="getUserDatasets"
           :key="$route.fullPath"
           :globusToken="globusToken"
           @globusLogin="globusLogin"
           :getGlobusIdentities="getGlobusIdentities"
-          :globusAllowedOrgs="globusAllowedOrgs"
           :errorCodes="errorCodes"
-          :maintenanceDate="maintenanceDate"
-          :maintenanceStatus="maintenanceStatus"
-          :catchDataset="catchDataset"
-          :catchBucket="catchBucket"
-          :catchFrequency="catchFrequency"
+          :definitionsAdded="definitionsAdded"
+          @markDefinitionsAdded="markDefinitionsAdded"
         />
       </div>
     </div>
@@ -65,7 +58,6 @@
         :config="config" 
         @changeDataset="updateDataset"
         :dataset="dataset"
-        :studies="studies"
         :datasetPrivileges="datasetPrivileges"
       />
     </div>
@@ -103,8 +95,8 @@ import '../src/css/globals.css';
 import '../src/css/typography.css';
 
 
-// config options
-import config from './config';
+// eslint-disable-next-line
+import firebaseKeys from './firebaseKeys';
 
 // components
 import SliderMenu from './components/Header/SliderMenu';
@@ -138,23 +130,9 @@ export default {
        */
       db: firebase.database(),
       /**
-       * This is the config object, it defines the look of the app
-       */
-      config,
-      /**
-       * Whether or not to show the configuration panel
-       */
-      showConfig: false,
-      /**
        * All the users in the /users document
        */
       allUsers: [],
-      /**
-       * The configuration state, keeping track of the step number only.
-       */
-      configurationState: {
-        step: 0,
-      },
       /**
        * Whether or not to show Mobile menu, will be extracted into Header component later
        */
@@ -164,21 +142,9 @@ export default {
        */
       datasetPrivileges: {},
       /**
-       * List of studies available
-       */
-      studies: {},
-      /**
-       * s3 bucket where the images are stored
-       */
-      bucket: '',
-      /**
        * Globus auth token
        */
       globusToken: '',
-      /**
-       * List of organizations we trust from globus auth
-       */
-      globusAllowedOrgs: [],
       /**
        * Errors thrown by brainswipes
        */
@@ -191,16 +157,14 @@ export default {
         5: 'The email associated with your BrainSwipes account has not been verified. Please verify in your profile.',
       },
       /**
-       * maintenance banner config from db
+       * prevents the tutorial addDefinitions function from running more than once
        */
-      maintenanceDate: '',
-      maintenanceStatus: false,
+      definitionsAdded: false,
       /**
-       * catch trials configuration
+       * the config from firebase
        */
-      catchDataset: '',
-      catchFrequency: 0,
-      catchBucket: '',
+      config: {},
+      loading: true,
     };
   },
   /**
@@ -214,7 +178,6 @@ export default {
     firebase.auth().onAuthStateChanged((user) => {
       self.userInfo = user || {};
     });
-    this.initCatchTrials();
   },
   components: {
     Footer,
@@ -231,12 +194,6 @@ export default {
     };
   },
   computed: {
-    /**
-     * the firebase keys from the config file
-     */
-    firebaseKeys() {
-      return this.config.firebaseKeys;
-    },
     /**
      * the current user's data, based on the userInfo from the firebase.auth.
      * this matches the info in allUsers (/users) to the firebase.auth user info.
@@ -257,27 +214,6 @@ export default {
         }
       });
       return data;
-    },
-    /**
-     * The levels are defined based on score bins. Each level also defines
-     * a character image that a user can "unlock" when the annotate enough samples.
-     * eventually, this should be abstracted out into the config variable.
-     */
-    levels() {
-      return this.config.levels;
-    },
-    /**
-     * the current user's level.
-     */
-    currentLevel() {
-      let clev = {};
-      _.mapValues(this.levels, (val) => {
-        if (this.userData.score >= val.min && this.userData.score <= val.max) {
-          clev = val;
-        }
-      });
-
-      return clev;
     },
     /**
      * whether or not a user is authenticated and has a username.
@@ -314,18 +250,45 @@ export default {
      * set the tutorial status of the current user
      */
     setTutorial(val) {
+      const currentValue = this.userData.takenTutorial;
+      let level = val;
+      let route = 'Home';
+      switch (true) {
+        case (currentValue === 'complete' && val === 'complete'):
+          route = 'Home';
+          level = 'complete';
+          break;
+        case (currentValue === 'complete' && val === 'needsPractice'):
+          route = 'Practice';
+          level = 'complete';
+          break;
+        case (currentValue === 'needsPractice' && val === 'complete'):
+          route = 'Home';
+          level = 'complete';
+          break;
+        case (currentValue === 'needsPractice' && val === 'needsPractice'):
+          route = 'Practice';
+          level = 'needsPractice';
+          break;
+        case (currentValue === 'none' && val === 'needsPractice'):
+          route = 'Practice';
+          level = 'needsPractice';
+          break;
+        default:
+          route = 'Home';
+          level = 'none';
+      }
       this.db
         .ref(`/users/${this.userInfo.displayName}`)
-        .child('taken_tutorial')
-        .set(val);
-      this.$router.replace('play');
+        .child('takenTutorial')
+        .set(level);
+      this.$router.push({ name: route });
     },
     /**
      * Passed to child to update dataset on event
      */
     updateDataset(newDataset) {
       this.dataset = newDataset;
-      this.bucket = this.studies[newDataset].bucket;
     },
     /**
      * What datasets the user can access
@@ -339,16 +302,6 @@ export default {
     },
     updateDatasetPermissions() {
       this.getUserDatasets();
-    },
-    async getStudies() {
-      this.db.ref('config/studies').on('value', (snap) => {
-        this.studies = snap.val();
-      });
-    },
-    async getGlobusAllowdOrgs() {
-      this.db.ref('config/allowedGlobusOrganizations').on('value', (snap) => {
-        this.globusAllowedOrgs = snap.val();
-      });
     },
     globusLogin(token) {
       this.globusToken = token;
@@ -371,19 +324,14 @@ export default {
       }
       return identities;
     },
-    async getMaintenanceStatus() {
-      this.db.ref('config/maintenance').on('value', (snap) => {
-        this.maintenanceDate = snap.val().date;
-        this.maintenanceStatus = snap.val().bannerStatus;
-      });
+    markDefinitionsAdded() {
+      this.definitionsAdded = true;
     },
-    initCatchTrials() {
-      this.db.ref('config/catchTrials').once('value', (snap) => {
-        this.catchDataset = snap.val().dataset;
-        this.catchFrequency = snap.val().frequency;
-        this.db.ref(`config/studies/${this.catchDataset}/bucket`).once('value', (snap3) => {
-          this.catchBucket = snap3.val();
-        });
+    async getConfig() {
+      this.db.ref('config').on('value', (snap) => {
+        const config = snap.val();
+        this.config = config;
+        this.loading = false;
       });
     },
   },
@@ -392,9 +340,7 @@ export default {
    */
   async created() {
     await this.getUserDatasets();
-    await this.getStudies();
-    await this.getGlobusAllowdOrgs();
-    await this.getMaintenanceStatus();
+    await this.getConfig();
   },
 };
 </script>

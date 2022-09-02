@@ -1,9 +1,74 @@
 <template name="review">
   <div id="review" class="container">
+    <!-- Modal Component -->
+    <b-modal
+      id="flagwarning" 
+      :title="flagged? 'Resolve Flag' : 'WARNING'"
+      ref="flagwarning"
+      size="lg"
+      @ok="flagImage"
+    >
+      <div v-if="flagged">
+        <h2>Pass or Fail?</h2>
+        <p>Describe why and unflag.</p>
+      </div>
+      <div v-else>
+        <h2>Flagging an image will remove it from circulation until it has been reviewed.</h2>
+        <h4>Only flag images where issues are present.</h4>
+        <hr>
+        <div class="flag-reasons">
+          <h3>Flag the image if</h3>
+          <ul>
+            <li>There is no overlay</li>
+            <li>There is an issue with the image not discussed in the tutorial</li>
+          </ul>
+          <h3>Do not flag the image if</h3>
+          <ul>
+            <li>You are unsure how to swipe, and have not reviewed the tutorial</li>
+          </ul>
+        </div>
+      </div>
+      <hr>
+      <b-input-group :prepend="flagged ? 'Explain your reasoning' : 'Description of issue'" class="mt-3">
+        <b-form-input id="flag-comment" ref="flag-comment" autocomplete="off" v-on:keyup="enableForm()" v-model="chatMessage"></b-form-input>
+      </b-input-group>
+      <div slot="modal-footer" class="w-100">
+        <b-button @click="flagImage" :disabled="formDisabled" type="submit" variant="primary">Submit</b-button>
+        <b-button @click="closeFlagWarning" type="submit" variant="primary">Cancel</b-button>
+      </div>
+    </b-modal>
     <div v-if="loading">
       LOADING
     </div>
     <div v-else-if="allowed">
+      <div id="tutorial-tips">
+        <div class="information-wrapper">
+          <div id="information">
+            <h2>This is a{{imageType[1]}}.</h2>
+            <div class="information" @click="toTutorial"></div>
+          </div>
+        </div>
+        <Checklist
+          :config="config"
+          :imageClass="imageType[0]"
+        />
+      </div>
+      <div>
+        <ImageSwipe
+        :widgetPointer="widgetPointer"
+        :widgetSummary="widgetSummary"
+        :playMode="''"
+        ref="widget"
+        :dataset="dataset"
+        :config="config"
+        />
+      </div>
+      <div id="review-controls">
+        <b-button variant="danger" @click="openFlagWarning" :disabled="flagged && !isAdmin">{{flagged ? 'This sample is flagged' : 'Flag for Expert Review'}}</b-button>
+        <b-button variant="primary" @click="toPlay">Back to Swiping</b-button>
+        <b-button variant="warning" v-if="isAdmin" @click="addToGallery" :disabled="config.learn.gallery[widgetPointer]">Add Sample to Gallery</b-button>
+      </div>
+      <hr>
       <div class="chat container">
         <h3 class="mb-2">Chat</h3>
         <div class="chatHistory pl-3 pr-3 pt-3 pb-3 mb-3" v-if="chatOrder.length">
@@ -23,22 +88,12 @@
                           type="text"
                           v-model="chatMessage"
                           required
-                          placeholder="Enter your message">
+                          placeholder="Enter your message"
+                          v-on:keyup="enableForm()">
             </b-form-input>
-            <b-button class="mt-2" variant="primary" @click="sendChat">Send</b-button>
+            <b-button class="mt-2" variant="primary" :disabled="formDisabled" @click="sendChat">Send</b-button>
           </b-form-group>
         </b-form>
-
-      </div>
-      <div>
-        <WidgetSelector
-        :widgetPointer="widgetPointer"
-        :widgetSummary="widgetSummary"
-        :playMode="''"
-        ref="widget"
-        :dataset="dataset"
-        :bucket="bucket"
-        />
       </div>
     </div>
 
@@ -74,6 +129,57 @@
     z-index: 0 !important;
   }
 
+  #tutorial-tips {
+    margin: 0.5em;
+  }
+
+  #tutorial-tips h2 {
+    margin-bottom: 0.5em;
+    font-size: 1.3em;
+  }
+
+  .information{
+    display: block;
+    content: ' ';
+    background-image: url('../assets/info-circle.svg');
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    height: 16px;
+    width: 16px;
+    cursor: help;
+  }
+
+  #information{
+    display: flex;
+  }
+
+  .information-wrapper{
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+  }
+
+  #flagwarning h5{
+    font-size: 2em;
+    font-weight: bold;
+    color: red;
+  }
+
+  #flagwarning h2{
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  #flagwarning h3{
+    font-size: 1.2em;
+  }
+
+  #flagwarning ul{
+    list-style-type: disc;
+    margin-left: 3em;
+  }
+
 </style>
 
 <script>
@@ -81,7 +187,8 @@
   import 'firebase/auth';
   import 'firebase/database';
   import _ from 'lodash';
-  import WidgetSelector from './WidgetSelector';
+  import ImageSwipe from './Widgets/ImageSwipe';
+  import Checklist from './Widgets/Checklist';
 
   /**
    * The review component shows the widget for a pointer to a sample in its route,
@@ -95,21 +202,6 @@
        * the computed user data object based on userInfo
        */
       userData: {
-        type: Object,
-        required: true,
-      },
-      /**
-       * the various levels, the points need to reach the levels,
-       * and the badges (colored and greyed out) to display
-       */
-      levels: {
-        type: Object,
-        required: true,
-      },
-      /**
-       * the user's current level
-       */
-      currentLevel: {
         type: Object,
         required: true,
       },
@@ -138,13 +230,6 @@
         required: true,
       },
       /**
-       * the s3 bucket where the images for the dataset are held
-       */
-      bucket: {
-        type: String,
-        required: true,
-      },
-      /**
        * The auth token from Globus
        */
       globusToken: {
@@ -158,16 +243,10 @@
         type: Function,
         required: true,
       },
-      /**
-       * List of studies from the db
-       */
-      studies: {
-        type: Object,
-        required: true,
-      },
     },
     components: {
-      WidgetSelector,
+      ImageSwipe,
+      Checklist,
     },
     data() {
       return {
@@ -195,6 +274,18 @@
          * if the component is loading
          */
         loading: true,
+        /**
+         * Disbales flagging without a comment
+         */
+        formDisabled: true,
+        /**
+         * disables flagging if the sample is already flagged
+         */
+        flagged: false,
+        /**
+         * if the user is an admin, sitewide or study specific
+         */
+        isAdmin: false,
       };
     },
     computed: {
@@ -208,6 +299,12 @@
         });
         chats.reverse();
         return chats;
+      },
+      /**
+       * Idenfities the class of image to assist in routing to the tutorial
+       */
+      imageType() {
+        return this.getImageType();
       },
     },
     watch: {
@@ -226,6 +323,8 @@
     mounted() {
       this.widgetPointer = this.$route.params.key;
       this.setSampleInfo(this.dataset);
+      this.checkFlaggedStatus();
+      this.getUserRoles();
     },
     methods: {
       /**
@@ -308,6 +407,77 @@
           .on('value', (snap) => {
             this.widgetSummary = snap.val();
           });
+      },
+      getImageType() {
+        const imageType = [];
+        if (this.widgetPointer.match(/atlas/i)) {
+          imageType[0] = 'atlasRegistration';
+          imageType[1] = 'n Atlas Registration';
+        } else if (this.widgetPointer.match(/task/i)) {
+          imageType[0] = 'functionalRegistration';
+          imageType[1] = ' Functional Registration';
+        } else {
+          imageType[0] = 'surfaceDelineation';
+          imageType[1] = ' Structural image';
+        }
+        return imageType;
+      },
+      toTutorial() {
+        const routeData = this.$router.resolve({ name: 'Tutorial', query: { section: this.imageType[0] } });
+        window.open(routeData.href, '_blank');
+      },
+      toPlay() {
+        const query = this.flagged ? null : { s: Buffer.from(this.widgetPointer).toString('Base64') };
+        this.$router.push({ name: 'Play', params: { dataset: this.dataset }, query });
+      },
+      openFlagWarning() {
+        this.$refs.flagwarning.show();
+      },
+      closeFlagWarning() {
+        this.$refs.flagwarning.hide();
+      },
+      flagImage(e) {
+        this.sendChat(e);
+        this.addToFlagged();
+        this.closeFlagWarning();
+      },
+      enableForm() {
+        this.formDisabled = this.chatMessage.length === 0;
+      },
+      addToFlagged() {
+        this.db.ref(`datasets/${this.dataset}/flaggedSamples`)
+          .child(this.widgetPointer)
+          .set(this.flagged ? null : this.userData.username);
+      },
+      checkFlaggedStatus() {
+        this.db.ref(`datasets/${this.dataset}/flaggedSamples`).on('value', (snap) => {
+          let flagged = false;
+          if (snap.val()) {
+            if (Object.keys(snap.val()).includes(this.widgetPointer)) {
+              flagged = true;
+            }
+          }
+          this.flagged = flagged;
+        });
+      },
+      /**
+       * checks if the current user is an admin
+       */
+      async getUserRoles() {
+        const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+        const userRoles = idTokenResult.claims;
+        this.isAdmin = userRoles.admin || userRoles.studyAdmin[this.dataset];
+      },
+      /**
+       * Adds the sample to the gallery
+       */
+      addToGallery() {
+        console.log('addToGallery');
+        const update = {
+          hidden: true,
+          dataset: this.dataset,
+        };
+        this.db.ref(`config/learn/gallery/${this.widgetPointer}`).set(update);
       },
     },
     /**

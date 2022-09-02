@@ -38,7 +38,7 @@
         <div id="organizations">
           <h2>Associated Organization</h2>
           <b-dropdown id="orgdropdown" :disabled="!userList[userData.username].admin" :text="userModified.org" class="m-md-2">
-            <b-dropdown-item v-for="org in globusAllowedOrgs" :key="org" @click="changeOrg(org)">{{org}}</b-dropdown-item>
+            <b-dropdown-item v-for="org in config.allowedGlobusOrganizations" :key="org" @click="changeOrg(org)">{{org}}</b-dropdown-item>
           </b-dropdown>
           <p>Contact a BrainSwipes site-wide admin to change this</p>
         </div>
@@ -69,7 +69,7 @@
             <td>
               <table class="studiesTable">
                 <tr>
-                  <th v-for="study in Object.keys(studies)" :key="study" v-show="userList[userData.username].studyAdmin[study] || userList[userData.username].admin" :class="{ red: userList[user].datasets? !userList[user].datasets[study] : false, green: userList[user].datasets? userList[user].datasets[study] : false }">{{study}}</th>
+                  <th v-for="study in Object.keys(config.studies)" :key="study" v-show="userList[userData.username].studyAdmin[study] || userList[userData.username].admin" :class="{ red: userList[user].datasets? !userList[user].datasets[study] : false, green: userList[user].datasets? userList[user].datasets[study] : false }">{{study}}</th>
                 </tr>
               </table>
             </td>
@@ -169,17 +169,10 @@ export default {
       required: true,
     },
     /**
-     * list of studies from the db
+     * config from the db
      */
-    studies: {
+    config: {
       type: Object,
-      required: true,
-    },
-    /**
-     * List of trusted organizations from globus auth
-     */
-    globusAllowedOrgs: {
-      type: Array,
       required: true,
     },
     /**
@@ -316,7 +309,7 @@ export default {
         JSON.parse(data.currentTarget.responseText),
       );
       const filteredUserList = _.pick(authUserList, Object.keys(
-        _.pickBy(this.allUsers, user => user.taken_tutorial),
+        _.pickBy(this.allUsers, user => user.takenTutorial === 'complete'),
       ));
       this.userList = filteredUserList;
       this.loading = false;

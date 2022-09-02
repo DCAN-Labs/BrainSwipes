@@ -4,12 +4,6 @@
     <b-container fluid>
       <!-- userInfo is a prop that was passed in from App -->
       <h1>
-        <b-img rounded="circle" width="75"
-          height="75" blank-color="#777"
-          alt="img" class="m-1"
-          :src="currentLevel.img"
-          v-if="currentLevel.img"
-          />
         {{userInfo.displayName}}
       </h1>
 
@@ -26,29 +20,6 @@
       <b-form v-if="!verified" @submit="verifyEmail">
         <b-button id="verifyEmail" type="submit" variant="primary">Verify Email</b-button>
       </b-form>
-      <hr>
-      <h3>Level {{currentLevel.level}}</h3>
-      <p class="lead">
-        Keep playing to unlock the remaining animals!
-      </p>
-
-      <b-container fluid class="p-4">
-        <b-row>
-          <b-col v-for="lev in levels" v-if="lev.img" :key="lev.min">
-            <div >
-              <b-img fluid class="pokemon"
-               :src="lev.img" alt="Thumbnail" v-if="lev.level <= currentLevel.level"/>
-              <b-img fluid class="pokemon"
-               :src="lev.img_grey" alt="Thumbnail" v-else/>
-              <br>
-              Level {{lev.level}}
-              <br>
-              <span v-if="lev.level > currentLevel.level">{{lev.min}} points</span>
-            </div>
-          </b-col>
-        </b-row>
-      </b-container>
-
       <hr>
 
       <!-- Chats don't currently work with multiple datasets,
@@ -111,8 +82,7 @@
  * It displays the number of points a user has earned
  * It shows the badges they've earned and greys out the ones they still need to earn
  * It shows a chats section, which are the discussions this user has participated in
- * if the user hasn't said anything, then it shows a blank image,
- * defined in config.profile.blankImage
+ * if the user hasn't said anything, then it shows a blank image
  * @author Anisha Keshavan
  * @license Apache 2.0
  */
@@ -168,31 +138,6 @@ export default {
      * the computed user data object based on userInfo
      */
     userData: {
-      type: Object,
-      required: true,
-    },
-    /**
-     * the various levels, the points need to reach the levels,
-     * and the badges (colored and greyed out) to display
-     */
-    levels: {
-      type: Object,
-      required: true,
-    },
-    /**
-     * the user's current level
-     */
-    currentLevel: {
-      type: Object,
-      required: true,
-    },
-    /**
-     * The config object that is loaded from src/config.js.
-     * It defines how the app is configured, including
-     * any content that needs to be displayed (app title, images, etc)
-     * and also the type of widget and where to update pointers to data
-     */
-    config: {
       type: Object,
       required: true,
     },

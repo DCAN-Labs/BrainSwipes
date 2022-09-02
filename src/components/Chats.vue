@@ -5,8 +5,8 @@
         <h1>Chats</h1>
         <p class="lead">See which samples people are talking about</p>
         <p v-for="(c, index) in sampleChat" :key="index">
-          <b-alert show>
-            <router-link :to="'/' + dataset + '/review/' + c['.key'] + '/' + btoaBucket">{{c['.key']}}</router-link>
+          <b-alert :variant="flagged.includes(c['.key']) ? 'danger' : 'primary'" show>
+            <router-link :to="'/' + dataset + '/review/' + c['.key']">{{c['.key']}}</router-link>
             <br>
             <span v-if="chatInfo[c['.key']]">
               <b>{{chatInfo[c['.key']].username}}</b> : {{chatInfo[c['.key']].message}}
@@ -28,6 +28,7 @@
  * This is the component for the /chats route. It shows all the chat messages
  * for each sample.
  */
+import _ from 'lodash';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 
@@ -40,9 +41,8 @@ export default {
       sampleChat: {
         source: this.db.ref(`datasets/${this.dataset}/chats`).child('sampleChatIndex').orderByChild('time'),
         readyCallback() {
-          // this.sampleChat.reverse();
+          this.sampleChat.reverse();
           this.sampleChat.forEach((c) => {
-            // console.log('c is', c);
             this.db.ref(`datasets/${this.dataset}/chats`)
               .child('sampleChats')
               .child(c['.key'])
@@ -58,6 +58,15 @@ export default {
           if (!this.sampleChat.length) {
             this.noData = true;
           }
+        },
+      },
+      flagged: {
+        source: this.db.ref(`datasets/${this.dataset}/flaggedSamples`),
+        readyCallback() {
+          this.flagged = _.reduce(this.flagged, (r, v) => {
+            r.push(v['.key']);
+            return r;
+          }, []);
         },
       },
     };
@@ -85,16 +94,6 @@ export default {
   },
   props: {
     /**
-     * The config object that is loaded from src/config.js.
-     * It defines how the app is configured, including
-     * any content that needs to be displayed (app title, images, etc)
-     * and also the type of widget and where to update pointers to data
-     */
-    config: {
-      type: Object,
-      required: true,
-    },
-    /**
      * the intialized firebase database
      */
     db: {
@@ -105,13 +104,6 @@ export default {
      * the dataset to swipe on
      */
     dataset: {
-      type: String,
-      required: true,
-    },
-    /**
-     * the s3 bucket where the images for the dataset are held
-     */
-    bucket: {
       type: String,
       required: true,
     },
@@ -128,25 +120,6 @@ export default {
     getGlobusIdentities: {
       type: Function,
       required: true,
-    },
-    /**
-     * List of studies from the db
-     */
-    studies: {
-      type: Object,
-      required: true,
-    },
-  },
-  computed: {
-    /**
-     * Reverses the order of the chats.
-     */
-    orderedPosts() {
-      const chats = this.sampleChat;
-      return chats.reverse();
-    },
-    btoaBucket() {
-      return btoa(this.bucket);
     },
   },
   /**

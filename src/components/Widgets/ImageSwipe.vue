@@ -32,7 +32,7 @@
              </span>
 
              <b-button v-if="playMode"
-              :to="`/${dataset}/review/${widgetPointer}/${btoaBucket}`"
+              :to="playMode == 'tutorial' ? '' : `/${dataset}/review/${widgetPointer}`"
               ref="helpButton"
               class="helpbtn"
               v-bind:class="{ focus: helpFocused }"
@@ -105,9 +105,9 @@
       },
      /**
      * Tells the widget to display a tutorial step.
+     * tutorialStep = 0 highlights/glows the fail button.
      * tutorialStep = 1 highlights/glows the pass button.
-     * tutorialStep = 2 highlights/glows the fail button.
-     * tutorialStep = 3 highlights/glows the help button.
+     * tutorialStep = 2 highlights/glows the help button.
      */
       tutorialStep: {
         type: Number,
@@ -121,20 +121,17 @@
         required: true,
       },
       /**
-       * the s3 bucket where the images for the dataset are held
+       * The config from firebase.
+       * Includes information necessary to access the correct image
        */
-      bucket: {
-        type: String,
+      config: {
+        type: Object,
         required: true,
       },
       /**
-       * config for the catch trials
+       * id for tutorial images
        */
-      catchBucket: {
-        type: String,
-        required: false,
-      },
-      catchDataset: {
+      identifier: {
         type: String,
         required: false,
       },
@@ -166,8 +163,8 @@
       };
     },
     computed: {
-      btoaBucket() {
-        return btoa(this.bucket);
+      bucket() {
+        return this.playMode === 'catch' ? this.config.studies[this.config.catchTrials.dataset].bucket : this.config.studies[this.dataset].bucket;
       },
     },
     /**
@@ -186,7 +183,7 @@
     },
     methods: {
       postRequest(pointer) {
-        const bucket = this.playMode === 'catch' ? this.catchBucket : this.bucket;
+        const bucket = this.bucket;
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.open('POST', '/Image', true);
@@ -219,11 +216,11 @@
         switch (stepNumber) {
           case 0:
             // highlight the pass button
-            this.rightFocused = true;
+            this.leftFocused = true;
             break;
           case 1:
             // highlight the fail button
-            this.leftFocused = true;
+            this.rightFocused = true;
             break;
           case 2:
             // highlight the help button
@@ -328,7 +325,11 @@
        * emit an annotation to the parent.
        */
       vote(val) {
-        this.$emit('widgetRating', val);
+        if (this.playMode === 'tutorial') {
+          this.$emit('widgetRating', [val, this.identifier, this.tutorialStep]);
+        } else {
+          this.$emit('widgetRating', val);
+        }
       },
       /**
        * set the swipe-left animation and vote 0

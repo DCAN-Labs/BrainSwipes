@@ -89,6 +89,7 @@ export default {
       menuItems: [
         { path: '/', name: 'Home' },
         { path: '/tutorial', name: 'Tutorial' },
+        { path: '/gallery', name: 'Gallery' },
         { path: '/leaderboard', name: 'Leaderboard' },
         { path: '/about', name: 'About' },
       ],

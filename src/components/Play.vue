@@ -1,13 +1,5 @@
 <template name="play">
   <div id="play" class="container">
-    <!-- Modal Component -->
-    <b-modal id="levelUp" ref="levelUp" title="You've Levelled Up!" ok-only>
-      <div class="my-4">
-        <h3>Level {{currentLevel.level}}</h3>
-        <img :src="currentLevel.img" width="120px" height="120px"/>
-        <p class="lead">You've unlocked: {{currentLevel.character}}</p>
-      </div>
-    </b-modal>
 
     <div v-if="allowed" class="main">
 
@@ -31,7 +23,7 @@
           <p class="mt-3 pt-3 lead">loading...</p>
         </div>
 
-        <WidgetSelector
+        <ImageSwipe
          v-else
          :widgetPointer="widgetPointer"
          :widgetSummary="widgetSummary"
@@ -39,9 +31,7 @@
          :playMode="playMode"
          ref="widget"
          :dataset="dataset"
-         :bucket="bucket"
-         :catchDataset="catchDataset"
-         :catchBucket="catchBucket"
+         :config="config"
         />
       </div>
 
@@ -85,11 +75,7 @@
 
 <script>
   /**
-   * This is the component for the `/play` route. It's view depends on the
-   * config property passed from the parent (`App.vue`).
-   * It decides which sample will be presented (`widgetPointer`)
-   * and passes the sample's summary (`widgetSummary`) to its
-   * widget component (`WidgetSelector`).
+   * This is the component for the `/play` route.
    *
    * This component is responsible for the following:
    * 1. Deciding which sample to present by choosing an item in `/sampleCounts`
@@ -109,10 +95,10 @@
   import firebase from 'firebase/app';
   import 'firebase/auth';
   import Vue from 'vue';
-  import WidgetSelector from './WidgetSelector';
+  import ImageSwipe from './Widgets/ImageSwipe';
   import Flask from './Animations/Flask';
 
-  Vue.component('WidgetSelector', WidgetSelector);
+  Vue.component('ImageSwipe', ImageSwipe);
 
   export default {
     name: 'play',
@@ -132,31 +118,6 @@
         required: true,
       },
       /**
-       * the various levels, the points need to reach the levels,
-       * and the badges (colored and greyed out) to display
-       */
-      levels: {
-        type: Object,
-        required: true,
-      },
-      /**
-       * the user's current level
-       */
-      currentLevel: {
-        type: Object,
-        required: true,
-      },
-      /**
-       * The config object that is loaded from src/config.js.
-       * It defines how the app is configured, including
-       * any content that needs to be displayed (app title, images, etc)
-       * and also the type of widget and where to update pointers to data
-       */
-      config: {
-        type: Object,
-        required: true,
-      },
-      /**
        * the intialized firebase database
        */
       db: {
@@ -167,13 +128,6 @@
        * the dataset to swipe on
        */
       dataset: {
-        type: String,
-        required: true,
-      },
-      /**
-       * the s3 bucket where the images for the dataset are held
-       */
-      bucket: {
         type: String,
         required: true,
       },
@@ -191,27 +145,9 @@
         type: Function,
         required: true,
       },
-      /**
-       * List of studies from the db
-       */
-      studies: {
+      config: {
         type: Object,
         required: true,
-      },
-      /**
-       * catch trials configuration
-       */
-      catchDataset: {
-        type: String,
-        required: false,
-      },
-      catchFrequency: {
-        type: Number,
-        required: true,
-      },
-      catchBucket: {
-        type: String,
-        required: false,
       },
     },
     data() {
@@ -248,8 +184,6 @@
          */
         sampleCounts: [],
         userSeenSamples: [],
-        catchTrials: [],
-
         /**
          * if sampleCounts is empty after its fetched from the db, then noData
          * flag is set to true. TODO: prompt the user to the setup instructions
@@ -281,17 +215,6 @@
     },
     watch: {
       /**
-       * Keep track of the user's current level.
-       * Update the database if their score pushes them up a level.
-       * This depends on the `level` prop that is passed from the parent (`App.vue`)
-       */
-      currentLevel() {
-        if (this.userData.score === this.currentLevel.min && this.currentLevel.min) {
-          this.$refs.levelUp.show();
-          this.db.ref(`/users/${this.userInfo.displayName}`).child('level').set(this.currentLevel.level);
-        }
-      },
-      /**
        * Watch the widget pointer, which is from `/sampleCounts` document in firebase.
        * When it changes, also update the `widgetSummary` to be from the new `widgetPointer`.
        */
@@ -311,10 +234,8 @@
     mounted() {
       this.initSampleCounts(this.dataset);
       this.initSeenSamples(this.dataset);
-      this.initCatchTrialSamples(this.dataset);
     },
     components: {
-      // WidgetSelector,
       Flask,
     },
     computed: {
@@ -324,6 +245,18 @@
       samplePriority() {
         return _.sortBy(this.sampleCounts, '.value');
       },
+      /**
+       * the dataset for catch trials.
+       */
+      catchDataset() {
+        return this.config.catchTrials.dataset;
+      },
+      /**
+       * the list of samples to be used as catch trials
+       */
+      catchTrials() {
+        return Object.keys(this.config.studies[this.dataset].catchTrials);
+      },
     },
     methods: {
       /**
@@ -332,17 +265,24 @@
        */
       initSampleCounts(dataset) {
         this.db.ref(`datasets/${dataset}/sampleCounts`).once('value', (snap) => {
-          /* eslint-disable */
-          this.sampleCounts = _.map(snap.val(), (val, key) => {
-            return { '.key': key, '.value': val };
+          this.db.ref(`datasets/${dataset}/flaggedSamples`).once('value', (snap2) => {
+            let flaggedSamples = [];
+            if (snap2.val()) {
+              flaggedSamples = Object.keys(snap2.val());
+            }
+            const sampleCounts = _.omit(snap.val(), flaggedSamples);
+            /* eslint-disable */
+            this.sampleCounts = _.map(sampleCounts, (val, key) => {
+              return { '.key': key, '.value': val };
+            });
+            /* eslint-enable */
+            if (!this.sampleCounts.length) {
+              this.noData = true;
+            } else {
+              this.startTime = new Date();
+              this.setNextSampleId();
+            }
           });
-          /* eslint-enable */
-          if (!this.sampleCounts.length) {
-            this.noData = true;
-          } else {
-            this.startTime = new Date();
-            this.setNextSampleId();
-          }
         });
       },
       /**
@@ -366,16 +306,6 @@
               /* eslint-enable */
             });
         }
-      },
-      /**
-       * Initialize the samples the current dataset will use as catch trials
-       */
-      initCatchTrialSamples(dataset) {
-        this.db.ref(`config/studies/${dataset}/catchTrials`).once('value', (snap) => {
-          if (snap.val()) {
-            this.catchTrials = Object.keys(snap.val());
-          }
-        });
       },
       /**
        * A method to shuffle an array.
@@ -472,6 +402,10 @@
         this.updateCount(currentDataset);
         this.updateSeen(currentDataset);
 
+        // 3. clear router query if exists
+        if (this.$route.query.s) {
+          this.clearRouterQuery();
+        }
         // 3. set the next Sample
         this.setNextSampleId();
       },
@@ -483,12 +417,14 @@
         this.startTime = new Date();
         this.playMode = 'play';
 
-        let sampleId = this.sampleUserPriority()[0];
-
-        if (Math.random() < this.catchFrequency && this.catchTrials.length) {
+        let sampleId;
+        if (this.$route.query.s) {
+          sampleId = { '.key': Buffer.from(this.$route.query.s, 'base64').toString('ascii') };
+        } else if (Math.random() < this.config.catchTrials.frequency && this.catchTrials) {
           sampleId = this.serveCatchTrial();
+        } else {
+          sampleId = this.sampleUserPriority()[0];
         }
-
         // if sampleId isn't null, set the widgetPointer
         if (sampleId) {
           this.widgetPointer = sampleId['.key'];
@@ -575,6 +511,12 @@
        */
       showAlert() {
         this.dismissCountDown = this.dismissSecs;
+      },
+      /**
+       * removes the router query
+       */
+      clearRouterQuery() {
+        this.$router.push({ name: 'Home', query: { reroute: `${this.dataset}/play` } });
       },
     },
     /**
