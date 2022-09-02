@@ -201,17 +201,9 @@
       /**
        * catch trials configuration
        */
-      catchDataset: {
-        type: String,
-        required: false,
-      },
       catchFrequency: {
         type: Number,
         required: true,
-      },
-      catchBucket: {
-        type: String,
-        required: false,
       },
     },
     data() {
@@ -248,7 +240,7 @@
          */
         sampleCounts: [],
         userSeenSamples: [],
-        catchTrials: [],
+        userSeenCatchSamples: [],
 
         /**
          * if sampleCounts is empty after its fetched from the db, then noData
@@ -311,7 +303,7 @@
     mounted() {
       this.initSampleCounts(this.dataset);
       this.initSeenSamples(this.dataset);
-      this.initCatchTrialSamples(this.dataset);
+      this.initSeenCatchSamples(this.dataset);
     },
     components: {
       // WidgetSelector,
@@ -350,32 +342,29 @@
        * `/userSeenSamples/<username>` document from firebase, once.
        */
       initSeenSamples(dataset) {
-        if (typeof (this.userInfo.displayName) === 'undefined') {
-          /** if initSeenSamples doesn't get a valid displayName, re-route to home.
-           * This happens when refreshing the play route.
-           */
-          // this.$router.push({ path: '/home' });
-        } else {
-          this.db.ref(`datasets/${dataset}/userSeenSamples`)
-            .child(this.userInfo.displayName)
-            .once('value', (snap) => {
-              /* eslint-disable */
-              this.userSeenSamples = _.map(snap.val(), (val, key) => {
-                return { '.key': key, '.value': val };
-              });
-              /* eslint-enable */
+        this.db.ref(`datasets/${dataset}/userSeenSamples`)
+          .child(this.userInfo.displayName)
+          .once('value', (snap) => {
+            /* eslint-disable */
+            this.userSeenSamples = _.map(snap.val(), (val, key) => {
+              return { '.key': key, '.value': val };
             });
-        }
+            /* eslint-enable */
+          });
       },
       /**
        * Initialize the samples the current dataset will use as catch trials
        */
-      initCatchTrialSamples(dataset) {
-        this.db.ref(`config/studies/${dataset}/catchTrials`).once('value', (snap) => {
-          if (snap.val()) {
-            this.catchTrials = Object.keys(snap.val());
-          }
-        });
+      initSeenCatchSamples(dataset) {
+        this.db.ref(`datasets/${dataset}/catch/userSeenSamples`)
+          .child(this.userInfo.displayName)
+          .once('value', (snap) => {
+            /* eslint-disable */
+            this.userSeenCatchSamples = _.map(snap.val(), (val, key) => {
+              return { '.key': key, '.value': val };
+            });
+            /* eslint-enable */
+          });
       },
       /**
        * A method to shuffle an array.
@@ -404,14 +393,15 @@
       * A method that returns an array of samples prioritized by
       * the least seen overall and by the user
       */
-      sampleUserPriority() {
+      sampleUserPriority(playMode) {
+        userSeenSamples = playMode === 'catch' ? this.userSeenCatchSamples : this.userSeenSamples;
         // if the user is logged in then,
         if (this.userInfo) {
           // remove all the samples that the user has seen
           let samplesRemain;
-          if (this.userSeenSamples) {
+          if (userSeenSamples) {
             // if the user has seen some samples, remove them
-            const userSeenList = _.map(this.userSeenSamples, s => s['.key']);
+            const userSeenList = _.map(userSeenSamples, s => s['.key']);
             samplesRemain = _.filter(this.samplePriority,
               v => userSeenList.indexOf(v['.key']) < 0);
 
@@ -457,10 +447,7 @@
           this.showAlert();
         }
 
-        let currentDataset = this.dataset;
-        if (this.playMode === 'catch') {
-          currentDataset = this.catchDataset;
-        }
+        const currentDataset = this.playMode === 'catch' ? `${this.dataset}/catch` : this.dataset;
 
         // 2. send the widget data
         const timeDiff = new Date() - this.startTime;
@@ -481,26 +468,19 @@
       */
       setNextSampleId() {
         this.startTime = new Date();
-        this.playMode = 'play';
 
-        let sampleId = this.sampleUserPriority()[0];
-
-        if (Math.random() < this.catchFrequency && this.catchTrials.length) {
-          sampleId = this.serveCatchTrial();
+        if (Math.random() < this.catchFrequency && this.userSeenCatchSamples.length) {
+          this.playMode = 'catch';
+        } else {
+          this.playMode = 'play';
         }
+
+        const sampleId = this.sampleUserPriority(this.playMode)[0];
 
         // if sampleId isn't null, set the widgetPointer
         if (sampleId) {
           this.widgetPointer = sampleId['.key'];
         }
-      },
-      /**
-       * returns a sampleId for a catch trial
-       */
-      serveCatchTrial() {
-        this.playMode = 'catch';
-        const catchId = this.shuffle(this.catchTrials)[0];
-        return { '.key': catchId };
       },
       /**
       * the user's response for the sample is sent to the db
