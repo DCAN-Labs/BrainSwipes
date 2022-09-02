@@ -13,7 +13,7 @@
         <ul class="navRoot">
           <li class="navSection main-logo">
             <router-link to="/">
-              <img src="./assets/swipes-for-science-logo.svg" alt="BrainSwipes logo" />
+              <img class="brainswipes-logo" src="../static/brainswipes-logo.svg" alt="BrainSwipes logo" />
             </router-link>
           </li>
           <li class="navSection mobile-menu">
@@ -414,6 +414,11 @@ export default {
 
 .router {
   height: 80vh;
+}
+
+.brainswipes-logo {
+  height: auto;
+  width: 100%;
 }
 
 #app {
