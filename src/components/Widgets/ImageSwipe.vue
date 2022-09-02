@@ -164,7 +164,7 @@
     },
     computed: {
       bucket() {
-        return this.playMode === 'catch' ? this.config.studies[this.config.catchTrials.dataset].bucket : this.config.studies[this.dataset].bucket;
+        return this.config.studies[this.dataset].bucket;
       },
     },
     /**
