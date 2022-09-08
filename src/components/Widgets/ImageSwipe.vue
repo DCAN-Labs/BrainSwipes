@@ -380,7 +380,8 @@
 
 <style scoped>
   .imageSwipe {
-    height: 532px;
+    max-height: 532px;
+    height: calc(100vw + 20px);
   }
   .user-card {
       max-width: 500px;

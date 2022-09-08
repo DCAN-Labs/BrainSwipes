@@ -71,9 +71,9 @@
       <hr>
       <div class="chat container">
         <h3 class="mb-2">Chat</h3>
-        <div class="chatHistory pl-3 pr-3 pt-3 pb-3 mb-3" v-if="chatOrder.length">
-          <p v-for="msg in chatOrder" class="text-left" :key="msg.time">
-            <b>{{msg.username}}</b>: {{msg.message}}
+        <div class="chatHistory pl-3 pr-3 pt-3 pb-3 mb-3" v-if="chatOrder.length" @mouseover="showChatTime = true" @mouseleave="showChatTime = false">
+          <p v-for="msg in chatOrder" class="text-left chat-text" :key="msg.time">
+            <span class="chat-time" v-show="showChatTime">{{msg.date}}</span><span class="chat-username">{{msg.username}}</span>: {{msg.message}}
           </p>
         </div>
         <div v-else>
@@ -178,6 +178,20 @@
   #flagwarning ul{
     list-style-type: disc;
     margin-left: 3em;
+  }
+
+  .chat-username{
+    font-weight: bold;
+  }
+
+  .chat-text{
+    margin-bottom: 0.5em;
+  }
+
+  .chat-time{
+    padding-right: 0.5em;
+    font-weight: 100;
+    font-size: 0.5em;
   }
 
 </style>
@@ -294,6 +308,10 @@
          * the users to notify
          */
         notify: {},
+        /**
+         * shows the timestamp of the chat on hover
+         */
+        showChatTime: false,
       };
     },
     computed: {
@@ -303,6 +321,8 @@
       chatOrder() {
         const chats = [];
         _.mapValues(this.chatHistory, (v) => {
+          // eslint-disable-next-line
+          v.date = new Date(v.time).toLocaleDateString();
           chats.push(v);
         });
         chats.reverse();
