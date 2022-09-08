@@ -62,6 +62,13 @@
               :db="db"
               :gradientArray="gradientArray"
               />
+              <CatchTrialsByUser
+              :dataset="submittedDataset"
+              :threshold="submittedThreshold"
+              :minVotes="submittedMinSwipes"
+              :db="db"
+              :gradientArray="gradientArray"
+              />              
               <!-- <InterraterConcordance
               :dataset="dataset"
               :db="db"
@@ -122,6 +129,7 @@
   import colorGradient from 'javascript-color-gradient';
   import _ from 'lodash';
   import InterraterConcordance from './Visualizations/InterraterConcordance';
+  import CatchTrialsByUser from './Visualizations/CatchTrialsbyUser';
   import SurvivngSessions from './Visualizations/SurvivingSessions';
   import SessionsPassFail from './Visualizations/SessionsPassFail';
   import UserCorrectness from './Visualizations/UserCorrectness';
@@ -130,6 +138,7 @@
 
 
   Vue.component('InterraterConcordance', InterraterConcordance);
+  Vue.component('CatchTrialsByUser', CatchTrialsByUser);
   Vue.component('SurvivingSessions', SurvivngSessions);
   Vue.component('SessionsPassFail', SessionsPassFail);
   Vue.component('UserCorrectness', UserCorrectness);
