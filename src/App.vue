@@ -27,7 +27,7 @@
               :userData="userData"
               :loggedIn="userIsDefined"
               @logout="logout"
-              :notification="notification"
+              :notifications="notifications"
             />
           </li>
           <li class="navSection desktop-menu"></li>
@@ -55,7 +55,7 @@
           :errorCodes="errorCodes"
           :definitionsAdded="definitionsAdded"
           @markDefinitionsAdded="markDefinitionsAdded"
-          :notification="notification"
+          :notifications="notifications"
         />
       </div>
     </div>
@@ -174,7 +174,7 @@ export default {
       /**
        * if the user has notifications
        */
-      notification: false,
+      notifications: {},
     };
   },
   /**
@@ -346,7 +346,6 @@ export default {
       });
     },
     getNotifications() {
-      let notification = false;
       Object.keys(_.pickBy(this.datasetPrivileges, _.identity)).forEach((study) => {
         this.db.ref(`datasets/${study}/chats/chats`).on('value', (snap) => {
           const chats = snap.val();
@@ -355,9 +354,8 @@ export default {
             result = value.notify[firebase.auth().currentUser.displayName] || result;
             return result;
           }, false);
-          notification = notification || studyNotification;
+          Vue.set(this.notifications, study, studyNotification);
         });
-        this.notification = notification;
       });
     },
   },

@@ -79,7 +79,6 @@
         <div v-else>
           <p>No one has said anything yet!</p>
         </div>
-        <p>{{notify}}</p>
         <b-form @submit="sendChat">
           <b-form-group id="exampleInputGroup1"
                   label="Enter chat message:"
@@ -359,7 +358,6 @@
           this.notify[user] = true;
         });
         this.notify[this.userData.username] = false;
-        console.log(this.notify);
         this.db.ref(`datasets/${this.dataset}/chats/chats/${key}/notify`).set(this.notify);
 
         this.chatMessage = '';

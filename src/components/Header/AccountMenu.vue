@@ -7,6 +7,7 @@
       <div class="account-menu__user-information">
         <span class="username">{{userInfo.displayName}}</span>
         <span class="user-score">{{userData.score}}</span>
+        <span :class="{ message: notification }"></span>
       </div>
     </div>
     <!-- The login option shows if the user is not authenticated -->
@@ -61,9 +62,25 @@ export default {
       type: Object,
       required: true,
     },
-    notification: {
-      type: Boolean,
+    /**
+     * keys: studies that user can access
+     * values: does the user have a notification from that study, boolean
+     */
+    notifications: {
+      type: Object,
       required: true,
+    },
+  },
+  computed: {
+    /**
+    * Does the user have any notifications
+    */
+    notification() {
+      let notification = false;
+      Object.keys(this.notifications).forEach((study) => {
+        notification = notification || this.notifications[study];
+      });
+      return notification;
     },
   },
   methods: {
@@ -123,8 +140,8 @@ export default {
 }
 .message::after {
   display: block;
-  content: ' ';
-  background-image: url('../../assets/envelope.svg');
+  content: '';
+  background-image: url('../../assets/envelope-fill.svg');
   background-repeat: no-repeat;
   background-size: 16px 16px;
   height: 16px;

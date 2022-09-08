@@ -100,7 +100,7 @@
     justify-content: center;
   }
 
-  .checked, .unchecked{
+  .checked, .unchecked, .checked-question{
     margin-right: 5px;
   }
 

@@ -25,20 +25,22 @@
       <div v-if="Object.keys(userChats).length" class="user-chats">
         <div v-for="study in Object.keys(userChats)" :key="study" class="study-chats-wrapper">
           <div>
-          <h2>{{study}}</h2>
-          <div class="study-chats" :class="{ scroller: Object.keys(userChats[study]).length > 4 }">
-            <!-- <router-link :to="'/review/' + c">{{c}}</router-link>: -->
-            <router-link v-for="c in userChats[study]" :key="c.sample" class="single-chat" :to="`${study}/review/${c.sample}?f=p`">
-              <b-alert :class="{ pulse: c.notify[userInfo.displayName] }" show>
-                <div :class="{ message: c.notify[userInfo.displayName] }"></div>
-                <h3>{{c.sample}}</h3>
-                <br>
-                <span >
-                  <b>{{c.username}}</b> : {{c.message}}
-                </span>
-              </b-alert>
-            </router-link>
-          </div>
+            <div class="study-title-wrapper">
+              <div class="study-title">
+                <h2>{{study}}</h2>
+                <span  :class="{ messagestudy: notifications[study] }"></span>
+              </div>
+            </div>
+            <div class="study-chats" :class="{ scroller: Object.keys(userChats[study]).length > 4 }">
+                <div v-for="c in userChats[study]" v-on:click="onChatClick(study, c.sample)" :key="c.sample" class="single-chat" :class="{ pulse: c.notify[userInfo.displayName] }">
+                  <div :class="{ messagechat: c.notify[userInfo.displayName] }"></div>
+                  <h3>{{c.sample}}</h3>
+                  <br>
+                  <span >
+                    <b>{{c.username}}</b> : {{c.message}}
+                  </span>
+                </div>
+            </div>
           </div>
         </div>
       </div>
@@ -82,8 +84,23 @@
     padding: 0.4em;
   }
 
+  .single-chat {
+    padding: 1em;
+    margin: 10px;
+    background-color: #CCE5FF;
+    position: relative;
+  }
+
   .single-chat h3{
     font-weight: 600;
+  }
+
+  .single-chat:hover{
+    cursor: pointer;
+  }
+
+  .single-chat:hover h3{
+    text-decoration: underline;
   }
 
   .scroller {
@@ -97,14 +114,48 @@
     background-color: #FFF3CD;
   }
 
-  .message::after {
+  .messagechat {
+    position: absolute;
+    right: 15px;
+  }
+
+  .messagechat::after {
     display: block;
-    content: ' ';
-    background-image: url('../assets/envelope.svg');
+    content: '';
+    background-image: url('../assets/envelope-fill.svg');
     background-repeat: no-repeat;
     background-size: 16px 16px;
     height: 16px;
     width: 16px;
+  }
+
+  .messagestudy {
+    position: absolute;
+    right: 0px;
+    top: 0.5em;
+  }
+
+  .messagestudy::after {
+    display: block;
+    content: '';
+    background-image: url('../assets/envelope-fill.svg');
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    height: 16px;
+    width: 16px;
+  }
+
+  .study-title-wrapper {
+    display: flex;
+    justify-content: center;
+    max-width: 500px;
+    position: relative;
+    align-items: baseline;
+  }
+
+  .study-title {
+    position: relative;
+    padding: 0 16px 0 16px;
   }
 
   @keyframes pulse {
@@ -190,6 +241,14 @@ export default {
       type: Object,
       required: true,
     },
+    /**
+     * keys: studies that user can access
+     * values: does the user have a notification from that study, boolean
+     */
+    notifications: {
+      type: Object,
+      required: true,
+    },
   },
   methods: {
     /**
@@ -233,6 +292,10 @@ export default {
           });
         }
       });
+    },
+    onChatClick(study, sample) {
+      this.$router.push(`${study}/review/${sample}?f=p`);
+      this.db.ref(`datasets/${study}/chats/chats/${sample}/notify/${this.userInfo.displayName}`).set(false);
     },
   },
   mounted() {
