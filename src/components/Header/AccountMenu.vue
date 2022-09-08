@@ -7,7 +7,7 @@
       <div class="account-menu__user-information">
         <span class="username">{{userInfo.displayName}}</span>
         <span class="user-score">{{userData.score}}</span>
-        <span :class="{ message: notification }"></span>
+        <span :class="{ notification: notification }"></span>
       </div>
     </div>
     <!-- The login option shows if the user is not authenticated -->
@@ -138,7 +138,7 @@ export default {
   font-weight: 400;
   font-size: 1.125em;
 }
-.message::after {
+.notification::after {
   display: block;
   content: '';
   background-image: url('../../assets/envelope-fill.svg');
