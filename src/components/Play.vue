@@ -34,9 +34,6 @@
          :config="config"
         />
       </div>
-
-
-
     </div>
 
   </div>
@@ -183,7 +180,10 @@
          * these keys will be filled by firebase when the component is mounted
          */
         sampleCounts: [],
+        catchSampleCounts: [],
         userSeenSamples: [],
+        userSeenCatchSamples: [],
+
         /**
          * if sampleCounts is empty after its fetched from the db, then noData
          * flag is set to true. TODO: prompt the user to the setup instructions
@@ -219,7 +219,7 @@
        * When it changes, also update the `widgetSummary` to be from the new `widgetPointer`.
        */
       widgetPointer() {
-        const currentDataset = this.playMode === 'play' ? this.dataset : this.catchDataset;
+        const currentDataset = this.playMode === 'play' ? this.dataset : `${this.dataset}/catch`;
         /* eslint-disable */
         this.widgetPointer ? this.db.ref(`datasets/${currentDataset}/sampleSummary`).child(this.widgetPointer).once('value', (snap) => {
           this.widgetSummary = snap.val();
@@ -233,7 +233,9 @@
      */
     mounted() {
       this.initSampleCounts(this.dataset);
+      this.initCatchSampleCounts(this.dataset);
       this.initSeenSamples(this.dataset);
+      this.initSeenCatchSamples(this.dataset);
     },
     components: {
       Flask,
@@ -245,17 +247,8 @@
       samplePriority() {
         return _.sortBy(this.sampleCounts, '.value');
       },
-      /**
-       * the dataset for catch trials.
-       */
-      catchDataset() {
-        return this.config.catchTrials.dataset;
-      },
-      /**
-       * the list of samples to be used as catch trials
-       */
-      catchTrials() {
-        return Object.keys(this.config.studies[this.dataset].catchTrials);
+      catchSamplePriority() {
+        return _.sortBy(this.catchSampleCounts, '.value');
       },
     },
     methods: {
@@ -285,27 +278,44 @@
           });
         });
       },
+      initCatchSampleCounts(dataset) {
+        this.db.ref(`datasets/${dataset}/catch/sampleCounts`).once('value', (snap) => {
+          const sampleCounts = snap.val();
+          /* eslint-disable */
+          this.catchSampleCounts = _.map(sampleCounts, (val, key) => {
+            return { '.key': key, '.value': 0 };
+          });
+          /* eslint-enable */
+        });
+      },
       /**
        * Initialize the samples that the user has seen, by fetching the
        * `/userSeenSamples/<username>` document from firebase, once.
        */
       initSeenSamples(dataset) {
-        if (typeof (this.userInfo.displayName) === 'undefined') {
-          /** if initSeenSamples doesn't get a valid displayName, re-route to home.
-           * This happens when refreshing the play route.
-           */
-          // this.$router.push({ path: '/home' });
-        } else {
-          this.db.ref(`datasets/${dataset}/userSeenSamples`)
-            .child(this.userInfo.displayName)
-            .once('value', (snap) => {
-              /* eslint-disable */
-              this.userSeenSamples = _.map(snap.val(), (val, key) => {
-                return { '.key': key, '.value': val };
-              });
-              /* eslint-enable */
+        this.db.ref(`datasets/${dataset}/userSeenSamples`)
+          .child(this.userInfo.displayName)
+          .once('value', (snap) => {
+            /* eslint-disable */
+            this.userSeenSamples = _.map(snap.val(), (val, key) => {
+              return { '.key': key, '.value': val };
             });
-        }
+            /* eslint-enable */
+          });
+      },
+      /**
+       * Initialize the samples the current dataset will use as catch trials
+       */
+      initSeenCatchSamples(dataset) {
+        this.db.ref(`datasets/${dataset}/catch/userSeenSamples`)
+          .child(this.userInfo.displayName)
+          .once('value', (snap) => {
+            /* eslint-disable */
+            this.userSeenCatchSamples = _.map(snap.val(), (val, key) => {
+              return { '.key': key, '.value': val };
+            });
+            /* eslint-enable */
+          });
       },
       /**
        * A method to shuffle an array.
@@ -334,23 +344,25 @@
       * A method that returns an array of samples prioritized by
       * the least seen overall and by the user
       */
-      sampleUserPriority() {
+      sampleUserPriority(playMode) {
+        const userSeenSamples = playMode === 'catch' ? this.userSeenCatchSamples : this.userSeenSamples;
+        const samplePriority = playMode === 'catch' ? this.catchSamplePriority : this.samplePriority;
         // if the user is logged in then,
         if (this.userInfo) {
           // remove all the samples that the user has seen
           let samplesRemain;
-          if (this.userSeenSamples) {
+          if (userSeenSamples) {
             // if the user has seen some samples, remove them
-            const userSeenList = _.map(this.userSeenSamples, s => s['.key']);
-            samplesRemain = _.filter(this.samplePriority,
+            const userSeenList = _.map(userSeenSamples, s => s['.key']);
+            samplesRemain = _.filter(samplePriority,
               v => userSeenList.indexOf(v['.key']) < 0);
 
             // but if the user has seen everything,
             // return the total sample priority
-            samplesRemain = samplesRemain.length ? samplesRemain : this.samplePriority;
+            samplesRemain = samplesRemain.length ? samplesRemain : samplePriority;
           } else {
             // the user hasn't seen anything yet, so all samples remain
-            samplesRemain = this.samplePriority;
+            samplesRemain = samplePriority;
           }
 
           if (samplesRemain.length) {
@@ -367,7 +379,7 @@
           }
 
           // TODO: check whether we actually hit this line. If we don't, remove it.
-          return this.shuffle(this.samplePriority);
+          return this.shuffle(samplePriority);
         }
         // if samplePriority was empty the whole time, return null
         return null;
@@ -387,10 +399,7 @@
           this.showAlert();
         }
 
-        let currentDataset = this.dataset;
-        if (this.playMode === 'catch') {
-          currentDataset = this.catchDataset;
-        }
+        const currentDataset = this.playMode === 'catch' ? `${this.dataset}/catch` : this.dataset;
 
         // 2. send the widget data
         const timeDiff = new Date() - this.startTime;
@@ -415,28 +424,25 @@
       */
       setNextSampleId() {
         this.startTime = new Date();
-        this.playMode = 'play';
 
-        let sampleId;
+        let sampleId = '';
+
         if (this.$route.query.s) {
           sampleId = { '.key': Buffer.from(this.$route.query.s, 'base64').toString('ascii') };
-        } else if (Math.random() < this.config.catchTrials.frequency && this.catchTrials) {
-          sampleId = this.serveCatchTrial();
+          this.playMode = 'play';
         } else {
-          sampleId = this.sampleUserPriority()[0];
+          if (Math.random() < this.config.catchTrials.frequency && this.catchSampleCounts.length) {
+            this.playMode = 'catch';
+          } else {
+            this.playMode = 'play';
+          }
+          sampleId = this.sampleUserPriority(this.playMode)[0];
         }
+
         // if sampleId isn't null, set the widgetPointer
         if (sampleId) {
           this.widgetPointer = sampleId['.key'];
         }
-      },
-      /**
-       * returns a sampleId for a catch trial
-       */
-      serveCatchTrial() {
-        this.playMode = 'catch';
-        const catchId = this.shuffle(this.catchTrials)[0];
-        return { '.key': catchId };
       },
       /**
       * the user's response for the sample is sent to the db
@@ -472,19 +478,21 @@
        * Update the sampleCount of the current widgetPointer.
        */
       updateCount(dataset) {
-        // update the firebase database copy
-        this.db.ref(`datasets/${dataset}/sampleCounts`)
-          .child(this.widgetPointer)
-          .transaction(count => (count || 0) + 1);
-
-        // update the local copy
-        _.map(this.sampleCounts, (val) => {
-          if (val['.key'] === this.widgetPointer) {
-            /* eslint-disable */
-            val['.value'] += 1;
-            /* eslint-enable */
-          }
-        });
+        if (this.playMode !== 'catch') {
+          // update the firebase database copy
+          this.db.ref(`datasets/${dataset}/sampleCounts`)
+            .child(this.widgetPointer)
+            .transaction(count => (count || 0) + 1);
+  
+          // update the local copy
+          _.map(this.sampleCounts, (val) => {
+            if (val['.key'] === this.widgetPointer) {
+              /* eslint-disable */
+              val['.value'] += 1;
+              /* eslint-enable */
+            }
+          });
+        }
       },
       /**
        * Update that the user has seen this sample, incrementing by 1.
