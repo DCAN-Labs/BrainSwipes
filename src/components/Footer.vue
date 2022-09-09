@@ -185,6 +185,7 @@ footer {
   .footer__container .logo {
     width: 3em;
     vertical-align: middle;
+    padding: 2px;
   }
   .footer__container {
     max-width: 65em;
