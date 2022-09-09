@@ -134,6 +134,8 @@
           return result;
         },{});
 
+
+        // TO DO: child chart sorting trial results based on image type
         // const reducedSampleCountsByModality = _.reduce(sampleCounts, function(result, value, key){
         //   let modality = '';
         //   if (key.match(restRegEx)) {
@@ -176,11 +178,23 @@
           xaxis: {
             type: 'category',
             categories: Object.keys(overallUserRatio),
-            labels: Object.keys(overallUserRatio),
+            labels: { rotate: -60, rotateAlways: true },
           },
-          markers,
+          markers: { hover: { size: 20 }, discrete: markers },
           legend: {
             show: false,
+          },
+          tooltip: {
+            y: {
+              formatter() {
+                return '';
+              },
+              title: {
+                formatter(seriesName, value) {
+                  return `<p>${seriesName}: <strong>${value.series[0][value.dataPointIndex]}</strong></p><p>Trials Swiped: <strong>${overallUserData[Object.keys(overallUserData)[value.dataPointIndex]].totalTrials}</strong></p>`;
+                },
+              },
+            },
           },
         };
         const series = [{
