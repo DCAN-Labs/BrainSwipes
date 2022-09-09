@@ -72,7 +72,7 @@
   import { VueHammer } from 'vue2-hammer';
   import imagesLoaded from 'vue-images-loaded';
   import GridLoader from 'vue-spinner/src/PulseLoader';
-  import VueProgressiveImage from '../../../node_modules/vue-progressive-image/dist/vue-progressive-image';
+  import VueProgressiveImage from 'vue-progressive-image';
 
   Vue.use(VueProgressiveImage);
   Vue.use(VueHammer);

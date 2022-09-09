@@ -255,7 +255,6 @@
 /**
  * TODO: fill this in.
  */
-  import { VueTyper } from 'vue-typer';
   import _ from 'lodash';
   import Vue from 'vue';
   import Arrow from './Animations/ArrowDown';
@@ -302,7 +301,6 @@
   export default {
     name: 'tutorial',
     components: {
-      'vue-typer': VueTyper,
       Arrow,
       ImageSwipe,
       Checklist,

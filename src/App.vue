@@ -88,21 +88,12 @@ import 'firebase/auth';
 // useful library for objects and arrays
 import _ from 'lodash';
 
-// Animate on scroll, for the tutorial
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-// font-awesome icons
-import '../node_modules/font-awesome/css/font-awesome.min.css';
-import '../node_modules/reset-css/reset.css';
+import 'reset-css';
 import '../src/css/animations.css';
 import '../src/css/globals.css';
 import '../src/css/typography.css';
-
-
-// eslint-disable-next-line
-import firebaseKeys from './firebaseKeys';
 
 // components
 import SliderMenu from './components/Header/SliderMenu';
@@ -182,7 +173,6 @@ export default {
    * load the config file from the query and set it to the components config variable.
    */
   mounted() {
-    AOS.init();
     this.userInfo = firebase.auth().currentUser;
     const self = this;
     firebase.auth().onAuthStateChanged((user) => {
