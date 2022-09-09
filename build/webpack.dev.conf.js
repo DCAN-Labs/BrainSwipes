@@ -68,10 +68,14 @@ function createUrl(pointer, bucket) {
   }
 }
 
-async function logUserManagement(method, modifier, modified, newRoles) {
+async function logUserManagement(method, modifierUid, modifiedUid, newRoles) {
   try {
     const ref = database.ref('log/userManagement');
     const timestamp = Date.now();
+    const modifierUserRecord = await admin.auth().getUser(modifierUid);
+    const modifier = modifierUserRecord.displayName;
+    const modifiedUserRecord = await admin.auth().getUser(modifiedUid);
+    const modified = modifiedUserRecord.displayName;
     const entry = {
       method,
       modifier,
