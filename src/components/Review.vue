@@ -490,7 +490,6 @@
        * Adds the sample to the gallery
        */
       addToGallery() {
-        console.log('addToGallery');
         const update = {
           hidden: true,
           dataset: this.dataset,
