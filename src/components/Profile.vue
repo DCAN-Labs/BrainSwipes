@@ -31,7 +31,7 @@
                 <span  :class="{ messagestudy: notifications[study] }"></span>
               </div>
             </div>
-            <div class="study-chats" :class="{ scroller: Object.keys(userChats[study]).length > 4 }">
+            <div v-if="config.studies[study].available" class="study-chats" :class="{ scroller: Object.keys(userChats[study]).length > 4 }">
                 <div v-for="c in userChats[study]" v-on:click="onChatClick(study, c.sample)" :key="c.sample" class="single-chat" :class="{ pulse: c.notify[userInfo.displayName] }">
                   <div :class="{ messagechat: c.notify[userInfo.displayName] }"></div>
                   <h3>{{c.sample}}</h3>
@@ -40,6 +40,22 @@
                     <b>{{c.username}}</b> : {{c.message}}
                   </span>
                 </div>
+            </div>
+            <div v-else>
+              <div v-if="globusAuthenticated">
+                <div v-for="c in userChats[study]" v-on:click="onChatClick(study, c.sample)" :key="c.sample" class="single-chat" :class="{ pulse: c.notify[userInfo.displayName] }">
+                  <div :class="{ messagechat: c.notify[userInfo.displayName] }"></div>
+                  <h3>{{c.sample}}</h3>
+                  <br>
+                  <span >
+                    <b>{{c.username}}</b> : {{c.message}}
+                  </span>
+                </div>
+              </div>
+              <div v-else>
+                <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{errorCodes[error]}}</p>
+                <b-button @click="routeToRestricted">Login with Globus</b-button>
+              </div>
             </div>
           </div>
         </div>
@@ -158,6 +174,12 @@
     padding: 0 16px 0 16px;
   }
 
+  .globus-auth-error {
+    background-color: #F8D7DA;
+    padding: 5px;
+    margin: 5px;
+  }
+
   @keyframes pulse {
     0% {background-color: #D1ECF1;}
     50% {background-color: #FFF3CD;}
@@ -193,6 +215,11 @@ export default {
        * collection of chats the current user has participated in
        */
       userChats: [],
+      /**
+       * Whether the user has authenticated with Globus
+       */
+      globusAuthenticated: false,
+      globusAuthErrors: [],
     };
   },
   computed: {
@@ -249,6 +276,34 @@ export default {
       type: Object,
       required: true,
     },
+    /**
+     * configuration document from the database
+     */
+    config: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * The auth token from Globus
+     */
+    globusToken: {
+      type: String,
+      required: true,
+    },
+    /**
+     * function that exchanges the Globus token for user information
+     */
+    getGlobusIdentities: {
+      type: Function,
+      required: true,
+    },
+    /**
+     * errors produced by brainswipes
+     */
+    errorCodes: {
+      type: Object,
+      required: true,
+    },
   },
   methods: {
     /**
@@ -297,9 +352,36 @@ export default {
       this.$router.push(`${study}/review/${sample}?f=p`);
       this.db.ref(`datasets/${study}/chats/chats/${sample}/notify/${this.userInfo.displayName}`).set(false);
     },
+    async allowRestrictedChats() {
+      const user = firebase.auth().currentUser;
+      const email = user.email;
+      const identities = await this.getGlobusIdentities(this.globusToken);
+      const errors = [];
+      const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+      const organization = idTokenResult.claims.org;
+      if (Object.keys(identities).length === 0) {
+        errors.push(1);
+      } else if (!identities[email]) {
+        errors.push(2);
+      } else if (identities[email][0] !== organization) {
+        errors.push(3);
+      } else if (identities[email][1] !== 'used') {
+        errors.push(4);
+      }
+      if (errors.length) {
+        this.globusAuthErrors = errors;
+        this.globusAuthenticated = false;
+      } else {
+        this.globusAuthenticated = true;
+      }
+    },
+    routeToRestricted() {
+      this.$router.push({ name: 'Restricted', query: { errors: this.globusAuthErrors } });
+    },
   },
   mounted() {
     this.getUserChats();
+    this.allowRestrictedChats();
   },
 };
 </script>
