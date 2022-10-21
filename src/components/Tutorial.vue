@@ -110,13 +110,6 @@
         </div>
       </div>
     </div>
-    <div class="arrow" v-if="bins.length-1 != currentBin.bin" v-scroll-to="nextStep">
-      <Arrow />
-    </div>
-
-    <p>
-    </p>
-      <div id="test"></div>
   </div>
 </template>
 
@@ -130,7 +123,7 @@
   }
 
   .fullpage {
-    min-height: 100vh;
+    margin-bottom: 10vh;
   }
 
   .widget {
@@ -257,7 +250,6 @@
  */
   import _ from 'lodash';
   import Vue from 'vue';
-  import Arrow from './Animations/ArrowDown';
   import ImageSwipe from './Widgets/ImageSwipe';
   import { glossary, glossaryKeys } from '../glossary';
   import Checklist from './Widgets/Checklist';
@@ -301,7 +293,6 @@
   export default {
     name: 'tutorial',
     components: {
-      Arrow,
       ImageSwipe,
       Checklist,
     },
