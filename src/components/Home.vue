@@ -7,18 +7,21 @@
         <p class="lead mt-3">
           {{Object.keys(userInfo).length ? userData.takenTutorial === 'complete' ? 'Choose a dataset to QC': 'Review our learning resources before you begin swiping' : 'Login to begin'}}
         </p>
+        <div class="information-wrapper">
+          <div class="inner-information-wrapper">
+            <h2 class="explain-private">Private Datasets</h2>
+            <div class="information" @mouseover="explainPrivate = true" @mouseleave="explainPrivate = false"></div>
+          </div>
+        </div>
       </div>
       <div v-if="Object.keys(userInfo).length">
         <div v-if="Object.keys(config.studies).length" class="mt-3">
           <div v-if="userData.takenTutorial === 'complete'">
-            <div class="information-wrapper">
-              <div class="inner-information-wrapper stand-out">
-                <h2>Public Datasets</h2>
-                <div class="information" @mouseover="explainPublic = true" @mouseleave="explainPublic = false"></div>
-              </div>
-            </div>
             <div class="explain-wrapper">
-              <span v-show="explainPublic" class="explain">Anyone can swipe these datasets! Visit the about page to learn more.</span>
+              <span v-show="explainPrivate" class="explain">
+                <p>Patient health information is sensitive. Some datasets have stricter legal limitations because of this.</p>
+                <p>Select grayed-out datasets to learn more.</p>
+              </span>
             </div>
             <div class="buttons">
               <div v-for="study in categorizedDatasets.open" :key="study">
@@ -26,18 +29,6 @@
               </div>
             </div>
             <hr class="seperator">
-            <div class="information-wrapper">
-              <div class="inner-information-wrapper stand-out">
-                <h2>Private Datasets</h2>
-                <div class="information" @mouseover="explainPrivate = true" @mouseleave="explainPrivate = false"></div>
-              </div>
-            </div>
-            <div class="explain-wrapper">
-              <span v-show="explainPrivate" class="explain">
-                <p>Patient health information is sensitive! Some datasets have stricter legal limitations because of this.</p>
-                <p>Select a dataset to learn more.</p>
-              </span>
-            </div>
             <div class="buttons">
               <div v-for="study in categorizedDatasets.restricted" :key="study">
                 <b-button class="btn" :class="datasetPrivileges[study] ? 'btn-primary' : 'btn-unavailable'" @click="routeToPlay(study)">{{study}}</b-button>
@@ -97,7 +88,6 @@ export default {
     return {
       landingStyle: { 'background-image': 'url("/static/UMN_logos2_PRINT-09.svg")' },
       explainPrivate: false,
-      explainPublic: false,
     };
   },
   methods: {
@@ -232,27 +222,16 @@ a {
 #titles {
   padding: 0.4rem;
   margin: 0 auto; 
-  text-shadow: white 1px 1px, white 0 0 1px;
 }
 
 .seperator {
   max-width: 500px;
 }
 
-.stand-out {
-  background-color: white;
-  border-width: thin;
-  border-radius: 8px;
-  border-style: outset;
-  padding: 8px;
-  font-size: 1.3em;
-  margin-bottom: 3px;
-  font-weight: bold;
-}
-
 .explain-wrapper {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .explain {
@@ -264,6 +243,9 @@ a {
   border-radius: 6px;
   padding: 5px;
   position: absolute;
+}
+.explain-private {
+  font-size: 0.9em;
 }
 
 @media (max-width: 979px) {

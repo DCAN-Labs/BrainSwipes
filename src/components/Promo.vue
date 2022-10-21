@@ -69,6 +69,7 @@ export default {
         'background-image': `url(/src/assets/${this.config.studies[this.dataset].about.logo})`,
         'background-position': 'center',
         'background-repeat': 'no-repeat',
+        'background-attachment': 'fixed',
       };
     },
   },
