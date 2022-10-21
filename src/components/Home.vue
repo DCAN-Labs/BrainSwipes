@@ -140,7 +140,7 @@ export default {
           restricted.push(study);
         }
       });
-      if (this.datasetPrivileges['TEST']) {
+      if (this.datasetPrivileges.TEST) {
         restricted.push('TEST');
       }
       return { open, restricted };
