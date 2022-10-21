@@ -62,7 +62,7 @@
   font-weight: 400;
   font-size: 1.125em;
 }
-a {
+.slider-menu a {
   color: rgb(100,0,0);
 }
 h1 {

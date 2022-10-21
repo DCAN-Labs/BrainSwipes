@@ -11,21 +11,27 @@
       </p>
     <h1> Why do we need this app? </h1>
       <p>
-        To use the often stated saying in introduction to statistics classes, “garbage in, garbage out.” Our research often involves using large-scale neuroimaging brain datasets. We want to be sure that the brain data that we use and share with the broader community has undergone effective quality control. BrainSwipes leverages crowdsourcing to review and rate large amounts of data quickly. This makes our results more replicable and reliable. 
+        Our research involves using large-scale neuroimaging datasets. We want to be sure that the data that we use and share with the broader community has undergone effective quality control. BrainSwipes leverages crowdsourcing to review and rate large amounts of data quickly, making our results more replicable and reliable. 
       </p>
     <h1> Origin of Swipes For Science </h1>
       <p>
-        The founders of the SwipesForScience game template - <a href="https://anisha.pizza/"> Anisha</a> and <a href="https://github.com/SwipesForScience/SwipesForScience/blob/master">Andreea</a> - met at the <a href="https://github.com/SwipesForScience/SwipesForScience/blob/master">eLife Innovation Sprint</a> in 2018. You can see their original work and <a href="https://github.com/SwipesForScience/SwipesForScience">template on GitHub</a>.
+        SwipesForScience is an open source project that is easy to create and customizable to any dataset. Visit the <a href="https://swipesforscience.org/" target="_blank">SwipesForScience website</a> to learn more.
       </p>
     <h1>Contact Us</h1>
-      <p>If you have any questions please contact us at <a href="mailto:dcanlab@umn.edu">dcanlab@umn.edu</a>!</p>
+      <p>If you have any questions please contact us at <a href="mailto:dcanlab@umn.edu" target="_blank">dcanlab@umn.edu</a>!</p>
     </b-container>
-
+    <h1>Current Studies</h1>
+      <p>Choose a study to learn about</p>
+      <div class="about-buttons">
+        <div v-for="study in filteredDatasets" :key="study">
+          <b-button class="btn btn-primary" @click="routeToPromo(study)">{{study}}</b-button>
+        </div>
+      </div>
   </div>
 
 </template>
 
-<style>
+<style scoped>
 
 #about {
   min-height: 100vh;
@@ -37,20 +43,45 @@
   padding-bottom: 1.5em;
 }
 
+.about-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: maroon;
+  border-color: maroon;
+  margin: 0.1em;
+}
+
 </style>
 
 <script>
 /**
  * This is the about page for the route /about.
- * Right now this page only shows the various badges you can win if you play
- * the game. Eventually, we should fill the content with text that the researcher
- * provides, in markdown.
  */
 export default {
   name: 'about',
   data() {
     return {
     };
+  },
+  props: {
+    config: {
+      type: Object,
+      required: true,
+    },
+  },
+  methods: {
+    routeToPromo(study) {
+      this.$router.push({ name: 'Promo', params: { dataset: study } });
+    },
+  },
+  computed: {
+    filteredDatasets() {
+      return Object.keys(this.config.studies).filter(study => study !== 'TEST');
+    },
   },
 };
 </script>

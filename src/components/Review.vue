@@ -43,7 +43,7 @@
     <div v-else-if="allowed">
       <div id="tutorial-tips">
         <div class="information-wrapper">
-          <div id="information">
+          <div class="inner-information-wrapper">
             <h2>This is a{{imageType[1]}}.</h2>
             <div class="information" @click="toTutorial"></div>
           </div>
@@ -137,28 +137,7 @@
     margin-bottom: 0.5em;
     font-size: 1.3em;
   }
-
-  .information{
-    display: block;
-    content: ' ';
-    background-image: url('../assets/info-circle.svg');
-    background-repeat: no-repeat;
-    background-size: 16px 16px;
-    height: 16px;
-    width: 16px;
-    cursor: help;
-  }
-
-  #information{
-    display: flex;
-  }
-
-  .information-wrapper{
-    margin-top: 5px;
-    display: flex;
-    justify-content: center;
-  }
-
+  
   #flagwarning h5{
     font-size: 2em;
     font-weight: bold;

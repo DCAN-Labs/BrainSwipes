@@ -403,6 +403,7 @@ export default {
   position: relative;
   padding: 1em 1.25em;
   height: 10vh;
+  z-index: 2;
 }
 
 .navRoot .navSection.main-logo {
@@ -456,4 +457,27 @@ export default {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.information{
+  display: block;
+  content: ' ';
+  background-image: url('/src/assets/info-circle.svg');
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+  height: 16px;
+  width: 16px;
+  cursor: help;
+  margin-left: 2px;
+}
+
+.information-wrapper{
+  margin-top: 5px;
+  display: flex;
+  justify-content: center;
+}
+
+.inner-information-wrapper{
+  display: flex;
+}
+
 </style>

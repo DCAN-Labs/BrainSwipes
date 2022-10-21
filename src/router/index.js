@@ -20,6 +20,7 @@ import Restricted from '@/components/Restricted';
 import Results from '@/components/Results';
 import Practice from '@/components/Practice';
 import Gallery from '@/components/Gallery';
+import Promo from '@/components/Promo';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -176,6 +177,12 @@ const router = new Router({
       path: '/gallery',
       name: 'Gallery',
       component: Gallery,
+    },
+    {
+      path: '/:dataset/about/',
+      name: 'Promo',
+      component: Promo,
+      props: route => ({ dataset: route.params.dataset }),
     },
   ],
 });
