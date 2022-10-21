@@ -7,7 +7,7 @@
         <p class="lead mt-3">
           {{Object.keys(userInfo).length ? userData.takenTutorial === 'complete' ? 'Choose a dataset to QC': 'Review our learning resources before you begin swiping' : 'Login to begin'}}
         </p>
-        <div class="information-wrapper">
+        <div v-if="userData.takenTutorial === 'complete'" class="information-wrapper">
           <div class="inner-information-wrapper">
             <h2 class="explain-private">Private Datasets</h2>
             <div class="information" @mouseover="explainPrivate = true" @mouseleave="explainPrivate = false"></div>
