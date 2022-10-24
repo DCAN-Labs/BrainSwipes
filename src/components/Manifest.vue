@@ -334,12 +334,6 @@ export default {
         }));
       });
     },
-    async setUserRoles(study, available) {
-      const response = await this.requestUserRolesUpdate(study, available).then(data =>
-        JSON.parse(data.currentTarget.responseText),
-      );
-      console.log(response);
-    },
   },
   beforeRouteEnter(to, from, next) {
     next(async (vm) => {
