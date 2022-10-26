@@ -461,7 +461,7 @@ export default {
 .information{
   display: block;
   content: ' ';
-  background-image: url('/src/assets/info-circle.svg');
+  background-image: url('../src/assets/info-circle.svg');
   background-repeat: no-repeat;
   background-size: 16px 16px;
   height: 16px;
