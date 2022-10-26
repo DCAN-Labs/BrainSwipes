@@ -1,8 +1,5 @@
 <template name="leaderboard">
   <div class="page">
-    <div class="page__header">
-      <h1>Leaderboard</h1>
-    </div>
     <div class="page__content grey-gradient-bg">
       <div class="page__content-container">
         <div class="leaderboard">
@@ -16,7 +13,7 @@
                 <div class="leaderboard__cell user-index">{{index + 1}}</div>
                 <div class="leaderboard__cell avatar">
                   <div class="avatar">
-                    <img src="../assets/kesh-profile-icon.svg" alt="Swipes for Science logo" />
+                    <img src="../assets/kesh-profile-icon.svg" alt="Default User Profile Icon" />
                   </div>
                 </div>
                 <div class="leaderboard__cell username">{{user.name}}</div>
@@ -98,11 +95,14 @@
   padding-left: 1em;
 }
 .leaderboard__cell.user-score:before {
-  font: normal normal normal 14px/1 FontAwesome;
-  content: "\F005";
-  color: hsl(43, 97%, 55%);
-  position: absolute;
-  left: 0px;
+    position: absolute;
+    left: 0px;
+    content: ' ';
+    background-image: url('../assets/star.svg');
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    height: 16px;
+    width: 16px;
 }
 
 

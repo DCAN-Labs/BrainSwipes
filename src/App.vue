@@ -402,7 +402,7 @@ export default {
   justify-content: space-between;
   position: relative;
   padding: 1em 1.25em;
-  height: 10vh;
+  height: 100px;
   z-index: 2;
 }
 

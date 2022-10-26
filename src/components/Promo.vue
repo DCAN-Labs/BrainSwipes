@@ -66,7 +66,7 @@ export default {
   methods: {
     backgroundStyles() {
       return {
-        'background-image': `url(../src/assets/${this.config.studies[this.dataset].about.logo})`,
+        'background-image': `url(/static/study_logos/${this.config.studies[this.dataset].about.logo})`,
         'background-position': 'center',
         'background-repeat': 'no-repeat',
         'background-attachment': 'fixed',
