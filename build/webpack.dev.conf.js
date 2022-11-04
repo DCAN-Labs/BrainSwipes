@@ -290,6 +290,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
                         const uid = userRecord.uid;
                         const claims = userRecord.customClaims;
                         claims.datasets[study] = available;
+                        claims.studyAdmin[study] = false;
                         admin.auth().setCustomUserClaims(uid, claims);
                       });
                       res.send("Success");
