@@ -1,24 +1,15 @@
-# Swipes For Science Dev
+# BrainSwipes
+[BrainSwipes](https://brainswipes.us) is a web application that brings the swipe right, swipe left paradigm to quality assurance.
+
+The DCAN Labs handle many neuroimaging datasets, and BrainSwipes helps centralize and scale the process of ensureing quality data.
+
+BrainSwipes is built off of the open source [Swipes For Science](https://docs.swipesforscience.org/) platform.
+
+
+## BrainSwipes Architecture
+BrainSwipes is hosted on [AWS Lightsail](https://lightsail.aws.amazon.com/ls/webapp/home/instances?#), uses a [Firebase](https://console.firebase.google.com/project/brainswipes/overview) database to track data on swipes, and S3 storage on UMN's [Minnesota Supercomputing Institute (MSI)](https://www.msi.umn.edu/).
 
 ![Swipes app flow](./src/assets/swipes-flow.png "Standard flow for the swipes app")
-
-## Other Sowftware used by Swipes
-Original SFS Documentation: https://docs.swipesforscience.org/
-
-Travis CI (continuous integration): https://app.travis-ci.com/github/DCAN-Labs/SwipesForScience
-
-Firebase (backend): https://console.firebase.google.com/project/brainswipes/overview
-
-AWS Lightsail (hosting) https://lightsail.aws.amazon.com/ls/webapp/home/instances?#
-
-## Current DCAN SFS Apps
-https://github.com/DCAN-Labs/SwipesForScience : https://brainswipes.us/
-
-https://github.com/DCAN-Labs/abcd-t1reg : https://abcd-t1reg.braindr.us/ (disabled)
-
-https://github.com/DCAN-Labs/abcd-surf: https://abcd-surf.braindr.us/ (disabled)
-
-https://github.com/DCAN-Labs/abcd-func : https://abcd-func.braindr.us/ (disabled)
 
 ## Setup for Development
 All development should be done on a branch on your local machine. Do not push to main until development is complete.
@@ -30,7 +21,6 @@ npm install
 npm run dev
 ```
 ​​Your application is running here: http://localhost:8080  
-Some parts of the program will not run without a server. In the dev environment you will not be able to load images.
 
 The database uses [firebase appcheck](https://firebase.google.com/docs/app-check/web/recaptcha-provider) to protect the app. You may need to add a token or temporarily enable localhost.
 
@@ -44,14 +34,14 @@ To restart the server using the new files, run pm2 kill then pm2 start express.j
 
 
 ## Adding new images
-Use [Anders’](mailto:perr0372@umn.edu) script to format images for use with brainswipes
+Use the tools/es2sfs_img_converter.py script to format images for use with brainswipes
 
 [Adding new studies to BrainSwipes](https://docs.google.com/document/d/1apA6hc4Oj33BoP_t7oacL-x3vDvglYWSt0CdlycPeuM/edit?usp=sharing)
 
 ## Data Storage
-The images are in AWS S3 buckets hosted on MSI. To find the name of the bucket, look in firebase under db/studies/[study name]/bucket. This is accessed in a node.js server on AWS Lightsail using the [AWS SDK](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/welcome.html). The SDK uses [Barry Tikalsky](mailto:tikal004@umn.edu)’s MSI credentials to construct a URL that gives limited access to an image. If you decide to use different credentials make sure the owner has access to all buckets being used by the app. If the MSI credentials are accidentally revealed you can renew them on [MSI’s website](https://www.msi.umn.edu/content/s3-credentials) then update them on the server.
+The images are in AWS S3 buckets hosted on MSI. To find the name of the bucket, look in firebase under config/studies/[study name]/bucket. This is accessed in a node.js server on AWS Lightsail using the [AWS SDK](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/welcome.html). The SDK uses a service account’s MSI credentials to construct a URL that gives limited access to an image. If the MSI credentials are accidentally revealed you can renew them on [MSI’s website](https://www.msi.umn.edu/content/s3-credentials) then update them on the server.
 
 The app uses [Firebase](https://console.firebase.google.com/project/brainswipes/overview) to store information on how images have been rated. Contact [Barry Tikalsky](mailto:tikal004@umn.edu) for access.
 
-## Custom Domain
-This site is hosted on http://brainswipes.us this domain is managed on AWS Route 53. Contact [Nora Byington](mailto:bying015@umn.edu) for access.
+## Domain Name
+This site is hosted on http://brainswipes.us this domain is managed on AWS Route 53 under the account tied to the [DCAN Labs email](mailto:dcanlabs@umn.edu)
