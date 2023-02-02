@@ -68,7 +68,13 @@
               :minVotes="submittedMinSwipes"
               :db="db"
               :gradientArray="gradientArray"
-              />              
+              />
+              <NumberOfSwipesByUser
+              :dataset="submittedDataset"
+              :threshold="submittedThreshold"
+              :db="db"
+              :gradientArray="gradientArray"
+              />
               <!-- <InterraterConcordance
               :dataset="dataset"
               :db="db"
@@ -129,6 +135,7 @@
   import colorGradient from 'javascript-color-gradient';
   import _ from 'lodash';
   import InterraterConcordance from './Visualizations/InterraterConcordance';
+  import NumberOfSwipesByUser from './Visualizations/NumberOfSwipesByUser';
   import CatchTrialsByUser from './Visualizations/CatchTrialsbyUser';
   import SurvivngSessions from './Visualizations/SurvivingSessions';
   import SessionsPassFail from './Visualizations/SessionsPassFail';
@@ -138,6 +145,7 @@
 
 
   Vue.component('InterraterConcordance', InterraterConcordance);
+  Vue.component('NumberOfSwipesByUser', NumberOfSwipesByUser);
   Vue.component('CatchTrialsByUser', CatchTrialsByUser);
   Vue.component('SurvivingSessions', SurvivngSessions);
   Vue.component('SessionsPassFail', SessionsPassFail);
