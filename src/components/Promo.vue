@@ -4,6 +4,11 @@
     <div id="promo-content">
       <h1>{{config.studies[dataset].about.title}}</h1>
       <p v-for="line in config.studies[dataset].about.text" :key="line" v-html="line"></p>
+      <div v-if="config.studies[dataset].archived" class="archived">
+        <hr>
+        <p>This dataset is archived and can no longer be swiped on.</p>
+        <p>You can still view chats and results.</p>
+      </div>
     </div>
   </div>
 
@@ -40,6 +45,10 @@
     font-size: 1.1em;
     margin: 2px;
     max-width: 90vw;
+  }
+  .archived p{
+    font-style: italic;
+    color:gray;
   }
 </style>
 

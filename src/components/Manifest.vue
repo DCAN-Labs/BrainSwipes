@@ -50,6 +50,11 @@
         <div v-if="status=='complete'" class="file-import">
           <pre id="result"></pre>
         </div>
+        <hr>
+        <div class="archived">
+          <b-button @click="archiveStudy(selectedStudy)">{{config.studies[selectedStudy].archived ? `${selectedStudy} is archived. Click to un-archive.` : `Click to archive ${selectedStudy}`}}</b-button>
+          <p>Archived studies cannot be swiped on, but their data can still be viewed.</p>
+        </div>
       </div>
 
     </b-container>
@@ -59,31 +64,35 @@
 </template>
 
 <style>
-#result{
-  text-align: start;
-  min-height: 1.2em;
-}
-.manifest-title {
-  margin-bottom: 2vh;
-}
-.study-buttons-row {
-  margin-bottom: 2vh;
-}
-.study-button {
-  color: #fff;
-  background-color:rgba(128,0,0,0.57);
-  border-color: maroon;
-  margin-right: .2em;
-}
-.study-button:hover {
-  background-color: rgba(128,0,0,1);
-}
-.selected {
-  background-color: rgba(128,0,0,.85);
-}
-.study-button:active, .study-button:focus {
-  background-color: rgba(128,0,0,.85);
-}
+  #result{
+    text-align: start;
+    min-height: 1.2em;
+  }
+  .manifest-title {
+    margin-bottom: 2vh;
+  }
+  .study-buttons-row {
+    margin-bottom: 2vh;
+  }
+  .study-button {
+    color: #fff;
+    background-color:rgba(128,0,0,0.57);
+    border-color: maroon;
+    margin-right: .2em;
+  }
+  .study-button:hover {
+    background-color: rgba(128,0,0,1);
+  }
+  .selected {
+    background-color: rgba(128,0,0,.85);
+  }
+  .study-button:active, .study-button:focus {
+    background-color: rgba(128,0,0,.85);
+  }
+  .archived p{
+    font-style: italic;
+    color:gray;
+  }
 </style>
 
 <script>
@@ -333,6 +342,12 @@ export default {
           currentUser: firebase.auth().currentUser.uid,
         }));
       });
+    },
+    /**
+     * Archive or un-archive a study.
+     */
+    archiveStudy(study) {
+      this.db.ref(`/config/studies/${study}/archived`).set(!this.config.studies[study].archived);
     },
   },
   beforeRouteEnter(to, from, next) {

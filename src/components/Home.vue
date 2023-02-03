@@ -25,7 +25,7 @@
             </div>
             <div class="buttons">
               <div v-for="study in categorizedDatasets.open" :key="study">
-                <b-button class="btn btn-primary" @click="routeToPlay(study)">{{study}}</b-button>
+                <b-button v-if="!config.studies[study].archived" class="btn btn-primary" @click="routeToPlay(study)">{{study}}</b-button>
               </div>
             </div>
             <hr class="seperator">
