@@ -2,8 +2,22 @@
   <div class="page">
     <div class="page__content grey-gradient-bg">
       <div class="page__content-container">
-        <div class="leaderboard">
-         <transition-group tag="div" name="list" class="leaderboard__rows">
+        <div class="leaderboard" :style="{cursor: loading ? 'wait' : 'unset'}">
+          <div>
+            <b-dropdown variant="warning" class="datasetsDropdown" :text="selectedDataset" ref="datasetDropdown">
+              <b-dropdown-form>
+                <b-form-radio-group
+                  id="radio-datasets"
+                  v-model="selectedDataset"
+                  :options="availableDatasets"
+                  name="chooseDataset"
+                  stacked
+                ></b-form-radio-group>
+              </b-dropdown-form>
+            </b-dropdown>
+          </div>
+          <br>
+          <transition-group tag="div" name="list" class="leaderboard__rows">
             <div
               v-for="(user, index) in displayUsersList"
               v-bind:key="user.name"
@@ -26,10 +40,10 @@
             </div>
           </transition-group>
           <button @click="showMore()" 
-                  id="leaderboard__showMore"
-                  class="full-size-desktop"
-                  v-if="displayLimit < sortedUsersList.length">
-                  Load more
+            id="leaderboard__showMore"
+            class="full-size-desktop"
+            v-if="displayLimit < sortedUsersList.length">
+            Load more
           </button>
         </div>
       </div>
@@ -60,7 +74,7 @@
 }
 /* Leaderboard top score row */
 .leaderboard__row:first-of-type .leaderboard__row-container {
-  background-color: maroon;
+  background-color: gold;
   border-radius: 8px;
   margin-bottom:  1.25em ;
 }
@@ -147,7 +161,7 @@
   .page__content-container {
     background-color: white;
     padding: 1.25em 4em;
-    padding-bottom: 10vh;
+    margin-bottom: 10vh;
     border-radius: 20px;
   }
 }
@@ -158,38 +172,16 @@
  * The leaderboard component for the route `/leaderboard`. It displays the
  * rank, badge, player username, and score. You can sort based on the score.
  */
+import _ from 'lodash';
 
 export default {
   name: 'leaderboard',
-  props: {
-    /**
-     * it comes directly from the `/users` document in Firebase.
-     */
-    allUsers: {
-      type: Object,
-      required: true,
-    },
-  },
-  computed: {
-    sortedUsersList() {
-      /* Removes '.key' property present on allUsers data */
-      let allUsernames = Object.keys(this.allUsers).filter(
-        user => user !== '.key',
-      );
-      // eslint-disable-next-line
-      allUsernames = allUsernames.map((user) => {
-        return { name: user, score: this.allUsers[user].score };
-      });
-      /* Sort descending by score */
-      allUsernames.sort((a, b) => b.score - a.score);
-      return allUsernames;
-    },
-    displayUsersList() {
-      return this.sortedUsersList.slice(0, this.displayLimit);
-    },
-  },
   data() {
     return {
+      /**
+       * whether the chart is loading
+       */
+      loading: true,
       /**
        * Tell the table component to sort by the score.
        */
@@ -218,7 +210,63 @@ export default {
         },
       ],
       displayLimit: 10,
+      /**
+       * the dataset selected to view
+      */
+      selectedDataset: 'All Studies',
+      /**
+       * list of users and their scores sorted by score
+       */
+      sortedUsersList: [],
     };
+  },
+  props: {
+    /**
+     * the intialized firebase database
+     */
+    db: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * it comes directly from the `/users` document in Firebase.
+     */
+    allUsers: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * a list of the datasets that the logged in user is allowed to see
+     */
+    datasetPrivileges: {
+      type: Object,
+      required: true,
+    },
+  },
+  computed: {
+    displayUsersList() {
+      return this.sortedUsersList.slice(0, this.displayLimit);
+    },
+    availableDatasets() {
+      const availableDatasets = Object.keys(this.datasetPrivileges)
+        .filter(key => this.datasetPrivileges[key]);
+      availableDatasets.unshift('All Studies');
+      return availableDatasets;
+    },
+    propsToWatch() {
+      return [this.selectedDataset];
+    },
+  },
+  watch: {
+    propsToWatch: {
+      handler() {
+        this.createUserScoreList(this.dataset);
+        this.resetDisplayLimit();
+        this.closeDropdown();
+      },
+      immediate: true,
+      deep: true,
+    },
   },
   methods: {
     showMore() {
@@ -227,6 +275,45 @@ export default {
         this.displayLimit < this.sortedUsersList.length
           ? Math.min(this.displayLimit + 10, this.sortedUsersList.length)
           : this.displayLimit;
+    },
+    resetDisplayLimit() {
+      this.displayLimit = 10;
+    },
+    closeDropdown() {
+      this.$refs.datasetDropdown.hide();
+    },
+    async createUserScoreList() {
+      this.loading = true;
+      let allUsernames = [];
+      if (this.selectedDataset === 'All Studies') {
+        /* Removes '.key' property present on allUsers data */
+        allUsernames = Object.keys(this.allUsers).filter(
+          user => user !== '.key',
+        );
+        // eslint-disable-next-line
+        allUsernames = allUsernames.map((user) => {
+          return { name: user, score: this.allUsers[user].score };
+        });
+      } else {
+        const votesRef = this.db.ref(`datasets/${this.selectedDataset}/votes`);
+        const votesSnap = await votesRef.once('value');
+        const votes = votesSnap.val();
+        // parse data
+        /* eslint-disable */
+        const reducedVotes = _.reduce(votes, (result, value) => {
+          const name = value.user;
+          result[name] ? result[name]['score'] = result[name]['score'] + 1 : result[name] = {name: name, score: 1};
+          return result;
+        }, {});
+        _.forIn(reducedVotes, (value, key) => {
+          allUsernames.push(value);
+        })
+        /* eslint-enable */
+      }
+      /* Sort descending by score */
+      allUsernames.sort((a, b) => b.score - a.score);
+      this.sortedUsersList = allUsernames;
+      this.loading = false;
     },
   },
 };

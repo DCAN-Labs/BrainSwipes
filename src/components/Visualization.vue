@@ -211,12 +211,15 @@
         required: true,
       },
       /**
-       * it comes directly from the `/userss` document in Firebase.
+       * it comes directly from the `/users` document in Firebase.
        */
       allUsers: {
         type: Object,
         required: true,
       },
+      /**
+       * a list of the datasets that the logged in user is allowed to see
+       */
       datasetPrivileges: {
         type: Object,
         required: true,
