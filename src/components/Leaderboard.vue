@@ -26,8 +26,10 @@
               <div class="leaderboard__row-container">
                 <div class="leaderboard__cell user-index">{{index + 1}}</div>
                 <div class="leaderboard__cell avatar">
-                  <div class="avatar">
-                    <img src="../assets/kesh-profile-icon.svg" alt="Default User Profile Icon" />
+                  <div class="img-overlay-wrap">
+                    <!--TO DO: change icon based on user -->
+                    <img src="/static/org_logos/UniversityOfMinnesota.svg" alt="Profile Avatar" class="avatar"/>
+                    <img :src="index  ===0 ? '/src/assets/profile-frame-gold.svg' : '/src/assets/profile-frame.svg'" class="profile-frame">
                   </div>
                 </div>
                 <div class="leaderboard__cell username">{{user.name}}</div>
@@ -91,9 +93,21 @@
 .leaderboard__cell.user-index {
   width: calc(20% - 1em);
 }
-.leaderboard__cell.avatar {
+.leaderboard__cell .img-overlay-wrap {
+  position: relative;
+  display: inline-block;
   margin-right: 0.5em;
   width: 2.5em;
+}
+.leaderboard__cell .img-overlay-wrap .avatar {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.leaderboard__cell .img-overlay-wrap .profile-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 .leaderboard__cell.username {
   flex-grow: 1;

@@ -2,7 +2,6 @@
   <div class="account-menu">
     <!-- Dropdown menu only available if user is logged in -->
     <div v-if="loggedIn" ref="account-menu-toggle" @click="toggleMenu">
-      <!-- Please replace with user's actual icon and data-->
       <div class="img-overlay-wrap">
         <img :src="profilePicURL" alt="Profile Avatar" class="avatar"/>
         <img src="/src/assets/profile-frame.svg" class="profile-frame">
@@ -208,12 +207,12 @@ export default {
     width: 4em;
     margin-right: 1em;
   }
-  .img-overlay-wrap .avatar {
+  .account-menu .img-overlay-wrap .avatar {
     display: block;
     max-width: 100%;
     height: auto;
   }
-  .img-overlay-wrap .profile-frame {
+  .account-menu .img-overlay-wrap .profile-frame {
     position: absolute;
     top: 0;
     left: 0;
