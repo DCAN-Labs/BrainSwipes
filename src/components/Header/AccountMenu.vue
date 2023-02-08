@@ -49,10 +49,6 @@ export default {
   data() {
     return {
       isActive: false,
-      /**
-       * url of the icon to use as a profile picture
-       */
-      profilePicURL: '/src/assets/kesh-profile-icon.svg',
     };
   },
   props: {
@@ -88,6 +84,17 @@ export default {
       });
       return notification;
     },
+    /**
+     * url of the icon to use as a profile picture
+     */
+    profilePicURL() {
+      let profilePicURL = '/src/assets/kesh-profile-icon.svg';
+      console.log(this.userData);
+      if (this.userData.pic) {
+        profilePicURL = `/static/org_logos/${this.userData.pic}.svg`;
+      }
+      return profilePicURL;
+    },
   },
   methods: {
     onClose() {
@@ -99,15 +106,6 @@ export default {
     onClickLogout() {
       this.$emit('logout');
     },
-    async getProfilePic() {
-      const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
-      const org = idTokenResult.claims.org.replace(/\s+/g, '');
-      const url = `/static/org_logos/${org}.svg`;
-      this.profilePicURL = url;
-    },
-  },
-  mounted() {
-    this.getProfilePic();
   },
   directives: {
     ClickOutside,
@@ -167,11 +165,6 @@ export default {
   .account-menu > div {
     display: flex;
   }
-  /* .account-menu .avatar {
-    display: block;
-    width: 4em;
-    margin-right: 1em;
-  } */
   .account-menu .user-score {
     display: block;
     top: 0.6em;
