@@ -3,7 +3,10 @@
     <!-- Dropdown menu only available if user is logged in -->
     <div v-if="loggedIn" ref="account-menu-toggle" @click="toggleMenu">
       <!-- Please replace with user's actual icon and data-->
-      <img src="../../assets/kesh-profile-icon.svg" alt="Profile Avatar" class="avatar" />
+      <div class="img-overlay-wrap">
+        <img :src="profilePicURL" alt="Profile Avatar" class="avatar"/>
+        <img src="/src/assets/profile-frame.svg" class="profile-frame">
+      </div>
       <div class="account-menu__user-information">
         <span class="username">{{userInfo.displayName}}</span>
         <span class="user-score">{{userData.score}}</span>
@@ -47,6 +50,10 @@ export default {
   data() {
     return {
       isActive: false,
+      /**
+       * url of the icon to use as a profile picture
+       */
+      profilePicURL: '/src/assets/kesh-profile-icon.svg',
     };
   },
   props: {
@@ -93,6 +100,15 @@ export default {
     onClickLogout() {
       this.$emit('logout');
     },
+    async getProfilePic() {
+      const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+      const org = idTokenResult.claims.org.replace(/\s+/g, '');
+      const url = `/static/org_logos/${org}.svg`;
+      this.profilePicURL = url;
+    },
+  },
+  mounted() {
+    this.getProfilePic();
   },
   directives: {
     ClickOutside,
@@ -152,11 +168,11 @@ export default {
   .account-menu > div {
     display: flex;
   }
-  .account-menu .avatar {
+  /* .account-menu .avatar {
     display: block;
     width: 4em;
     margin-right: 1em;
-  }
+  } */
   .account-menu .user-score {
     display: block;
     top: 0.6em;
@@ -186,5 +202,22 @@ export default {
   .account-menu__dropdown {
     top: 100px;
   }
+  .account-menu .img-overlay-wrap {
+    position: relative;
+    display: inline-block;
+    width: 4em;
+    margin-right: 1em;
+  }
+  .img-overlay-wrap .avatar {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+  .img-overlay-wrap .profile-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
 }
 </style>
