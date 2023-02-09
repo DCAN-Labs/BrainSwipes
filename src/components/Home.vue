@@ -24,14 +24,15 @@
               </span>
             </div>
             <div class="buttons">
-              <div v-for="study in categorizedDatasets.open" :key="study">
-                <b-button v-if="!config.studies[study].archived" class="btn btn-primary" @click="routeToPlay(study)">{{study}}</b-button>
+              <div v-for="study in Object.keys(config.studies)" :key="study">
+                <b-button v-if="study !== 'TEST'" :class="datasetPrivileges[study] ? 'btn-primary' : 'btn-unavailable'" @click="chooseDataset(study)">{{study}}</b-button>
               </div>
+              <b-button v-if="datasetPrivileges['TEST']" class="btn btn-primary" @click="chooseDataset('TEST')">TEST</b-button>
             </div>
             <hr class="seperator">
-            <div class="buttons">
-              <div v-for="study in categorizedDatasets.restricted" :key="study">
-                <b-button class="btn" :class="datasetPrivileges[study] ? 'btn-primary' : 'btn-unavailable'" @click="routeToPlay(study)">{{study}}</b-button>
+            <div class="buttons" v-if="selectedStudy">
+              <div v-for="dataset in Object.keys(config.studies[selectedStudy].datasets)" :key="dataset">
+                <b-button :class="config.studies[selectedStudy].datasets[dataset].archived ? 'btn-unavailable' : datasetPrivileges[selectedStudy] ? 'btn-primary' : 'btn-unavailable'" @click="routeToPlay(dataset)">{{dataset}}</b-button>
               </div>
             </div>
           </div>
@@ -87,14 +88,23 @@ export default {
   data() {
     return {
       landingStyle: { 'background-image': 'url("/static/UMN_logos2_PRINT-09.svg")' },
+      /**
+       * whether to show the tooltip explaining private datasets
+       */
       explainPrivate: false,
+      /**
+       * which study to show datasets for
+       */
+      selectedStudy: '',
     };
   },
   methods: {
     routeToPlay(label) {
-      if (this.datasetPrivileges[label]) {
+      if (this.config.studies[this.selectedStudy].datasets[label].archived) {
+        this.$router.push({ name: 'Promo', params: { dataset: label } });
+      } else if (this.datasetPrivileges[label]) {
         const errors = [];
-        if (!this.config.studies[label].available) {
+        if (!this.config.studies[this.selectedStudy].available) {
           if (!this.globusToken) {
             errors.push(1);
           }
@@ -121,6 +131,9 @@ export default {
       if (query.reroute) {
         this.$router.push({ path: query.reroute });
       }
+    },
+    chooseDataset(study) {
+      this.selectedStudy = this.selectedStudy === study ? '' : study;
     },
   },
   mounted() {
@@ -252,5 +265,8 @@ a {
   .jumbotron {
     background-size: 90%
   }
+}
+.buttons img {
+  color: white;
 }
 </style>
