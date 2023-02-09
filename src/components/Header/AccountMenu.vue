@@ -88,10 +88,9 @@ export default {
      * url of the icon to use as a profile picture
      */
     profilePicURL() {
-      let profilePicURL = '/src/assets/kesh-profile-icon.svg';
-      console.log(this.userData);
+      let profilePicURL = '/static/profile_pic/kesh-profile-icon.svg';
       if (this.userData.pic) {
-        profilePicURL = `/static/org_logos/${this.userData.pic}.svg`;
+        profilePicURL = `/static/profile_pics/${this.userData.pic}.svg`;
       }
       return profilePicURL;
     },

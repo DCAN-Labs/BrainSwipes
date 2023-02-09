@@ -28,7 +28,7 @@
                 <div class="leaderboard__cell avatar">
                   <div class="img-overlay-wrap">
                     <!--TO DO: change icon based on user -->
-                    <img src="/static/org_logos/UniversityOfMinnesota.svg" alt="Profile Avatar" class="avatar"/>
+                    <img :src="user.pic ? `/static/profile_pics/${user.pic}.svg` : '/static/profile_pics/kesh-profile-icon.svg'" alt="Profile Avatar" class="avatar"/>
                     <img :src="index  ===0 ? '/src/assets/profile-frame-gold.svg' : '/src/assets/profile-frame.svg'" class="profile-frame">
                   </div>
                 </div>
@@ -306,7 +306,7 @@ export default {
         );
         // eslint-disable-next-line
         allUsernames = allUsernames.map((user) => {
-          return { name: user, score: this.allUsers[user].score };
+          return { name: user, score: this.allUsers[user].score, pic: this.allUsers[user].pic };
         });
       } else {
         const votesRef = this.db.ref(`datasets/${this.selectedDataset}/votes`);
@@ -316,7 +316,7 @@ export default {
         /* eslint-disable */
         const reducedVotes = _.reduce(votes, (result, value) => {
           const name = value.user;
-          result[name] ? result[name]['score'] = result[name]['score'] + 1 : result[name] = {name: name, score: 1};
+          result[name] ? result[name]['score'] = result[name]['score'] + 1 : result[name] = {name: name, score: 1, pic: this.allUsers[name].pic};
           return result;
         }, {});
         _.forIn(reducedVotes, (value, key) => {
