@@ -4,7 +4,7 @@
     <div v-if="loggedIn" ref="account-menu-toggle" @click="toggleMenu">
       <div class="img-overlay-wrap">
         <img :src="profilePicURL" alt="Profile Avatar" class="avatar"/>
-        <img src="/src/assets/profile-frame.svg" class="profile-frame">
+        <img src="/static/profile-frame.svg" class="profile-frame">
       </div>
       <div class="account-menu__user-information">
         <span class="username">{{userInfo.displayName}}</span>

@@ -29,7 +29,7 @@
                   <div class="img-overlay-wrap">
                     <!--TO DO: change icon based on user -->
                     <img :src="user.pic ? `/static/profile_pics/${user.pic}.svg` : '/static/profile_pics/kesh-profile-icon.svg'" alt="Profile Avatar" class="avatar"/>
-                    <img :src="index  ===0 ? '/src/assets/profile-frame-gold.svg' : '/src/assets/profile-frame.svg'" class="profile-frame">
+                    <img :src="index  ===0 ? '/static/profile-frame-gold.svg' : '/static/profile-frame.svg'" class="profile-frame">
                   </div>
                 </div>
                 <div class="leaderboard__cell username">{{user.name}}</div>
