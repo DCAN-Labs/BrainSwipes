@@ -21,6 +21,12 @@
         <b-button id="verifyEmail" type="submit" variant="primary">Verify Email</b-button>
       </b-form>
       <hr>
+      <div class="profile-pic-options">
+        <h1>Choose a Profile Picture!</h1>
+        <br>
+        <img v-for="pic in profilePics" :key="pic" :src="`/static/profile_pics/${pic}.svg`" v-on:click="setProfilePic(pic)">
+      </div>
+      <hr>
       <h1>Samples you've commented on</h1>
       <div v-if="Object.keys(userChats).length" class="user-chats">
         <div v-for="study in Object.keys(userChats)" :key="study" class="study-chats-wrapper">
@@ -186,6 +192,11 @@
     100% {background-color: #D1ECF1;}
   }
 
+  .profile-pic-options img{
+    height: 4em;
+    margin: 2px;
+  }
+
 </style>
 
 <script>
@@ -220,6 +231,10 @@ export default {
        */
       globusAuthenticated: false,
       globusAuthErrors: [],
+      /**
+       * List of profile pic options
+       */
+      profilePics: ['kesh-profile-icon', 'UniversityOfMinnesota', 'dcan-yellow-no-text', 'abide', 'connectome'],
     };
   },
   computed: {
@@ -377,6 +392,9 @@ export default {
     },
     routeToRestricted() {
       this.$router.push({ name: 'Restricted', query: { errors: this.globusAuthErrors } });
+    },
+    setProfilePic(pic) {
+      this.db.ref(`users/${this.userInfo.displayName}/pic`).set(pic);
     },
   },
   mounted() {

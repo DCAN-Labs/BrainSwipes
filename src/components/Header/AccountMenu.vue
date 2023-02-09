@@ -88,7 +88,7 @@ export default {
      * url of the icon to use as a profile picture
      */
     profilePicURL() {
-      let profilePicURL = '/static/profile_pic/kesh-profile-icon.svg';
+      let profilePicURL = '/static/profile_pics/kesh-profile-icon.svg';
       if (this.userData.pic) {
         profilePicURL = `/static/profile_pics/${this.userData.pic}.svg`;
       }
@@ -128,7 +128,7 @@ export default {
   cursor: pointer;
 }
 
-.account-menu .avatar,
+.account-menu .img-overlay-wrap,
 .account-menu .user-score {
   display: none;
 }
