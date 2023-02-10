@@ -60,6 +60,7 @@
         :playMode="''"
         ref="widget"
         :dataset="dataset"
+        :study="study"
         :config="config"
         />
       </div>
@@ -219,6 +220,13 @@
        * the dataset to swipe on
        */
       dataset: {
+        type: String,
+        required: true,
+      },
+      /**
+       * the study the dataset falls under
+       */
+      study: {
         type: String,
         required: true,
       },
@@ -425,7 +433,7 @@
       },
       toPlay() {
         const query = this.flagged ? null : { s: Buffer.from(this.widgetPointer).toString('Base64') };
-        this.$router.push({ name: 'Play', params: { dataset: this.dataset }, query });
+        this.$router.push({ name: 'Play', query });
       },
       openFlagWarning() {
         this.$refs.flagwarning.show();

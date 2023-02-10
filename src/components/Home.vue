@@ -31,8 +31,8 @@
             </div>
             <hr class="seperator">
             <div class="buttons" v-if="selectedStudy">
-              <div v-for="dataset in Object.keys(config.studies[selectedStudy].datasets)" :key="dataset">
-                <b-button :class="config.studies[selectedStudy].datasets[dataset].archived ? 'btn-unavailable' : datasetPrivileges[selectedStudy] ? 'btn-primary' : 'btn-unavailable'" @click="routeToPlay(dataset)">{{dataset}}</b-button>
+              <div v-for="dataset in config.studies[selectedStudy].datasets" :key="dataset">
+                <b-button :class="config.datasets[dataset].archived ? 'btn-unavailable' : datasetPrivileges[selectedStudy] ? 'btn-primary' : 'btn-unavailable'" @click="routeToPlay(dataset)">{{config.datasets[dataset].name}}</b-button>
               </div>
             </div>
           </div>
@@ -100,9 +100,9 @@ export default {
   },
   methods: {
     routeToPlay(label) {
-      if (this.config.studies[this.selectedStudy].datasets[label].archived) {
-        this.$router.push({ name: 'Promo', params: { dataset: label } });
-      } else if (this.datasetPrivileges[label]) {
+      if (this.config.datasets[label].archived) {
+        this.$router.push({ name: 'Promo', params: { study: this.selectedStudy } });
+      } else if (this.datasetPrivileges[this.selectedStudy]) {
         const errors = [];
         if (!this.config.studies[this.selectedStudy].available) {
           if (!this.globusToken) {
@@ -115,11 +115,11 @@ export default {
         if (errors.length) {
           this.$router.push({ name: 'Restricted', query: { errors } });
         } else {
-          this.$emit('changeDataset', label);
-          this.$router.push({ name: 'Play', params: { dataset: label } });
+          this.$emit('changeDataset', label, this.selectedStudy);
+          this.$router.push({ name: 'Play', params: { study: this.selectedStudy, dataset: label } });
         }
       } else {
-        this.$router.push({ name: 'Promo', params: { dataset: label } });
+        this.$router.push({ name: 'Promo', params: { study: this.selectedStudy } });
       }
     },
     routeToTutorial() {

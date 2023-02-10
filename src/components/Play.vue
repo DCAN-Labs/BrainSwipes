@@ -31,6 +31,7 @@
          :playMode="playMode"
          ref="widget"
          :dataset="dataset"
+         :study="study"
          :config="config"
         />
       </div>
@@ -125,6 +126,13 @@
        * the dataset to swipe on
        */
       dataset: {
+        type: String,
+        required: true,
+      },
+      /**
+       * the study the dataset falls under
+       */
+      study: {
         type: String,
         required: true,
       },
@@ -524,7 +532,7 @@
        * removes the router query
        */
       clearRouterQuery() {
-        this.$router.push({ name: 'Home', query: { reroute: `${this.dataset}/play` } });
+        this.$router.push({ name: 'Home', query: { reroute: `${this.study}/${this.dataset}/play` } });
       },
     },
     /**
@@ -534,12 +542,12 @@
     beforeRouteEnter(to, from, next) {
       next(async (vm) => {
         /* eslint-disable no-underscore-dangle */
-        const available = await vm._props.db.ref(`config/studies/${to.params.dataset}/available`).once('value');
+        const available = await vm._props.db.ref(`config/studies/${to.params.study}/available`).once('value');
         const restricted = !available.val();
         const errors = [];
         const user = firebase.auth().currentUser;
         const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
-        const userAllowed = idTokenResult.claims.datasets[to.params.dataset];
+        const userAllowed = idTokenResult.claims.datasets[to.params.study];
         if (to.params.dataset !== vm.dataset) {
           vm.$router.push({ name: 'Home' });
         } else if (restricted) {

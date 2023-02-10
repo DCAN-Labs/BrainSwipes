@@ -2,12 +2,17 @@
   <div id="promo">
     <div id="promo-background" :style="backgroundStyles()"></div>
     <div id="promo-content">
-      <h1>{{config.studies[dataset].about.title}}</h1>
-      <p v-for="line in config.studies[dataset].about.text" :key="line" v-html="line"></p>
-      <div v-if="config.studies[dataset].archived" class="archived">
-        <hr>
-        <p>This dataset is archived and can no longer be swiped on.</p>
-        <p>You can still view chats and results.</p>
+      <h1>{{config.studies[study].about.title}}</h1>
+      <p v-for="line in config.studies[study].about.text" :key="line" v-html="line"></p>
+      <hr style="width: 80vw;">
+      <h1>Available Datasets for {{study}}</h1>
+      <div v-for="dataset in config.studies[study].datasets" :key="dataset">
+        <h2>{{config.datasets[dataset].name}}</h2>
+        <p v-for="line in config.datasets[dataset].about.text" :key="line" v-html="line"></p>
+        <div v-if="config.datasets[dataset].archived" class="archived">
+          <p>This dataset is archived and can no longer be swiped on.</p>
+          <p>You can still view chats and results.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -41,6 +46,12 @@
     font-size: 2em;
     margin-bottom: 7px;
   }
+  #promo-content h2{
+    font-size: 1.4em;
+    margin-bottom: 7px;
+    color: maroon;
+    font-weight: bold;
+  }
   #promo-content p{
     font-size: 1.1em;
     margin: 2px;
@@ -67,7 +78,7 @@ export default {
       type: Object,
       required: true,
     },
-    dataset: {
+    study: {
       type: String,
       required: true,
     },
@@ -75,7 +86,7 @@ export default {
   methods: {
     backgroundStyles() {
       return {
-        'background-image': `url(/static/study_logos/${this.config.studies[this.dataset].about.logo})`,
+        'background-image': `url(/static/study_logos/${this.config.studies[this.study].about.logo})`,
         'background-position': 'center',
         'background-repeat': 'no-repeat',
         'background-attachment': 'fixed',
@@ -83,14 +94,14 @@ export default {
     },
   },
   /**
-   * Reroutes users to Home if they attempt to go to an about page for a dataset that does not exist
+   * Reroutes users to Home if they attempt to go to an about page for a study that does not exist
    */
   beforeRouteEnter(to, from, next) {
     next(async (vm) => {
       /* eslint-disable no-underscore-dangle */
       const studies = await vm._props.config.studies;
       const studyList = Object.keys(studies);
-      if (!studyList.includes(to.params.dataset)) {
+      if (!studyList.includes(to.params.study)) {
         vm.$router.push({ name: 'Home' });
       }
       /* eslint-enable no-underscore-dangle */

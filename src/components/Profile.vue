@@ -333,7 +333,6 @@ export default {
      * for the specified dataset
      */
     getUserChats() {
-      // const userChats = {};
       Object.keys(this.datasetPrivileges).forEach(async (study) => {
         if (this.datasetPrivileges[study]) {
           this.db.ref(`datasets/${study}/chats/chats`).on('value', (snap) => {

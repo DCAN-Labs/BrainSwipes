@@ -44,6 +44,7 @@
           :db="db"
           v-on:takenTutorial="setTutorial"
           :dataset="dataset"
+          :study="study"
           @changeDataset="updateDataset"
           :datasetPrivileges="datasetPrivileges"
           @changePermissions="updateDatasetPermissions"
@@ -64,6 +65,7 @@
         :config="config" 
         @changeDataset="updateDataset"
         :dataset="dataset"
+        :study="study"
         :datasetPrivileges="datasetPrivileges"
       />
     </div>
@@ -122,6 +124,10 @@ export default {
        * The dataset to access.
        */
       dataset: '',
+      /**
+       * the study the dataset falls under
+       */
+      study: '',
       /**
        * This is the firebase database object.
        */
@@ -287,8 +293,9 @@ export default {
     /**
      * Passed to child to update dataset on event
      */
-    updateDataset(newDataset) {
+    updateDataset(newDataset, newStudy) {
       this.dataset = newDataset;
+      this.study = newStudy;
     },
     /**
      * What datasets the user can access

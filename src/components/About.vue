@@ -76,7 +76,7 @@ export default {
   },
   methods: {
     routeToPromo(study) {
-      this.$router.push({ name: 'Promo', params: { dataset: study } });
+      this.$router.push({ name: 'Promo', params: { study } });
     },
   },
   computed: {

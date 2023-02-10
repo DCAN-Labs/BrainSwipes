@@ -58,7 +58,7 @@ const router = new Router({
       },
     },
     {
-      path: '/:dataset/play',
+      path: '/:study/:dataset/play',
       name: 'Play',
       component: Play,
       meta: {
@@ -106,7 +106,7 @@ const router = new Router({
       },
     },
     {
-      path: '/:dataset/chats',
+      path: '/:study/:dataset/chats',
       name: 'Chats',
       component: Chats,
       meta: {
@@ -116,10 +116,14 @@ const router = new Router({
       },
     },
     {
-      path: '/:dataset/review/:key/',
+      path: '/:study/:dataset/review/:key/',
       name: 'Review',
       component: Review,
-      props: route => ({ widgetPointer: route.params.key, dataset: route.params.dataset }),
+      props: route => ({
+        widgetPointer: route.params.key,
+        study: route.params.study,
+        dataset: route.params.dataset,
+      }),
       meta: {
         requiresAccess: true,
         requiresTutorial: true,
@@ -179,10 +183,10 @@ const router = new Router({
       component: Gallery,
     },
     {
-      path: '/:dataset/about/',
+      path: '/:study/about/',
       name: 'Promo',
       component: Promo,
-      props: route => ({ dataset: route.params.dataset }),
+      props: route => ({ study: route.params.study }),
     },
   ],
 });
@@ -225,9 +229,9 @@ router.beforeEach((to, from, next) => {
   }
 
   if (requiresAccess) {
-    const dataset = to.params.dataset;
+    const study = to.params.study;
     getUserRoles().then((userRoles) => {
-      if (!userRoles.datasets[dataset]) {
+      if (!userRoles.datasets[study]) {
         next({ path: '/unauthorized', query: from.query });
       }
     });

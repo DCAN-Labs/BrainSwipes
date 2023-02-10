@@ -32,7 +32,7 @@
              </span>
 
              <b-button v-if="playMode"
-              :to="playMode == 'tutorial' ? '' : `/${dataset}/review/${widgetPointer}?f=h`"
+              :to="playMode == 'tutorial' ? '' : `/${study}/${dataset}/review/${widgetPointer}?f=h`"
               ref="helpButton"
               class="helpbtn"
               v-bind:class="{ focus: helpFocused }"
@@ -121,6 +121,13 @@
         required: true,
       },
       /**
+       * the study the dataset falls under
+       */
+      study: {
+        type: String,
+        required: true,
+      },
+      /**
        * The config from firebase.
        * Includes information necessary to access the correct image
        */
@@ -164,7 +171,7 @@
     },
     computed: {
       bucket() {
-        return this.config.studies[this.dataset].bucket;
+        return this.config.datasets[this.dataset].bucket;
       },
     },
     /**
