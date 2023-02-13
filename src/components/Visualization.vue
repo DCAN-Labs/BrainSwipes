@@ -2,43 +2,50 @@
   <div id="visualization">
     <h1> Study Visualizations </h1>
     <b-container>
-      <div>
-        <b-dropdown variant="warning" class="datasetsDropdown" :text="submittedDataset ? submittedDataset : 'Select Study'" ref="datasetDropdown">
-          <b-dropdown-form>
-            <b-form-radio-group
-              id="radio-datasets"
-              v-model="selectedDataset"
-              :options="availableDatasets"
-              name="chooseDataset"
-              stacked
-            ></b-form-radio-group>
-          </b-dropdown-form>
-        </b-dropdown>
+      <div class="buttons">
+        <div v-for="study in Object.keys(config.studies)" :key="study">
+          <b-button v-if="datasetPrivileges[study]" class="btn-primary" @click="chooseStudy(study)">{{study}}</b-button>
+        </div>
       </div>
-      <div> 
-        <b-dropdown variant="warning" class="usersDropdown" text="Users to Include" ref="usersDropdown">
-          <b-dropdown-form>
-            <b-button v-on:click="selectAll">{{selectedUsers.length === sortedUsersList.length? 'Unselect All' : 'Select All'}}</b-button>
-            <b-dropdown-divider></b-dropdown-divider>
-            <b-form-checkbox-group
-              id="checkbox-group-users"
-              v-model="selectedUsers"
-              :options="sortedUsersList"
-              name="exclude-users"
-              stacked
-            ></b-form-checkbox-group>
-          </b-dropdown-form>
-        </b-dropdown>
+      <hr class="seperator">
+      <div v-if="showDatasets">
+        <div v-if="!config.studies[selectedStudy].available && !globusAuthenticated">
+          <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{errorCodes[error]}}</p>
+          <b-button @click="routeToRestricted">Login with Globus</b-button>
+        </div>
+        <div class="buttons" v-else>
+          <div v-for="dataset in config.studies[selectedStudy].datasets" :key="dataset">
+            <b-button :class="config.datasets[dataset].archived ? 'btn-unavailable' : datasetPrivileges[selectedStudy] ? 'btn-primary' : 'btn-unavailable'" @click="chooseDataset(dataset)">{{config.datasets[dataset].name}}</b-button>
+          </div>
+        </div>
       </div>
-      <div>        
-        <b-form-input id="range-minSwipes" v-model="minSwipes" type="range" min="1" :max="maxSwipes" :number="true"></b-form-input>
-        <div class="mt-2">Include samples with a minimum of <span class="data-value">{{ minSwipes }}</span> swipes</div>
+      <div v-if="selectedDataset">
+        <div> 
+          <b-dropdown variant="warning" class="usersDropdown" text="Users to Include" ref="usersDropdown">
+            <b-dropdown-form>
+              <b-button v-on:click="selectAll">{{selectedUsers.length === sortedUsersList.length? 'Unselect All' : 'Select All'}}</b-button>
+              <b-dropdown-divider></b-dropdown-divider>
+              <b-form-checkbox-group
+                id="checkbox-group-users"
+                v-model="selectedUsers"
+                :options="sortedUsersList"
+                name="exclude-users"
+                stacked
+              ></b-form-checkbox-group>
+            </b-dropdown-form>
+          </b-dropdown>
+        </div>
+        <div>        
+          <b-form-input id="range-minSwipes" v-model="minSwipes" type="range" min="1" :max="maxSwipes" :number="true"></b-form-input>
+          <div class="mt-2">Include samples with a minimum of <span class="data-value">{{ minSwipes }}</span> swipes</div>
+        </div>
+        <div>
+          <b-form-input id="range-threshold" v-model="threshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
+          <div class="mt-2">Samples with a minimum pass percentage of <span class="data-value">{{threshold}}%</span> will be considered a pass</div>
+        </div>
+        <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
+        <hr class="seperator">
       </div>
-      <div>
-        <b-form-input id="range-threshold" v-model="threshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
-        <div class="mt-2">Samples with a minimum pass percentage of <span class="data-value">{{threshold}}%</span> will be considered a pass</div>
-      </div>
-      <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
       <div id="charts" v-if="showCharts">
         <b-card no-body fill>
           <b-tabs card lazy>
@@ -107,7 +114,7 @@
 
 </template>
 
-<style>
+<style scoped>
   #visualization {
     padding-bottom: 12vh;
   }
@@ -128,12 +135,35 @@
     font-weight: bold;
     font-size: 1.2em;
   }
+  .buttons {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+  }
+  .btn-primary {
+    color: #fff;
+    background-color: maroon;
+    border-color: maroon;
+    margin: 0.1em;
+  }
+  .btn-unavailable {
+    color: #fff;
+    background-color: grey;
+    border-color: grey;
+    margin: 0.1em;
+  }
+  .globus-auth-error {
+    background-color: #F8D7DA;
+    padding: 5px;
+    margin: 5px;
+  }
 </style>
 
 <script>
   import Vue from 'vue';
   import colorGradient from 'javascript-color-gradient';
   import _ from 'lodash';
+  import firebase from 'firebase/app';
   import InterraterConcordance from './Visualizations/InterraterConcordance';
   import NumberOfSwipesByUser from './Visualizations/NumberOfSwipesByUser';
   import CatchTrialsByUser from './Visualizations/CatchTrialsbyUser';
@@ -188,7 +218,7 @@
         /**
          * default value selected as the threshold for a sample to pass
          */
-        threshold: 100,
+        threshold: 70,
         /**
          * submit button lockout
          */
@@ -200,6 +230,19 @@
         submittedMinSwipes: 1,
         submittedDataset: '',
         submittedThreshold: '',
+        /**
+         * the selected study
+         */
+        selectedStudy: '',
+        /**
+         * whether to show the dataset buttons
+         */
+        showDatasets: false,
+        /**
+         * Whether the user has authenticated with Globus
+         */
+        globusAuthenticated: false,
+        globusAuthErrors: [],
       };
     },
     props: {
@@ -221,6 +264,34 @@
        * a list of the datasets that the logged in user is allowed to see
        */
       datasetPrivileges: {
+        type: Object,
+        required: true,
+      },
+      /**
+       * configuration from firebase.
+       */
+      config: {
+        type: Object,
+        required: true,
+      },
+      /**
+       * The auth token from Globus
+       */
+      globusToken: {
+        type: String,
+        required: true,
+      },
+      /**
+       * function that exchanges the Globus token for user information
+       */
+      getGlobusIdentities: {
+        type: Function,
+        required: true,
+      },
+      /**
+       * errors produced by brainswipes
+       */
+      errorCodes: {
         type: Object,
         required: true,
       },
@@ -249,7 +320,18 @@
         return usernameArray.sort();
       },
       availableDatasets() {
-        return Object.keys(this.datasetPrivileges).filter(key => this.datasetPrivileges[key]);
+        let availableDatasets = [];
+        const allowedStudies = Object.keys(this.datasetPrivileges)
+                    .filter(key => this.datasetPrivileges[key]);
+        allowedStudies.forEach((study) => {
+          console.log(study);
+          if (this.config.studies[study].datasets) {
+            availableDatasets = availableDatasets
+              .concat(this.config.studies[study].datasets);
+          }
+        });
+        console.log(availableDatasets);
+        return availableDatasets;
       },
     },
     methods: {
@@ -266,6 +348,45 @@
         this.selectedUsers = this.selectedUsers.length === this.sortedUsersList.length ?
           [] : _.clone(this.sortedUsersList);
       },
+      chooseStudy(study) {
+        this.selectedStudy = study;
+        this.selectedDataset = '';
+        this.showDatasets = true;
+        this.showCharts = false;
+      },
+      chooseDataset(dataset) {
+        this.selectedDataset = dataset;
+        this.showDatasets = false;
+      },
+      async allowRestrictedDatasets() {
+        const user = firebase.auth().currentUser;
+        const email = user.email;
+        const identities = await this.getGlobusIdentities(this.globusToken);
+        const errors = [];
+        const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+        const organization = idTokenResult.claims.org;
+        if (Object.keys(identities).length === 0) {
+          errors.push(1);
+        } else if (!identities[email]) {
+          errors.push(2);
+        } else if (identities[email][0] !== organization) {
+          errors.push(3);
+        } else if (identities[email][1] !== 'used') {
+          errors.push(4);
+        }
+        if (errors.length) {
+          this.globusAuthErrors = errors;
+          this.globusAuthenticated = false;
+        } else {
+          this.globusAuthenticated = true;
+        }
+      },
+      routeToRestricted() {
+        this.$router.push({ name: 'Restricted', query: { errors: this.globusAuthErrors } });
+      },
+    },
+    mounted() {
+      this.allowRestrictedDatasets();
     },
   };
 </script>

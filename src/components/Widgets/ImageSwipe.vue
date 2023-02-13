@@ -125,7 +125,7 @@
        */
       study: {
         type: String,
-        required: true,
+        required: false,
       },
       /**
        * The config from firebase.

@@ -61,7 +61,7 @@
           <tr>
             <th>User</th>
             <th>Admin</th>
-            <th>Datasets</th>
+            <th>Studies</th>
           </tr>
           <tr v-for="user in Object.keys(userList).sort((a, b) => { return (b > a)? -1 : 1 })" :key="user">
             <td><b-button variant="outline-dark" @click="modifyUser(user, userList[user])">{{user}}</b-button></td>
