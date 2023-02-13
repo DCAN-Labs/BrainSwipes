@@ -1,12 +1,24 @@
 <template>
   <b-container>
-    <div v-if="allowed">
+    <div class="buttons">
+      <div v-for="study in Object.keys(config.studies)" :key="study">
+        <b-button v-if="study !== 'TEST'" :class="datasetPrivileges[study] ? 'btn-primary' : 'btn-unavailable'" @click="chooseStudy(study)">{{study}}</b-button>
+      </div>
+      <b-button v-if="datasetPrivileges['TEST']" class="btn btn-primary" @click="chooseStudy('TEST')">TEST</b-button>
+    </div>
+    <hr class="seperator">
+    <div class="buttons" v-if="showDatasets">
+      <div v-for="dataset in config.studies[selectedStudy].datasets" :key="dataset">
+        <b-button :class="config.datasets[dataset].archived ? 'btn-unavailable' : datasetPrivileges[selectedStudy] ? 'btn-primary' : 'btn-unavailable'" @click="chooseDataset(dataset)">{{config.datasets[dataset].name}}</b-button>
+      </div>
+    </div>
+    <div v-if="dataset">
       <div class="chats-div" v-if="!noData">
         <h1>Chats</h1>
         <p class="lead">See which samples people are talking about</p>
         <p v-for="c in sampleChats" :key="c.sample">
           <b-alert :variant="flagged.includes(c.sample) ? 'danger' : 'primary'" show>
-            <router-link :to="`/${dataset}/review/${c.sample}?f=c`">{{c.sample}}</router-link>
+            <router-link :to="`/${selectedStudy}/${dataset}/review/${c.sample}?f=c`">{{c.sample}}</router-link>
             <br>
             <span >
               <b>{{c.username}}</b> : {{c.message}}
@@ -29,43 +41,9 @@
  * for each sample.
  */
 import _ from 'lodash';
-import firebase from 'firebase/app';
 import 'firebase/auth';
 
 export default {
-  firebase() {
-    return {
-      /**
-      * keep track of all the samples that have been discussed.
-      */
-      sampleChats: {
-        source: this.db.ref(`datasets/${this.dataset}/chats/chats`),
-        readyCallback() {
-          const chats = _.reduce(this.sampleChats, (result, value) => {
-            const existingChats = _.filter(value.chats, { deleted: false });
-            if (existingChats.length) {
-              const values = Object.values(existingChats)[Object.keys(existingChats).length - 1];
-              result.push({ sample: value['.key'], message: values.message, time: values.time, username: values.username });
-            }
-            return result;
-          }, []);
-          this.sampleChats = _.orderBy(chats, 'time', 'desc');
-          if (!this.sampleChats.length) {
-            this.noData = true;
-          }
-        },
-      },
-      flagged: {
-        source: this.db.ref(`datasets/${this.dataset}/flaggedSamples`),
-        readyCallback() {
-          this.flagged = _.reduce(this.flagged, (r, v) => {
-            r.push(v['.key']);
-            return r;
-          }, []);
-        },
-      },
-    };
-  },
   data() {
     return {
       /**
@@ -81,6 +59,26 @@ export default {
        * If this.noData is true, this image is rendered.
        */
       blankChatImage: 'https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_no_data.svg?sanitize=true',
+      /**
+       * the dataset to see chats for
+       */
+      dataset: '',
+      /**
+       * the selected study
+       */
+      selectedStudy: '',
+      /**
+       * list of chats for the dataset
+       */
+      sampleChats: [],
+      /**
+       * list of flagged samples
+       */
+      flagged: [],
+      /**
+       * whether to show the dataset buttons
+       */
+      showDatasets: false,
     };
   },
   props: {
@@ -89,13 +87,6 @@ export default {
      */
     db: {
       type: Object,
-      required: true,
-    },
-    /**
-     * the dataset to swipe on
-     */
-    dataset: {
-      type: String,
       required: true,
     },
     /**
@@ -112,59 +103,60 @@ export default {
       type: Function,
       required: true,
     },
+    /**
+     * the configuration from firebase
+     */
+    config: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * the studies the user is allowed to see
+     */
+    datasetPrivileges: {
+      type: Object,
+      required: true,
+    },
   },
   methods: {
     getChats() {
-      this.db.ref(`datasets/${this.dataset}/chats/sampleChats`).on('value', (snap) => {
-        const samples = snap.val();
-        const chats = _.reduce(samples, (result, value, key) => {
-          const values = value[Object.keys(value)[Object.keys(value).length - 1]];
-          result.push({
-            sample: key, message: values.message, time: values.time, username: values.username });
+      this.db.ref(`datasets/${this.dataset}/chats/chats`).on('value', (snap) => {
+        const sampleChats = snap.val();
+        const chats = _.reduce(sampleChats, (result, value, key) => {
+          const existingChats = _.filter(value.chats, { deleted: false });
+          if (existingChats.length) {
+            const values = Object.values(existingChats)[Object.keys(existingChats).length - 1];
+            result.push({
+              sample: key,
+              message: values.message,
+              time: values.time,
+              username: values.username,
+            });
+          }
           return result;
         }, []);
-        const sortedChats = _.orderBy(chats, 'time', 'desc');
-        console.log(sortedChats);
+        this.sampleChats = _.orderBy(chats, 'time', 'desc');
+        if (!this.sampleChats.length) {
+          this.noData = true;
+        }
       });
     },
-  },
-  /**
-   * Prevents navigation to Chats when the dataset prop does not match the route name
-  * or if globus authentication is incorrect
-  */
-  beforeRouteEnter(to, from, next) {
-    next(async (vm) => {
-      /* eslint-disable no-underscore-dangle */
-      const available = await vm._props.db.ref(`config/studies/${to.params.dataset}/available`).once('value');
-      const restricted = !available.val();
-      const errors = [];
-      const user = firebase.auth().currentUser;
-      const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
-      const userAllowed = idTokenResult.claims.datasets[to.params.dataset];
-      if (to.params.dataset !== vm.dataset) {
-        vm.$router.push({ name: 'Home' });
-      } else if (restricted) {
-        const email = user.email;
-        const identities = await vm._props.getGlobusIdentities(vm._props.globusToken);
-        /* eslint-enable no-underscore-dangle */
-        const organization = idTokenResult.claims.org;
-        if (Object.keys(identities).length === 0) {
-          errors.push(1);
-        } else if (!identities[email]) {
-          errors.push(2);
-        } else if (identities[email][0] !== organization) {
-          errors.push(3);
-        } else if (identities[email][1] !== 'used') {
-          errors.push(4);
-        }
-      } if (errors.length) {
-        vm.$router.push({ name: 'Restricted', query: { errors } });
-      } else if (userAllowed) {
-      /* eslint-disable */
-      vm.allowed = true;
-      /* eslint-enable */
-      }
-    });
+    getFlags() {
+      this.db.ref(`datasets/${this.dataset}/flaggedSamples`).on('value', (snap) => {
+        const flags = snap.val();
+        this.flagged = flags ? Object.keys(flags) : [];
+      });
+    },
+    chooseStudy(study) {
+      this.selectedStudy = this.selectedStudy === study ? '' : study;
+      this.showDatasets = true;
+    },
+    chooseDataset(dataset) {
+      this.dataset = dataset;
+      this.getChats();
+      this.getFlags();
+      this.showDatasets = false;
+    },
   },
   beforeRouteUpdate(to, from, next) {
     next({ name: 'Home', query: { reroute: to.fullPath } });
@@ -172,11 +164,29 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
   .blankImage {
     max-width: 500px;
   }
   .chats-div {
     padding-bottom: 12vh !important;
+  }
+  .buttons {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+  }
+  .btn-primary {
+    color: #fff;
+    background-color: maroon;
+    border-color: maroon;
+    margin: 0.1em;
+  }
+
+  .btn-unavailable {
+    color: #fff;
+    background-color: grey;
+    border-color: grey;
+    margin: 0.1em;
   }
 </style>

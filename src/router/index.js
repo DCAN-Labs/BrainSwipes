@@ -106,12 +106,11 @@ const router = new Router({
       },
     },
     {
-      path: '/:study/:dataset/chats',
+      path: '/chats',
       name: 'Chats',
       component: Chats,
       meta: {
         requiresAuth: true,
-        requiresAccess: true,
         requiresTutorial: true,
       },
     },

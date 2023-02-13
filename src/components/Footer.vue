@@ -25,14 +25,6 @@
           </div>
           <a class="nav__link dropdown-button">Learn</a>
         </div>
-        <div class="dropdown" @mouseover="hoverChats = true" @mouseleave="hoverChats = false">
-          <div v-show="hoverChats">
-            <div class="dropdown-content">
-              <a v-for="study in Object.keys(datasetPrivileges)" :key="study" @click="routeToChats(study)" class="nav__link" v-show="datasetPrivileges[study]">{{study}}</a>
-            </div>
-          </div>
-          <a class="nav__link dropdown-button">Chats</a>
-        </div>
       </nav>
 
     </div>
@@ -69,11 +61,11 @@ export default {
         { path: '/leaderboard', name: 'Leaderboard' },
         { path: '/about', name: 'About' },
         { path: '/results', name: 'Results' },
+        { path: '/chats', name: 'Chats' },
       ],
       isAdmin: false,
       loadingAdmin: true,
       loadingLearn: true,
-      hoverChats: false,
       hoverLearn: false,
       tutorialLevel: -1,
     };
@@ -108,13 +100,6 @@ export default {
         this.isAdmin = false;
         this.loadingAdmin = false;
       }
-    },
-    /**
-     * updates dataset prop and routes to the appropriate chats route
-     */
-    routeToChats(label) {
-      this.$emit('changeDataset', label);
-      this.$router.push({ name: 'Chats', params: { dataset: label } });
     },
     routeTo(route) {
       const path = { name: route };
