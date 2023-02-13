@@ -237,10 +237,6 @@ a {
   margin: 0 auto; 
 }
 
-.seperator {
-  max-width: 500px;
-}
-
 .explain-wrapper {
   display: flex;
   justify-content: center;

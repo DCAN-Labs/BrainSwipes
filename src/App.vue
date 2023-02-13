@@ -487,4 +487,8 @@ export default {
   display: flex;
 }
 
+.seperator {
+  max-width: 500px;
+}
+
 </style>

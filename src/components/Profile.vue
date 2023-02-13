@@ -29,27 +29,18 @@
       <hr>
       <h1>Samples you've commented on</h1>
       <div v-if="Object.keys(userChats).length" class="user-chats">
-        <div v-for="study in Object.keys(userChats)" :key="study" class="study-chats-wrapper">
-          <div>
-            <div class="study-title-wrapper">
-              <div class="study-title">
-                <h2>{{study}}</h2>
-                <span  :class="{ messagestudy: notifications[study] }"></span>
-              </div>
-            </div>
-            <div v-if="config.studies[study].available" class="study-chats" :class="{ scroller: Object.keys(userChats[study]).length > 4 }">
-                <div v-for="c in userChats[study]" v-on:click="onChatClick(study, c.sample)" :key="c.sample" class="single-chat" :class="{ pulse: c.notify[userInfo.displayName] }">
-                  <div :class="{ messagechat: c.notify[userInfo.displayName] }"></div>
-                  <h3>{{c.sample}}</h3>
-                  <br>
-                  <span >
-                    <b>{{c.username}}</b> : {{c.message}}
-                  </span>
+        <div v-for="study in allowedStudies" :key="study">
+          <h1>{{study}}</h1>
+          <div v-for="dataset in config.studies[study].datasets" :key="dataset" class="dataset-chats-wrapper">
+            <div v-if="Object.keys(userChats[dataset]).length">
+              <div class="dataset-title-wrapper">
+                <div class="dataset-title">
+                  <h2>{{config.datasets[dataset].name}}</h2>
+                  <span  :class="{ messagestudy: notifications[dataset] }"></span>
                 </div>
-            </div>
-            <div v-else>
-              <div v-if="globusAuthenticated">
-                <div v-for="c in userChats[study]" v-on:click="onChatClick(study, c.sample)" :key="c.sample" class="single-chat" :class="{ pulse: c.notify[userInfo.displayName] }">
+              </div>
+              <div v-if="config.studies[dataset].available" class="dataset-chats" :class="{ scroller: Object.keys(userChats[dataset]).length > 4 }">
+                <div v-for="c in userChats[dataset]" v-on:click="onChatClick(dataset, study, c.sample)" :key="c.sample" class="single-chat" :class="{ pulse: c.notify[userInfo.displayName] }">
                   <div :class="{ messagechat: c.notify[userInfo.displayName] }"></div>
                   <h3>{{c.sample}}</h3>
                   <br>
@@ -59,11 +50,24 @@
                 </div>
               </div>
               <div v-else>
-                <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{errorCodes[error]}}</p>
-                <b-button @click="routeToRestricted">Login with Globus</b-button>
+                <div v-if="globusAuthenticated">
+                  <div v-for="c in userChats[dataset]" v-on:click="onChatClick(dataset, study, c.sample)" :key="c.sample" class="single-chat" :class="{ pulse: c.notify[userInfo.displayName] }">
+                    <div :class="{ messagechat: c.notify[userInfo.displayName] }"></div>
+                    <h3>{{c.sample}}</h3>
+                    <br>
+                    <span >
+                      <b>{{c.username}}</b> : {{c.message}}
+                    </span>
+                  </div>
+                </div>
+                <div v-else>
+                  <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{errorCodes[error]}}</p>
+                  <b-button @click="routeToRestricted">Login with Globus</b-button>
+                </div>
               </div>
             </div>
           </div>
+        <hr class="seperator">
         </div>
       </div>
       <div v-else>
@@ -91,11 +95,11 @@
     padding-bottom: 12vh;
   }
 
-  .study-chats {
+  .dataset-chats {
     max-width: 500px;
   }
 
-  .study-chats-wrapper {
+  .dataset-chats-wrapper {
     display: flex;
     justify-content: center;
   }
@@ -167,7 +171,7 @@
     width: 16px;
   }
 
-  .study-title-wrapper {
+  .dataset-title-wrapper {
     display: flex;
     justify-content: center;
     max-width: 500px;
@@ -175,7 +179,7 @@
     align-items: baseline;
   }
 
-  .study-title {
+  .dataset-title {
     position: relative;
     padding: 0 16px 0 16px;
   }
@@ -253,6 +257,15 @@ export default {
     verified() {
       return firebase.auth().currentUser.emailVerified;
     },
+    allowedStudies() {
+      const allowedStudies = [];
+      Object.keys(this.datasetPrivileges).forEach((study) => {
+        if (this.datasetPrivileges[study]) {
+          allowedStudies.push(study);
+        }
+      });
+      return allowedStudies;
+    },
   },
   props: {
     /**
@@ -285,7 +298,7 @@ export default {
     },
     /**
      * keys: studies that user can access
-     * values: does the user have a notification from that study, boolean
+     * values: does the user have a notification from that dataset, boolean
      */
     notifications: {
       type: Object,
@@ -333,38 +346,36 @@ export default {
      * for the specified dataset
      */
     getUserChats() {
-      Object.keys(this.datasetPrivileges).forEach(async (study) => {
-        if (this.datasetPrivileges[study]) {
-          this.db.ref(`datasets/${study}/chats/chats`).on('value', (snap) => {
-            const data = snap.val();
-            const currentUserChats = _.reduce(data, (result, value, key) => {
-              if (_.filter(Object.values(value.chats),
-                { username: this.userInfo.displayName, deleted: false }).length) {
-                // eslint-disable-next-line
-                result[key] = { ...value.chats, notify: value.notify };
-              }
-              return result;
-            }, {});
-            const mostRecentMessages = _.reduce(currentUserChats, (result, value, key) => {
-              const values = _.orderBy(_.filter(_.omit(value, 'notify'), { deleted: false }), 'time', 'desc')[0];
-              result.push({
-                sample: key,
-                message: values.message,
-                time: values.time,
-                username: values.username,
-                notify: value.notify,
-              });
-              return result;
-            }, []);
-            const studyChats = _.orderBy(mostRecentMessages, 'time', 'desc');
-            Vue.set(this.userChats, study, studyChats);
-          });
-        }
+      Object.keys(this.config.datasets).forEach(async (dataset) => {
+        this.db.ref(`datasets/${dataset}/chats/chats`).on('value', (snap) => {
+          const data = snap.val();
+          const currentUserChats = _.reduce(data, (result, value, key) => {
+            if (_.filter(Object.values(value.chats),
+              { username: this.userInfo.displayName, deleted: false }).length) {
+              // eslint-disable-next-line
+              result[key] = { ...value.chats, notify: value.notify };
+            }
+            return result;
+          }, {});
+          const mostRecentMessages = _.reduce(currentUserChats, (result, value, key) => {
+            const values = _.orderBy(_.filter(_.omit(value, 'notify'), { deleted: false }), 'time', 'desc')[0];
+            result.push({
+              sample: key,
+              message: values.message,
+              time: values.time,
+              username: values.username,
+              notify: value.notify,
+            });
+            return result;
+          }, []);
+          const studyChats = _.orderBy(mostRecentMessages, 'time', 'desc');
+          Vue.set(this.userChats, dataset, studyChats);
+        });
       });
     },
-    onChatClick(study, sample) {
-      this.$router.push(`${study}/review/${sample}?f=p`);
-      this.db.ref(`datasets/${study}/chats/chats/${sample}/notify/${this.userInfo.displayName}`).set(false);
+    onChatClick(dataset, study, sample) {
+      this.$router.push(`${study}/${dataset}/review/${sample}?f=p`);
+      this.db.ref(`datasets/${dataset}/chats/chats/${sample}/notify/${this.userInfo.displayName}`).set(false);
     },
     async allowRestrictedChats() {
       const user = firebase.auth().currentUser;

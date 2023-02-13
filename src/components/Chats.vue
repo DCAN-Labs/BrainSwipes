@@ -6,20 +6,20 @@
       </div>
     </div>
     <hr class="seperator">
-    <div class="buttons" v-if="showDatasets">
+    <div v-if="showDatasets">
       <div v-if="!config.studies[selectedStudy].available && !globusAuthenticated">
         <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{errorCodes[error]}}</p>
         <b-button @click="routeToRestricted">Login with Globus</b-button>
       </div>
-      <div v-else>
+      <div class="buttons" v-else>
         <div v-for="dataset in config.studies[selectedStudy].datasets" :key="dataset">
           <b-button :class="config.datasets[dataset].archived ? 'btn-unavailable' : datasetPrivileges[selectedStudy] ? 'btn-primary' : 'btn-unavailable'" @click="chooseDataset(dataset)">{{config.datasets[dataset].name}}</b-button>
         </div>
       </div>
     </div>
     <div v-if="dataset">
+      <h1>Chats for {{config.datasets[dataset].name}}</h1>
       <div class="chats-div" v-if="!noData">
-        <h1>Chats</h1>
         <p class="lead">See which samples people are talking about</p>
         <p v-for="c in sampleChats" :key="c.sample">
           <b-alert :variant="flagged.includes(c.sample) ? 'danger' : 'primary'" show>
@@ -32,7 +32,6 @@
         </p>
       </div>
       <div v-else>
-        <h1>Chats</h1>
         <p class="lead">No one has said anything yet!</p>
         <img :src="blankChatImage" class="blankImage"/>
       </div>
@@ -166,7 +165,8 @@ export default {
       });
     },
     chooseStudy(study) {
-      this.selectedStudy = this.selectedStudy === study ? '' : study;
+      this.selectedStudy = study;
+      this.dataset = '';
       this.showDatasets = true;
     },
     chooseDataset(dataset) {
