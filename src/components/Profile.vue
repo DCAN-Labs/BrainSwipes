@@ -234,7 +234,7 @@ export default {
       /**
        * List of profile pic options
        */
-      profilePics: ['kesh-profile-icon', 'UniversityOfMinnesota', 'dcan-yellow-no-text', 'abide', 'connectome'],
+      profilePics: ['kesh-profile-icon', 'UniversityOfMinnesota', 'dcan', 'abide', 'connectome'],
     };
   },
   computed: {
