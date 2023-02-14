@@ -110,7 +110,7 @@
             enabled: false,
           },
           title: {
-            text: `Number of Swipes on ${dataset} by User`,
+            text: 'Number of Swipes by User',
           },
           stroke: {
             show: true,
