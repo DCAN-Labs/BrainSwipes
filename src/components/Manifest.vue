@@ -1,30 +1,71 @@
 <template>
   <div id="manifest" v-show="allowed">
-    <h1 class="manifest-title"> Select a dataset to update in the database </h1>
-    <b-modal id="newdataset" :title="'Add a New Dataset to BrainSwipes'" ref="newdataset" size="lg">
-      <div>
+    <b-container>
+      <div v-if="selectionStage === 'start'">
+        <h1 class="manifest-title">Modify an existing dataset or create a new one?</h1>
+        <div>
+          <b-button @click="changeSelectionStage('modify-existing')">Modify Existing</b-button>
+          <b-button @click="changeSelectionStage('create-new')">Create New</b-button>
+        </div>
+      </div>
+      <div v-else-if="selectionStage === 'create-new'">
+        <h1 class="manifest-title">Add dataset to existing study or create new study?</h1>
+        <b-button @click="changeSelectionStage('existing-study')">Existing Study</b-button>
+        <b-button @click="changeSelectionStage('new-study')">New Study</b-button>
+        <b-button @click="changeSelectionStage('start')">Start Over</b-button>
+      </div>
+      <div v-else-if="selectionStage === 'modify-existing'">
+        <h1 class="manifest-title">Select dataset to modify</h1>
+        <b-button @click="changeSelectionStage('start')">Start Over</b-button>
+          <DatasetSelect
+            :globusToken="globusToken"
+            :getGlobusIdentities="getGlobusIdentities"
+            :errorCodes="errorCodes"
+            :config="config"
+            :datasetPrivileges="datasetPrivileges"
+            :surpressArchived="false"
+            :showUnavailable="true"
+            :useGlobus="false"
+            @activateDataset="activateDataset"
+          />
+      </div>
+      <div v-else-if="selectionStage === 'new-study'">
+        <h1 class="manifest-title">Create a new study and dataset</h1>
+        <b-button @click="changeSelectionStage('start')">Start Over</b-button>
+      </div>
+      <div v-else-if="selectionStage === 'existing-study'">
+        <h1 class="manifest-title">Select a study and create a new dataset</h1>
+        <b-button @click="changeSelectionStage('start')">Start Over</b-button>
+        <div v-if="!lockout" class="dataset-buttons-row">
+          <b-button
+            v-for="study in Object.keys(config.studies)"
+            :key="study"
+            class="dataset-button"
+            v-bind:class="{selected: study === selectedStudy}"
+            @click="selectStudy(study)">{{study}}
+          </b-button>
+        </div>
+      </div>
+      <div v-if="selectionStage === 'new-study' || selectionStage === 'existing-study'">
+        <b-input-group prepend="Name of Study" class="mt-3">
+          <b-form-input v-model="selectedStudy" id="new-study-text" ref="new-study-text" :disabled="formLockout || selectionStage === 'existing-study'" autocomplete="off" v-on:keyup="enableForm()"></b-form-input>
+        </b-input-group>
         <b-input-group prepend="Name of Dataset" class="mt-3">
-        <b-form-input id="new-dataset-text" ref="new-dataset-text" :disabled="formLockout" autocomplete="off" v-on:keyup="enableForm()"></b-form-input>
+          <b-form-input id="new-dataset-text" ref="new-dataset-text" :disabled="formLockout" autocomplete="off" v-on:keyup="enableForm()"></b-form-input>
         </b-input-group>
         <b-input-group prepend="Name of MSI S3 Bucket" class="mt-3">
-        <b-form-input id="new-bucket-text" ref="new-bucket-text" :disabled="formLockout" autocomplete="off" v-on:keyup="enableForm()"></b-form-input>
+          <b-form-input id="new-bucket-text" ref="new-bucket-text" :disabled="formLockout" autocomplete="off" v-on:keyup="enableForm()"></b-form-input>
         </b-input-group>
-        <b-button-group size="lg">
+        <b-button-group v-if="selectionStage === 'new-study'" size="lg">
           <b-button class="dataset-button" style="margin-right:0" v-bind:class="{selected: !available}" :disabled="formLockout" @click="changeAvailability(false)">Restricted access</b-button>
           <b-button class="dataset-button" v-bind:class="{selected: available}" :disabled="formLockout" @click="changeAvailability(true)">Available to all users</b-button>
         </b-button-group>
+        <div>
+          <b-button @click="onSubmit(selectionStage)" :disabled="formDisabled || formLockout" type="submit" variant="primary">Submit</b-button>
+          <b-button @click="changeSelectionStage('start')" :disabled="formLockout" type="submit" variant="primary">Cancel</b-button>
+        </div>
       </div>
-      <div slot="modal-footer" class="w-100">
-          <b-button @click="closeDialogSubmit" :disabled="formDisabled || formLockout" type="submit" variant="primary">Submit</b-button>
-          <b-button @click="closeDialogCancel" :disabled="formLockout" type="submit" variant="primary">Cancel</b-button>
-      </div>
-    </b-modal>
-    <b-container>
-      <div v-if="!lockout" class="dataset-buttons-row">
-        <b-button v-for="dataset in Object.keys(config.studies)" :key="dataset" class="dataset-button" v-bind:class="{selected: dataset === selectedDataset}" @click="selectDataset(dataset)">{{dataset}}</b-button>
-        <b-button class="dataset-button" @click="newDataset">New Dataset</b-button>
-      </div>
-      <div v-if="selectedDataset">
+      <div v-if="showModifyDataset">
         <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
         <p v-if="status=='complete'">
           <b>Data Source:</b>
@@ -57,7 +98,7 @@
           <p>Archived studies cannot be swiped on, but their data can still be viewed.</p>
         </div>
       </div>
-
+      <b-alert :show="error.length" variant="danger" dismissible @dismissed="changeSelectionStage('start')">{{error}}</b-alert>
     </b-container>
 
   </div>
@@ -77,7 +118,7 @@
   }
   .dataset-button {
     color: #fff;
-    background-color:rgba(128,0,0,0.57);
+    background-color:rgba(128,0,0,0.40);
     border-color: maroon;
     margin-right: .2em;
   }
@@ -99,6 +140,7 @@
 <script>
 import _ from 'lodash';
 import firebase from 'firebase/app';
+import DatasetSelect from './Widgets/DatasetSelect';
 
 /** Manifest panel for the /manifest route.
  * The manifest panel syncs data from the uploaded file. Only people
@@ -130,6 +172,7 @@ export default {
        * the currently selected dataset
        */
       selectedDataset: '',
+      selectedStudy: '',
       /**
        * If new dataset is available by default
        */
@@ -151,6 +194,18 @@ export default {
        * if the user is allowed to see this component
        */
       allowed: false,
+      /**
+       * the stage of the selection process to show
+       */
+      selectionStage: 'start',
+      /**
+       * whether to show the dataset modification controls
+       */
+      showModifyDataset: false,
+      /**
+       * the error message to show
+       */
+      error: '',
     };
   },
   props: {
@@ -162,12 +217,43 @@ export default {
       required: true,
     },
     /**
-     * The config from the db
+     * The auth token from Globus
+     */
+    globusToken: {
+      type: String,
+      required: true,
+    },
+    /**
+     * function that exchanges the Globus token for user information
+     */
+    getGlobusIdentities: {
+      type: Function,
+      required: true,
+    },
+    /**
+     * errors produced by brainswipes
+     */
+    errorCodes: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * the configuration from firebase
      */
     config: {
       type: Object,
       required: true,
     },
+    /**
+     * the studies the user is allowed to see
+     */
+    datasetPrivileges: {
+      type: Object,
+      required: true,
+    },
+  },
+  components: {
+    DatasetSelect,
   },
   methods: {
     /**
@@ -277,29 +363,45 @@ export default {
       this.addFirebaseListener();
     },
     /**
-     * Show the new dataset menu
+     * submit the new dataset/study form and add to firebase
      */
-    newDataset() {
-      this.formLockout = false;
-      this.$refs.newdataset.show();
-    },
-    /**
-     * close the new dataset menu and submit changes
-     */
-    closeDialogSubmit(e) {
+    onSubmit(mode) {
       this.formLockout = true;
-      e.preventDefault();
-      this.addDatasetToFirebase();
-      this.setUserDatasetPermissions();
-      this.$refs.newdataset.hide();
-      this.$emit('changePermissions');
-    },
-    /**
-     * close the new dataset menu without submitting changes
-     */
-    closeDialogCancel(e) {
-      e.preventDefault();
-      this.$refs.newdataset.hide();
+
+      const studies = JSON.parse(JSON.stringify(this.config.studies));
+      const datasets = JSON.parse(JSON.stringify(this.config.datasets));
+
+      const newStudy = this.$refs['new-study-text'].localValue.replace(/[^0-9a-z]/gi, '');
+      const name = this.$refs['new-dataset-text'].localValue;
+      const newDataset = name.replace(/[^0-9a-z]/gi, '');
+      const bucket = this.$refs['new-bucket-text'].localValue;
+
+      if (studies[newStudy]) {
+        this.error = 'Study name already in use';
+      } else if (datasets[newDataset]) {
+        this.error = 'Dataset name already in use';
+      } else {
+        if (mode === 'new-study') {
+          const about = {
+            text: ['This is a new study! An admin will update this shortly.'],
+            logo: 'test_logo.jpg',
+            title: `Help QC ${newStudy} Images!`,
+          };
+          studies[newStudy] = { available: this.available, datasets: [newDataset], about };
+          this.setUserStudyPermissions();
+          this.$emit('changePermissions');
+        } else if (mode === 'existing-study') {
+          studies[newStudy].datasets.push(newDataset);
+        } else {
+          console.log('Invalid submit mode');
+        }
+
+        datasets[newDataset] = { archived: false, bucket, name, about: { text: ['This is a new dataset! An admin will update this shortly.'] } };
+        this.db.ref('/config/datasets').set(datasets);
+        this.db.ref('/config/studies').set(studies);
+
+        this.changeSelectionStage('start');
+      }
     },
     /**
      * set the default availability of the new dataset
@@ -308,27 +410,21 @@ export default {
       this.available = value;
     },
     /**
-     * add the empty dataset to firebase
+     * set default permissions for the new study for all users
      */
-    addDatasetToFirebase() {
-      const studies = JSON.parse(JSON.stringify(this.config.studies));
-      const newDataset = this.$refs['new-dataset-text'].localValue;
-      const newBucket = this.$refs['new-bucket-text'].localValue;
-      studies[newDataset] = { available: this.available, bucket: newBucket };
-      this.db.ref('/config/studies').set(studies);
+    setUserStudyPermissions() {
+      const newStudy = this.$refs['new-study-text'].localValue;
+      this.requestUserRolesUpdate(newStudy, this.available);
     },
     /**
-     * set default permissions for the new dataset for all users
+     * disables submission of new dataset form if any field is blank
      */
-    setUserDatasetPermissions() {
-      const newDataset = this.$refs['new-dataset-text'].localValue;
-      this.requestUserRolesUpdate(newDataset, this.available);
-    },
     enableForm() {
-      this.formDisabled = this.$refs['new-dataset-text'].localValue.length === 0 || this.$refs['new-bucket-text'].localValue.length === 0;
+      this.formDisabled = this.$refs['new-dataset-text'].localValue.length === 0 || this.$refs['new-bucket-text'].localValue.length === 0 || this.selectedStudy.length === 0;
     },
     /**
      * Request an update of user roles to include new dataset
+     * 'dataset' in this function is actually a study
      */
     requestUserRolesUpdate(dataset, available) {
       return new Promise((resolve, reject) => {
@@ -349,6 +445,27 @@ export default {
      */
     archiveDataset(dataset) {
       this.db.ref(`/config/datasets/${dataset}/archived`).set(!this.config.datasets[dataset].archived);
+    },
+    /**
+     * Changes stage of the selection process the user is in
+     */
+    changeSelectionStage(stage) {
+      this.showModifyDataset = false;
+      this.formLockout = false;
+      this.selectionStage = stage;
+      this.selectDataset = '';
+      this.selectedStudy = '';
+      this.error = '';
+    },
+    activateDataset(study, dataset) {
+      this.selectedDataset = dataset;
+      this.selectedStudy = study;
+      this.showModifyDataset = true;
+      this.status = 'loading...';
+      this.addFirebaseListener();
+    },
+    selectStudy(study) {
+      this.selectedStudy = study;
     },
   },
   beforeRouteEnter(to, from, next) {
