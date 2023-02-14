@@ -1,17 +1,17 @@
 <template>
   <div id="manifest" v-show="allowed">
-    <h1 class="manifest-title"> Select a study to update in the database </h1>
-    <b-modal id="newstudy" :title="'Add a New Study to BrainSwipes'" ref="newstudy" size="lg">
+    <h1 class="manifest-title"> Select a dataset to update in the database </h1>
+    <b-modal id="newdataset" :title="'Add a New Dataset to BrainSwipes'" ref="newdataset" size="lg">
       <div>
-        <b-input-group prepend="Name of Study" class="mt-3">
-        <b-form-input id="new-study-text" ref="new-study-text" :disabled="formLockout" autocomplete="off" v-on:keyup="enableForm()"></b-form-input>
+        <b-input-group prepend="Name of Dataset" class="mt-3">
+        <b-form-input id="new-dataset-text" ref="new-dataset-text" :disabled="formLockout" autocomplete="off" v-on:keyup="enableForm()"></b-form-input>
         </b-input-group>
         <b-input-group prepend="Name of MSI S3 Bucket" class="mt-3">
         <b-form-input id="new-bucket-text" ref="new-bucket-text" :disabled="formLockout" autocomplete="off" v-on:keyup="enableForm()"></b-form-input>
         </b-input-group>
         <b-button-group size="lg">
-          <b-button class="study-button" style="margin-right:0" v-bind:class="{selected: !available}" :disabled="formLockout" @click="changeAvailability(false)">Restricted access</b-button>
-          <b-button class="study-button" v-bind:class="{selected: available}" :disabled="formLockout" @click="changeAvailability(true)">Available to all users</b-button>
+          <b-button class="dataset-button" style="margin-right:0" v-bind:class="{selected: !available}" :disabled="formLockout" @click="changeAvailability(false)">Restricted access</b-button>
+          <b-button class="dataset-button" v-bind:class="{selected: available}" :disabled="formLockout" @click="changeAvailability(true)">Available to all users</b-button>
         </b-button-group>
       </div>
       <div slot="modal-footer" class="w-100">
@@ -20,10 +20,11 @@
       </div>
     </b-modal>
     <b-container>
-      <div v-if="!lockout" class="study-buttons-row">
-        <b-button v-for="study in Object.keys(config.studies)" :key="study" class="study-button" v-bind:class="{selected: study === selectedStudy}" @click="selectStudy(study)">{{study}}</b-button><b-button class="study-button" @click="newStudy">New Study</b-button>
+      <div v-if="!lockout" class="dataset-buttons-row">
+        <b-button v-for="dataset in Object.keys(config.studies)" :key="dataset" class="dataset-button" v-bind:class="{selected: dataset === selectedDataset}" @click="selectDataset(dataset)">{{dataset}}</b-button>
+        <b-button class="dataset-button" @click="newDataset">New Dataset</b-button>
       </div>
-      <div v-if="selectedStudy">
+      <div v-if="selectedDataset">
         <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
         <p v-if="status=='complete'">
           <b>Data Source:</b>
@@ -52,7 +53,7 @@
         </div>
         <hr>
         <div class="archived">
-          <b-button @click="archiveStudy(selectedStudy)">{{config.studies[selectedStudy].archived ? `${selectedStudy} is archived. Click to un-archive.` : `Click to archive ${selectedStudy}`}}</b-button>
+          <b-button @click="archiveDataset(selectedDataset)">{{config.datasets[selectedDataset].archived ? `${selectedDataset} is archived. Click to un-archive.` : `Click to archive ${selectedDataset}`}}</b-button>
           <p>Archived studies cannot be swiped on, but their data can still be viewed.</p>
         </div>
       </div>
@@ -71,22 +72,22 @@
   .manifest-title {
     margin-bottom: 2vh;
   }
-  .study-buttons-row {
+  .dataset-buttons-row {
     margin-bottom: 2vh;
   }
-  .study-button {
+  .dataset-button {
     color: #fff;
     background-color:rgba(128,0,0,0.57);
     border-color: maroon;
     margin-right: .2em;
   }
-  .study-button:hover {
+  .dataset-button:hover {
     background-color: rgba(128,0,0,1);
   }
   .selected {
     background-color: rgba(128,0,0,.85);
   }
-  .study-button:active, .study-button:focus {
+  .dataset-button:active, .dataset-button:focus {
     background-color: rgba(128,0,0,.85);
   }
   .archived p{
@@ -126,11 +127,11 @@ export default {
        */
       sampleCounts: [],
       /**
-       * the currently selected study
+       * the currently selected dataset
        */
-      selectedStudy: '',
+      selectedDataset: '',
       /**
-       * If new study is available by default
+       * If new dataset is available by default
        */
       available: false,
       /**
@@ -139,7 +140,7 @@ export default {
        */
       lockout: false,
       /**
-       * if the new study form is disabled
+       * if the new dataset form is disabled
        */
       formDisabled: true,
       /**
@@ -193,7 +194,7 @@ export default {
      * This method keeps track of sampleCounts, but only loads it once.
      */
     addFirebaseListener() {
-      this.db.ref(`datasets/${this.selectedStudy}/sampleCounts`).once('value', (snap) => {
+      this.db.ref(`datasets/${this.selectedDataset}/sampleCounts`).once('value', (snap) => {
         /* eslint-disable */
         this.sampleCounts = _.map(snap.val(), (val, key) => {
           return { '.key': key, '.value': val };
@@ -236,7 +237,7 @@ export default {
         // check to see if the key is in the manifest.
         if (this.manifestEntries.indexOf(key) < 0) {
           // since the key isn't there, remove it from firebase.
-          this.db.ref(`datasets/${this.selectedStudy}/sampleCounts`).child(key).remove();
+          this.db.ref(`datasets/${this.selectedDataset}/sampleCounts`).child(key).remove();
         }
       });
     },
@@ -245,13 +246,13 @@ export default {
       const filtered = _.filter(this.manifestEntries, m => firebaseEntries.indexOf(m) < 0);
       const target = filtered.length;
       this.target = target;
-      const study = this.selectedStudy;
+      const dataset = this.selectedDataset;
       let current = 0;
       if (target) {
         _.map(filtered,
           (key) => {
-            if (study) {
-              this.db.ref(`datasets/${study}/sampleCounts`).child(key).set(0).then(() => {
+            if (dataset) {
+              this.db.ref(`datasets/${dataset}/sampleCounts`).child(key).set(0).then(() => {
                 current += 1;
                 this.progress += 1;
                 if (current === target) {
@@ -268,37 +269,37 @@ export default {
     },
     /* eslint-enable */
     /**
-     * choose which study's data to modify
+     * choose which dataset's data to modify
      */
-    selectStudy(study) {
-      this.selectedStudy = study;
+    selectDataset(dataset) {
+      this.selectedDataset = dataset;
       this.status = 'loading...';
       this.addFirebaseListener();
     },
     /**
-     * Show the new study menu
+     * Show the new dataset menu
      */
-    newStudy() {
+    newDataset() {
       this.formLockout = false;
-      this.$refs.newstudy.show();
+      this.$refs.newdataset.show();
     },
     /**
-     * close the new study menu and submit changes
+     * close the new dataset menu and submit changes
      */
     closeDialogSubmit(e) {
       this.formLockout = true;
       e.preventDefault();
-      this.addStudyToFirebase();
+      this.addDatasetToFirebase();
       this.setUserDatasetPermissions();
-      this.$refs.newstudy.hide();
+      this.$refs.newdataset.hide();
       this.$emit('changePermissions');
     },
     /**
-     * close the new study menu without submitting changes
+     * close the new dataset menu without submitting changes
      */
     closeDialogCancel(e) {
       e.preventDefault();
-      this.$refs.newstudy.hide();
+      this.$refs.newdataset.hide();
     },
     /**
      * set the default availability of the new dataset
@@ -307,29 +308,29 @@ export default {
       this.available = value;
     },
     /**
-     * add the empty study to firebase
+     * add the empty dataset to firebase
      */
-    addStudyToFirebase() {
+    addDatasetToFirebase() {
       const studies = JSON.parse(JSON.stringify(this.config.studies));
-      const newStudy = this.$refs['new-study-text'].localValue;
+      const newDataset = this.$refs['new-dataset-text'].localValue;
       const newBucket = this.$refs['new-bucket-text'].localValue;
-      studies[newStudy] = { available: this.available, bucket: newBucket };
+      studies[newDataset] = { available: this.available, bucket: newBucket };
       this.db.ref('/config/studies').set(studies);
     },
     /**
-     * set default permissions for the new study for all users
+     * set default permissions for the new dataset for all users
      */
     setUserDatasetPermissions() {
-      const newStudy = this.$refs['new-study-text'].localValue;
-      this.requestUserRolesUpdate(newStudy, this.available);
+      const newDataset = this.$refs['new-dataset-text'].localValue;
+      this.requestUserRolesUpdate(newDataset, this.available);
     },
     enableForm() {
-      this.formDisabled = this.$refs['new-study-text'].localValue.length === 0 || this.$refs['new-bucket-text'].localValue.length === 0;
+      this.formDisabled = this.$refs['new-dataset-text'].localValue.length === 0 || this.$refs['new-bucket-text'].localValue.length === 0;
     },
     /**
      * Request an update of user roles to include new dataset
      */
-    requestUserRolesUpdate(study, available) {
+    requestUserRolesUpdate(dataset, available) {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/addStudy', true);
@@ -337,17 +338,17 @@ export default {
         xhr.onload = resolve;
         xhr.onerror = reject;
         xhr.send(JSON.stringify({
-          study,
+          dataset,
           available,
           currentUser: firebase.auth().currentUser.uid,
         }));
       });
     },
     /**
-     * Archive or un-archive a study.
+     * Archive or un-archive a dataset.
      */
-    archiveStudy(study) {
-      this.db.ref(`/config/studies/${study}/archived`).set(!this.config.studies[study].archived);
+    archiveDataset(dataset) {
+      this.db.ref(`/config/datasets/${dataset}/archived`).set(!this.config.datasets[dataset].archived);
     },
   },
   beforeRouteEnter(to, from, next) {

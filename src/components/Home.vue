@@ -23,18 +23,17 @@
                 <p>Select grayed-out datasets to learn more.</p>
               </span>
             </div>
-            <div class="buttons">
-              <div v-for="study in Object.keys(config.studies)" :key="study">
-                <b-button v-if="study !== 'TEST'" :class="datasetPrivileges[study] ? 'btn-primary' : 'btn-unavailable'" @click="chooseDataset(study)">{{study}}</b-button>
-              </div>
-              <b-button v-if="datasetPrivileges['TEST']" class="btn btn-primary" @click="chooseDataset('TEST')">TEST</b-button>
-            </div>
-            <hr class="seperator">
-            <div class="buttons" v-if="selectedStudy">
-              <div v-for="dataset in config.studies[selectedStudy].datasets" :key="dataset">
-                <b-button :class="config.datasets[dataset].archived ? 'btn-unavailable' : datasetPrivileges[selectedStudy] ? 'btn-primary' : 'btn-unavailable'" @click="routeToPlay(dataset)">{{config.datasets[dataset].name}}</b-button>
-              </div>
-            </div>
+            <DatasetSelect
+              :globusToken="globusToken"
+              :getGlobusIdentities="getGlobusIdentities"
+              :errorCodes="errorCodes"
+              :config="config"
+              :datasetPrivileges="datasetPrivileges"
+              :surpressArchived="true"
+              :showUnavailable="true"
+              :useGlobus="false"
+              @activateDataset="routeToPlay"
+            />
           </div>
           <div v-else>
             <b-button class="btn btn-primary" @click="routeToTutorial">Learn</b-button>
@@ -52,39 +51,10 @@
  * The landing page, on the route `/`. This component displays a title, tagline,
  * and background image splash page.
  */
+import DatasetSelect from './Widgets/DatasetSelect';
 
 export default {
   name: 'Home',
-  props: {
-    dataset: {
-      type: String,
-      required: true,
-    },
-    datasetPrivileges: {
-      type: Object,
-      required: true,
-    },
-    db: {
-      type: Object,
-      required: true,
-    },
-    globusToken: {
-      type: String,
-      required: true,
-    },
-    userInfo: {
-      type: Object,
-      required: true,
-    },
-    userData: {
-      type: Object,
-      required: true,
-    },
-    config: {
-      type: Object,
-      required: true,
-    },
-  },
   data() {
     return {
       landingStyle: { 'background-image': 'url("/static/UMN_logos2_PRINT-09.svg")' },
@@ -98,13 +68,72 @@ export default {
       selectedStudy: '',
     };
   },
+  props: {
+    dataset: {
+      type: String,
+      required: true,
+    },
+    /**
+     * the studies the user is allowed to see
+     */
+    datasetPrivileges: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * the intialized firebase database
+     */
+    db: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * The auth token from Globus
+     */
+    globusToken: {
+      type: String,
+      required: true,
+    },
+    /**
+     * function that exchanges the Globus token for user information
+     */
+    getGlobusIdentities: {
+      type: Function,
+      required: true,
+    },
+    /**
+     * errors produced by brainswipes
+     */
+    errorCodes: {
+      type: Object,
+      required: true,
+    },
+    userInfo: {
+      type: Object,
+      required: true,
+    },
+    userData: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * the configuration from firebase
+     */
+    config: {
+      type: Object,
+      required: true,
+    },
+  },
+  components: {
+    DatasetSelect,
+  },
   methods: {
-    routeToPlay(label) {
-      if (this.config.datasets[label].archived) {
-        this.$router.push({ name: 'Promo', params: { study: this.selectedStudy } });
-      } else if (this.datasetPrivileges[this.selectedStudy]) {
+    routeToPlay(study, dataset) {
+      if (this.config.datasets[dataset].archived) {
+        this.$router.push({ name: 'Promo', params: { study } });
+      } else if (this.datasetPrivileges[study]) {
         const errors = [];
-        if (!this.config.studies[this.selectedStudy].available) {
+        if (!this.config.studies[study].available) {
           if (!this.globusToken) {
             errors.push(1);
           }
@@ -115,11 +144,11 @@ export default {
         if (errors.length) {
           this.$router.push({ name: 'Restricted', query: { errors } });
         } else {
-          this.$emit('changeDataset', label, this.selectedStudy);
-          this.$router.push({ name: 'Play', params: { study: this.selectedStudy, dataset: label } });
+          this.$emit('changeDataset', dataset, study);
+          this.$router.push({ name: 'Play', params: { study, dataset } });
         }
       } else {
-        this.$router.push({ name: 'Promo', params: { study: this.selectedStudy } });
+        this.$router.push({ name: 'Promo', params: { study } });
       }
     },
     routeToTutorial() {
@@ -131,9 +160,6 @@ export default {
       if (query.reroute) {
         this.$router.push({ path: query.reroute });
       }
-    },
-    chooseDataset(study) {
-      this.selectedStudy = this.selectedStudy === study ? '' : study;
     },
   },
   mounted() {

@@ -1,22 +1,16 @@
 <template>
   <b-container>
-    <div class="buttons">
-      <div v-for="study in Object.keys(config.studies)" :key="study">
-        <b-button v-if="datasetPrivileges[study]" class="btn-primary" @click="chooseStudy(study)">{{study}}</b-button>
-      </div>
-    </div>
-    <hr class="seperator">
-    <div v-if="showDatasets">
-      <div v-if="!config.studies[selectedStudy].available && !globusAuthenticated">
-        <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{errorCodes[error]}}</p>
-        <b-button @click="routeToRestricted">Login with Globus</b-button>
-      </div>
-      <div class="buttons" v-else>
-        <div v-for="dataset in config.studies[selectedStudy].datasets" :key="dataset">
-          <b-button :class="config.datasets[dataset].archived ? 'btn-unavailable' : datasetPrivileges[selectedStudy] ? 'btn-primary' : 'btn-unavailable'" @click="chooseDataset(dataset)">{{config.datasets[dataset].name}}</b-button>
-        </div>
-      </div>
-    </div>
+    <DatasetSelect
+      :globusToken="globusToken"
+      :getGlobusIdentities="getGlobusIdentities"
+      :errorCodes="errorCodes"
+      :config="config"
+      :datasetPrivileges="datasetPrivileges"
+      :surpressArchived="false"
+      :showUnavailable="false"
+      :useGlobus="true"
+      @activateDataset="activateDataset"
+    />
     <div v-if="dataset">
       <h1>Chats for {{config.datasets[dataset].name}}</h1>
       <div class="chats-div" v-if="!noData">
@@ -44,9 +38,10 @@
  * This is the component for the /chats route. It shows all the chat messages
  * for each sample.
  */
-import firebase from 'firebase/app';
 import _ from 'lodash';
 import 'firebase/auth';
+
+import DatasetSelect from './Widgets/DatasetSelect';
 
 export default {
   data() {
@@ -135,6 +130,9 @@ export default {
       required: true,
     },
   },
+  components: {
+    DatasetSelect,
+  },
   methods: {
     getChats() {
       this.db.ref(`datasets/${this.dataset}/chats/chats`).on('value', (snap) => {
@@ -164,46 +162,12 @@ export default {
         this.flagged = flags ? Object.keys(flags) : [];
       });
     },
-    chooseStudy(study) {
-      this.selectedStudy = study;
-      this.dataset = '';
-      this.showDatasets = true;
-    },
-    chooseDataset(dataset) {
+    activateDataset(study, dataset) {
       this.dataset = dataset;
+      this.selectedStudy = study;
       this.getChats();
       this.getFlags();
-      this.showDatasets = false;
     },
-    async allowRestrictedChats() {
-      const user = firebase.auth().currentUser;
-      const email = user.email;
-      const identities = await this.getGlobusIdentities(this.globusToken);
-      const errors = [];
-      const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
-      const organization = idTokenResult.claims.org;
-      if (Object.keys(identities).length === 0) {
-        errors.push(1);
-      } else if (!identities[email]) {
-        errors.push(2);
-      } else if (identities[email][0] !== organization) {
-        errors.push(3);
-      } else if (identities[email][1] !== 'used') {
-        errors.push(4);
-      }
-      if (errors.length) {
-        this.globusAuthErrors = errors;
-        this.globusAuthenticated = false;
-      } else {
-        this.globusAuthenticated = true;
-      }
-    },
-    routeToRestricted() {
-      this.$router.push({ name: 'Restricted', query: { errors: this.globusAuthErrors } });
-    },
-  },
-  mounted() {
-    this.allowRestrictedChats();
   },
   beforeRouteUpdate(to, from, next) {
     next({ name: 'Home', query: { reroute: to.fullPath } });
