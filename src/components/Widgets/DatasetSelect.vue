@@ -117,14 +117,20 @@ export default {
   },
   methods: {
     chooseStudy(study) {
-      this.selectedStudy = study;
-      this.selectedDataset = '';
-      this.showDatasets = true;
-      this.$emit('activateStudy', this.selectedStudy);
+      if (this.selectedStudy === study) {
+        this.showDatasets = false;
+        this.selectedStudy = '';
+      } else {
+        this.selectedStudy = study;
+        this.selectedDataset = '';
+        this.showDatasets = true;
+        this.$emit('activateStudy', this.selectedStudy);
+      }
     },
     chooseDataset(dataset) {
       this.selectedDataset = dataset;
       this.$emit('activateDataset', this.selectedStudy, this.selectedDataset);
+      this.selectedStudy = '';
       this.showDatasets = false;
     },
     async allowRestrictedDatasets() {
@@ -165,22 +171,5 @@ export default {
     text-align: center;
     display: flex;
     justify-content: center;
-  }
-  .btn-primary {
-    color: #fff;
-    background-color: maroon;
-    border-color: maroon;
-    margin: 0.1em;
-  }
-  .btn-unavailable {
-    color: #fff;
-    background-color: grey;
-    border-color: grey;
-    margin: 0.1em;
-  }
-  .globus-auth-error {
-    background-color: #F8D7DA;
-    padding: 5px;
-    margin: 5px;
   }
 </style>

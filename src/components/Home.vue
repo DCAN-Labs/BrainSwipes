@@ -239,20 +239,6 @@ a {
   margin: auto;
 }
 
-.btn-primary {
-  color: #fff;
-  background-color: maroon;
-  border-color: maroon;
-  margin: 0.1em;
-}
-
-.btn-unavailable {
-  color: #fff;
-  background-color: grey;
-  border-color: grey;
-  margin: 0.1em;
-}
-
 .jumbotron {
     padding: 2rem 1rem;
     margin-bottom: 0rem;

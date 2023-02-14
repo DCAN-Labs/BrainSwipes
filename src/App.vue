@@ -491,4 +491,24 @@ export default {
   max-width: 500px;
 }
 
+.btn-primary, .btn-primary:hover,
+  .btn-primary:focus, .btn-primary:active {
+  color: #fff;
+  background-color: maroon;
+  border-color: maroon;
+  margin: 0.1em;
+}
+
+.btn-unavailable {
+  color: #fff;
+  background-color: grey;
+  border-color: grey;
+  margin: 0.1em;
+}
+
+.globus-auth-error {
+  background-color: #F8D7DA;
+  padding: 5px;
+  margin: 5px;
+}
 </style>

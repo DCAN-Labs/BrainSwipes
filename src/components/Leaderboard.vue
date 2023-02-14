@@ -4,18 +4,21 @@
       <div class="page__content-container">
         <div class="leaderboard" :style="{cursor: loading ? 'wait' : 'unset'}">
           <div>
-            <b-dropdown variant="warning" class="datasetsDropdown" :text="selectedDataset" ref="datasetDropdown">
-              <b-dropdown-form>
-                <b-form-radio-group
-                  id="radio-datasets"
-                  v-model="selectedDataset"
-                  :options="availableDatasets"
-                  name="chooseDataset"
-                  stacked
-                ></b-form-radio-group>
-              </b-dropdown-form>
-            </b-dropdown>
+            <b-button class="btn btn-primary" @click="selectedDataset = 'All Datasets'">All Datasets</b-button>
+            <DatasetSelect
+              :globusToken="globusToken"
+              :getGlobusIdentities="getGlobusIdentities"
+              :errorCodes="errorCodes"
+              :config="config"
+              :datasetPrivileges="datasetPrivileges"
+              :surpressArchived="false"
+              :showUnavailable="false"
+              :useGlobus="false"
+              @activateDataset="activateDataset"
+            />
           </div>
+          <br>
+          <h1>Leaders for {{selectedDataset === 'All Datasets' ? 'All Datasets' : config.datasets[selectedDataset].name}}</h1>
           <br>
           <transition-group tag="div" name="list" class="leaderboard__rows">
             <div
@@ -27,7 +30,6 @@
                 <div class="leaderboard__cell user-index">{{index + 1}}</div>
                 <div class="leaderboard__cell avatar">
                   <div class="img-overlay-wrap">
-                    <!--TO DO: change icon based on user -->
                     <img :src="user.pic ? `/static/profile_pics/${user.pic}.svg` : '/static/profile_pics/kesh-profile-icon.svg'" alt="Profile Avatar" class="avatar"/>
                     <img :src="index  ===0 ? '/static/profile-frame-gold.svg' : '/static/profile-frame.svg'" class="profile-frame">
                   </div>
@@ -187,6 +189,7 @@
  * rank, badge, player username, and score. You can sort based on the score.
  */
 import _ from 'lodash';
+import DatasetSelect from './Widgets/DatasetSelect';
 
 export default {
   name: 'leaderboard',
@@ -227,7 +230,7 @@ export default {
       /**
        * the dataset selected to view
       */
-      selectedDataset: 'All Studies',
+      selectedDataset: 'All Datasets',
       /**
        * list of users and their scores sorted by score
        */
@@ -250,22 +253,47 @@ export default {
       required: true,
     },
     /**
-     * a list of the datasets that the logged in user is allowed to see
+     * The auth token from Globus
+     */
+    globusToken: {
+      type: String,
+      required: true,
+    },
+    /**
+     * function that exchanges the Globus token for user information
+     */
+    getGlobusIdentities: {
+      type: Function,
+      required: true,
+    },
+    /**
+     * errors produced by brainswipes
+     */
+    errorCodes: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * the configuration from firebase
+     */
+    config: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * the studies the user is allowed to see
      */
     datasetPrivileges: {
       type: Object,
       required: true,
     },
   },
+  components: {
+    DatasetSelect,
+  },
   computed: {
     displayUsersList() {
       return this.sortedUsersList.slice(0, this.displayLimit);
-    },
-    availableDatasets() {
-      const availableDatasets = Object.keys(this.datasetPrivileges)
-        .filter(key => this.datasetPrivileges[key]);
-      availableDatasets.unshift('All Studies');
-      return availableDatasets;
     },
     propsToWatch() {
       return [this.selectedDataset];
@@ -276,13 +304,15 @@ export default {
       handler() {
         this.createUserScoreList(this.dataset);
         this.resetDisplayLimit();
-        this.closeDropdown();
       },
       immediate: true,
       deep: true,
     },
   },
   methods: {
+    activateDataset(study, dataset) {
+      this.selectedDataset = dataset;
+    },
     showMore() {
       // Show 10 more users at a time until maximum number of users reached
       this.displayLimit =
@@ -293,13 +323,10 @@ export default {
     resetDisplayLimit() {
       this.displayLimit = 10;
     },
-    closeDropdown() {
-      this.$refs.datasetDropdown.hide();
-    },
     async createUserScoreList() {
       this.loading = true;
       let allUsernames = [];
-      if (this.selectedDataset === 'All Studies') {
+      if (this.selectedDataset === 'All Datasets') {
         /* Removes '.key' property present on allUsers data */
         allUsernames = Object.keys(this.allUsers).filter(
           user => user !== '.key',

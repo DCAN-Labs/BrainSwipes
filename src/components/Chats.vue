@@ -75,15 +75,6 @@ export default {
        * list of flagged samples
        */
       flagged: [],
-      /**
-       * whether to show the dataset buttons
-       */
-      showDatasets: false,
-      /**
-       * Whether the user has authenticated with Globus
-       */
-      globusAuthenticated: false,
-      globusAuthErrors: [],
     };
   },
   props: {
@@ -186,23 +177,5 @@ export default {
     text-align: center;
     display: flex;
     justify-content: center;
-  }
-  .btn-primary {
-    color: #fff;
-    background-color: maroon;
-    border-color: maroon;
-    margin: 0.1em;
-  }
-
-  .btn-unavailable {
-    color: #fff;
-    background-color: grey;
-    border-color: grey;
-    margin: 0.1em;
-  }
-  .globus-auth-error {
-    background-color: #F8D7DA;
-    padding: 5px;
-    margin: 5px;
   }
 </style>

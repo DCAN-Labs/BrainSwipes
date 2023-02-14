@@ -140,12 +140,6 @@
     font-weight: bold;
   }
 
-  .globus-auth-error {
-    background-color: #F8D7DA;
-    padding: 5px;
-    margin: 5px;
-  }
-
 </style>
 
 <script>

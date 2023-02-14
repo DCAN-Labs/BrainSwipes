@@ -49,13 +49,6 @@
   flex-wrap: wrap;
 }
 
-.btn-primary {
-  color: #fff;
-  background-color: maroon;
-  border-color: maroon;
-  margin: 0.1em;
-}
-
 </style>
 
 <script>

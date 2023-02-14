@@ -184,12 +184,6 @@
     padding: 0 16px 0 16px;
   }
 
-  .globus-auth-error {
-    background-color: #F8D7DA;
-    padding: 5px;
-    margin: 5px;
-  }
-
   @keyframes pulse {
     0% {background-color: #D1ECF1;}
     50% {background-color: #FFF3CD;}
