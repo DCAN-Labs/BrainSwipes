@@ -480,6 +480,7 @@
         const update = {
           hidden: true,
           dataset: this.dataset,
+          study: this.study,
         };
         this.db.ref(`config/learn/gallery/${this.widgetPointer}`).set(update);
       },

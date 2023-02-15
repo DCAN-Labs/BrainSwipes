@@ -10,7 +10,7 @@
     <div v-if="!loading">
       <div v-for="sample in Object.keys(gallery)" :key="sample">
         <div v-if="!gallery[sample].hidden || adminRoles.studyAdmin[gallery[sample].dataset] || adminRoles.admin" :class="gallery[sample].hidden ? 'hidden-item' : ''" class="gallery-item" >
-          <div v-if="(config.studies[gallery[sample].dataset].available) || (globusAuthenticated && datasetPrivileges[gallery[sample].dataset])">
+          <div v-if="(config.studies[gallery[sample].study].available) || (globusAuthenticated && datasetPrivileges[gallery[sample].study])">
             <div v-if="gallery[sample].hidden" class="gallery-form-wrapper">
               <div class="gallery-form">
                 <b-form>
