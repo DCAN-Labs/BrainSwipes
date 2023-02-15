@@ -510,12 +510,12 @@
     beforeRouteEnter(to, from, next) {
       next(async (vm) => {
         /* eslint-disable no-underscore-dangle */
-        const available = await vm._props.db.ref(`config/studies/${to.params.dataset}/available`).once('value');
+        const available = await vm._props.db.ref(`config/studies/${to.params.study}/available`).once('value');
         const restricted = !available.val();
         const errors = [];
         const user = firebase.auth().currentUser;
         const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
-        const userAllowed = idTokenResult.claims.datasets[to.params.dataset];
+        const userAllowed = idTokenResult.claims.datasets[to.params.study];
         if (to.params.dataset !== vm.dataset) {
           vm.$router.push({ name: 'Home' });
         } else if (restricted) {
