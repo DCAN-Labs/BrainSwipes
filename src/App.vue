@@ -493,16 +493,16 @@ export default {
 
 .btn-swipes, .btn-swipes:hover,
   .btn-swipes:focus, .btn-swipes:active {
-  color: #fff;
-  background-color: maroon;
-  border-color: maroon;
+  color: #fff !important;
+  background-color: maroon !important;
+  border-color: maroon !important;
   margin: 0.1em;
 }
 
 .btn-unavailable {
-  color: #fff;
-  background-color: grey;
-  border-color: grey;
+  color: #fff !important;
+  background-color: grey !important;
+  border-color: grey !important;
   margin: 0.1em;
 }
 
