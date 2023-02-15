@@ -39,7 +39,7 @@
                   <span  :class="{ messagestudy: notifications[dataset] }"></span>
                 </div>
               </div>
-              <div v-if="config.studies[dataset].available" class="dataset-chats" :class="{ scroller: Object.keys(userChats[dataset]).length > 4 }">
+              <div v-if="config.studies[study].available" class="dataset-chats" :class="{ scroller: Object.keys(userChats[dataset]).length > 4 }">
                 <div v-for="c in userChats[dataset]" v-on:click="onChatClick(dataset, study, c.sample)" :key="c.sample" class="single-chat" :class="{ pulse: c.notify[userInfo.displayName] }">
                   <div :class="{ messagechat: c.notify[userInfo.displayName] }"></div>
                   <h3>{{c.sample}}</h3>
@@ -210,7 +210,6 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import _ from 'lodash';
-import Vue from 'vue';
 
 export default {
   name: 'profile',
@@ -223,7 +222,7 @@ export default {
       /**
        * collection of chats the current user has participated in
        */
-      userChats: [],
+      userChats: {},
       /**
        * Whether the user has authenticated with Globus
        */
@@ -363,7 +362,7 @@ export default {
             return result;
           }, []);
           const studyChats = _.orderBy(mostRecentMessages, 'time', 'desc');
-          Vue.set(this.userChats, dataset, studyChats);
+          this.$set(this.userChats, dataset, studyChats);
         });
       });
     },
