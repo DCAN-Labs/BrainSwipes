@@ -32,7 +32,7 @@
         <div v-for="study in allowedStudies" :key="study">
           <h1>{{study}}</h1>
           <div v-for="dataset in config.studies[study].datasets" :key="dataset" class="dataset-chats-wrapper">
-            <div v-if="Object.keys(userChats[dataset]).length">
+            <div v-if="userChats[dataset]">
               <div class="dataset-title-wrapper">
                 <div class="dataset-title">
                   <h2>{{config.datasets[dataset].name}}</h2>
