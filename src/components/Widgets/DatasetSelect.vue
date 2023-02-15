@@ -2,13 +2,13 @@
   <div class="dataset-select">
     <div v-if="showUnavailable" class="buttons">
       <div v-for="study in Object.keys(config.studies)" :key="study">
-        <b-button v-if="study !== 'TEST'" :class="datasetPrivileges[study] ? 'btn-primary' : 'btn-unavailable'" @click="chooseStudy(study)">{{study}}</b-button>
+        <b-button v-if="study !== 'TEST'" :class="datasetPrivileges[study] ? 'btn-swipes' : 'btn-unavailable'" @click="chooseStudy(study)">{{study}}</b-button>
       </div>
-      <b-button v-if="datasetPrivileges['TEST']" class="btn btn-primary" @click="chooseStudy('TEST')">TEST</b-button>
+      <b-button v-if="datasetPrivileges['TEST']" class="btn-swipes" @click="chooseStudy('TEST')">TEST</b-button>
     </div>
     <div v-else class="buttons">
       <div v-for="study in Object.keys(config.studies)" :key="study">
-        <b-button v-if="datasetPrivileges[study]" class="btn-primary" @click="chooseStudy(study)">{{study}}</b-button>
+        <b-button v-if="datasetPrivileges[study]" class="btn-swipes" @click="chooseStudy(study)">{{study}}</b-button>
       </div>
     </div>
     <hr class="seperator">
@@ -20,7 +20,7 @@
       <div class="buttons" v-else>
         <div v-for="dataset in config.studies[selectedStudy].datasets" :key="dataset">
           <b-button
-            :class="config.datasets[dataset].archived && surpressArchived ? 'btn-unavailable' : datasetPrivileges[selectedStudy] ? 'btn-primary' : 'btn-unavailable'"
+            :class="config.datasets[dataset].archived && surpressArchived ? 'btn-unavailable' : datasetPrivileges[selectedStudy] ? 'btn-swipes' : 'btn-unavailable'"
             @click="chooseDataset(dataset)"
           >
             {{config.datasets[dataset].name}}

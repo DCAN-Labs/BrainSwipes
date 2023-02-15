@@ -36,7 +36,7 @@
             />
           </div>
           <div v-else>
-            <b-button class="btn btn-primary" @click="routeToTutorial">Learn</b-button>
+            <b-button class="btn-swipes" @click="routeToTutorial">Learn</b-button>
           </div>
         </div>
       </div>

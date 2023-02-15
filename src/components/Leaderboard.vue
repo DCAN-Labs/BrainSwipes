@@ -4,7 +4,7 @@
       <div class="page__content-container">
         <div class="leaderboard" :style="{cursor: loading ? 'wait' : 'unset'}">
           <div>
-            <b-button class="btn btn-primary" @click="selectedDataset = 'All Datasets'">All Datasets</b-button>
+            <b-button class="btn-swipes" @click="selectedDataset = 'All Datasets'">All Datasets</b-button>
             <DatasetSelect
               :globusToken="globusToken"
               :getGlobusIdentities="getGlobusIdentities"

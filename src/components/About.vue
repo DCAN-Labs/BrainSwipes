@@ -24,7 +24,7 @@
       <p>Choose a study to learn about</p>
       <div class="about-buttons">
         <div v-for="study in filteredDatasets" :key="study">
-          <b-button class="btn btn-primary" @click="routeToPromo(study)">{{study}}</b-button>
+          <b-button class="btn-swipes" @click="routeToPromo(study)">{{study}}</b-button>
         </div>
       </div>
   </div>

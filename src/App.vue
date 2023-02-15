@@ -491,8 +491,8 @@ export default {
   max-width: 500px;
 }
 
-.btn-primary, .btn-primary:hover,
-  .btn-primary:focus, .btn-primary:active {
+.btn-swipes, .btn-swipes:hover,
+  .btn-swipes:focus, .btn-swipes:active {
   color: #fff;
   background-color: maroon;
   border-color: maroon;

@@ -3,14 +3,14 @@
     <b-alert v-for="error in errors" :key="error" :show="showErrors" variant="danger">{{errorCodes[error]}}</b-alert>
     <b-alert :show="showAuthError" variant="danger">Please attempt to login again. If this error persists contact an administrator.</b-alert>
     <div v-if="!authenticated">
-      <b-button class="btn btn-primary" @click="loginWithGlobus">Login with Globus</b-button>
+      <b-button class="btn-swipes" @click="loginWithGlobus">Login with Globus</b-button>
     </div>
     <div v-else>
-      <b-button class="btn btn-primary" @click="logoutOfGlobus">Logout of Globus</b-button>
+      <b-button class="btn-swipes" @click="logoutOfGlobus">Logout of Globus</b-button>
     </div>
     <div v-if="!userInfo.emailVerified">
       <p>This dataset requires a verified email address.</p>
-      <b-button class="btn btn-primary" @click="verifyEmail">Verify Email</b-button>
+      <b-button class="btn-swipes" @click="verifyEmail">Verify Email</b-button>
     </div>
   </div>
 </template>
