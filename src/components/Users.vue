@@ -124,6 +124,10 @@ th {
   display: flex;
   justify-content: space-around;
 }
+.dropdown-menu {
+  overflow: auto;
+  max-height: 80vh;
+}
 </style>
 
 <script>
