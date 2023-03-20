@@ -7,6 +7,7 @@ sed -e 's/$/",/' -i $manifest_file
 sed '$ s/.$/]/' -i $manifest_file
 sed -e 's/^/"/' -i $manifest_file
 sed '1s/^/[/' -i $manifest_file
+# To do: remove '.png'
 
 # EXAMPLE:
 # ./generate_manifest.sh swipes_test manifest.json
