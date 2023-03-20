@@ -376,10 +376,10 @@ export default {
       const newDataset = name.replace(/[^0-9a-z]/gi, '');
       const bucket = this.$refs['new-bucket-text'].localValue;
 
-      if (studies[newStudy]) {
-        this.error = 'Study name already in use';
-      } else if (datasets[newDataset]) {
+      if (datasets[newDataset]) {
         this.error = 'Dataset name already in use';
+      } else if (studies[newStudy] && mode === 'new-study') {
+        this.error = 'Study name already in use';
       } else {
         if (mode === 'new-study') {
           const about = {
