@@ -9,7 +9,7 @@
         </p>
         <div v-if="userData.takenTutorial === 'complete'" class="information-wrapper">
           <div class="inner-information-wrapper">
-            <h2 class="explain-private">Private Datasets</h2>
+            <h2 class="explain-private">Private Studies</h2>
             <div class="information" @mouseover="explainPrivate = true" @mouseleave="explainPrivate = false"></div>
           </div>
         </div>
@@ -19,8 +19,8 @@
           <div v-if="userData.takenTutorial === 'complete'">
             <div class="explain-wrapper">
               <span v-show="explainPrivate" class="explain">
-                <p>Patient health information is sensitive. Some datasets have stricter legal limitations because of this.</p>
-                <p>Select grayed-out datasets to learn more.</p>
+                <p>Patient health information is sensitive. Some studies have stricter legal limitations because of this.</p>
+                <p>Select grayed-out studies to learn more.</p>
               </span>
             </div>
             <DatasetSelect
