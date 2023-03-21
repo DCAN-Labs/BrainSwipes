@@ -144,6 +144,8 @@ export default {
         this.sampleChats = _.orderBy(chats, 'time', 'desc');
         if (!this.sampleChats.length) {
           this.noData = true;
+        } else {
+          this.noData = false;
         }
       });
     },
