@@ -16,6 +16,7 @@
         <b-button class="btn btn-warning" @click="changeBannerState">Banner is currently {{isBannerOn}}</b-button>
       </div>
     </b-container>
+    <b-button @click="handlePostRequest">POST</b-button>
 
   </div>
 
@@ -78,6 +79,27 @@ export default {
       const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
       const userRoles = idTokenResult.claims;
       this.fullAdmin = userRoles.admin;
+    },
+    async handlePostRequest() {
+      const response = await this.postRequest().then(data =>
+        data.currentTarget.responseText,
+      );
+      console.log(response);
+    },
+    postRequest() {
+      const bucket = 'swipes_test';
+      const folder = 'test-folder';
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/s3List', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = resolve;
+        xhr.onerror = reject;
+        xhr.send(JSON.stringify({
+          bucket,
+          folder,
+        }));
+      });
     },
   },
   props: {

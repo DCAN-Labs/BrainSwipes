@@ -88,27 +88,27 @@
         type: String,
         required: true,
       },
-     /**
-     * The summary data for the widget.
-     * This one keeps track of the running average.
-    */
+      /**
+       * The summary data for the widget.
+       * This one keeps track of the running average.
+      */
       widgetSummary: {
         type: Object,
         required: false,
       },
-     /**
+      /**
       * Tells the widget if it should be in a "play mode" or maybe a "review mode".
       */
       playMode: {
         type: String,
         required: false,
       },
-     /**
-     * Tells the widget to display a tutorial step.
-     * tutorialStep = 0 highlights/glows the fail button.
-     * tutorialStep = 1 highlights/glows the pass button.
-     * tutorialStep = 2 highlights/glows the help button.
-     */
+      /**
+       * Tells the widget to display a tutorial step.
+       * tutorialStep = 0 highlights/glows the fail button.
+       * tutorialStep = 1 highlights/glows the pass button.
+       * tutorialStep = 2 highlights/glows the help button.
+       */
       tutorialStep: {
         type: Number,
         required: false,
@@ -191,6 +191,7 @@
     methods: {
       postRequest(pointer) {
         const bucket = this.bucket;
+        const folder = this.config.datasets[this.dataset].folder ? this.config.datasets[this.dataset].folder : '';
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.open('POST', '/Image', true);
@@ -198,7 +199,8 @@
           xhr.onload = resolve;
           xhr.onerror = reject;
           xhr.send(JSON.stringify({
-            pointer, bucket,
+            pointer: folder + pointer,
+            bucket,
           }));
         });
       },

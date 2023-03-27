@@ -10,6 +10,7 @@ const portfinder = require('portfinder')
 const bodyParser = require('body-parser');
 const S3Client = require('@aws-sdk/client-s3').S3Client;
 const GetObjectCommand = require('@aws-sdk/client-s3').GetObjectCommand;
+const ListObjectsV2Command = require('@aws-sdk/client-s3').ListObjectsV2Command;
 const getSignedUrl = require('@aws-sdk/s3-request-presigner').getSignedUrl;
 const msiKeys = require('../msiKeys.json');
 const serviceAccount = require('../brainswipes-firebase-adminsdk.json');
@@ -308,6 +309,30 @@ const devWebpackConfig = merge(baseWebpackConfig, {
               });
           }
           catch(err) {
+            logError(err);
+          }
+        })()
+      });
+      app.post('/s3List', function (req, res) {
+        (async () => {
+          try {
+            const bucket = req.body.bucket;
+            const folder = req.body.folder;
+            const input = {
+              Bucket: bucket,
+            };
+            const command = new ListObjectsV2Command(input);
+            const response = await s3Client.send(command);
+            const objects = [];
+            const regex = /^(test-folder\/)([^\/]*)\.png/gm;
+            response.Contents.forEach(item => {
+              match = item.Key.match(regex);
+              if (match) {
+                objects.push(match[0]);
+              }
+            });
+            res.send(objects);
+          } catch (err) {
             logError(err);
           }
         })()
