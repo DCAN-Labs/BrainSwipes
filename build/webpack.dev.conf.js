@@ -44,6 +44,7 @@ async function logError(error) {
       error: errorString
     }
     ref.push(entry);
+    console.log(error);
   }
   catch(err) {
     console.log(err);
@@ -316,23 +317,37 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       app.post('/s3List', function (req, res) {
         (async () => {
           try {
-            const bucket = req.body.bucket;
-            const folder = req.body.folder;
+            const dataset = req.body.dataset;
+            const configRef = database.ref(`config/datasets/${dataset}`);
+            const snap = await configRef.once('value');
+            const config = snap.val();
+            const bucket = config.bucket;
+            const folder = config.folder;
+            // get the current sample counts from the database
+            const sampleCountsRef = database.ref(`datasets/${dataset}/sampleCounts`);
+            const sampleCountsSnap = await sampleCountsRef.once('value');
+            const sampleCounts = sampleCountsSnap.val();
+            // get the list of items in the s3 bucket
             const input = {
               Bucket: bucket,
             };
             const command = new ListObjectsV2Command(input);
             const response = await s3Client.send(command);
-            const objects = [];
-            const regex = /^(test-folder\/)([^\/]*)\.png/gm;
+            const regexp = new RegExp("^" + folder + "([^\/]*)\.png")
+            const update = {};
             response.Contents.forEach(item => {
-              match = item.Key.match(regex);
+              const match = item.Key.match(regexp);
               if (match) {
-                objects.push(match[0]);
+                const sample = match[1];
+                if (!sampleCounts[sample]){
+                  update[sample] = 0;
+                }
               }
             });
-            res.send(objects);
+            sampleCountsRef.update(update);
+            res.send("Updated sampleCounts.");
           } catch (err) {
+            res.send(err);
             logError(err);
           }
         })()
