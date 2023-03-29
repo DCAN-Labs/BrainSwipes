@@ -110,14 +110,16 @@
           <div v-if="status=='complete'" class="file-import">
             <pre id="result"></pre>
           </div>
-          <hr>
+        </div>
+        <div v-else-if="updateMethod=='archive'">
           <div class="archived">
-            <b-button @click="archiveDataset(selectedDataset)">{{config.datasets[selectedDataset].archived ? `${selectedDataset} is archived. Click to un-archive.` : `Click to archive ${selectedDataset}`}}</b-button>
+            <b-button variant="warning" @click="archiveDataset(selectedDataset)">{{config.datasets[selectedDataset].archived ? `${config.datasets[selectedDataset].name} is archived. Click to un-archive.` : `Click to archive ${config.datasets[selectedDataset].name}`}}</b-button>
             <p>Archived studies cannot be swiped on, but their data can still be viewed.</p>
           </div>
         </div>
         <div v-else>
           <p class="lead">Choose update method</p>
+          <b-button variant="warning" @click="setUpdateMethod('archive')">Archive the Dataset</b-button>
           <b-button variant="warning" @click="setUpdateMethod('json')">Manifest JSON</b-button>
           <b-button variant="warning" @click="setUpdateMethod('s3')">S3</b-button>
         </div>
