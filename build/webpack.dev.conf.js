@@ -32,7 +32,7 @@ const s3Client = new S3Client({
 },
 );
 
-async function logError(error) {
+async function logError(method, error) {
   try {
     const errorString = String(error)
     const ref = database.ref('log/serverErrors');
@@ -41,6 +41,7 @@ async function logError(error) {
     const entry = {
       timestamp,
       server,
+      method,
       error: errorString
     }
     ref.push(entry);
@@ -66,7 +67,7 @@ function createUrl(pointer, bucket) {
     return url;
   }
   catch(err) {
-    logError(err);
+    logError("createUrl", err);
   }
 }
 
@@ -88,7 +89,7 @@ async function logUserManagement(method, modifierUid, modifiedUid, newRoles) {
     ref.push(entry);
   }
   catch(err) {
-    logError(err);
+    logError("logUserManagement", err);
   }
 }
 
@@ -106,12 +107,12 @@ async function findUser(displayName){
         });
       })
       .catch((error) => {
-        logError(error);
+        logError("findUser", error);
       });
     return uid;
   }
   catch(err) {
-    logError(err);
+    logError("findUser", err);
   }
 }
 
@@ -154,7 +155,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             }
           }
           catch(err) {
-            logError(err);
+            logError("Image", err);
           }
         })()
       });
@@ -174,7 +175,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
                     logUserManagement('setRoles-full-admin', currentUser, uid, obj);
                   })
                   .catch((error) => {
-                    logError(error);
+                    logError("setRoles", error);
                     res.send(null);
                   });
                 } else if (Object.values(currentUserRecord.customClaims.studyAdmin).includes(true)) {
@@ -190,22 +191,22 @@ const devWebpackConfig = merge(baseWebpackConfig, {
                       res.send({ ...{ name: obj.name }, ...claims });
                       logUserManagement('setRoles-study-admin', currentUser, uid, claims);
                     }).catch((error) => {
-                      logError(error);
+                      logError("setRoles", error);
                     })
                   })
                   .catch((error) => {
-                    logError(error);
+                    logError("setRoles", error);
                     res.send(null);
                   });
                 }
               })
               .catch((error) => {
-                logError(error);
+                logError("setRoles", error);
                 res.send(null);
               });
           }
           catch(err) {
-            logError(err);
+            logError("setRoles", err);
           }
         })()
       });
@@ -232,12 +233,12 @@ const devWebpackConfig = merge(baseWebpackConfig, {
               res.send('New user roles set');
             })
             .catch((error) => {
-              logError(error);
+              logError("setNewUserRoles", error);
               res.send('Error setting new user roles');
             });
           }
           catch(err) {
-            logError(err);
+            logError("setNewUserRoles", err);
           }
         })()
       });
@@ -259,19 +260,19 @@ const devWebpackConfig = merge(baseWebpackConfig, {
                       res.send(allUsers);
                     })
                     .catch((error) => {
-                      logError(error);
+                      logError("getAllUsers", error);
                       res.send({});
                     });
                 } else {
                   res.send({});
                 }
               }).catch((error) => {
-                logError(error);
+                logError("getAllUsers", error);
                 res.send({});
               });
           }
           catch(err) {
-            logError(err);
+            logError("getAllUsers", err);
           }
         })()
       });
@@ -298,19 +299,19 @@ const devWebpackConfig = merge(baseWebpackConfig, {
                       res.send("Success");
                     })
                     .catch((error) => {
-                      logError(error);
+                      logError("addStudy", error);
                       res.send({});
                     });
                 } else {
                   res.send({});
                 }
               }).catch((error) => {
-                logError(error);
+                logError("addStudy", error);
                 res.send({});
               });
           }
           catch(err) {
-            logError(err);
+            logError("addStudy", err);
           }
         })()
       });
@@ -332,23 +333,27 @@ const devWebpackConfig = merge(baseWebpackConfig, {
               Bucket: bucket,
             };
             const command = new ListObjectsV2Command(input);
-            const response = await s3Client.send(command, {abortSignal: AbortSignal.abort()});
+            const response = await s3Client.send(command);
             const regexp = new RegExp("^" + folder + "([^\/]*)\.png");
             const update = {};
             response.Contents.forEach(item => {
               const match = item.Key.match(regexp);
               if (match) {
                 const sample = match[1];
-                if (!sampleCounts[sample]){
+                if (!Object.keys(sampleCounts).includes(sample)){
                   update[sample] = 0;
                 }
               }
             });
             sampleCountsRef.update(update);
-            res.send(`Updated sampleCounts.\n${JSON.stringify(update)}`);
+            if (Object.keys(update).length){
+              res.send(`Updated sampleCounts.\n${JSON.stringify(update)}`);
+            } else {
+              res.send('No new PNG files found.')
+            }
           } catch (err) {
-            res.send(err);
-            logError(err);
+            res.send(String(err));
+            logError("updateSampleCountsFromS3", err);
           }
         })()
       });

@@ -4,19 +4,19 @@
       <div v-if="selectionStage === 'start'">
         <h1 class="manifest-title">Modify an existing dataset or create a new one?</h1>
         <div>
-          <b-button @click="changeSelectionStage('modify-existing')">Modify Existing</b-button>
-          <b-button @click="changeSelectionStage('create-new')">Create New</b-button>
+          <b-button variant="warning" @click="changeSelectionStage('modify-existing')">Modify Existing</b-button>
+          <b-button variant="warning" @click="changeSelectionStage('create-new')">Create New</b-button>
         </div>
       </div>
       <div v-else-if="selectionStage === 'create-new'">
         <h1 class="manifest-title">Add dataset to existing study or create new study?</h1>
-        <b-button @click="changeSelectionStage('existing-study')">Existing Study</b-button>
-        <b-button @click="changeSelectionStage('new-study')">New Study</b-button>
-        <b-button @click="changeSelectionStage('start')">Start Over</b-button>
+        <b-button variant="warning" @click="changeSelectionStage('existing-study')">Existing Study</b-button>
+        <b-button variant="warning" @click="changeSelectionStage('new-study')">New Study</b-button>
+        <b-button variant="outline-warning" @click="changeSelectionStage('start')">Start Over</b-button>
       </div>
       <div v-else-if="selectionStage === 'modify-existing'">
         <h1 class="manifest-title">Select dataset to modify</h1>
-        <b-button @click="changeSelectionStage('start')">Start Over</b-button>
+        <b-button variant="outline-warning" @click="changeSelectionStage('start')">Start Over</b-button>
           <DatasetSelect
             :globusToken="globusToken"
             :getGlobusIdentities="getGlobusIdentities"
@@ -27,15 +27,16 @@
             :showUnavailable="true"
             :useGlobus="false"
             @activateDataset="activateDataset"
+            @activateStudy="activateStudy"
           />
       </div>
       <div v-else-if="selectionStage === 'new-study'">
         <h1 class="manifest-title">Create a new study and dataset</h1>
-        <b-button @click="changeSelectionStage('start')">Start Over</b-button>
+        <b-button variant="outline-warning" @click="changeSelectionStage('start')">Start Over</b-button>
       </div>
       <div v-else-if="selectionStage === 'existing-study'">
         <h1 class="manifest-title">Select a study and create a new dataset</h1>
-        <b-button @click="changeSelectionStage('start')">Start Over</b-button>
+        <b-button variant="outline-warning" @click="changeSelectionStage('start')">Start Over</b-button>
         <div v-if="!lockout" class="dataset-buttons-row">
           <b-button
             v-for="study in Object.keys(config.studies)"
@@ -66,36 +67,59 @@
         </div>
       </div>
       <div v-if="showModifyDataset">
-        <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
-        <p v-if="status=='complete'">
-          <b>Data Source:</b>
-          <input type="file" id="selectFiles" value="Import" /><br />
-          <b-button variant="warning" id="import" @click="importFile">Import The File!</b-button>
-        </p>
-        <p class="mt-3 pt-3"
-        v-if="status=='complete'">Click the button below to sync your firebase database with your manifest.</p>
+        <div v-if="updateMethod=='s3'">
+          <p class="lead">Clicking update will:<p>
+          <div class="method-params">
+            <ul class="method-params-list">
+              <li>list all .png files in the s3 bucket defined in firebase config for the selected dataset</li>
+              <li>compare with the existing tracked png files in the sampleCounts document in firebase</li>
+              <li>add all missing samples to sampleCounts</li>
+              <li>this method never deletes entries from sampleCounts</li>
+              <li>the BrainSwipes service account needs s3:ListBucket action permission to use this method</li>
+            </ul>
+          </div>
+          <br>
+          <b-button variant="warning" @click="handlePostRequest">Update {{config.datasets[selectedDataset].name}}</b-button>
+          <br>
+          <p class="lead">{{response}}</p>
+        </div>
+        <div v-else-if="updateMethod=='json'">
+          <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
+          <p v-if="status=='complete'">
+            <b>Data Source:</b>
+            <input type="file" id="selectFiles" value="Import" /><br />
+            <b-button variant="warning" id="import" @click="importFile">Import The File!</b-button>
+          </p>
+          <p class="mt-3 pt-3"
+          v-if="status=='complete'">Click the button below to sync your firebase database with your manifest.</p>
 
-        <div class="mb-3 pb-3">
-          <b-button v-if="status=='complete'" @click="refreshSamples">
-            <span> Refresh Sample List </span>
-          </b-button>
-          <div v-else>
-            <p>{{status}} {{progress}} / {{target}}</p>
-            <b-progress :value="progress" :max="target" variant="info" striped class="mb-2"></b-progress>
+          <div class="mb-3 pb-3">
+            <b-button v-if="status=='complete'" @click="refreshSamples">
+              <span> Refresh Sample List </span>
+            </b-button>
+            <div v-else>
+              <p>{{status}} {{progress}} / {{target}}</p>
+              <b-progress :value="progress" :max="target" variant="info" striped class="mb-2"></b-progress>
+            </div>
+          </div>
+          <div v-if="manifestEntries.length && status=='complete'" class="mt-3 pt-3">
+            <small>
+              Here are a few items in your manifest file. There are {{manifestEntries.length}} items in total
+            </small>
+          </div>
+          <div v-if="status=='complete'" class="file-import">
+            <pre id="result"></pre>
+          </div>
+          <hr>
+          <div class="archived">
+            <b-button @click="archiveDataset(selectedDataset)">{{config.datasets[selectedDataset].archived ? `${selectedDataset} is archived. Click to un-archive.` : `Click to archive ${selectedDataset}`}}</b-button>
+            <p>Archived studies cannot be swiped on, but their data can still be viewed.</p>
           </div>
         </div>
-        <div v-if="manifestEntries.length && status=='complete'" class="mt-3 pt-3">
-          <small>
-            Here are a few items in your manifest file. There are {{manifestEntries.length}} items in total
-          </small>
-        </div>
-        <div v-if="status=='complete'" class="file-import">
-          <pre id="result"></pre>
-        </div>
-        <hr>
-        <div class="archived">
-          <b-button @click="archiveDataset(selectedDataset)">{{config.datasets[selectedDataset].archived ? `${selectedDataset} is archived. Click to un-archive.` : `Click to archive ${selectedDataset}`}}</b-button>
-          <p>Archived studies cannot be swiped on, but their data can still be viewed.</p>
+        <div v-else>
+          <p class="lead">Choose update method</p>
+          <b-button variant="warning" @click="setUpdateMethod('json')">Manifest JSON</b-button>
+          <b-button variant="warning" @click="setUpdateMethod('s3')">S3</b-button>
         </div>
       </div>
       <b-alert :show="error.length" variant="danger" dismissible @dismissed="changeSelectionStage('start')">{{error}}</b-alert>
@@ -134,6 +158,14 @@
   .archived p{
     font-style: italic;
     color:gray;
+  }
+  .method-params{
+    display: flex;
+    justify-content: center;
+  }
+  .method-params-list{
+    max-width: 500px;
+    list-style-type: disc;
   }
 </style>
 
@@ -206,6 +238,14 @@ export default {
        * the error message to show
        */
       error: '',
+      /**
+       * what method to use to update the database
+       */
+      updateMethod: '',
+      /**
+       * the response from the server when using s3 update method
+       */
+      response: '',
     };
   },
   props: {
@@ -461,11 +501,38 @@ export default {
       this.selectedDataset = dataset;
       this.selectedStudy = study;
       this.showModifyDataset = true;
+      this.updateMethod = '';
+      this.response = '';
       this.status = 'loading...';
       this.addFirebaseListener();
     },
+    activateStudy() {
+      this.updateMethod = '';
+      this.showModifyDataset = false;
+    },
     selectStudy(study) {
       this.selectedStudy = study;
+    },
+    async handlePostRequest() {
+      const response = await this.postRequest().then(data =>
+        data.currentTarget.responseText,
+      );
+      this.response = response;
+    },
+    postRequest() {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/updateSampleCountsFromS3', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = resolve;
+        xhr.onerror = reject;
+        xhr.send(JSON.stringify({
+          dataset: this.selectedDataset,
+        }));
+      });
+    },
+    setUpdateMethod(method) {
+      this.updateMethod = method;
     },
   },
   beforeRouteEnter(to, from, next) {
