@@ -314,7 +314,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           }
         })()
       });
-      app.post('/s3List', function (req, res) {
+      app.post('/updateSampleCountsFromS3', function (req, res) {
         (async () => {
           try {
             const dataset = req.body.dataset;

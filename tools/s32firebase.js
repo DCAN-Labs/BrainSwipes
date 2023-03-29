@@ -12,7 +12,7 @@ function main() {
           const options = {
             hostname,
             port,
-            path: '/s3List',
+            path: '/updateSampleCountsFromS3',
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
