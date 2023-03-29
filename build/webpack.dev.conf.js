@@ -332,8 +332,8 @@ const devWebpackConfig = merge(baseWebpackConfig, {
               Bucket: bucket,
             };
             const command = new ListObjectsV2Command(input);
-            const response = await s3Client.send(command);
-            const regexp = new RegExp("^" + folder + "([^\/]*)\.png")
+            const response = await s3Client.send(command, {abortSignal: AbortSignal.abort()});
+            const regexp = new RegExp("^" + folder + "([^\/]*)\.png");
             const update = {};
             response.Contents.forEach(item => {
               const match = item.Key.match(regexp);
