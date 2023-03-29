@@ -322,7 +322,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             const snap = await configRef.once('value');
             const config = snap.val();
             const bucket = config.bucket;
-            const folder = config.folder;
+            const folder = config.folder ? config.folder : '';
             // get the current sample counts from the database
             const sampleCountsRef = database.ref(`datasets/${dataset}/sampleCounts`);
             const sampleCountsSnap = await sampleCountsRef.once('value');
@@ -345,7 +345,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
               }
             });
             sampleCountsRef.update(update);
-            res.send("Updated sampleCounts.");
+            res.send(`Updated sampleCounts.\n${JSON.stringify(update)}`);
           } catch (err) {
             res.send(err);
             logError(err);
