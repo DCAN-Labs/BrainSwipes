@@ -21,6 +21,17 @@
         <b-button id="verifyEmail" type="submit" variant="primary">Verify Email</b-button>
       </b-form>
       <hr>
+      <div>
+        <h1>Your Study Access</h1>
+        <div class="dataset-chats-wrapper">
+          <table id=study-access-table>
+            <th v-for="study in Object.keys(userStudies)" :key="study" :class="{ red: !userStudies[study], green: userStudies[study] }">{{study}}</th>
+          </table>
+        </div>
+        <br>
+        <b-button variant="warning" @click="routeToAccessRequest" :disabled="!verified">Request Study Access</b-button>
+      </div>
+      <hr>
       <div class="profile-pic-options">
         <h1>Choose a Profile Picture!</h1>
         <br>
@@ -195,6 +206,22 @@
     margin: 2px;
   }
 
+  .red {
+  background-color: red;
+  }
+  .green {
+    background-color: green;
+  }
+  #study-access-table th{
+    height: 30px;
+    padding: 2px;
+    border: 2px ridge;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+    color: whitesmoke;
+  }
+
 </style>
 
 <script>
@@ -232,6 +259,10 @@ export default {
        * List of profile pic options
        */
       profilePics: ['kesh-profile-icon', 'UniversityOfMinnesota', 'dcan', 'abide', 'connectome'],
+      /**
+       * list of studies the user has access to
+       */
+      userStudies: [],
     };
   },
   computed: {
@@ -399,10 +430,20 @@ export default {
     setProfilePic(pic) {
       this.db.ref(`users/${this.userInfo.displayName}/pic`).set(pic);
     },
+    routeToAccessRequest() {
+      this.$router.push({ name: 'AccessRequest' });
+    },
+    async getUserStudies() {
+      const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+      const studies = idTokenResult.claims.datasets;
+      delete studies.TEST;
+      this.userStudies = studies;
+    },
   },
   mounted() {
     this.getUserChats();
     this.allowRestrictedChats();
+    this.getUserStudies();
   },
 };
 </script>

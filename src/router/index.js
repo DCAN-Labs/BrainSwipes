@@ -21,6 +21,7 @@ import Results from '@/components/Results';
 import Practice from '@/components/Practice';
 import Gallery from '@/components/Gallery';
 import Promo from '@/components/Promo';
+import AccessRequest from '@/components/AccessRequest';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -186,6 +187,14 @@ const router = new Router({
       name: 'Promo',
       component: Promo,
       props: route => ({ study: route.params.study }),
+    },
+    {
+      path: '/access-request',
+      name: 'AccessRequest',
+      component: AccessRequest,
+      meta: {
+        requiresAuth: true,
+      },
     },
   ],
 });
