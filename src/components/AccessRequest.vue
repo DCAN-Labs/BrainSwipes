@@ -3,7 +3,7 @@
     <h1> Request Study Access </h1>
     <br>
     <div id="access-request-form" v-if="globusToken">
-      <b-card title="Study Access Request Form" sub-title="Fill out this form to gain access to a restricted study">
+      <b-card v-if="!submitted" title="Study Access Request Form" sub-title="Fill out this form to gain access to a restricted study">
         <b-form-group label="Study" label-for="selectStudy" label-cols="4">
           <b-form-select id="selectStudy" v-model="selectedStudy" :options="restrictedStudies"></b-form-select>
         </b-form-group>
@@ -21,6 +21,10 @@
         </b-form-group>
         <b-button @click="onSubmit" :disabled="!(selectedStudy && submittedName)">Submit</b-button>
       </b-card>
+      <div v-else>
+        <p>You have successfully submitted a request to access {{selectedStudy}}.</p>
+        <b-button variant="warning" @click="formReset">Submit another request</b-button>
+      </div>
     </div>
     <div v-else>
       <p>You must log in with Globus to submit a request</p>
@@ -31,7 +35,7 @@
 
 </template>
 
-<style>
+<style scoped>
 #access-request-form{
   display: flex;
   justify-content: center;
@@ -56,6 +60,7 @@ export default {
       submittedName: '',
       globusOrgs: [],
       restrictedStudies: [],
+      submitted: false,
     };
   },
   props: {
@@ -102,17 +107,20 @@ export default {
         study: this.selectedStudy,
         org: this.globusOrg,
         username: this.userInfo.displayName,
+        email: this.userInfo.email,
         name: this.submittedName,
         timestamp: Date.now(),
         organizations: this.globusOrgs,
-        resolved: false,
+        status: 'awaiting',
       };
       this.db.ref(`requests/${this.selectedStudy}/${this.userInfo.displayName}`).set(formInfo);
-      // reset form
+      this.submitted = true;
+    },
+    formReset() {
       this.globusOrg = '';
       this.submittedName = '';
       this.selectedStudy = '';
-      this.formSuccess = true;
+      this.submitted = false;
     },
     async getIdentites() {
       if (this.globusToken) {

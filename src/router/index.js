@@ -22,6 +22,7 @@ import Practice from '@/components/Practice';
 import Gallery from '@/components/Gallery';
 import Promo from '@/components/Promo';
 import AccessRequest from '@/components/AccessRequest';
+import AccessReview from '@/components/AccessReview';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -194,6 +195,15 @@ const router = new Router({
       component: AccessRequest,
       meta: {
         requiresAuth: true,
+      },
+    },
+    {
+      path: '/admin/access-review',
+      name: 'AccessReview',
+      component: AccessReview,
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
       },
     },
   ],
