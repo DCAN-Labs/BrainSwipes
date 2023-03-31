@@ -67,7 +67,7 @@
       <div id="review-controls">
         <b-button variant="danger" @click="openFlagWarning" :disabled="flagged && !isAdmin">{{flagged ? 'This sample is flagged' : 'Flag for Expert Review'}}</b-button>
         <b-button v-if="source" variant="primary" @click="toSource">Back to {{source}}</b-button>
-        <b-button variant="warning" v-if="isAdmin" @click="addToGallery" :disabled="config.learn.gallery[widgetPointer]">Add Sample to Gallery</b-button>
+        <b-button variant="warning" v-if="isAdmin" @click="addToGallery" :disabled="Object.hasOwn(config.learn.gallery, widgetPointer)">Add Sample to Gallery</b-button>
       </div>
       <hr>
       <div class="chat container">
@@ -360,10 +360,11 @@
             time: new Date().toISOString(),
             deleted: false,
           });
-
-        Object.keys(this.notify).forEach((user) => {
-          this.notify[user] = true;
-        });
+        if (Object.keys(this.notify).length) {
+          Object.keys(this.notify).forEach((user) => {
+            this.notify[user] = true;
+          });
+        }
         this.notify[this.userData.username] = false;
         this.db.ref(`datasets/${this.dataset}/chats/chats/${key}/notify`).set(this.notify);
 
@@ -386,9 +387,14 @@
         // get the chat for this sample
         this.db.ref(`datasets/${dataset}/chats/chats/${this.widgetPointer}`)
           .on('value', (snap2) => {
-            const chatData = _.filter(snap2.val().chats, { deleted: false });
-            this.chatHistory = chatData;
-            this.notify = snap2.val().notify;
+            const snap2Val = snap2.val();
+            if (snap2Val) {
+              if (Object.hasOwn(snap2Val, 'chats')) {
+                const chatData = _.filter(snap2.val().chats, { deleted: false });
+                this.chatHistory = chatData;
+                this.notify = snap2Val.notify ? snap2Val.notify : {};
+              }
+            }
           });
 
         // get the widget's summary info
