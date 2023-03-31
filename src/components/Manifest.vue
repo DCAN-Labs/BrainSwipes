@@ -468,7 +468,7 @@ export default {
      * Request an update of user roles to include new dataset
      * 'dataset' in this function is actually a study
      */
-    requestUserRolesUpdate(dataset, available) {
+    requestUserRolesUpdate(study, available) {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/addStudy', true);
@@ -476,7 +476,7 @@ export default {
         xhr.onload = resolve;
         xhr.onerror = reject;
         xhr.send(JSON.stringify({
-          dataset,
+          study,
           available,
           currentUser: firebase.auth().currentUser.uid,
         }));
