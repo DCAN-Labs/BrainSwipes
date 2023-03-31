@@ -13,11 +13,11 @@
         <b-form-group label-cols="4" label="Username" label-for="username">
           <b-form-input id="username" readonly v-model="userInfo.displayName"></b-form-input>
         </b-form-group>
-        <b-form-group label-cols="4" label="Email" label-for="email" description="The email you used to register your BrainSwipes account. This will determine what Globus identity we use.">
+        <b-form-group label-cols="4" label="Email" label-for="email">
           <b-form-input id="email" readonly v-model="userInfo.email"></b-form-input>
         </b-form-group>
         <b-form-group label="Organization" label-for="selectGlobusOrg" label-cols="4" description="This should be the organization you are a member of for purposes of this study's data use agreement.">
-          <b-form-input id="selectGlobusOrg" readonly v-model="globusOrg"></b-form-input>
+          <b-form-select id="selectGlobusOrg" v-model="globusOrg" :options="globusOrgs"></b-form-select>
         </b-form-group>
         <b-button @click="onSubmit" :disabled="!(selectedStudy && submittedName)">Submit</b-button>
       </b-card>
@@ -27,7 +27,6 @@
       <br>
       <b-button variant="warning" @click="routeToRestricted">To Globus Login Page</b-button>
     </div>
-
   </div>
 
 </template>
@@ -44,6 +43,8 @@
 /**
  * Route for requesting access to a restricted dataset.
  */
+import firebase from 'firebase/app';
+import 'firebase/auth';
 import _ from 'lodash';
 
 export default {
@@ -53,27 +54,9 @@ export default {
       globusOrg: '',
       selectedStudy: '',
       submittedName: '',
+      globusOrgs: [],
+      restrictedStudies: [],
     };
-  },
-  methods: {
-    onSubmit() {
-      const formInfo = {
-        study: this.selectedStudy,
-        org: this.globusOrg,
-        username: this.userInfo.displayName,
-        name: this.submittedName,
-        timestamp: Date.now(),
-      };
-      console.log(formInfo);
-    },
-    async getIdentites() {
-      const identities = await this.getGlobusIdentities(this.globusToken);
-      const email = this.userInfo.email;
-      this.globusOrg = identities[email][0];
-    },
-    routeToRestricted() {
-      this.$router.push({ name: 'Restricted', query: { errors: this.globusAuthErrors } });
-    },
   },
   props: {
     /**
@@ -112,15 +95,52 @@ export default {
       required: true,
     },
   },
-  computed: {
-    restrictedStudies() {
-      const restrictedStudies = Object.keys(
-        _.pickBy(this.config.studies, (v, k) => !v.available && k !== 'TEST'));
-      return restrictedStudies;
+  methods: {
+    onSubmit() {
+      // submit info to database
+      const formInfo = {
+        study: this.selectedStudy,
+        org: this.globusOrg,
+        username: this.userInfo.displayName,
+        name: this.submittedName,
+        timestamp: Date.now(),
+        organizations: this.globusOrgs,
+        resolved: false,
+      };
+      this.db.ref(`requests/${this.selectedStudy}/${this.userInfo.displayName}`).set(formInfo);
+      // reset form
+      this.globusOrg = '';
+      this.submittedName = '';
+      this.selectedStudy = '';
+      this.formSuccess = true;
+    },
+    async getIdentites() {
+      if (this.globusToken) {
+        const identities = await this.getGlobusIdentities(this.globusToken);
+        const email = this.userInfo.email;
+        if (Object.hasOwn(identities, email)) {
+          this.globusOrg = identities[email][0];
+        }
+        const organizations = [];
+        Object.keys(identities).forEach(identity => organizations.push(identities[identity][0]));
+        this.globusOrgs = organizations;
+      }
+    },
+    routeToRestricted() {
+      this.$router.push({ name: 'Restricted', query: { errors: this.globusAuthErrors } });
+    },
+    async getRestrictedStudies() {
+      const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
+      const studies = idTokenResult.claims.datasets;
+      delete studies.TEST;
+      const requestableStudies = Object.keys(
+        _.pickBy(studies, (v, k) => !v && k !== 'TEST'));
+      this.restrictedStudies = requestableStudies;
     },
   },
   mounted() {
     this.getIdentites();
+    this.getRestrictedStudies();
   },
 };
 </script>
