@@ -14,6 +14,11 @@
           <p>You can still view chats and results.</p>
         </div>
       </div>
+      <div v-if="!config.studies[study].available">
+        <hr>
+        <p>If you believe you should have access to this study fill out the access form:</p>
+        <b-button @click="routeToRequest" variant="warning">To Access Form</b-button>
+      </div>
     </div>
   </div>
 
@@ -91,6 +96,9 @@ export default {
         'background-repeat': 'no-repeat',
         'background-attachment': 'fixed',
       };
+    },
+    routeToRequest() {
+      this.$router.push({ name: 'AccessRequest' });
     },
   },
   /**
