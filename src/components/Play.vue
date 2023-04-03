@@ -2,38 +2,47 @@
   <div id="play" class="container">
 
     <div v-if="allowed" class="main">
-
-      <b-alert :show="dismissCountDown"
-         :variant="feedback.variant"
-         class="toast"
-         @dismissed="dismissCountdown=0"
-         @dismiss-count-down="countDownChanged">
-         {{feedback.message}}
-      </b-alert>
-
-      <div v-if="noData">
-        <h1>Didn't find any samples to display</h1>
-        <p class="lead">Try refreshing the page, otherwise this dataset might not be set up yet.</p>
-        <img class="blankImage" :src="blankImage" alt="there is no data" />
+      <div v-if="!completedTutorialRequirements">
+        <h1>You must complete additional tutorials to swipe this dataset.</h1>
+        <div v-for="tutorial in Object.keys(config.datasets[dataset].tutorials)" :key="tutorial">
+          <h2>{{config.learn.tutorials[tutorial].name}}</h2>
+          <b-button class="btn-swipes" @click="routeTo('Tutorial')">To Tutorial</b-button>
+        </div>
       </div>
 
       <div v-else>
-        <div v-if="!widgetPointer">
-          <Flask />
-          <p class="mt-3 pt-3 lead">loading...</p>
+        <b-alert :show="dismissCountDown"
+          :variant="feedback.variant"
+          class="toast"
+          @dismissed="dismissCountdown=0"
+          @dismiss-count-down="countDownChanged">
+          {{feedback.message}}
+        </b-alert>
+
+        <div v-if="noData">
+          <h1>Didn't find any samples to display</h1>
+          <p class="lead">Try refreshing the page, otherwise this dataset might not be set up yet.</p>
+          <img class="blankImage" :src="blankImage" alt="there is no data" />
         </div>
 
-        <ImageSwipe
-         v-else
-         :widgetPointer="widgetPointer"
-         :widgetSummary="widgetSummary"
-         v-on:widgetRating="sendWidgetResponse"
-         :playMode="playMode"
-         ref="widget"
-         :dataset="dataset"
-         :study="study"
-         :config="config"
-        />
+        <div v-else>
+          <div v-if="!widgetPointer">
+            <Flask />
+            <p class="mt-3 pt-3 lead">loading...</p>
+          </div>
+
+          <ImageSwipe
+          v-else
+          :widgetPointer="widgetPointer"
+          :widgetSummary="widgetSummary"
+          v-on:widgetRating="sendWidgetResponse"
+          :playMode="playMode"
+          ref="widget"
+          :dataset="dataset"
+          :study="study"
+          :config="config"
+          />
+        </div>
       </div>
     </div>
 
@@ -257,6 +266,18 @@
       },
       catchSamplePriority() {
         return _.sortBy(this.catchSampleCounts, '.value');
+      },
+      completedTutorialRequirements() {
+        let completedTutorialRequirements = true;
+        if (Object.hasOwn(this.config.datasets[this.dataset], 'tutorials')) {
+          Object.keys(this.config.datasets[this.dataset].tutorials).forEach((tutorial) => {
+            if (this.config.datasets[this.dataset].tutorials[tutorial]) {
+              completedTutorialRequirements =
+                completedTutorialRequirements && this.userData.tutorials[tutorial];
+            }
+          });
+        }
+        return completedTutorialRequirements;
       },
     },
     methods: {
@@ -533,6 +554,9 @@
        */
       clearRouterQuery() {
         this.$router.push({ name: 'Home', query: { reroute: `${this.study}/${this.dataset}/play` } });
+      },
+      routeTo(route) {
+        this.$router.push({ name: route });
       },
     },
     /**
