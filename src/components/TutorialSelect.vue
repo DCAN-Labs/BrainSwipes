@@ -16,9 +16,11 @@
             <div class="checked"></div>
           </div>
           <b-card-text v-else>
-            {{config.learn.tutorials[tutorial].about}}
+            <p>{{config.learn.tutorials[tutorial].about}}</p>
+            <h3>Required for:</h3>
+            <p v-for="dataset in requiredFor[tutorial]" :key="dataset">{{config.datasets[dataset].name}}</p>
           </b-card-text>
-          <b-button @click="routeToTutorial(tutorial)" class="btn-swipes">Start Tutorial</b-button>
+          <b-button @click="routeToTutorial(tutorial)" class="btn-swipes">View Tutorial</b-button>
         </b-card>
       </div>
     </div>
@@ -56,16 +58,35 @@
         console.log(tutorial);
       },
     },
+    computed: {
+      requiredFor() {
+        const requiredFor = {};
+        Object.keys(this.config.datasets).forEach((dataset) => {
+          if (!dataset.includes('TEST')) {
+            if (Object.hasOwn(this.config.datasets[dataset], 'tutorials')) {
+              Object.keys(this.config.datasets[dataset].tutorials).forEach((tutorial) => {
+                if (Object.hasOwn(requiredFor, tutorial)) {
+                  requiredFor[tutorial].push(dataset);
+                } else {
+                  requiredFor[tutorial] = [dataset];
+                }
+              });
+            }
+          }
+        });
+        return requiredFor;
+      },
+    },
   };
 </script>
 
 <style scoped>
-  h4{
+  h4 {
     font-size: 1.6em;
     font-weight: bold;
     color: maroon;
   }
-  .checked{
+  .checked {
     content: ' ';
     background-image: url('../assets/check-square.svg');
     background-repeat: no-repeat;
@@ -73,11 +94,11 @@
     height: 44px;
     width: 44px;
   }
-  .card-wrapper{
+  .card-wrapper {
     display: flex;
     justify-content: center;
   }
-  .check-wrapper{
+  .check-wrapper {
     display: flex;
     justify-content: center;
     margin: 5px;
