@@ -23,9 +23,7 @@
 </template>
 
 <style>
-  #maintenance p, #maintenance h1{
-    margin: 0.3em;
-  }
+
 </style>
 
 <script>

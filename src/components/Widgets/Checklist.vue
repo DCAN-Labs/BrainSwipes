@@ -75,7 +75,7 @@
   };
 </script>
 
-<style>
+<style scoped>
   .checklist-item{
     display: flex;
     font-size: 1.1em;

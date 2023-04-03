@@ -23,6 +23,7 @@ import Gallery from '@/components/Gallery';
 import Promo from '@/components/Promo';
 import AccessRequest from '@/components/AccessRequest';
 import AccessReview from '@/components/AccessReview';
+import TutorialSelect from '@/components/TutorialSelect';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -204,6 +205,14 @@ const router = new Router({
       meta: {
         requiresAuth: true,
         requiresAdmin: true,
+      },
+    },
+    {
+      path: '/tutorial-select',
+      name: 'TutorialSelect',
+      component: TutorialSelect,
+      meta: {
+        requiresAuth: true,
       },
     },
   ],

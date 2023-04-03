@@ -65,9 +65,6 @@
 .slider-menu a {
   color: rgb(100,0,0);
 }
-h1 {
-  color: rgb(100,0,0);
-}
 
 @media (min-width: 65em) {
     .slider-menu {

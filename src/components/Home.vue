@@ -192,7 +192,7 @@ export default {
 <style scoped>
 
 h1 {
-  font-weight: bold;
+  font-size: 1.5em;
 }
 ul {
   list-style-type: none;

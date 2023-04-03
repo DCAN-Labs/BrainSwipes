@@ -47,10 +47,6 @@
     top: 12vh;
     width: 100vw;
   }
-  #promo-content h1{
-    font-size: 2em;
-    margin-bottom: 7px;
-  }
   #promo-content p{
     font-size: 1.1em;
     margin: 2px;

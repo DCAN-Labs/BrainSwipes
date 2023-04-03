@@ -525,4 +525,11 @@ h2 {
   margin: 0.5em;
 }
 
+h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.5em;
+  color: rgb(100,0,0);
+}
+
 </style>

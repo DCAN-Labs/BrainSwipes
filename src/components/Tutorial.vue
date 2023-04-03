@@ -195,8 +195,6 @@
 
   .tutorial-steps h1{
     padding-top: 50px;
-    margin-bottom: 15px;
-    font-size: 2em;
   }
   
   .tutorial-step{
