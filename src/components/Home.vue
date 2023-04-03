@@ -190,10 +190,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
-h1 {
-  font-size: 1.5em;
-}
 ul {
   list-style-type: none;
   padding: 0;

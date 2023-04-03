@@ -526,7 +526,7 @@ h2 {
 }
 
 h1 {
-  font-size: 2em;
+  font-size: 1.5em;
   font-weight: bold;
   margin: 0.5em;
   color: rgb(100,0,0);
