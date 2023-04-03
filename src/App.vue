@@ -511,4 +511,11 @@ export default {
   padding: 5px;
   margin: 5px;
 }
+
+h3 {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: rgb(100,0,0);
+}
+
 </style>

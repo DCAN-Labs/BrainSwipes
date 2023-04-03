@@ -28,6 +28,14 @@
             <th v-for="study in Object.keys(userStudies)" :key="study" :class="{ red: !userStudies[study], green: userStudies[study] }">{{study}}</th>
           </table>
         </div>
+        <div v-if="Object.keys(userRequests).length">
+          <h3>Your Access Requests</h3>
+          <div v-for="study in Object.keys(userRequests)" :key="study">
+          <p>
+            {{study}} : {{userRequests[study].status == 'denied' ? userRequests[study].reason == 'Other' ? `${userRequests[study].status} - ${userRequests[study].other}` : `${userRequests[study].status} - ${userRequests[study].reason}` : userRequests[study].status }}
+          </p>
+          </div>
+        </div>
         <br>
         <b-button variant="warning" @click="routeToAccessRequest" :disabled="!verified">Request Study Access</b-button>
       </div>
@@ -263,6 +271,10 @@ export default {
        * list of studies the user has access to
        */
       userStudies: [],
+      /**
+       * object recording study access requests this user has made
+       */
+      userRequests: {},
     };
   },
   computed: {
@@ -439,11 +451,28 @@ export default {
       delete studies.TEST;
       this.userStudies = studies;
     },
+    getUserRequests() {
+      this.db.ref('requests').on('value', (snap) => {
+        const requests = snap.val();
+        const userRequests = {};
+        Object.keys(requests).forEach((study) => {
+          Object.keys(requests[study]).forEach((user) => {
+            if (user === this.userInfo.displayName) {
+              if (requests[study][user].status !== 'accepted') {
+                userRequests[study] = requests[study][user];
+              }
+            }
+          });
+        });
+        this.userRequests = userRequests;
+      });
+    },
   },
   mounted() {
     this.getUserChats();
     this.allowRestrictedChats();
     this.getUserStudies();
+    this.getUserRequests();
   },
 };
 </script>

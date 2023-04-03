@@ -17,7 +17,7 @@
       <li>
         <router-link to="/login" class="nav__link">
           <i class="fa fa-user" aria-hidden="true"></i>
-          Login
+          Login or Sign Up
         </router-link>
       </li>
     </ul>

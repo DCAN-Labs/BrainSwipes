@@ -130,7 +130,11 @@ export default {
           this.globusOrg = identities[email][0];
         }
         const organizations = [];
-        Object.keys(identities).forEach(identity => organizations.push(identities[identity][0]));
+        Object.keys(identities).forEach((identity) => {
+          if (identities[identity][0] !== null) {
+            organizations.push(identities[identity][0]);
+          }
+        });
         this.globusOrgs = organizations;
       }
     },
