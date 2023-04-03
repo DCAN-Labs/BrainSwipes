@@ -165,7 +165,32 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             const obj = req.body.obj;
             const currentUser = req.body.currentUser;
             const uid = await findUser(obj.name);
-
+            // fill in missing info in obj
+            const userRecord = await admin.auth().getUser(uid);
+            const userClaims = userRecord.customClaims;
+            if (!Object.hasOwn(obj, 'admin')) {
+              obj.admin = userClaims.admin;
+            }
+            if (!Object.hasOwn(obj, 'org')) {
+              obj.org = userClaims.org;
+            }
+            if (!Object.hasOwn(obj, 'studyAdmin')) {
+              obj.studyAdmin = userClaims.studyAdmin;
+            }
+            if (!Object.hasOwn(obj, 'datasets')) {
+              obj.datasets = userClaims.datasets;
+            }
+            Object.keys(userClaims.datasets).forEach(dataset => {
+              if (!Object.hasOwn(obj.datasets, dataset)) {
+                obj.datasets[dataset] = userClaims.datasets[dataset];
+              }
+            });
+            Object.keys(userClaims.studyAdmin).forEach(dataset => {
+              if (!Object.hasOwn(obj.datasets, dataset)) {
+                obj.studyAdmin[dataset] = userClaims.studyAdmin[dataset];
+              }
+            });
+            // update claims
             admin.auth()
               .getUser(currentUser)
               .then((currentUserRecord) => {
