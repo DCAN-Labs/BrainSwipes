@@ -51,12 +51,6 @@
     font-size: 2em;
     margin-bottom: 7px;
   }
-  #promo-content h2{
-    font-size: 1.4em;
-    margin-bottom: 7px;
-    color: maroon;
-    font-weight: bold;
-  }
   #promo-content p{
     font-size: 1.1em;
     margin: 2px;

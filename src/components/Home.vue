@@ -9,7 +9,7 @@
         </p>
         <div v-if="userData.takenTutorial === 'complete'" class="information-wrapper">
           <div class="inner-information-wrapper">
-            <h2 class="explain-private">Private Studies</h2>
+            <p class="explain-private">Private Studies</p>
             <div class="information" @mouseover="explainPrivate = true" @mouseleave="explainPrivate = false"></div>
           </div>
         </div>
@@ -191,7 +191,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
-h1, h2 {
+h1 {
   font-weight: bold;
 }
 ul {
@@ -267,6 +267,7 @@ a {
 }
 .explain-private {
   font-size: 0.9em;
+  font-weight: bold;
 }
 
 @media (max-width: 979px) {

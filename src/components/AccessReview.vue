@@ -66,12 +66,6 @@
     display: flex;
     justify-content: center;
   }
-  h2 {
-    font-size: 1.3em;
-    color: maroon;
-    font-weight: bold;
-    margin: 0.5em;
-  }
   .requests-list{
     padding-bottom: 10vh;
   }

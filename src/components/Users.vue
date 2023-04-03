@@ -113,13 +113,6 @@ th {
   display: flex;
   justify-content: space-around;
 }
-#modifyuser h2{
-  font-weight: bold;
-  font-size: 1.3em;
-}
-#modifyuser h3{
-  font-size: 1.1em;
-}
 #study-access-list, #study-admin-list{
   display: flex;
   justify-content: space-around;

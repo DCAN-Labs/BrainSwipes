@@ -51,7 +51,6 @@
       <!-- Introduction steps -->
 
       <div v-for="(step, index) in steps.MRIintro" :key="`intro${index}`" class="fullpage">
-        <hr><!--Hidden. This adds just enough width to make the arrow v-scroll work when the p-bar first pops up-->
         <div class="tutorial-step" :id="'MRIintro'+index">
 
           <p v-html="step.text"></p>
@@ -99,7 +98,7 @@
               :playMode="'tutorial'"
               :tutorialStep="step.tutorialStep"
               ref="widget"
-              :dataset="tutorialDataset"
+              :dataset="step.dataset"
               :identifier="'example'+index"
               :config="config"
             />
@@ -200,10 +199,6 @@
     font-size: 2em;
   }
   
-  .tutorial-step h2{
-    font-size: 1.6em;
-  }
-
   .tutorial-step{
     margin: 0 10vw;
   }
@@ -378,12 +373,6 @@
           return `#MRIintro${this.currentBin.bin + 1}`;
         }
         return `#example${(this.currentBin.bin - this.steps.MRIintro.length) + 1}`;
-      },
-      /**
-       * dataset that the tutorial images are from
-       */
-      tutorialDataset() {
-        return this.config.learn.tutorial.dataset;
       },
     },
     methods: {

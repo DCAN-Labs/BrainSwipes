@@ -104,13 +104,6 @@
     margin-bottom: 35px;
   }
 
-  .gallery-item h2{
-    font-size: 1.5em;
-    font-weight: 700;
-    color: #640000;
-    margin-bottom: 10px;
-  }
-
   .gallery-item {
     padding-bottom: 15vh;
   }

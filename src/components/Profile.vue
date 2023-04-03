@@ -123,12 +123,6 @@
     justify-content: center;
   }
 
-  .user-chats h2 {
-    font-weight: 600;
-    font-size: 1.2em;
-    padding: 0.4em;
-  }
-
   .single-chat {
     padding: 1em;
     margin: 10px;

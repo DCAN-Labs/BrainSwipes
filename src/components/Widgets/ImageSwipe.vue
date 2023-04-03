@@ -169,11 +169,6 @@
         delay: 500,
       };
     },
-    computed: {
-      bucket() {
-        return this.config.datasets[this.dataset].bucket;
-      },
-    },
     /**
      * If the playMode === 'tutorial', show a tutorial step.
      */
@@ -190,7 +185,7 @@
     },
     methods: {
       postRequest(pointer) {
-        const bucket = this.bucket;
+        const bucket = this.config.datasets[this.dataset].bucket;
         const folder = this.config.datasets[this.dataset].folder ? this.config.datasets[this.dataset].folder : '';
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();

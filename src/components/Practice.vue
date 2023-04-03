@@ -78,20 +78,6 @@
   .feedback-body {
     min-height: 400px;
   }
-  
-  #practice-feedback h2{
-    font-size: 1.5em;
-    font-weight: 700;
-    color: #640000;
-    margin-bottom: 10px;
-  }
-
-  #practice-feedback h3{
-    font-size: 1.2em;
-    font-weight: 600;
-    color: #640000;
-    margin-bottom: 10px;
-  }
 
   #practice-sample {
     padding-bottom: 15vh;

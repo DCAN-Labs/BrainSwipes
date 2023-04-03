@@ -518,4 +518,11 @@ h3 {
   color: rgb(100,0,0);
 }
 
+h2 {
+  font-size: 1.3em;
+  color: rgb(100,0,0);
+  font-weight: bold;
+  margin: 0.5em;
+}
+
 </style>

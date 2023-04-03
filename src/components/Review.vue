@@ -133,22 +133,11 @@
   #tutorial-tips {
     margin: 0.5em;
   }
-
-  #tutorial-tips h2 {
-    margin-bottom: 0.5em;
-    font-size: 1.3em;
-  }
   
   #flagwarning h5{
     font-size: 2em;
     font-weight: bold;
     color: red;
-  }
-
-  #flagwarning h2{
-    font-size: 1.3em;
-    font-weight: bold;
-    margin-bottom: 5px;
   }
 
   #flagwarning h3{
