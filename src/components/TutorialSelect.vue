@@ -1,39 +1,40 @@
 <template>
   <div id=tutorial-select>
     <h1>Complete more tutorials to access more datasets!</h1>
-    <div class="card-wrapper">
-      <div class="carousel-wrapper">
-        <b-carousel
-          controls
-          indicators
-          :interval="0"
-          background="#ababab"
-        >
-          <b-carousel-slide v-for="tutorial in Object.keys(config.learn.tutorials)" :key="tutorial" :img-src="config.learn.tutorials[tutorial].image">
-            <b-card
-              :title="config.learn.tutorials[tutorial].name"
-              tag="article"
-              class="mb-2"
-            >
-              <div v-if="userData.tutorials[tutorial] === 'complete'" class="check-wrapper">
-                <div class="checked"></div>
-              </div>
-              <b-card-text v-else>
-                <p>{{config.learn.tutorials[tutorial].about}}</p>
-                <h3>Required for:</h3>
-                <p><span v-for="dataset in requiredFor[tutorial]" :key="dataset"><strong>|</strong> {{config.datasets[dataset].name}} <strong>|</strong></span></p>
-              </b-card-text>
-              <b-button v-if="completedPrerequisites(tutorial)" @click="routeToTutorial(tutorial)" class="btn-swipes">View Tutorial</b-button>
-              <div v-else>
-                <hr>
-                <h3>You must complete the prerequisites.</h3>
-                <p v-for="prereq in Object.keys(config.learn.tutorials[tutorial].prereq)" :key="prereq">
-                    {{config.learn.tutorials[prereq].name}}
-                </p>
-              </div>
-            </b-card>
-          </b-carousel-slide>
-        </b-carousel>
+    <div class="center-flex">
+      <div class="card-wrapper">
+        <div class="accordion" role="tablist">
+          <b-card no-body v-for="tutorial in Object.keys(config.learn.tutorials)" :key="tutorial">
+            <b-card-header header-tag="header" class="p-1" role="tab">
+              <b-button block v-b-toggle="`accordion-${tutorial}`" class="btn-swipes">
+                <span class="center-flex vertical-align-center">
+                  <p class="header-text">{{config.learn.tutorials[tutorial].name}} <p>
+                  <div v-if="userData.tutorials[tutorial] === 'complete'" class="check-wrapper">
+                    <div class="checked"></div>
+                  </div>
+                </span>
+              </b-button>
+            </b-card-header>
+            <b-collapse :id="`accordion-${tutorial}`" accordion="my-accordion" role="tabpanel">
+              <b-card-body>
+                <b-card-text>
+                  <p>{{config.learn.tutorials[tutorial].about}}</p>
+                  <hr>
+                  <h3>Required for:</h3>
+                  <p v-for="dataset in requiredFor[tutorial]" :key="dataset"> {{config.datasets[dataset].name}} </p>
+                  <hr>
+                  <b-button v-if="completedPrerequisites(tutorial)" @click="routeToTutorial(tutorial)" class="btn-swipes">View Tutorial</b-button>
+                  <div v-else>
+                    <h3>You must complete the prerequisites.</h3>
+                    <p v-for="prereq in Object.keys(config.learn.tutorials[tutorial].prereq)" :key="prereq">
+                        {{config.learn.tutorials[prereq].name}}
+                    </p>
+                  </div>
+                </b-card-text>
+              </b-card-body>
+            </b-collapse>
+          </b-card>
+        </div>
       </div>
     </div>
   </div>
@@ -116,33 +117,41 @@
   }
   .checked {
     content: ' ';
-    background-image: url('../assets/check-square.svg');
+    background-image: url('../assets/check-square-white.svg');
     background-repeat: no-repeat;
-    background-size: 44px 44px;
-    height: 44px;
-    width: 44px;
+    background-size: 28px 28px;
+    height: 28px;
+    width: 28px;
   }
   .card-wrapper {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
   }
   .check-wrapper {
     display: flex;
     justify-content: center;
     margin: 5px;
   }
-  .carousel-wrapper{
-    width: 500px;
-    height: 220px;
-  }
   .card-body {
-    height: 250px;
-    overflow-y: scroll;
+    width: 300px;
+  }
+  .card-header {
+    width: 300px;
   }
   p {
     color: black;
   }
   strong {
     font-weight: bold;
+  }
+  .center-flex {
+    display: flex;
+    justify-content: center;
+  }
+  .vertical-align-center {
+    align-items: center;
+  }
+  .header-text {
+    color: whitesmoke;
   }
 </style>
