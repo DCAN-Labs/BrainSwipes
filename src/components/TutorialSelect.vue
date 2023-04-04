@@ -74,7 +74,7 @@
         let completedPrerequisites = true;
         if (Object.hasOwn(this.config.learn.tutorials[tutorial], 'prereq')) {
           Object.keys(this.config.learn.tutorials[tutorial].prereq).forEach((prereq) => {
-            if (this.userData.tutorials[tutorial][prereq] !== 'complete') {
+            if (this.userData.tutorials[prereq] !== 'complete') {
               completedPrerequisites = false;
             }
           });
