@@ -96,9 +96,12 @@ const router = new Router({
       component: Leaderboard,
     },
     {
-      path: '/tutorial',
+      path: '/tutorial/:module',
       name: 'Tutorial',
       component: Tutorial,
+      props: route => ({
+        module: route.params.module,
+      }),
     },
     {
       path: '/visualization',

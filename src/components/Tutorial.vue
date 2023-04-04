@@ -17,13 +17,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></svg></b-button>
       <div id="table-of-contents" v-show="showTOC">
         <ul>
-          <li v-scroll-to="'#header-MR-Intro'" @click="hideTOC">Introduction to MRI</li>
-          <li v-scroll-to="'#header-qa-intro'" @click="hideTOC">Introduction to Quality Assessment</li>
-          <li v-scroll-to="'#header-Type-Imgs'" @click="hideTOC">Types of Images in BrainSwipes</li>
-          <li v-scroll-to="'#header-Surf-Delin'" @click="hideTOC">Assessing the Quality of Surface Delineations</li>
-          <li v-scroll-to="'#header-Atl-Reg'" @click="hideTOC">Assessing the Quality of Atlas Registration</li>
-          <li v-scroll-to="'#header-Func-Reg'" @click="hideTOC">Assesing the Quality of Functional Registration</li>
-          <li v-scroll-to="'#using-swipes'" @click="hideTOC">Using the BrainSwipes interface</li>
+          <li v-for="section, sectionIndex in content" :key="sectionIndex" v-scroll-to="`#section${sectionIndex}`" @click="hideTOC">{{section.title}}</li>
         </ul>
       </div>
     </div>
@@ -48,48 +42,40 @@
       </div>
     </b-modal>
     <div class="tutorial-steps">
-      <!-- Introduction steps -->
-
-      <div v-for="(step, index) in steps.MRIintro" :key="`intro${index}`" class="fullpage">
-        <div class="tutorial-step" :id="'MRIintro'+index">
-
-          <p v-html="step.text"></p>
-
-        </div>
-        <div v-if="step.checks">
-          <Checklist
-            :config="config"
-            :imageClass="Object.keys(step.checks)[0]"
-            :checks="Object.values(step.checks)[0]"
-          />
-        </div>
-        <div class="tutorial-tabs-wrapper">
-          <div class="tutorial-tabs" v-if="step.tabs">
-            <b-card>
-              <b-tabs card pills fill>
-                <b-tab v-for="(tab, index) in step.tabs" :key="index" :title="tab.title" :active="!index">
-                  <div class="checklist-wrapper" v-if="tab.checks">
-                    <Checklist
-                    :config="config"
-                    :imageClass="Object.keys(tab.checks)[0]"
-                    :checks="Object.values(tab.checks)[0]"
-                    />
-                  </div>
-                  <img :src="tab.image" class="mt-s pt-3 img"/>
-                </b-tab>
-              </b-tabs>
-            </b-card>
+      <div v-for="(section, sectionIndex) in content" :key="`section${sectionIndex}`">
+        <h1 :id="`section${sectionIndex}`">{{section.title}}</h1>
+        <div v-for="(step, stepIndex) in content[sectionIndex].steps" :key="`step${stepIndex}`" :id="`section${sectionIndex}step${stepIndex}`" class="fullpage">
+          <div v-if="step.text" class="tutorial-step">
+            <p v-html="step.text"></p>
           </div>
-        </div>
-        <img :src="step.image" class="mt-3 pt-3 img"/>
-      </div>
-      
-      <!-- Example Steps -->
-      
-      <div v-for="(step, index) in steps.examples" :key="`example${index}`" class="widget">
-        <div class="text-center message w-100" :id="'example'+index">
-          <p v-html="step.text"></p>
-
+          <div v-if="step.checks">
+            <Checklist
+              :config="config"
+              :imageClass="Object.keys(step.checks)[0]"
+              :checks="Object.values(step.checks)[0]"
+            />
+          </div>
+          <div class="tutorial-tabs-wrapper" v-if="step.tabs">
+            <div class="tutorial-tabs">
+              <b-card>
+                <b-tabs card pills fill>
+                  <b-tab v-for="(tab, index) in step.tabs" :key="index" :title="tab.title" :active="!index">
+                    <div class="checklist-wrapper" v-if="tab.checks">
+                      <Checklist
+                      :config="config"
+                      :imageClass="Object.keys(tab.checks)[0]"
+                      :checks="Object.values(tab.checks)[0]"
+                      />
+                    </div>
+                    <img :src="tab.image" class="mt-s pt-3 img"/>
+                  </b-tab>
+                </b-tabs>
+              </b-card>
+            </div>
+          </div>
+          <div v-if="step.image">
+            <img :src="step.image" class="mt-3 pt-3 img"/>
+          </div>
           <div v-if="step.pointer" class="mt-3">
             <ImageSwipe
               :widgetPointer="step.pointer"
@@ -99,7 +85,7 @@
               :tutorialStep="step.tutorialStep"
               ref="widget"
               :dataset="step.dataset"
-              :identifier="'example'+index"
+              :identifier="'example'+stepIndex"
               :config="config"
             />
           </div>
@@ -131,11 +117,6 @@
 
   .message {
     position: absolute;
-  }
-
-  .invisible {
-    opacity: 0;
-    white-space: pre-wrap;
   }
 
   .pbar {
@@ -201,17 +182,9 @@
     margin: 0 10vw;
   }
 
-  .arrow{
-    display: block;
-  }
-
   dfn{
     font-weight: bold;
     cursor: help;
-  }
-
-  .fullpage hr{
-    opacity: 0;
   }
 
   .tutorial-tabs-wrapper{
@@ -224,10 +197,11 @@
     width: 500px;
   }
 
+  .tutorial {
+    padding-bottom: 15vh;
+  }
+
   @media (min-width: 65em) {
-    .arrow {
-      display: none;
-    }
 
     #help {
       display: none;
@@ -325,15 +299,22 @@
         type: Boolean,
         required: true,
       },
+      /**
+       * the tutorial module being viewed
+       */
+      module: {
+        type: String,
+        required: true,
+      },
     },
     watch: {
     },
     computed: {
       /**
-       * The steps defined in config, with text and images to display.
+       * Tutorial content defined in config, with text and images to display.
        */
-      steps() {
-        return this.config.learn.tutorial.steps;
+      content() {
+        return this.config.learn.tutorials[this.module].content;
       },
       /**
        * The cutoffs of scrolling,
@@ -341,8 +322,8 @@
        */
       bins() {
         let Nsteps = 0;
-        Object.keys(this.steps).forEach((key) => {
-          Nsteps += this.steps[key].length;
+        this.content.forEach((section) => {
+          Nsteps += section.steps.length;
         });
         const binSize = 1 / Nsteps;
         const bins = [];
@@ -362,15 +343,6 @@
         }
 
         return { bin: 0 };
-      },
-      /**
-       * The next step that should be displayed.
-       */
-      nextStep() {
-        if (this.currentBin.bin < this.steps.MRIintro.length - 1) {
-          return `#MRIintro${this.currentBin.bin + 1}`;
-        }
-        return `#example${(this.currentBin.bin - this.steps.MRIintro.length) + 1}`;
       },
     },
     methods: {
@@ -405,14 +377,15 @@
         if (!this.definitionsAdded) {
           const terms = Object.keys(this.glossaryKeys);
           const termsRegex = new RegExp(`${terms.join('|')}`, 'gi');
-          // const steps = JSON.parse(JSON.stringify(this.steps));
-          Object.keys(this.steps).forEach((section) => {
-            // TODO probs make this a for loop with length of this.steps.section
-            for (let index = 0; index < this.steps[section].length; index += 1) {
-              const text = this.steps[section][index].text;
-              const match = text.match(termsRegex);
-              if (match) {
-                this.steps[section][index].text = this.replaceSubstring(match, text);
+          this.content.forEach((section) => {
+            for (let index = 0; index < section.steps.length; index += 1) {
+              if (Object.hasOwn(section.steps[index], 'text')) {
+                const text = section.steps[index].text;
+                const match = text.match(termsRegex);
+                if (match) {
+                  //eslint-disable-next-line
+                  section.steps[index].text = this.replaceSubstring(match, text);
+                }
               }
             }
           });
