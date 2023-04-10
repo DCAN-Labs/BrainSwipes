@@ -306,8 +306,13 @@ export default {
         JSON.parse(data.currentTarget.responseText),
       );
       const filteredUserList = _.pick(authUserList, Object.keys(
-        _.pickBy(this.allUsers, user => user.takenTutorial === 'complete'),
-      ));
+        _.pickBy(this.allUsers, (user) => {
+          let includeUser = false;
+          if (Object.hasOwn(user, 'tutorials')) {
+            includeUser = user.tutorials.basic === 'complete';
+          }
+          return includeUser;
+        })));
       this.userList = filteredUserList;
       this.loading = false;
     },

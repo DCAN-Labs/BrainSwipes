@@ -5,9 +5,9 @@
       <div id="titles">
         <h1>BrainSwipes by DCAN</h1>
         <p class="lead mt-3">
-          {{Object.keys(userInfo).length ? userData.takenTutorial === 'complete' ? 'Choose a dataset to QC': 'Review our learning resources before you begin swiping' : 'Login to begin'}}
+          {{Object.keys(userInfo).length ? needsTutorial ? 'Review our learning resources before you begin swiping' : 'Choose a dataset to QC' : 'Login to begin'}}
         </p>
-        <div v-if="userData.takenTutorial === 'complete'" class="information-wrapper">
+        <div v-if="!needsTutorial" class="information-wrapper">
           <div class="inner-information-wrapper">
             <p class="explain-private">Private Studies</p>
             <div class="information" @mouseover="explainPrivate = true" @mouseleave="explainPrivate = false"></div>
@@ -16,7 +16,7 @@
       </div>
       <div v-if="Object.keys(userInfo).length">
         <div v-if="Object.keys(config.studies).length" class="mt-3">
-          <div v-if="userData.takenTutorial === 'complete'">
+          <div v-if="!needsTutorial">
             <div class="explain-wrapper">
               <span v-show="explainPrivate" class="explain">
                 <p>Patient health information is sensitive. Some studies have stricter legal limitations because of this.</p>
@@ -152,8 +152,7 @@ export default {
       }
     },
     routeToTutorial() {
-      const name = this.userData.takenTutorial === 'none' ? 'Tutorial' : 'Practice';
-      this.$router.push({ name });
+      this.$router.push({ name: 'TutorialSelect' });
     },
     reroute() {
       const query = this.$route.query;
@@ -183,6 +182,15 @@ export default {
         restricted.push('TEST');
       }
       return { open, restricted };
+    },
+    needsTutorial() {
+      let needsTutorial = true;
+      if (Object.hasOwn(this.userData, 'tutorials')) {
+        if (Object.hasOwn(this.userData.tutorials, 'basic')) {
+          needsTutorial = this.userData.tutorials.basic === 'none';
+        }
+      }
+      return needsTutorial;
     },
   },
 };

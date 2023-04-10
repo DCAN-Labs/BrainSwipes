@@ -2,7 +2,7 @@
   <footer>
     <div class="footer__container">
       <a href="https://innovation.umn.edu/developmental-cognition-and-neuroimaging-lab/" target="_blank"><img src="../assets/DCAN-logo.png" alt="DCAN logo" class="logo"></a>
-      <nav v-if="loadingAdmin || loadingLearn">
+      <nav v-if="loadingAdmin">
       </nav>
       <nav v-else>
         <router-link
@@ -18,9 +18,9 @@
         <div class="dropdown" @mouseover="hoverLearn = true" @mouseleave="hoverLearn = false">
           <div v-show="hoverLearn">
             <div class="dropdown-content">
-              <a @click="routeTo('Tutorial')" v-show="tutorialLevel >= 0" class="nav__link">Tutorial</a>
-              <a @click="routeTo('Practice')" v-show="tutorialLevel >= 1" class="nav__link">Practice</a>
-              <a @click="routeTo('Gallery')" v-show="tutorialLevel >= 2" class="nav__link">Gallery</a>
+              <a @click="routeTo('TutorialSelect')" class="nav__link">Tutorials</a>
+              <a @click="routeTo('Practice')" class="nav__link">Practice</a>
+              <a @click="routeTo('Gallery')" class="nav__link">Gallery</a>
             </div>
           </div>
           <a class="nav__link dropdown-button">Learn</a>
@@ -65,22 +65,17 @@ export default {
       ],
       isAdmin: false,
       loadingAdmin: true,
-      loadingLearn: true,
       hoverLearn: false,
-      tutorialLevel: -1,
     };
   },
   mounted() {
     firebase.auth().onAuthStateChanged(() => {
       this.loadingAdmin = true;
       this.loadingLearn = true;
-      this.tutorialLevel = -1;
       this.addAdminRoutes();
-      this.setTutorialLevel();
     });
   },
   async created() {
-    await this.setTutorialLevel();
     await this.addAdminRoutes();
   },
   methods: {
@@ -104,30 +99,6 @@ export default {
     routeTo(route) {
       const path = { name: route };
       this.$router.push(path);
-    },
-    async setTutorialLevel() {
-      const currentUser = firebase.auth().currentUser;
-      if (currentUser) {
-        const dbRef = firebase.database().ref(`users/${currentUser.displayName}/takenTutorial`);
-        dbRef.on('value', (snap) => {
-          const takenTutorial = snap.val();
-          let tutorialLevel = 0;
-          switch (takenTutorial) {
-            case 'complete':
-              tutorialLevel = 2;
-              break;
-            case 'needsPractice':
-              tutorialLevel = 1;
-              break;
-            default:
-              tutorialLevel = 0;
-          }
-          this.tutorialLevel = tutorialLevel;
-          this.loadingLearn = false;
-        });
-      } else {
-        this.loadingLearn = false;
-      }
     },
   },
 };

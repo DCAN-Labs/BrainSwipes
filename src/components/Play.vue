@@ -4,10 +4,10 @@
     <div v-if="allowed" class="main">
       <div v-if="!completedTutorialRequirements">
         <h1>You must complete additional tutorials to swipe this dataset.</h1>
-        <div v-for="tutorial in Object.keys(config.datasets[dataset].tutorials)" :key="tutorial">
-          <h2>{{config.learn.tutorials[tutorial].name}}</h2>
-          <b-button class="btn-swipes" @click="routeTo('TutorialSelect')">To Tutorial</b-button>
+        <div v-for="tutorial in neededTutorials" :key="tutorial">
+          <h3>{{config.learn.tutorials[tutorial].name}}</h3>
         </div>
+        <b-button class="btn-swipes" @click="routeTo('TutorialSelect')">To Tutorials</b-button>
       </div>
 
       <div v-else>
@@ -281,6 +281,25 @@
           });
         }
         return completedTutorialRequirements;
+      },
+      neededTutorials() {
+        const neededTutorials = [];
+        if (Object.hasOwn(this.config.datasets[this.dataset], 'tutorials')) {
+          Object.keys(this.config.datasets[this.dataset].tutorials).forEach((tutorial) => {
+            if (this.config.datasets[this.dataset].tutorials[tutorial]) {
+              let tutorialComplete = false;
+              if (Object.hasOwn(this.userData, 'tutorials')) {
+                if (this.userData.tutorials[tutorial] === 'complete') {
+                  tutorialComplete = true;
+                }
+              }
+              if (!tutorialComplete) {
+                neededTutorials.push(tutorial);
+              }
+            }
+          });
+        }
+        return neededTutorials;
       },
     },
     methods: {

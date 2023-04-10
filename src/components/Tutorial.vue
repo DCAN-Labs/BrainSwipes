@@ -2,8 +2,8 @@
   <div class="tutorial" ref="tutorial">
     <!-- Title -->
     <div>
-      <h1>Tutorial</h1>
-      <p class="lead">Scroll down to learn how to play</p>
+      <h1>{{config.learn.tutorials[module].name}}</h1>
+      <p class="lead">Scroll down to learn</p>
     </div>
 
     <!-- Progress Bar -->
@@ -16,6 +16,9 @@
       <b-button type="button" class="btn btn-outline-primary btn-light" id="open-toc" @click="openTOC">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></svg></b-button>
       <div id="table-of-contents" v-show="showTOC">
+        <b-button class="btn-swipes" @click="routeTo('TutorialSelect')">Back to Tutorial Selection</b-button>
+        <hr>
+        <h2>To Section</h2>
         <ul>
           <li v-for="section, sectionIndex in content" :key="sectionIndex" v-scroll-to="`#section${sectionIndex}`" @click="hideTOC">{{section.title}}</li>
         </ul>
@@ -89,11 +92,9 @@
               :config="config"
             />
           </div>
-          <div v-if="step.tutorialCompleted">
-            <b-button @click="tutorialComplete" class="mt-3">Test Your Knowledge</b-button>
-          </div>
         </div>
       </div>
+      <b-button @click="tutorialComplete" class="mt-3 btn-swipes">Complete</b-button>
     </div>
   </div>
 </template>
@@ -109,6 +110,10 @@
 
   .fullpage {
     margin-bottom: 10vh;
+  }
+  
+  .fullpage hr {
+    opacity: 0;
   }
 
   .widget {
@@ -351,7 +356,7 @@
        * user has completed the tutorial.
        */
       tutorialComplete() {
-        this.$emit('takenTutorial', 'needsPractice');
+        this.$emit('takenTutorial', this.module, 'complete');
       },
       /**
        * Keep track of the scroll position and save it to the scrollPosition variable.
@@ -441,6 +446,9 @@
       },
       removeClass(element, className) {
         element.classList.remove(className);
+      },
+      routeTo(route) {
+        this.$router.push({ name: route });
       },
     },
     /**

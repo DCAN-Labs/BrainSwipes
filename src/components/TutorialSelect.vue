@@ -4,7 +4,7 @@
     <div class="center-flex">
       <div class="card-wrapper">
         <div class="accordion" role="tablist">
-          <b-card no-body v-for="tutorial in Object.keys(config.learn.tutorials)" :key="tutorial">
+          <b-card no-body v-for="tutorial in orderedTutorials" :key="tutorial">
             <b-card-header header-tag="header" class="p-1" role="tab">
               <b-button block v-b-toggle="`accordion-${tutorial}`" class="btn-swipes">
                 <span class="center-flex vertical-align-center">
@@ -67,8 +67,8 @@
       },
     },
     methods: {
-      routeToTutorial(tutorial) {
-        console.log(tutorial);
+      routeToTutorial(module) {
+        this.$router.push({ name: 'Tutorial', params: { module } });
       },
       completedPrerequisites(tutorial) {
         let completedPrerequisites = true;
@@ -104,6 +104,26 @@
           }
         });
         return requiredFor;
+      },
+      orderedTutorials() {
+        let orderedTutorials = [];
+        Object.keys(this.config.learn.tutorials).forEach((tutorial) => {
+          let includeTutorial = true;
+          if (Object.hasOwn(this.config.learn.tutorials[tutorial], 'inactive')) {
+            if (this.config.learn.tutorials[tutorial].inactive) {
+              includeTutorial = false;
+            }
+          }
+          if (includeTutorial) {
+            orderedTutorials.push([tutorial, this.config.learn.tutorials[tutorial].order]);
+          }
+        });
+        orderedTutorials = orderedTutorials.sort((a, b) => a[1] - b[1]);
+        const sortedTutorials = [];
+        orderedTutorials.forEach((tutorial) => {
+          sortedTutorials.push(tutorial[0]);
+        });
+        return sortedTutorials;
       },
     },
   };

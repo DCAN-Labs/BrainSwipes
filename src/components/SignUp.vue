@@ -215,7 +215,6 @@
         const displayName = firebase.auth().currentUser.displayName;
         firebase.database().ref(`users/${displayName}`).set({
           score: 0,
-          takenTutorial: 'none',
           consent: this.form.consented,
           consentedOn: date,
         })

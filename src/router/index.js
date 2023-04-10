@@ -247,10 +247,16 @@ router.beforeEach((to, from, next) => {
       firebase.database().ref(`/users/${currentUser.displayName}`).once('value')
         .then((snap) => {
           const data = snap.val();
-          if (data.takenTutorial === 'needsPractice') {
-            next({ path: '/practice', query: from.query });
-          } else if (data.takenTutorial !== 'complete') {
-            next({ path: '/tutorial', query: from.query });
+          let bounce = true;
+          if (Object.hasOwn(data, 'tutorials')) {
+            if (Object.hasOwn(data.tutorials, 'basic')) {
+              if (data.tutorials.basic === 'complete') {
+                bounce = false;
+              }
+            }
+          }
+          if (bounce) {
+            next({ name: 'TutorialSelect', query: from.query });
           }
         });
     } else {
