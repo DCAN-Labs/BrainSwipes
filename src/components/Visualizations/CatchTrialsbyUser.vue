@@ -205,8 +205,6 @@
 
         this.parentChartOptions = options;
         this.parentChartSeries = series;
-        console.log(this.parentChartOptions);
-        console.log(this.parentChartSeries);
 
         this.loading = false;
         console.timeEnd('catchTrialsByUser');
