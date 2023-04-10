@@ -9,8 +9,14 @@
       <b-button class="btn-swipes" @click="logoutOfGlobus">Logout of Globus</b-button>
     </div>
     <div v-if="!userInfo.emailVerified">
+      <br>
       <p>This dataset requires a verified email address.</p>
       <b-button class="btn-swipes" @click="verifyEmail">Verify Email</b-button>
+    </div>
+    <div>
+      <br>
+      <p>Globus unifies logins across institutions by using each organization's authentication system.</p>
+      <p>Read the <a href="https://docs.globus.org/how-to/get-started/" target="_blank">globus documentation</a> to learn more.</p>
     </div>
   </div>
 </template>
