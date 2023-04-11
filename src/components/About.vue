@@ -39,6 +39,7 @@
 
 #about {
   min-height: 100vh;
+  padding-bottom: 15vh;
 }
 
 .about p {

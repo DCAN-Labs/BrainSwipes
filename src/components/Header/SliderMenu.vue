@@ -29,6 +29,15 @@
         <li v-for="menuItem in menuItems" :key="menuItem.name">
           <router-link :to="menuItem.path">{{menuItem.name}}</router-link>
         </li>
+        <li v-if="loggedIn">
+          <a @click="onClickLearn">Learn</a>
+        </li>
+        <li v-show="showLearn">
+          <router-link to="/tutorial-select">Tutorials</router-link>
+        </li>
+        <li v-show="showLearn">
+          <router-link to="/gallery">Gallery</router-link>
+        </li>
       </ul>
     </div>
   </div>
@@ -85,21 +94,37 @@ export default {
       isActive: false,
       menuItems: [
         { path: '/', name: 'Home' },
-        { path: '/tutorial', name: 'Tutorial' },
-        { path: '/gallery', name: 'Gallery' },
         { path: '/leaderboard', name: 'Leaderboard' },
         { path: '/about', name: 'About' },
       ],
+      showLearn: false,
     };
   },
   props: {
+    userData: {
+      type: Object,
+      required: true,
+    },
+    loggedIn: {
+      type: Boolean,
+      required: true,
+    },
   },
   methods: {
     onClose() {
       this.isActive = false;
+      this.showLearn = false;
     },
     toggleMenu() {
       this.isActive = !this.isActive;
+      this.showLearn = false;
+    },
+    onClickLearn() {
+      if (this.userData.tutorials.basic === 'complete') {
+        this.showLearn = !this.showLearn;
+      } else {
+        this.$router.push({ name: 'Tutorial', params: { module: 'basic' } });
+      }
     },
   },
   directives: {

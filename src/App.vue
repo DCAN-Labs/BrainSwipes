@@ -18,7 +18,8 @@
           </li>
           <li class="navSection mobile-menu">
             <SliderMenu
-             :dataset="dataset"
+             :userData="userData"
+             :loggedIn="userIsDefined"
             />
           </li>
           <li class="navSection account-details">
@@ -67,6 +68,7 @@
         :dataset="dataset"
         :study="study"
         :datasetPrivileges="datasetPrivileges"
+        :userData="userData"
       />
     </div>
   </div>

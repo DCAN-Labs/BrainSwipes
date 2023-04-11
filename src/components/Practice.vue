@@ -158,7 +158,7 @@
        * user has completed the tutorial.
        */
       tutorialComplete() {
-        this.$emit('takenTutorial', 'complete');
+        this.$emit('takenTutorial', 'practice', 'complete');
       },
       simulateSwipe(response) {
         const vote = response[0];

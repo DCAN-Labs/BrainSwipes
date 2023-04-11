@@ -36,7 +36,7 @@
             />
           </div>
           <div v-else>
-            <b-button class="btn-swipes" @click="routeToTutorial">Learn</b-button>
+            <b-button class="btn-swipes" to="/tutorial/basic">Learn</b-button>
           </div>
         </div>
       </div>
@@ -150,9 +150,6 @@ export default {
       } else {
         this.$router.push({ name: 'Promo', params: { study } });
       }
-    },
-    routeToTutorial() {
-      this.$router.push({ name: 'TutorialSelect' });
     },
     reroute() {
       const query = this.$route.query;

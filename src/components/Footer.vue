@@ -15,7 +15,7 @@
           :to="menuItem.path"
           class="nav__link"
         >{{menuItem.name}}</router-link>
-        <div class="dropdown" @mouseover="hoverLearn = true" @mouseleave="hoverLearn = false">
+        <div v-if="completedTutorial" class="dropdown" @mouseover="hoverLearn = true" @mouseleave="hoverLearn = false">
           <div v-show="hoverLearn">
             <div class="dropdown-content">
               <a @click="routeTo('TutorialSelect')" class="nav__link">Tutorials</a>
@@ -25,6 +25,7 @@
           </div>
           <a class="nav__link dropdown-button">Learn</a>
         </div>
+        <router-link v-else to="/tutorial/basic" class="nav__link">Learn</router-link>
       </nav>
 
     </div>
@@ -50,6 +51,10 @@ export default {
       required: true,
     },
     config: {
+      type: Object,
+      required: true,
+    },
+    userData: {
       type: Object,
       required: true,
     },
@@ -101,8 +106,22 @@ export default {
       this.$router.push(path);
     },
   },
+  computed: {
+    completedTutorial() {
+      let completedTutorial = false;
+      if (Object.keys(this.userData).length) {
+        if (Object.hasOwn(this.userData, 'tutorials')) {
+          if (Object.hasOwn(this.userData.tutorials, 'basic')) {
+            completedTutorial = this.userData.tutorials.basic === 'complete';
+          }
+        }
+      }
+      return completedTutorial;
+    },
+  },
 };
 </script>
+
 <style scoped>
 footer {
   width: 100%;

@@ -396,19 +396,19 @@
       getImageType() {
         const imageType = [];
         if (this.widgetPointer.match(/atlas/i)) {
-          imageType[0] = 'atlasRegistration';
+          imageType[0] = 'atlas';
           imageType[1] = 'n Atlas Registration';
         } else if (this.widgetPointer.match(/task/i)) {
-          imageType[0] = 'functionalRegistration';
+          imageType[0] = 'func';
           imageType[1] = ' Functional Registration';
         } else {
-          imageType[0] = 'surfaceDelineation';
+          imageType[0] = 'anat';
           imageType[1] = ' Structural image';
         }
         return imageType;
       },
       toTutorial() {
-        const routeData = this.$router.resolve({ name: 'Tutorial', query: { section: this.imageType[0] } });
+        const routeData = this.$router.resolve({ name: 'Tutorial', params: { module: this.imageType[0] } });
         window.open(routeData.href, '_blank');
       },
       toSource() {

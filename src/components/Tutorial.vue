@@ -88,7 +88,7 @@
               :tutorialStep="step.tutorialStep"
               ref="widget"
               :dataset="step.dataset"
-              :identifier="'example'+stepIndex"
+              :identifier="`section${sectionIndex}step${stepIndex}`"
               :config="config"
             />
           </div>
