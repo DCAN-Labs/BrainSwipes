@@ -17,14 +17,6 @@
       <b-form @submit="onSubmit" validated>
         <b-alert :show="errors.show" variant="danger">{{errors.message}}</b-alert>
 
-        <b-form-group id="consentOpenButton"
-                      :label="consentFormLabel"
-                      label-for="openConsent">
-            <b-button v-if="!form.consented"
-             variant="success" id="openConsent"
-             @click="openConsentModal"> Open Consent Form </b-button>
-        </b-form-group>
-
         <b-form-group id="emailAddressInputGroup"
                       label="Email address:"
                       label-for="emailAddress"
@@ -73,8 +65,11 @@
           </b-form-input>
         </b-form-group>
 
+        <b-button v-if="!form.consented"
+             variant="success" id="openConsent"
+             @click="openConsentModal"> Open Consent Form </b-button>
 
-        <b-button type="submit"
+        <b-button v-else type="submit"
          variant="primary" :disabled="!validated || !form.consented">Submit</b-button>
 
         <p class="mt-3">
@@ -217,6 +212,7 @@
           score: 0,
           consent: this.form.consented,
           consentedOn: date,
+          tutorials: { basic: 'none' },
         })
         .then(() => {
         })
@@ -236,7 +232,7 @@
             this.insertUser();
             // firebase.auth().currentUser.sendEmailVerification();
             this.$emit('changePermissions');
-            this.$router.replace('tutorial');
+            this.$router.push({ name: 'Tutorial', params: { module: 'basic' } });
           }, (err) => {
             this.errors.show = true;
             this.errors.message = `SetRoles: ${err.message}`;

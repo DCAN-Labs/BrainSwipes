@@ -19,7 +19,6 @@
           <div v-show="hoverLearn">
             <div class="dropdown-content">
               <a @click="routeTo('TutorialSelect')" class="nav__link">Tutorials</a>
-              <a @click="routeTo('Practice')" class="nav__link">Practice</a>
               <a @click="routeTo('Gallery')" class="nav__link">Gallery</a>
             </div>
           </div>

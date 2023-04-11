@@ -178,9 +178,12 @@ const router = new Router({
       },
     },
     {
-      path: '/practice',
+      path: '/practice/:module',
       name: 'Practice',
       component: Practice,
+      props: route => ({
+        module: route.params.module,
+      }),
     },
     {
       path: '/gallery',
@@ -256,7 +259,7 @@ router.beforeEach((to, from, next) => {
             }
           }
           if (bounce) {
-            next({ name: 'TutorialSelect', query: from.query });
+            next({ name: 'Tutorial', params: { module: 'basic' }, query: from.query });
           }
         });
     } else {

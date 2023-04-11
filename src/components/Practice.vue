@@ -2,7 +2,7 @@
   <div id="practice" class="container">
     <!-- Title -->
     <div>
-      <h1>Practice</h1>
+      <h1>{{config.learn.tutorials[module].name}}</h1>
       <p class="lead">Test your knowledge on these practice images!</p>
       <hr>
     </div>
@@ -137,13 +137,17 @@
         type: Object,
         required: true,
       },
+      module: {
+        type: String,
+        required: true,
+      },
     },
     computed: {
       /**
        * The steps defined in config, with text and images to display.
        */
       steps() {
-        return this.config.learn.practice;
+        return this.config.learn.tutorials[this.module].steps;
       },
       /**
        * dataset that the tutorial images are from
@@ -158,7 +162,7 @@
        * user has completed the tutorial.
        */
       tutorialComplete() {
-        this.$emit('takenTutorial', 'practice', 'complete');
+        this.$emit('takenTutorial', this.module, 'complete');
       },
       simulateSwipe(response) {
         const vote = response[0];
