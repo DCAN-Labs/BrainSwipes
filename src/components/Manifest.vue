@@ -117,8 +117,18 @@
             <p>Archived studies cannot be swiped on, but their data can still be viewed.</p>
           </div>
         </div>
+        <div v-else-if="updateMethod=='tutorial'">
+          <b-button
+            v-for="tutorial in Object.keys(config.learn.tutorials)"
+            :key="tutorial"
+            :class="config.datasets[selectedDataset].tutorials[tutorial] ? 'btn-swipes' : 'btn-unavilable'"
+            @click="setTutorial(tutorial)">
+              {{config.learn.tutorials[tutorial].name}}
+            </b-button>
+        </div>
         <div v-else>
           <p class="lead">Choose update method</p>
+          <b-button variant="warning" @click="setUpdateMethod('tutorial')">Set Tutorials</b-button>
           <b-button variant="warning" @click="setUpdateMethod('archive')">Archive the Dataset</b-button>
           <b-button variant="warning" @click="setUpdateMethod('json')">Manifest JSON</b-button>
           <b-button variant="warning" @click="setUpdateMethod('s3')">S3</b-button>
@@ -535,6 +545,10 @@ export default {
     },
     setUpdateMethod(method) {
       this.updateMethod = method;
+    },
+    setTutorial(tutorial) {
+      const isActive = !this.config.datasets[this.selectedDataset].tutorials[tutorial];
+      this.db.ref(`/config/datasets/${this.selectedDataset}/tutorials/${tutorial}`).set(isActive);
     },
   },
   beforeRouteEnter(to, from, next) {
