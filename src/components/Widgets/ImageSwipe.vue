@@ -3,13 +3,13 @@
       <transition :key="swipe" :name="swipe" >
         <div class="user-card" :key="imgKey">
             <div class="image_area">
-              <progressive-img class="user-card__picture mx-auto"
+              <img class="user-card__picture mx-auto"
                 :src="imgUrl"
                 v-hammer:swipe.horizontal="onSwipe"
                 placeholder="https://unsplash.it/500"
                 :aspect-ratio="1"
+                @error="imageError"
               >
-              </progressive-img>
             </div>
 
             <div class="user-card__name">
@@ -212,6 +212,9 @@
         // updating the data elements
         this.imgUrl = url;
         this.imgKey = urlKey;
+      },
+      imageError() {
+        this.imgUrl = '/static/not-found.png';
       },
       /**
        * Show a tutorial step
