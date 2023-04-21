@@ -1,11 +1,28 @@
 h1 {
     font-size: 1.2em;
     font-weight: 700;
-    color: hsl(253, 45%, 46%);
+    color: rgb(100,0,0);
+    margin: 0.5em;
   }
+ 
+h2 {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: rgb(100,0,0);
+  margin: 0.5em;
+}
+
+h3 {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: rgb(100,0,0);
+}
 
 @media (min-width: 65em) {
   h1 {
     font-size: 1.5em;
+  }
+  h2 {
+    font-size: 1.3em;
   }
 }

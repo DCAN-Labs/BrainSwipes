@@ -18,7 +18,7 @@
         {{verificationStatus}}
       </p>
       <b-form v-if="!verified" @submit="verifyEmail">
-        <b-button id="verifyEmail" type="submit" variant="primary">Verify Email</b-button>
+        <b-button id="verifyEmail" type="submit" class="btn-swipes">Verify Email</b-button>
       </b-form>
       <hr>
       <div>
@@ -260,7 +260,7 @@ export default {
       /**
        * List of profile pic options
        */
-      profilePics: ['kesh-profile-icon', 'UniversityOfMinnesota', 'dcan', 'abide', 'connectome'],
+      profilePics: ['kesh-profile-icon', 'UniversityOfMinnesota', 'dcan', 'elab', 'abide', 'connectome'],
       /**
        * list of studies the user has access to
        */
