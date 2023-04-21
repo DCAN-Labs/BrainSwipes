@@ -245,7 +245,7 @@ export default {
         .then(() => {
           this.userInfo = {};
           this.datasetPrivileges = {};
-          this.$router.replace('login');
+          this.$router.replace({ name: 'Login' });
         });
     },
     /**
