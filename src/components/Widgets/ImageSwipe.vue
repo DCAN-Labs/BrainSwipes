@@ -6,8 +6,6 @@
               <img class="user-card__picture mx-auto"
                 :src="imgUrl"
                 v-hammer:swipe.horizontal="onSwipe"
-                placeholder="https://unsplash.it/500"
-                :aspect-ratio="1"
                 @error="imageError"
               >
             </div>
@@ -72,9 +70,7 @@
   import { VueHammer } from 'vue2-hammer';
   import imagesLoaded from 'vue-images-loaded';
   import GridLoader from 'vue-spinner/src/PulseLoader';
-  import VueProgressiveImage from 'vue-progressive-image';
 
-  Vue.use(VueProgressiveImage);
   Vue.use(VueHammer);
   Vue.use(require('vue-shortkey'));
 
@@ -410,6 +406,8 @@
   .image_area {
     background: black;
     position: relative;
+    max-height: 480px;
+    overflow-y: hidden;
   }
   .loader {
     position: absolute;

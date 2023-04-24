@@ -365,6 +365,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             const config = snap.val();
             const bucket = config.bucket;
             const folder = config.folder ? config.folder : '';
+            const s3regex = config.s3regex;
             // get the current sample counts from the database
             const sampleCountsRef = database.ref(`datasets/${dataset}/sampleCounts`);
             const sampleCountsSnap = await sampleCountsRef.once('value');
@@ -374,7 +375,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
               Bucket: bucket,
             };
             const objectsList = await listItems(bucket, input, []);
-            const regexp = new RegExp("^" + folder + "([^\/]*)\.png");
+            const regexp = s3regex ? new RegExp(s3regex) : new RegExp("^" + folder + "([^\/]*)\.png");
             const update = {};
             objectsList.forEach(object => {
               object.forEach(item => {
