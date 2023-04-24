@@ -116,6 +116,22 @@ async function findUser(displayName){
   }
 }
 
+// list items in s3 bucket
+async function listItems(bucket, input, objectsList) {
+  const command = new ListObjectsV2Command(input);
+  const response = await s3Client.send(command);
+  objectsList.push(response.Contents);
+  if (typeof response.NextContinuationToken == "string") {
+    const newInput = {
+      Bucket: bucket,
+      ContinuationToken: response.NextContinuationToken,
+    };
+    return await listItems(bucket, newInput, objectsList);
+  } else {
+    return objectsList;
+  }
+}
+
 // standard webpack dev server config
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
@@ -352,23 +368,24 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             // get the current sample counts from the database
             const sampleCountsRef = database.ref(`datasets/${dataset}/sampleCounts`);
             const sampleCountsSnap = await sampleCountsRef.once('value');
-            const sampleCounts = sampleCountsSnap.val();
+            const sampleCounts = sampleCountsSnap.val() ? sampleCountsSnap.val() : {};
             // get the list of items in the s3 bucket
             const input = {
               Bucket: bucket,
             };
-            const command = new ListObjectsV2Command(input);
-            const response = await s3Client.send(command);
+            const objectsList = await listItems(bucket, input, []);
             const regexp = new RegExp("^" + folder + "([^\/]*)\.png");
             const update = {};
-            response.Contents.forEach(item => {
-              const match = item.Key.match(regexp);
-              if (match) {
-                const sample = match[1];
-                if (!Object.keys(sampleCounts).includes(sample)){
-                  update[sample] = 0;
+            objectsList.forEach(object => {
+              object.forEach(item => {
+                const match = item.Key.match(regexp);
+                if (match) {
+                  const sample = match[1];
+                  if (!Object.keys(sampleCounts).includes(sample)){
+                    update[sample] = 0;
+                  }
                 }
-              }
+              });
             });
             sampleCountsRef.update(update);
             if (Object.keys(update).length){
