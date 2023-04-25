@@ -52,10 +52,10 @@ async function logError(method, error) {
   }
 }
 
-function createUrl(pointer, bucket) {
+function createUrl(filepath, bucket) {
   try{
     // choosing an image path from the firebase
-    const key = `${pointer}.png`;
+    const key = filepath;
     // setting up the Get command
     const getObjectParams = {
       Bucket: bucket,
@@ -162,10 +162,10 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       app.post('/Image', function (req, res) {
         (async () => {
           try {
-            const pointer = req.body.pointer;
+            const filepath = req.body.filepath;
             const bucket = req.body.bucket;
-            if (bucket && pointer) {
-              createUrl(pointer, bucket).then(imageUrl =>{
+            if (bucket && filepath) {
+              createUrl(filepath, bucket).then(imageUrl =>{
                 res.send(imageUrl);
               });  
             }
@@ -364,8 +364,6 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             const snap = await configRef.once('value');
             const config = snap.val();
             const bucket = config.bucket;
-            const folder = config.folder ? config.folder : '';
-            const s3regex = config.s3regex;
             // get the current sample counts from the database
             const sampleCountsRef = database.ref(`datasets/${dataset}/sampleCounts`);
             const sampleCountsSnap = await sampleCountsRef.once('value');
@@ -375,7 +373,10 @@ const devWebpackConfig = merge(baseWebpackConfig, {
               Bucket: bucket,
             };
             const objectsList = await listItems(bucket, input, []);
-            const regexp = s3regex ? new RegExp(s3regex) : new RegExp("^" + folder + "([^\/]*)\.png");
+            let regexp = new RegExp("^([^\/]*)\.png");
+            if (Object.hasOwn(config, 's3path')) {
+              regexp = new RegExp(config.s3path.replace('/', '\/').replace('{{SESSION}}', 'ses-.*?').replace('{{SUBJECT}}', 'sub-\\d{6}').replace('{{FILENAME}}', '([^\/]*)\\.png'));
+            }
             const update = {};
             objectsList.forEach(object => {
               object.forEach(item => {

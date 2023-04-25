@@ -182,7 +182,16 @@
     methods: {
       postRequest(pointer) {
         const bucket = this.config.datasets[this.dataset].bucket;
-        const folder = this.config.datasets[this.dataset].folder ? this.config.datasets[this.dataset].folder : '';
+        let filepath = `${pointer}.png`;
+        if (Object.hasOwn(this.config.datasets[this.dataset], 's3path')) {
+          const config = this.config.datasets[this.dataset];
+          const s3path = config.s3path;
+          const subRegExp = /(sub-\d{6})/;
+          const sesRegExp = /_(ses-.*?)_/;
+          const ses = pointer.match(sesRegExp)[1];
+          const sub = pointer.match(subRegExp)[1];
+          filepath = s3path.replace('{{SUBJECT}}', sub).replace('{{SESSION}}', ses).replace('{{FILENAME}}', `${pointer}.png`);
+        }
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.open('POST', '/Image', true);
@@ -190,7 +199,7 @@
           xhr.onload = resolve;
           xhr.onerror = reject;
           xhr.send(JSON.stringify({
-            pointer: folder + pointer,
+            filepath,
             bucket,
           }));
         });
@@ -406,7 +415,7 @@
   .image_area {
     background: black;
     position: relative;
-    max-height: 480px;
+    height: 480px;
     overflow-y: hidden;
   }
   .loader {
