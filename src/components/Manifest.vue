@@ -121,7 +121,7 @@
           <b-button
             v-for="tutorial in Object.keys(config.learn.tutorials)"
             :key="tutorial"
-            :class="config.datasets[selectedDataset].tutorials[tutorial] ? 'btn-swipes' : 'btn-unavilable'"
+            :class="Object.hasOwn(config.datasets[selectedDataset], 'tutorials') ? config.datasets[selectedDataset].tutorials[tutorial] ? 'btn-swipes' : 'btn-unavilable' : 'btn-unavailable'"
             @click="setTutorial(tutorial)">
               {{config.learn.tutorials[tutorial].name}}
             </b-button>
@@ -547,7 +547,10 @@ export default {
       this.updateMethod = method;
     },
     setTutorial(tutorial) {
-      const isActive = !this.config.datasets[this.selectedDataset].tutorials[tutorial];
+      let isActive = true;
+      if (Object.hasOwn(this.config.datasets[this.selectedDataset], 'tutorials')) {
+        isActive = !this.config.datasets[this.selectedDataset].tutorials[tutorial];
+      }
       this.db.ref(`/config/datasets/${this.selectedDataset}/tutorials/${tutorial}`).set(isActive);
     },
   },

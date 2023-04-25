@@ -29,7 +29,6 @@
     "vue": "^2.6.14",
     "vue-apexcharts": "^1.6.2",
     "vue-images-loaded": "^1.1.2",
-    "vue-progressive-image": "^2.5.0",
     "vue-router": "^3.5.3",
     "vue-scrollto": "^2.20.0",
     "vue-shortkey": "^3.1.7",

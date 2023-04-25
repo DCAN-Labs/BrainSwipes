@@ -2,7 +2,7 @@
   <div id="admin">
     <h1> Admin </h1>
 
-    <b-container>
+    <b-container class="admin">
       <p class="buttons mt-3">
         <router-link class="btn btn-warning" :to="{name: 'Users'}"> Manage Users </router-link>
         <router-link class="btn btn-warning" v-if="fullAdmin" :to="{name: 'Manifest'}">Manage Database</router-link>
@@ -22,8 +22,17 @@
 
 </template>
 
-<style>
-
+<style scoped>
+  .buttons {
+    display: flex;
+    flex-direction: column;
+  }
+  .btn {
+    margin: 5px;
+  }
+  .admin {
+    max-width: 500px;
+  }
 </style>
 
 <script>
