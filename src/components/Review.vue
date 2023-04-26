@@ -395,7 +395,10 @@
       },
       getImageType() {
         const imageType = [];
-        if (this.widgetPointer.match(/atlas/i)) {
+        if (this.config.datasets[this.dataset].imageType === 'raw') {
+          imageType[0] = 'raw';
+          imageType[1] = ' Pre-processed Image';
+        } else if (this.widgetPointer.match(/atlas/i)) {
           imageType[0] = 'atlas';
           imageType[1] = 'n Atlas Registration';
         } else if (this.widgetPointer.match(/task/i)) {

@@ -301,7 +301,7 @@
        * prevents addDefinitions from running more than once
        */
       definitionsAdded: {
-        type: Boolean,
+        type: Object,
         required: true,
       },
       /**
@@ -379,7 +379,7 @@
         this.showTOC = !this.showTOC;
       },
       async addDefinitions() {
-        if (!this.definitionsAdded) {
+        if (!this.definitionsAdded[this.module]) {
           const terms = Object.keys(this.glossaryKeys);
           const termsRegex = new RegExp(`${terms.join('|')}`, 'gi');
           this.content.forEach((section) => {
@@ -394,7 +394,7 @@
               }
             }
           });
-          this.$emit('markDefinitionsAdded');
+          this.$emit('markDefinitionsAdded', this.module);
         }
       },
       replaceSubstring(match, inputText) {

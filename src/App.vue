@@ -164,7 +164,7 @@ export default {
       /**
        * prevents the tutorial addDefinitions function from running more than once
        */
-      definitionsAdded: false,
+      definitionsAdded: {},
       /**
        * the config from firebase
        */
@@ -305,8 +305,8 @@ export default {
       }
       return identities;
     },
-    markDefinitionsAdded() {
-      this.definitionsAdded = true;
+    markDefinitionsAdded(tutorial) {
+      this.definitionsAdded[tutorial] = true;
     },
     async getConfig() {
       this.db.ref('config').on('value', (snap) => {
