@@ -161,9 +161,17 @@ export default {
       this.getChats();
       this.getFlags();
     },
+    async handleQuery() {
+      const query = this.$route.query;
+      if (query.study && query.dataset) {
+        const study = query.study;
+        const dataset = query.dataset;
+        this.activateDataset(study, dataset);
+      }
+    },
   },
-  beforeRouteUpdate(to, from, next) {
-    next({ name: 'Home', query: { reroute: to.fullPath } });
+  mounted() {
+    this.handleQuery();
   },
 };
 </script>

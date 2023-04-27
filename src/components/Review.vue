@@ -420,7 +420,7 @@
             this.toPlay();
             break;
           case 'Chats':
-            this.$router.push({ name: 'Chats', params: { dataset: this.dataset } });
+            this.$router.push({ name: 'Chats', query: { dataset: this.dataset, study: this.study } });
             break;
           case 'Profile':
             this.$router.push({ name: 'Profile' });
