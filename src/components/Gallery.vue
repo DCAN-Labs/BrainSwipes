@@ -230,13 +230,13 @@
       getImageType(pointer) {
         const imageType = [];
         if (pointer.match(/atlas/i)) {
-          imageType[0] = 'atlasRegistration';
+          imageType[0] = 'atlas';
           imageType[1] = 'Atlas Registration';
         } else if (pointer.match(/task/i)) {
-          imageType[0] = 'functionalRegistration';
+          imageType[0] = 'func';
           imageType[1] = 'Functional Registration';
         } else {
-          imageType[0] = 'surfaceDelineation';
+          imageType[0] = 'anat';
           imageType[1] = 'Structural Image';
         }
         return imageType;
