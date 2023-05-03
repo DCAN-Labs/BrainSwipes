@@ -66,7 +66,7 @@ strong{
             enabled: false,
           },
           title: {
-            text: 'Correct Decision Rate for Samples by User',
+            text: 'Correct Decision Rate for Samples by User Relative to Other Users',
           },
           xaxis: {
             type: 'category',
@@ -200,8 +200,8 @@ strong{
         return userTotals;
       },
       async createChart(dataset, threshold, minVotes) {
-        console.time('userCorrectness');
-        console.log('userCorrectness start');
+        // console.time('userCorrectness');
+        // console.log('userCorrectness start');
         this.loading = true;
         const input = await this.getUserCorrectness(dataset, threshold, minVotes);
         const sortable = [];
@@ -242,7 +242,7 @@ strong{
             },
           },
         };
-        console.timeEnd('userCorrectness');
+        // console.timeEnd('userCorrectness');
         this.loading = false;
       },
       formatMarkers(numRatings, index) {

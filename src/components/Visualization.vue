@@ -14,32 +14,34 @@
         @activateDataset="activateDataset"
         @activateStudy="activateStudy"
       />
-      <div v-if="showControls">
-        <div> 
-          <b-dropdown variant="warning" class="usersDropdown" text="Users to Include" ref="usersDropdown">
-            <b-dropdown-form>
-              <b-button v-on:click="selectAll">{{selectedUsers.length === sortedUsersList.length? 'Unselect All' : 'Select All'}}</b-button>
-              <b-dropdown-divider></b-dropdown-divider>
-              <b-form-checkbox-group
-                id="checkbox-group-users"
-                v-model="selectedUsers"
-                :options="sortedUsersList"
-                name="exclude-users"
-                stacked
-              ></b-form-checkbox-group>
-            </b-dropdown-form>
-          </b-dropdown>
+      <div v-if="showControls" class="center-flex">
+        <div class="control-wrapper">
+          <div> 
+            <b-dropdown variant="warning" class="usersDropdown" text="Users to Include" ref="usersDropdown">
+              <b-dropdown-form>
+                <b-button v-on:click="selectAll">{{selectedUsers.length === sortedUsersList.length? 'Unselect All' : 'Select All'}}</b-button>
+                <b-dropdown-divider></b-dropdown-divider>
+                <b-form-checkbox-group
+                  id="checkbox-group-users"
+                  v-model="selectedUsers"
+                  :options="sortedUsersList"
+                  name="exclude-users"
+                  stacked
+                ></b-form-checkbox-group>
+              </b-dropdown-form>
+            </b-dropdown>
+          </div>
+          <div class="control-group">        
+            <b-form-input id="range-minSwipes" v-model="minSwipes" type="range" min="1" :max="maxSwipes" :number="true"></b-form-input>
+            <div class="mt-2">Include samples with a minimum of <span class="data-value">{{ minSwipes }}</span> swipes</div>
+          </div>
+          <div class="control-group">
+            <b-form-input id="range-threshold" v-model="threshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
+            <div class="mt-2">Samples with a minimum pass percentage of <span class="data-value">{{threshold}}%</span> will be considered a pass</div>
+          </div>
+          <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
+          <hr class="seperator">
         </div>
-        <div>        
-          <b-form-input id="range-minSwipes" v-model="minSwipes" type="range" min="1" :max="maxSwipes" :number="true"></b-form-input>
-          <div class="mt-2">Include samples with a minimum of <span class="data-value">{{ minSwipes }}</span> swipes</div>
-        </div>
-        <div>
-          <b-form-input id="range-threshold" v-model="threshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
-          <div class="mt-2">Samples with a minimum pass percentage of <span class="data-value">{{threshold}}%</span> will be considered a pass</div>
-        </div>
-        <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
-        <hr class="seperator">
       </div>
       <div id="charts" v-if="showCharts">
         <b-card no-body fill>
@@ -123,17 +125,22 @@
   #range-minSwipes, #range-threshold {
     max-width: 300px;
   }
-  .datasetsDropdown{
-    margin-bottom: 0.5em;
-  }
   .data-value{
     font-weight: bold;
     font-size: 1.2em;
   }
-  .buttons {
-    text-align: center;
+  .center-flex {
     display: flex;
     justify-content: center;
+  }
+  .control-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+  .control-group {
+    background-color: aliceblue;
+    margin: 2px;
+    max-width: 500px;
   }
 </style>
 
@@ -169,14 +176,9 @@
     name: 'visualization',
     data() {
       return {
+        sortedUsersList: [],
         selectedUsers: [],
         excludedUsers: [],
-        survivingSessionsSeries: [],
-        /**
-         * tracks whether each chart is loading
-         */
-        survivingSessionsloading: true,
-        userCorrectnessLoading: true,
         /**
          * default values for min/max swipes for a sample to show in charts
          */
@@ -218,6 +220,7 @@
          */
         globusAuthenticated: false,
         globusAuthErrors: [],
+
       };
     },
     props: {
@@ -225,13 +228,6 @@
        * the intialized firebase database
        */
       db: {
-        type: Object,
-        required: true,
-      },
-      /**
-       * it comes directly from the `/users` document in Firebase.
-       */
-      allUsers: {
         type: Object,
         required: true,
       },
@@ -279,21 +275,6 @@
           .getArray();
         return gradientArray;
       },
-      sortedUsersList() {
-        /* Removes '.key' property present on allUsers data */
-        const allUsernames = Object.keys(this.allUsers).filter(
-          user => user !== '.key',
-        );
-        const usernameArray = [];
-        // eslint-disable-next-line
-        allUsernames.map((user) => {
-          if (this.allUsers[user].score > 0) {
-            usernameArray.push(user);
-          }
-        });
-        this.selectedUsers = usernameArray;
-        return usernameArray.sort();
-      },
       availableDatasets() {
         let availableDatasets = [];
         const allowedStudies = Object.keys(this.datasetPrivileges)
@@ -330,6 +311,25 @@
       activateDataset(study, dataset) {
         this.selectedDataset = dataset;
         this.showControls = true;
+      },
+      sortUsersList() {
+        this.db.ref(`datasets/${this.selectedDataset}/userSeenSamples`).on('value', (snap) => {
+          const userSeenSamples = snap.val();
+          const users = Object.keys(userSeenSamples);
+          this.selectedUsers = users;
+          this.sortedUsersList = users.sort();
+        });
+      },
+    },
+    watch: {
+      selectedDataset: {
+        handler() {
+          if (this.selectedDataset !== '') {
+            this.sortUsersList();
+          }
+        },
+        immediate: true,
+        deep: true,
       },
     },
   };

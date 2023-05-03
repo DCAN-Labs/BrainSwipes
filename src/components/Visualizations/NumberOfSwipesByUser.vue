@@ -77,19 +77,24 @@
         /* eslint-disable */
         const reducedVotes = _.reduce(votes, (result, value) => {
           const user = value.user;
-          result[user] ? result[user]['votes'] = result[user]['votes'] + 1 : result[user] = {user: user, votes: 1};
+          const response = value.response === 1 ? 'pass' : 'fail';
+          const notResponse = value.response === 1 ? 'fail': 'pass';
+          result[user] ? result[user][response] = result[user][response] + 1 : result[user] = { user: user, [response]: 1, [notResponse]: 0 };
           return result;
         }, {});
         /* eslint-enable */
-        const sorted = _.sortBy(reducedVotes, ['votes']);
+        const sorted = _.sortBy(reducedVotes, ['pass']);
         let categories = [];
-        let data = [];
+        let pass = [];
+        let fail = [];
         sorted.forEach((user) => {
           categories.push(user.user);
-          data.push(user.votes);
+          pass.push(user.pass);
+          fail.push(user.fail);
         });
         categories = _.reverse(categories);
-        data = _.reverse(data);
+        pass = _.reverse(pass);
+        fail = _.reverse(fail);
 
         const options = {
           chart: {
@@ -98,6 +103,7 @@
             toolbar: {
               show: false,
             },
+            stacked: true,
           },
           plotOptions: {
             bar: {
@@ -123,11 +129,18 @@
           fill: {
             opacity: 1,
           },
+          colors: ['#00C400', '#C40000'],
         };
-        const series = [{
-          name: 'Number of Swipes',
-          data,
-        }];
+        const series = [
+          {
+            name: 'Number of Passes',
+            data: pass,
+          },
+          {
+            name: 'Number of Fails',
+            data: fail,
+          },
+        ];
 
         this.chartOptions = options;
         this.series = series;

@@ -102,8 +102,8 @@
     methods: {
       async createParentChart(dataset) {
         /* eslint-disable */
-        console.time('recentSwipes');
-        console.log('recentSwipes start');
+        // console.time('recentSwipes');
+        // console.log('recentSwipes start');
         this.loading = true;
         // get data from db
         const votesRef = this.db.ref(`datasets/${dataset}/votes`);
@@ -200,7 +200,7 @@
         this.parentChartSeries = series;
 
         this.loading = false;
-        console.timeEnd('recentSwipes');
+        // console.timeEnd('recentSwipes');
         /* eslint-enable */
       },
       createChildChart(dataPoint, color) {

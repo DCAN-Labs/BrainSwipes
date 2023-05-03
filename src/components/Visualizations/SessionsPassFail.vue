@@ -90,8 +90,8 @@
     methods: {
       async createChart(dataset, excludedUsers, threshold, minSwipes) {
         /* eslint-disable */
-        console.time('sessionsPassFail');
-        console.log('sessionsPassFail start');
+        // console.time('sessionsPassFail');
+        // console.log('sessionsPassFail start');
         this.loading = true;
         // db
         const dbRef = this.db.ref(`datasets/${dataset}/votes`);
@@ -218,7 +218,7 @@
         this.chartSeries = series;
 
         this.loading = false;
-        console.timeEnd('sessionsPassFail');
+        // console.timeEnd('sessionsPassFail');
         /* eslint-enable */
       },
       generateCSV() {

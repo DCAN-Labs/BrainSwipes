@@ -89,8 +89,8 @@
     methods: {
       async createParentChart(dataset) {
         /* eslint-disable */
-        console.time('numberOfVotes');
-        console.log('numberOfVotes start');
+        // console.time('numberOfVotes');
+        // console.log('numberOfVotes start');
         this.loading = true;
         // RegEx
         const t1RegEx = RegExp('T1');
@@ -193,7 +193,7 @@
         this.parentChartSeries = series;
 
         this.loading = false;
-        console.timeEnd('numberOfVotes');
+        // console.timeEnd('numberOfVotes');
         /* eslint-enable */
       },
       createChildChart(dataPoint, color) {

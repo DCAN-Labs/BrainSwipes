@@ -10,6 +10,12 @@
       <div id="childChart" :class="{ childActive: showChild }">
         <apexchart type="bar" height="350" :options="childChartOptions" :series="childChartSeries"></apexchart>
       </div>
+      <Legend
+        :max="maxSwipes"
+        :min="0"
+        :gradientArray="gradientArray"
+        :label="' Samples Swiped'"
+      />
     </div>
   </div>
 </template>
@@ -38,10 +44,12 @@
   import VueApexCharts from 'vue-apexcharts';
   import _ from 'lodash';
   import { labels } from '../../labels';
+  import Legend from './Legend/Legend';
 
   Vue.use(VueApexCharts);
 
   Vue.component('apexchart', VueApexCharts);
+  Vue.component('Legend', Legend);
 
   export default {
     name: 'catchTrialsbyUser',
@@ -96,8 +104,8 @@
     methods: {
       async createParentChart(dataset) {
         /* eslint-disable */
-        console.time('catchTrialsByUser');
-        console.log('catchTrialsByUser start');
+        // console.time('catchTrialsByUser');
+        // console.log('catchTrialsByUser start');
         this.loading = true;
         // RegEx
         const t1RegEx = RegExp('T1');
@@ -118,7 +126,7 @@
           Object.hasOwnProperty.call(result, value.user) ? result[value.user].push({sample: value.sample, wasCorrect}) : result[value.user] = [{sample: value.sample, wasCorrect}];
           return result;
         },{});
-
+        const swipes = [];
         const overallUserData = _.reduce(voteCorrectness, (result, value, key) => {
           const numberCorrect = _.reduce(value, (userResult, userValue) => {
             userResult = userValue.wasCorrect ? userResult + 1 : userResult; 
@@ -126,11 +134,13 @@
           },0);
           const totalTrials = value.length;
           result[key] = {numberCorrect, totalTrials};
+          swipes.push(totalTrials);
           return result;
         },{});
+        this.maxSwipes = Math.max(...swipes);
         
         const overallUserRatio = _.reduce(overallUserData, (result, value, key) => {
-          result[key] = value.numberCorrect / value.totalTrials;
+          result[key] = (value.numberCorrect / value.totalTrials).toFixed(2);
           return result;
         },{});
 
@@ -202,12 +212,11 @@
           data: Object.values(overallUserRatio),
         }];
 
-
         this.parentChartOptions = options;
         this.parentChartSeries = series;
 
         this.loading = false;
-        console.timeEnd('catchTrialsByUser');
+        // console.timeEnd('catchTrialsByUser');
         /* eslint-enable */
       },
       createChildChart(dataPoint, color) {

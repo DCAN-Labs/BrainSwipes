@@ -86,8 +86,8 @@
     methods: {
       async createChart(dataset, excludedUsers, minSwipes) {
         /* eslint-disable */
-        console.time('survivingSessions');
-        console.log('survivingSessions start');
+        // console.time('survivingSessions');
+        // console.log('survivingSessions start');
         this.loading = true;
         // RegEx
         const t1RegEx = RegExp('T1');
@@ -199,7 +199,7 @@
           data: thresholdsAsInt.All,
         }];
         this.loading = false;
-        console.timeEnd('survivingSessions');
+        // console.timeEnd('survivingSessions');
         /* eslint-enable */
       },
     },
