@@ -95,7 +95,8 @@
         // RegEx
         const t1RegEx = RegExp('T1');
         const t2RegEx = RegExp('T2');
-        const restRegEx = RegExp('rest');
+        const funcRegEx = RegExp('_task');
+        const atlasRegEx = RegExp('Atlas');
         // get data from db
         const sampleCountsRef = this.db.ref(`datasets/${dataset}/sampleCounts`);
         const sampleCountsSnap = await sampleCountsRef.once('value');
@@ -110,9 +111,11 @@
 
 
         const reducedSampleCountsByModality = _.reduce(sampleCounts, function(result, value, key){
-          let modality = ''; // do we want atlas registrations seperate?
-          if (key.match(restRegEx)) {
-            modality = 'Rest'; // should this be 'Task'?
+          let modality = '';
+          if (key.match(funcRegEx)) {
+            modality = 'fMRI';
+          } else if (key.match(atlasRegEx)) {
+            modality = 'Atlas'
           } else if (key.match(t1RegEx)) {
             modality = 'T1';
           } else if (key.match(t2RegEx)) {

@@ -92,7 +92,8 @@
         // RegEx
         const t1RegEx = RegExp('T1');
         const t2RegEx = RegExp('T2');
-        const restRegEx = RegExp('rest');
+        const funcRegEx = RegExp('_task');
+        const atlasRegEx = RegExp('Atlas');
         // db
         const dbRef = this.db.ref(`datasets/${dataset}/votes`);
         const snap = await dbRef.once('value');
@@ -126,8 +127,10 @@
           }
 
           let modality = ''; // do we want atlas registrations seperate?
-          if (key.match(restRegEx)) {
-            modality = 'Rest'; // should this be 'Task'?
+          if (key.match(funcRegEx)) {
+            modality = 'fMRI';
+          } else if (key.match(atlasRegEx)) {
+            modality = 'Atlas'
           } else if (key.match(t1RegEx)) {
             modality = 'T1';
           } else if (key.match(t2RegEx)) {
@@ -153,23 +156,24 @@
         const reducedCutoffs = _.reduce(minBySessionModality, (result, value) => {
           result.T1[value.T1] = result.T1[value.T1] ? result.T1[value.T1] + 1 : 1;
           result.T2[value.T2] = result.T2[value.T2] ? result.T2[value.T2] + 1 : 1;
-          result.Rest[value.Rest] = result.Rest[value.Rest] ? result.Rest[value.Rest] + 1 : 1;
+          result.Atlas[value.Atlas] = result.Atlas[value.Atlas] ? result.Atlas[value.Atlas] + 1 : 1;
+          result.fMRI[value.fMRI] = result.fMRI[value.fMRI] ? result.fMRI[value.fMRI] + 1 : 1;
           result.All[value.All] = result.All[value.All] ? result.All[value.All] + 1 : 1;
           return result;
-        }, { T1: {}, T2: {}, Rest: {}, All: {} });
+        }, { T1: {}, T2: {}, Atlas: {}, fMRI: {}, All: {} });
 
         const numSamplesPerThreshold = _.reduce(reducedCutoffs, (outerResult, scores, modality) => {
           const modalityThresholds = _.reduce(scores, (result, value, key) => {
-            for (let i = 0; i < 100; i += 5) {
+            for (let i = 0; i < 105; i += 5) {
               if (key >= i / 100) {
                 result[i] += value;
               }
             }
             return result;
-          }, { 0: 0, 5: 0, 10: 0, 15: 0, 20: 0, 25: 0, 30: 0, 35: 0, 40: 0, 45: 0, 50: 0,55: 0, 60: 0, 65: 0, 70: 0, 75: 0, 80: 0, 85: 0, 90: 0, 95: 0 });
+          }, { 0: 0, 5: 0, 10: 0, 15: 0, 20: 0, 25: 0, 30: 0, 35: 0, 40: 0, 45: 0, 50: 0,55: 0, 60: 0, 65: 0, 70: 0, 75: 0, 80: 0, 85: 0, 90: 0, 95: 0, 100: 0 });
           outerResult[modality] = modalityThresholds;
           return outerResult;
-        }, { T1: {}, T2: {}, Rest: {}, All: {} });
+        }, { T1: {}, T2: {}, Atlas: {}, fMRI: {}, All: {} });
 
         const thresholdsAsPairs = _.reduce(numSamplesPerThreshold, (result, value, key) => {
           result[key] = _.toPairs(value);
@@ -192,8 +196,11 @@
           name: 'T2',
           data: thresholdsAsInt.T2,
         }, {
-          name: 'Rest',
-          data: thresholdsAsInt.Rest,
+          name: 'fMRI',
+          data: thresholdsAsInt.fMRI,
+        }, {
+          name: 'Atlas',
+          data: thresholdsAsInt.Atlas,
         }, {
           name: 'All',
           data: thresholdsAsInt.All,

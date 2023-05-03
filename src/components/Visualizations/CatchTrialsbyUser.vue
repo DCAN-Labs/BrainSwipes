@@ -110,7 +110,8 @@
         // RegEx
         const t1RegEx = RegExp('T1');
         const t2RegEx = RegExp('T2');
-        const restRegEx = RegExp('rest');
+        const funcRegEx = RegExp('_task');
+        const atlasRegEx = RegExp('Atlas');
         // get data from db
         const catchAnswersRef = this.db.ref(`datasets/${dataset}/catch/sampleCounts`);
         const catchAnswersSnap = await catchAnswersRef.once('value');
@@ -148,8 +149,10 @@
         // TO DO: child chart sorting trial results based on image type
         // const reducedSampleCountsByModality = _.reduce(sampleCounts, function(result, value, key){
         //   let modality = '';
-        //   if (key.match(restRegEx)) {
-        //     modality = 'Rest'; // should this be 'Task'?
+        //   if (key.match(funcRegEx)) {
+        //     modality = 'fMRI';
+        //    } else if (key.match(atlasRegEx)) {
+        //      modality = 'Atlas';
         //   } else if (key.match(t1RegEx)) {
         //     modality = 'T1';
         //   } else if (key.match(t2RegEx)) {
