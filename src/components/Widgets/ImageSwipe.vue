@@ -415,7 +415,7 @@
   .image_area {
     background: black;
     position: relative;
-    height: 480px;
+    aspect-ratio : 1 / 1;
     overflow-y: hidden;
   }
   .loader {
