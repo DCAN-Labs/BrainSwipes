@@ -82,6 +82,13 @@
         type: Number,
         required: true,
       },
+      /**
+       * minimum ratio of passes to swipes to be considered a pass for a sample
+       */
+      sampleThreshold: {
+        type: Number,
+        required: true,
+      },
     },
     methods: {
       async createChart(dataset, excludedUsers, minSwipes) {
@@ -126,7 +133,7 @@
             console.log(error);
           }
 
-          let modality = ''; // do we want atlas registrations seperate?
+          let modality = '';
           if (key.match(funcRegEx)) {
             modality = 'fMRI';
           } else if (key.match(atlasRegEx)) {
@@ -138,22 +145,31 @@
           } else {
             modality = 'Other';
           }
-          ses ? (result[ses] || (result[ses] = [])).push({ [modality]: value }) : null;
+          ses ? result[ses] ? (result[ses][modality] || (result[ses][modality] = [])).push(value) : result[ses] = { [modality]: [value] } : null;
           return result;
         }, {});
 
-        const minBySessionModality = _.reduce(reducedBySession, (result, modalities, session) => {
-          const reducedSample = _.reduce(modalities, (minimum, value) => {
-            minimum[Object.keys(value)] = minimum.hasOwnProperty(Object.keys(value)) ? _.min([minimum[Object.keys(value)], Object.values(value)[0]]): Object.values(value)[0];
-            return minimum;
+        console.log(reducedBySession);
+
+        const reducedBySessionModality = _.reduce(reducedBySession, (result, modalities, session) => {
+          const reducedModalities = _.reduce(modalities, (ratio, scores, modality) => {
+            const reducedScores = _.reduce(scores, (passes, score) => {
+              if (score >= this.sampleThreshold) {
+                passes = passes + 1
+              }
+              return passes;
+            }, 0);
+            ratio[modality] = reducedScores / scores.length;
+            return ratio;
           }, {});
-          const sessionFloor = _.reduce(reducedSample, (innerResult, value) => _.min([innerResult, value]), 9);
-          reducedSample.All = sessionFloor;
-          result[session] = reducedSample;
+          result[session] = reducedModalities;
+          result[session].All = _.min(Object.values(reducedModalities));
           return result;
-        }, {});
+        },{});
 
-        const reducedCutoffs = _.reduce(minBySessionModality, (result, value) => {
+        console.log(reducedBySessionModality);
+
+        const reducedCutoffs = _.reduce(reducedBySessionModality, (result, value) => {
           result.T1[value.T1] = result.T1[value.T1] ? result.T1[value.T1] + 1 : 1;
           result.T2[value.T2] = result.T2[value.T2] ? result.T2[value.T2] + 1 : 1;
           result.Atlas[value.Atlas] = result.Atlas[value.Atlas] ? result.Atlas[value.Atlas] + 1 : 1;

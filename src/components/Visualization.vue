@@ -16,7 +16,7 @@
       />
       <div v-if="showControls" class="center-flex">
         <div class="control-wrapper">
-          <div> 
+          <div class="control-group"> 
             <b-dropdown variant="warning" class="usersDropdown" text="Users to Include" ref="usersDropdown">
               <b-dropdown-form>
                 <b-button v-on:click="selectAll">{{selectedUsers.length === sortedUsersList.length? 'Unselect All' : 'Select All'}}</b-button>
@@ -30,14 +30,22 @@
                 ></b-form-checkbox-group>
               </b-dropdown-form>
             </b-dropdown>
+            <p class="control-note">Include/exclude votes by specific users in 'Evaluate Sessions' and 'See Results'</p>
           </div>
-          <div class="control-group">        
+          <div class="control-group">      
             <b-form-input id="range-minSwipes" v-model="minSwipes" type="range" min="1" :max="maxSwipes" :number="true"></b-form-input>
             <div class="mt-2">Include samples with a minimum of <span class="data-value">{{ minSwipes }}</span> swipes</div>
+            <p class="control-note">Affects 'Evaluate Users', 'Evaluate Sessions', 'See Results'</p>
           </div>
           <div class="control-group">
             <b-form-input id="range-threshold" v-model="threshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
-            <div class="mt-2">Samples with a minimum pass percentage of <span class="data-value">{{threshold}}%</span> will be considered a pass</div>
+            <div class="mt-2"><span class="data-value">Samples</span> with a minimum pass percentage of <span class="data-value">{{threshold}}%</span> will be considered a pass</div>
+            <p class="control-note">Affects 'Evaluate Users', 'Evaluate Sessions', 'See Results'</p>
+          </div>
+          <div class="control-group">
+            <b-form-input id="range-session-threshold" v-model="sessionThreshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
+            <div class="mt-2"><span class="data-value">Sessions</span> with a minimum pass percentage of <span class="data-value">{{sessionThreshold}}%</span> will be considered a pass</div>
+            <p class="control-note">Affects 'See Results'</p>
           </div>
           <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
           <hr class="seperator">
@@ -85,18 +93,20 @@
               :gradientArray="gradientArray"
               /> -->
             </b-tab>              
-            <b-tab title="Evaluate Samples">
+            <b-tab title="Evaluate Sessions">
               <SurvivingSessions
               :dataset="submittedDataset"
               :minSwipes="submittedMinSwipes"
               :excludedUsers="excludedUsers"
+              :sampleThreshold="submittedThreshold"
               :db="db"
               />
             </b-tab>
             <b-tab title="See Results">
               <SessionsPassFail
               :dataset="submittedDataset"
-              :threshold="submittedThreshold"
+              :sampleThreshold="submittedThreshold"
+              :sessionThreshold="submittedSessionThreshold"
               :minSwipes="submittedMinSwipes"
               :excludedUsers="excludedUsers"
               :db="db"
@@ -122,7 +132,7 @@
   .submit-div {
     margin-top: 3px;
   }
-  #range-minSwipes, #range-threshold {
+  #range-minSwipes, #range-threshold #range-session-threshold{
     max-width: 300px;
   }
   .data-value{
@@ -140,7 +150,12 @@
   .control-group {
     background-color: aliceblue;
     margin: 2px;
+    padding: 4px;
     max-width: 500px;
+  }
+  .control-note {
+    margin: 2px;
+    font-size: 0.7em;
   }
 </style>
 
@@ -201,6 +216,10 @@
          */
         threshold: 70,
         /**
+         * default value selected as the threshold for a session to pass
+         */
+        sessionThreshold: 100,
+        /**
          * submit button lockout
          */
         submitDisabled: false,
@@ -211,6 +230,7 @@
         submittedMinSwipes: 1,
         submittedDataset: '',
         submittedThreshold: '',
+        submittedSessionThreshold: '',
         /**
          * whether to show the controls
          */
@@ -296,6 +316,7 @@
         this.submittedMinSwipes = this.minSwipes;
         this.submittedDataset = this.selectedDataset;
         this.submittedThreshold = this.threshold / 100;
+        this.submittedSessionThreshold = this.sessionThreshold / 100;
         this.excludedUsers = _.difference(this.sortedUsersList, this.selectedUsers);
         this.showCharts = true;
         this.submitDisabled = false;

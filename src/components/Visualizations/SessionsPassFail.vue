@@ -73,22 +73,29 @@
         required: true,
       },
       /**
-       * threshold considered a pass
-       */
-      threshold: {
-        type: Number,
-        required: true,
-      },
-      /**
        * minimum number of swipes on a sample to be included in the chart data
        */
       minSwipes: {
         type: Number,
         required: true,
+      },      /**
+       * minimum ratio of passes to swipes to be considered a pass for a sample
+       */
+      sampleThreshold: {
+        type: Number,
+        required: true,
+      },
+      /**
+       * minimum ratio of passed samples to total samples
+       * to be considered a pass for a session
+       */
+      sessionThreshold: {
+        type: Number,
+        required: true,
       },
     },
     methods: {
-      async createChart(dataset, excludedUsers, threshold, minSwipes) {
+      async createChart(dataset, excludedUsers, sampleThreshold, minSwipes) {
         /* eslint-disable */
         // console.time('sessionsPassFail');
         // console.log('sessionsPassFail start');
@@ -148,7 +155,7 @@
 
         const meetsThreshold = _.reduce(reducedBySession, (result, modalities, session) => {
           const reducedSample = _.reduce(modalities, (sampleResult, value) => {
-            sampleResult[Object.keys(value)] = sampleResult.hasOwnProperty(Object.keys(value)) ? sampleResult[Object.keys(value)] && Object.values(value) >= threshold : Object.values(value) >= threshold;
+            sampleResult[Object.keys(value)] = sampleResult.hasOwnProperty(Object.keys(value)) ? sampleResult[Object.keys(value)] && Object.values(value) >= sampleThreshold : Object.values(value) >= sampleThreshold;
             return sampleResult;
           }, {});
           const hasFalse = Object.values(reducedSample).some(value => !value);
@@ -242,7 +249,7 @@
     },
     computed: {
       propsToWatch() {
-        return [this.dataset, this.excludedUsers, this.threshold, this.minSwipes];
+        return [this.dataset, this.excludedUsers, this.sampleThreshold, this.minSwipes];
       },
       labelsRegex() {
         return new RegExp(labels.join('|'));
@@ -251,7 +258,7 @@
     watch: {
       propsToWatch: {
         handler() {
-          this.createChart(this.dataset, this.excludedUsers, this.threshold, this.minSwipes);
+          this.createChart(this.dataset, this.excludedUsers, this.sampleThreshold, this.minSwipes);
         },
         immediate: true,
         deep: true,
