@@ -81,7 +81,7 @@
       },      /**
        * minimum ratio of passes to swipes to be considered a pass for a sample
        */
-      sampleThreshold: {
+      sliceThreshold: {
         type: Number,
         required: true,
       },
@@ -95,7 +95,7 @@
       },
     },
     methods: {
-      async createChart(dataset, excludedUsers, sampleThreshold, minSwipes) {
+      async createChart(dataset, excludedUsers, sliceThreshold, minSwipes) {
         /* eslint-disable */
         // console.time('sessionsPassFail');
         // console.log('sessionsPassFail start');
@@ -155,7 +155,7 @@
 
         const meetsThreshold = _.reduce(reducedBySession, (result, modalities, session) => {
           const reducedSample = _.reduce(modalities, (sampleResult, value) => {
-            sampleResult[Object.keys(value)] = sampleResult.hasOwnProperty(Object.keys(value)) ? sampleResult[Object.keys(value)] && Object.values(value) >= sampleThreshold : Object.values(value) >= sampleThreshold;
+            sampleResult[Object.keys(value)] = sampleResult.hasOwnProperty(Object.keys(value)) ? sampleResult[Object.keys(value)] && Object.values(value) >= sliceThreshold : Object.values(value) >= sliceThreshold;
             return sampleResult;
           }, {});
           const hasFalse = Object.values(reducedSample).some(value => !value);
@@ -249,7 +249,7 @@
     },
     computed: {
       propsToWatch() {
-        return [this.dataset, this.excludedUsers, this.sampleThreshold, this.minSwipes];
+        return [this.dataset, this.excludedUsers, this.sliceThreshold, this.minSwipes];
       },
       labelsRegex() {
         return new RegExp(labels.join('|'));
@@ -258,7 +258,7 @@
     watch: {
       propsToWatch: {
         handler() {
-          this.createChart(this.dataset, this.excludedUsers, this.sampleThreshold, this.minSwipes);
+          this.createChart(this.dataset, this.excludedUsers, this.sliceThreshold, this.minSwipes);
         },
         immediate: true,
         deep: true,

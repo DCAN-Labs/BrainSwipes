@@ -47,7 +47,7 @@
             enabled: false,
           },
           title: {
-            text: 'Number of Surviving Sessions at Different Rating Cutoffs',
+            text: 'Number of Surviving Scans at Different Slice Rating Thresholds',
           },
         },
         series: {},
@@ -76,16 +76,16 @@
         required: true,
       },
       /**
-       * minimum number of swipes on a sample to be included in the chart data
+       * minimum number of swipes on a slice to be included in the chart data
        */
       minSwipes: {
         type: Number,
         required: true,
       },
       /**
-       * minimum ratio of passes to swipes to be considered a pass for a sample
+       * minimum ratio of passes to swipes to be considered a pass for a slice
        */
-      sampleThreshold: {
+      sliceThreshold: {
         type: Number,
         required: true,
       },
@@ -154,7 +154,7 @@
         const reducedBySessionModality = _.reduce(reducedBySession, (result, modalities, session) => {
           const reducedModalities = _.reduce(modalities, (ratio, scores, modality) => {
             const reducedScores = _.reduce(scores, (passes, score) => {
-              if (score >= this.sampleThreshold) {
+              if (score >= this.sliceThreshold) {
                 passes = passes + 1
               }
               return passes;

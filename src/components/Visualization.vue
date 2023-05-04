@@ -39,12 +39,12 @@
           </div>
           <div class="control-group">
             <b-form-input id="range-threshold" v-model="threshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
-            <div class="mt-2"><span class="data-value">Samples</span> with a minimum pass percentage of <span class="data-value">{{threshold}}%</span> will be considered a pass</div>
+            <div class="mt-2"><span class="data-value">Slices</span> with a minimum pass percentage of <span class="data-value">{{threshold}}%</span> will be considered a pass</div>
             <p class="control-note">Affects 'Evaluate Users', 'Evaluate Sessions', 'See Results'</p>
           </div>
           <div class="control-group">
-            <b-form-input id="range-session-threshold" v-model="sessionThreshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
-            <div class="mt-2"><span class="data-value">Sessions</span> with a minimum pass percentage of <span class="data-value">{{sessionThreshold}}%</span> will be considered a pass</div>
+            <b-form-input id="range-session-threshold" v-model="scanThreshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
+            <div class="mt-2"><span class="data-value">Scans</span> where a minimum of <span class="data-value">{{scanThreshold}}%</span> of the slices passed will be considered a pass</div>
             <p class="control-note">Affects 'See Results'</p>
           </div>
           <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
@@ -93,20 +93,20 @@
               :gradientArray="gradientArray"
               /> -->
             </b-tab>              
-            <b-tab title="Evaluate Sessions">
+            <b-tab title="Evaluate Scans">
               <SurvivingSessions
               :dataset="submittedDataset"
               :minSwipes="submittedMinSwipes"
               :excludedUsers="excludedUsers"
-              :sampleThreshold="submittedThreshold"
+              :sliceThreshold="submittedThreshold"
               :db="db"
               />
             </b-tab>
             <b-tab title="See Results">
               <SessionsPassFail
               :dataset="submittedDataset"
-              :sampleThreshold="submittedThreshold"
-              :sessionThreshold="submittedSessionThreshold"
+              :sliceThreshold="submittedThreshold"
+              :scanThreshold="submittedscanThreshold"
               :minSwipes="submittedMinSwipes"
               :excludedUsers="excludedUsers"
               :db="db"
@@ -218,7 +218,7 @@
         /**
          * default value selected as the threshold for a session to pass
          */
-        sessionThreshold: 100,
+        scanThreshold: 100,
         /**
          * submit button lockout
          */
@@ -230,7 +230,7 @@
         submittedMinSwipes: 1,
         submittedDataset: '',
         submittedThreshold: '',
-        submittedSessionThreshold: '',
+        submittedscanThreshold: '',
         /**
          * whether to show the controls
          */
@@ -316,7 +316,7 @@
         this.submittedMinSwipes = this.minSwipes;
         this.submittedDataset = this.selectedDataset;
         this.submittedThreshold = this.threshold / 100;
-        this.submittedSessionThreshold = this.sessionThreshold / 100;
+        this.submittedscanThreshold = this.scanThreshold / 100;
         this.excludedUsers = _.difference(this.sortedUsersList, this.selectedUsers);
         this.showCharts = true;
         this.submitDisabled = false;
