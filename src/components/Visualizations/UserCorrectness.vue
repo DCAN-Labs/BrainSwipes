@@ -1,5 +1,12 @@
 <template>
   <div>
+    <div v-if="!loading">
+      <p>Users are considered correct if:</p>
+      <p>They voted <span class="pass">PASS</span> on a slice with <span class="data-value">{{threshold.toFixed(2)}}</span> percent or higher average rating.</p>
+      <p>They voted <span class="fail">FAIL</span> on a slice with <span class="data-value">{{(1 - threshold).toFixed(2)}}</span> percent or lower average rating.</p>
+      <p>Slices outside of this range are excluded from this calculation.</p>
+      <p>Slices with less than <span class="data-value">{{minVotes}}</span> votes are excluded from this calculation.</p>
+    </div>
     <div v-if="loading">
       LOADING
     </div>
@@ -29,6 +36,18 @@ strong{
   display: block;
   overflow: hidden;
   width: 100%;
+}
+.data-value{
+  font-weight: bold;
+  font-size: 1.2em;
+}
+.pass {
+  color: #00FF00;
+  font-weight: bold;
+}
+.fail {
+  color: #FF0000;
+  font-weight: bold;
 }
 </style>
 
@@ -66,7 +85,7 @@ strong{
             enabled: false,
           },
           title: {
-            text: 'Correct Decision Rate for Samples by User Relative to Other Users',
+            text: 'Correct Decision Rate for Slices by User Relative to Other Users',
           },
           xaxis: {
             type: 'category',

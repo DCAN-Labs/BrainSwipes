@@ -83,7 +83,7 @@
           return result;
         }, {});
         /* eslint-enable */
-        const sorted = _.sortBy(reducedVotes, ['pass']);
+        const sorted = _.sortBy(reducedVotes, [o => o.pass + o.fail]);
         let categories = [];
         let pass = [];
         let fail = [];

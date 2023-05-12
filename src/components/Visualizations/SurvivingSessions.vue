@@ -101,6 +101,7 @@
         const t2RegEx = RegExp('T2');
         const funcRegEx = RegExp('_task');
         const atlasRegEx = RegExp('Atlas');
+        const runRegEx = RegExp('_(run-\\d*?)_');
         // db
         const dbRef = this.db.ref(`datasets/${dataset}/votes`);
         const snap = await dbRef.once('value');
@@ -124,7 +125,7 @@
 
         const averageScoreBySample = _.mapValues(removeLowSwipeCounts, o => _.mean(o));
 
-        const reducedBySession = _.reduce(averageScoreBySample, (result, value, key) => {
+        const reducedByScan = _.reduce(averageScoreBySample, (result, value, key) => {
           let ses = '';
           try {
             ses = key.substring(0, key.match(this.labelsRegex).index);
@@ -135,13 +136,33 @@
 
           let modality = '';
           if (key.match(funcRegEx)) {
-            modality = 'fMRI';
+            if (key.match(runRegEx)) {
+              const run = key.match(runRegEx)[1];
+              modality = `fMRI_${run}`;
+            } else {
+              modality = 'fMRI';
+            }
           } else if (key.match(atlasRegEx)) {
-            modality = 'Atlas'
+            if (key.match(runRegEx)) {
+              const run = key.match(runRegEx)[1];
+              modality = `Atlas_${run}`;
+            } else {
+              modality = 'Atlas'
+            }
           } else if (key.match(t1RegEx)) {
-            modality = 'T1';
+            if (key.match(runRegEx)) {
+              const run = key.match(runRegEx)[1];
+              modality = `T1_${run}`;
+            } else {
+              modality = 'T1';
+            }
           } else if (key.match(t2RegEx)) {
-            modality = 'T2';
+            if (key.match(runRegEx)) {
+              const run = key.match(runRegEx)[1];
+              modality = `T2_${run}`;
+            } else {
+              modality = 'T2';
+            }
           } else {
             modality = 'Other';
           }
@@ -149,36 +170,33 @@
           return result;
         }, {});
 
-        console.log(reducedBySession);
-
-        const reducedBySessionModality = _.reduce(reducedBySession, (result, modalities, session) => {
-          const reducedModalities = _.reduce(modalities, (ratio, scores, modality) => {
-            const reducedScores = _.reduce(scores, (passes, score) => {
-              if (score >= this.sliceThreshold) {
-                passes = passes + 1
-              }
-              return passes;
-            }, 0);
-            ratio[modality] = reducedScores / scores.length;
-            return ratio;
-          }, {});
-          result[session] = reducedModalities;
-          result[session].All = _.min(Object.values(reducedModalities));
+        const minBySession = _.reduce(reducedByScan, (result, scans, session) => {
+          const minByScan = _.mapValues(scans, scan => _.min(scan));
+          result[session] = minByScan;
           return result;
-        },{});
+        }, {});
 
-        console.log(reducedBySessionModality);
-
-        const reducedCutoffs = _.reduce(reducedBySessionModality, (result, value) => {
-          result.T1[value.T1] = result.T1[value.T1] ? result.T1[value.T1] + 1 : 1;
-          result.T2[value.T2] = result.T2[value.T2] ? result.T2[value.T2] + 1 : 1;
-          result.Atlas[value.Atlas] = result.Atlas[value.Atlas] ? result.Atlas[value.Atlas] + 1 : 1;
-          result.fMRI[value.fMRI] = result.fMRI[value.fMRI] ? result.fMRI[value.fMRI] + 1 : 1;
-          result.All[value.All] = result.All[value.All] ? result.All[value.All] + 1 : 1;
+        const collapseRuns = _.reduce(minBySession, (result, scans, session) => {
+          const runs = {};
+          Object.keys(scans).forEach(scan => {
+            const modality = this.findModality(scan);
+            runs[modality] = runs[modality] || {};
+            runs[modality][scans[scan]] = (runs[modality][scans[scan]] || 0) + 1;
+          });
+          result[session] = runs;
           return result;
-        }, { T1: {}, T2: {}, Atlas: {}, fMRI: {}, All: {} });
+        }, {});
 
-        const numSamplesPerThreshold = _.reduce(reducedCutoffs, (outerResult, scores, modality) => {
+        const ratingsByModality = _.reduce(collapseRuns, (result, modalities, session) => {
+          Object.keys(modalities).forEach(modality => {
+            Object.keys(modalities[modality]).forEach(ratio => {
+              result[modality][ratio] = (result[modality][ratio] || 0) + modalities[modality][ratio];
+            });
+          });
+          return result;
+        }, { T1: {}, T2: {}, Atlas: {}, fMRI: {} });
+
+        const numSamplesPerThreshold = _.reduce(ratingsByModality, (outerResult, scores, modality) => {
           const modalityThresholds = _.reduce(scores, (result, value, key) => {
             for (let i = 0; i < 105; i += 5) {
               if (key >= i / 100) {
@@ -186,10 +204,10 @@
               }
             }
             return result;
-          }, { 0: 0, 5: 0, 10: 0, 15: 0, 20: 0, 25: 0, 30: 0, 35: 0, 40: 0, 45: 0, 50: 0,55: 0, 60: 0, 65: 0, 70: 0, 75: 0, 80: 0, 85: 0, 90: 0, 95: 0, 100: 0 });
+          }, { 0: 0, 5: 0, 10: 0, 15: 0, 20: 0, 25: 0, 30: 0, 35: 0, 40: 0, 45: 0, 50: 0, 55: 0, 60: 0, 65: 0, 70: 0, 75: 0, 80: 0, 85: 0, 90: 0, 95: 0, 100: 0 });
           outerResult[modality] = modalityThresholds;
           return outerResult;
-        }, { T1: {}, T2: {}, Atlas: {}, fMRI: {}, All: {} });
+        }, { T1: {}, T2: {}, Atlas: {}, fMRI: {}});
 
         const thresholdsAsPairs = _.reduce(numSamplesPerThreshold, (result, value, key) => {
           result[key] = _.toPairs(value);
@@ -217,13 +235,30 @@
         }, {
           name: 'Atlas',
           data: thresholdsAsInt.Atlas,
-        }, {
-          name: 'All',
-          data: thresholdsAsInt.All,
         }];
         this.loading = false;
         // console.timeEnd('survivingSessions');
         /* eslint-enable */
+      },
+      findModality(key) {
+        const t1RegEx = RegExp('T1');
+        const t2RegEx = RegExp('T2');
+        const fMRIRegEx = RegExp('fMRI');
+        const atlasRegEx = RegExp('Atlas');
+
+        let modality = '';
+        if (key.match(fMRIRegEx)) {
+          modality = 'fMRI';
+        } else if (key.match(atlasRegEx)) {
+          modality = 'Atlas';
+        } else if (key.match(t1RegEx)) {
+          modality = 'T1';
+        } else if (key.match(t2RegEx)) {
+          modality = 'T2';
+        } else {
+          modality = 'Other';
+        }
+        return modality;
       },
     },
     computed: {

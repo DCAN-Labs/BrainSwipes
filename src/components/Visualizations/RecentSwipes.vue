@@ -172,10 +172,10 @@
           },
           colors: colorsArray,
           title: {
-            text: 'Number of Samples Voted on vs Day',
+            text: 'Number of Swipes per Day',
           },
           subtitle: {
-            text: '(Click on bar to see details)',
+            text: '(Click on bar to see user specific data)',
             offsetX: 15
           },
           xaxis: {

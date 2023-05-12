@@ -40,12 +40,7 @@
           <div class="control-group">
             <b-form-input id="range-threshold" v-model="threshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
             <div class="mt-2"><span class="data-value">Slices</span> with a minimum pass percentage of <span class="data-value">{{threshold}}%</span> will be considered a pass</div>
-            <p class="control-note">Affects 'Evaluate Users', 'Evaluate Sessions', 'See Results'</p>
-          </div>
-          <div class="control-group">
-            <b-form-input id="range-session-threshold" v-model="scanThreshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
-            <div class="mt-2"><span class="data-value">Scans</span> where a minimum of <span class="data-value">{{scanThreshold}}%</span> of the slices passed will be considered a pass</div>
-            <p class="control-note">Affects 'See Results'</p>
+            <p class="control-note">Use 'Evaluate Scans' to help choose this. Affects 'Evaluate Users', 'See Results'</p>
           </div>
           <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
           <hr class="seperator">
@@ -106,7 +101,6 @@
               <SessionsPassFail
               :dataset="submittedDataset"
               :sliceThreshold="submittedThreshold"
-              :scanThreshold="submittedscanThreshold"
               :minSwipes="submittedMinSwipes"
               :excludedUsers="excludedUsers"
               :db="db"
@@ -216,10 +210,6 @@
          */
         threshold: 70,
         /**
-         * default value selected as the threshold for a session to pass
-         */
-        scanThreshold: 100,
-        /**
          * submit button lockout
          */
         submitDisabled: false,
@@ -230,7 +220,6 @@
         submittedMinSwipes: 1,
         submittedDataset: '',
         submittedThreshold: '',
-        submittedscanThreshold: '',
         /**
          * whether to show the controls
          */
@@ -316,7 +305,6 @@
         this.submittedMinSwipes = this.minSwipes;
         this.submittedDataset = this.selectedDataset;
         this.submittedThreshold = this.threshold / 100;
-        this.submittedscanThreshold = this.scanThreshold / 100;
         this.excludedUsers = _.difference(this.sortedUsersList, this.selectedUsers);
         this.showCharts = true;
         this.submitDisabled = false;

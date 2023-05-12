@@ -167,10 +167,10 @@
           },
           colors: colorsArray,
           title: {
-            text: 'Number of Samples with N votes',
+            text: 'Number of Slices with N votes',
           },
           subtitle: {
-            text: '(Click on bar to see details)',
+            text: '(Click on bar to see modality specific data)',
             offsetX: 15
           },
           xaxis: {

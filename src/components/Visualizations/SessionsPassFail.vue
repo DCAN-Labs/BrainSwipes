@@ -85,14 +85,6 @@
         type: Number,
         required: true,
       },
-      /**
-       * minimum ratio of passed samples to total samples
-       * to be considered a pass for a session
-       */
-      sessionThreshold: {
-        type: Number,
-        required: true,
-      },
     },
     methods: {
       async createChart(dataset, excludedUsers, sliceThreshold, minSwipes) {
