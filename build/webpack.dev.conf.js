@@ -132,6 +132,53 @@ async function listItems(bucket, input, objectsList) {
   }
 }
 
+// get tsv data from s3
+async function getObjectFromS3(bucket, object) {
+  const command = new GetObjectCommand({
+    Bucket: bucket,
+    Key: object
+  });
+  // https://dev.to/aws-builders/using-streams-when-getting-objects-from-s3-2jo4
+  const response = (await s3Client.send(command)).Body;
+  const chunks = [];
+
+  for await (const chunk of response) {
+      chunks.push(chunk);
+  }
+
+  const responseBuffer = Buffer.concat(chunks);
+  return responseBuffer.toString();
+}
+
+// get excluded subjects
+async function getExcludedSubjects(dataset) {
+  const configRef = database.ref(`config/datasets/${dataset}`);
+  const snap = await configRef.once('value');
+  const config = snap.val();
+  const bucket = config.bucket;
+  const excludedSubjects = [];
+
+  if (Object.hasOwn(config, 'exclusions')) {
+      const data = await getObjectFromS3(bucket, config.exclusions.s3path);
+      const arrayData = data.split(/\r\n|\r|\n/);
+      const headers = arrayData[0].split(/\t/);
+      config.exclusions.rules.forEach(rule => {
+          const filterIndex = headers.indexOf(rule.filterCol);
+          const idIndex = headers.indexOf(rule.idCol);
+          const pattern = rule.pattern;
+          arrayData.forEach(row => {
+              const rowData = row.split(/\t/);
+              if (rowData.length == headers.length) {
+                  if (rowData[filterIndex].match(pattern)) {
+                      excludedSubjects.push(rowData[idIndex]);
+                  }
+              }
+          });
+      });
+  }
+  return excludedSubjects;
+}
+
 // standard webpack dev server config
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
@@ -374,16 +421,23 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             };
             const objectsList = await listItems(bucket, input, []);
             let regexp = new RegExp("^([^\/]*)\.png");
+            const subRegExp = new RegExp("(^sub-.*?)_");
             if (Object.hasOwn(config, 's3path')) {
               regexp = new RegExp(config.s3path.replace('/', '\/').replace('{{SESSION}}', 'ses-.*?').replace('{{SUBJECT}}', 'sub-\\d{6}').replace('{{FILENAME}}', '([^\/]*)\\.png'));
             }
+            // get exclusions
+            const excludedSubjects = await getExcludedSubjects(dataset);
+            // update sampleCounts
             const update = {};
             objectsList.forEach(object => {
               object.forEach(item => {
                 const match = item.Key.match(regexp);
                 if (match) {
                   const sample = match[1];
-                  if (!Object.keys(sampleCounts).includes(sample)){
+                  const sub = sample.match(subRegExp)[1];
+                  if (excludedSubjects.includes(sub)) {
+                    // do nothing
+                  } else if (!Object.keys(sampleCounts).includes(sample)){
                     update[sample] = 0;
                   }
                 }
