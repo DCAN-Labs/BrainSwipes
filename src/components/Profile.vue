@@ -23,17 +23,19 @@
       <hr>
       <div>
         <h1>Your Study Access</h1>
-        <div class="dataset-chats-wrapper">
-          <table id=study-access-table>
-            <th v-for="study in Object.keys(userStudies)" :key="study" :class="{ red: !userStudies[study], green: userStudies[study] }">{{study}}</th>
-          </table>
-        </div>
-        <div v-if="Object.keys(userRequests).length">
-          <h3>Your Access Requests</h3>
-          <div v-for="study in Object.keys(userRequests)" :key="study">
-          <p>
-            {{study}} : {{userRequests[study].status == 'denied' ? userRequests[study].reason == 'Other' ? `${userRequests[study].status} - ${userRequests[study].other}` : `${userRequests[study].status} - ${userRequests[study].reason}` : userRequests[study].status }}
-          </p>
+        <div>
+          <div class="dataset-chats-wrapper">
+            <table id=study-access-table>
+              <th v-for="study in Object.keys(userStudies)" :key="study" :class="{ red: !userStudies[study], green: userStudies[study] }">{{study}}</th>
+            </table>
+          </div>
+          <div v-if="Object.keys(userRequests).length">
+            <h3>Your Access Requests</h3>
+            <div v-for="study in Object.keys(userRequests)" :key="study">
+            <p>
+              {{study}} : {{userRequests[study].status == 'denied' ? userRequests[study].reason == 'Other' ? `${userRequests[study].status} - ${userRequests[study].other}` : `${userRequests[study].status} - ${userRequests[study].reason}` : userRequests[study].status }}
+            </p>
+            </div>
           </div>
         </div>
         <br>
@@ -59,8 +61,8 @@
                 </div>
               </div>
               <div v-if="config.studies[study].available" class="dataset-chats" :class="{ scroller: Object.keys(userChats[dataset]).length > 4 }">
-                <div v-for="c in userChats[dataset]" v-on:click="onChatClick(dataset, study, c.sample)" :key="c.sample" class="single-chat" :class="{ pulse: c.notify[userInfo.displayName] }">
-                  <div :class="{ messagechat: c.notify[userInfo.displayName] }"></div>
+                <div v-for="c in userChats[dataset]" v-on:click="onChatClick(dataset, study, c.sample)" :key="c.sample" class="single-chat" :class="{ pulse: c.notify ? c.notify[userInfo.displayName] : false }">
+                  <div :class="{ messagechat: c.notify ? c.notify[userInfo.displayName] : false }"></div>
                   <h3>{{c.sample}}</h3>
                   <br>
                   <span >
@@ -70,8 +72,8 @@
               </div>
               <div v-else>
                 <div v-if="globusAuthenticated">
-                  <div v-for="c in userChats[dataset]" v-on:click="onChatClick(dataset, study, c.sample)" :key="c.sample" class="single-chat" :class="{ pulse: c.notify[userInfo.displayName] }">
-                    <div :class="{ messagechat: c.notify[userInfo.displayName] }"></div>
+                  <div v-for="c in userChats[dataset]" v-on:click="onChatClick(dataset, study, c.sample)" :key="c.sample" class="single-chat" :class="{ pulse: c.notify ? c.notify[userInfo.displayName] : false }">
+                    <div :class="{ messagechat: c.notify ? c.notify[userInfo.displayName] : false }"></div>
                     <h3>{{c.sample}}</h3>
                     <br>
                     <span >
