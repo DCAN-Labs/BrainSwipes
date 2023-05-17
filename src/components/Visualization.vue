@@ -319,6 +319,7 @@
       },
       activateDataset(study, dataset) {
         this.selectedDataset = dataset;
+        this.updateCharts();
         this.showControls = true;
       },
       sortUsersList() {
