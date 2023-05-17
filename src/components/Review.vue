@@ -396,7 +396,7 @@
       getImageType() {
         const imageType = [];
         if (this.config.datasets[this.dataset].imageType === 'raw') {
-          imageType[0] = 'raw';
+          imageType[0] = 'anatRaw';
           imageType[1] = ' Pre-processed Image';
         } else if (this.widgetPointer.match(/atlas/i)) {
           imageType[0] = 'atlas';
