@@ -19,6 +19,7 @@
         </p>
       <h1>Contact Us</h1>
         <p>If you have any questions please contact us at <a href="mailto:dcanlab@umn.edu" target="_blank">dcanlab@umn.edu</a>!</p>
+        <p>Found a bug or other issue with the app? Post a <a href="https://github.com/DCAN-Labs/BrainSwipes/issues/new" target="_blank">GitHub issue.</a></p>
       <h1>Accessing Closed Studies</h1>
         <p>
           Some studies are not open to the public. In order to access these you must sign the appropriate data use aggreement with the governing body for that study. If you believe you should have access to a study, fill out an access request form by following the link in your profile. BrainSwipes uses Globus authentication to authenticate users for these studies. See the <a href="https://docs.globus.org/how-to/get-started/" target="_blank">Globus documentation</a> on how to add an identity to your Globus account.
