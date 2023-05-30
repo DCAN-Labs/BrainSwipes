@@ -24,6 +24,7 @@ import Promo from '@/components/Promo';
 import AccessRequest from '@/components/AccessRequest';
 import AccessReview from '@/components/AccessReview';
 import TutorialSelect from '@/components/TutorialSelect';
+import SampleView from '@/components/SampleView';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -219,6 +220,15 @@ const router = new Router({
       component: TutorialSelect,
       meta: {
         requiresAuth: true,
+      },
+    },
+    {
+      path: '/admin/sample-view',
+      name: 'SampleView',
+      component: SampleView,
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
       },
     },
   ],

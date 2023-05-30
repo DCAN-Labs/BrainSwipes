@@ -425,6 +425,9 @@
           case 'Profile':
             this.$router.push({ name: 'Profile' });
             break;
+          case 'Viewer':
+            this.$router.push({ name: 'SampleView' });
+            break;
           default:
             break;
         }
@@ -494,6 +497,9 @@
               break;
             case 'c':
               this.source = 'Chats';
+              break;
+            case 'v':
+              this.source = 'Viewer';
               break;
             default:
               this.source = '';
