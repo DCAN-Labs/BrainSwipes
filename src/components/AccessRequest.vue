@@ -29,7 +29,15 @@
     <div v-else>
       <p>You must log in with Globus to submit a request</p>
       <br>
-      <b-button variant="warning" @click="routeToRestricted">To Globus Login Page</b-button>
+      <GlobusAuth
+        :globusToken="globusToken"
+        :getGlobusIdentities="getGlobusIdentities"
+        :userInfo="userInfo"
+        :config="config"
+        redirect="access-request"
+        redirectComponent="AccessRequest"
+        @globusLogin="globusLogin"
+      />
     </div>
   </div>
 
@@ -50,9 +58,13 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import _ from 'lodash';
+import GlobusAuth from './Widgets/GlobusAuth';
 
 export default {
   name: 'access-request',
+  components: {
+    GlobusAuth,
+  },
   data() {
     return {
       globusOrg: '',
@@ -131,9 +143,7 @@ export default {
         }
         const organizations = [];
         Object.keys(identities).forEach((identity) => {
-          if (identities[identity][0] !== null) {
-            organizations.push(identities[identity][0]);
-          }
+          organizations.push(identities[identity][0]);
         });
         this.globusOrgs = organizations;
       }
@@ -148,6 +158,9 @@ export default {
       const requestableStudies = Object.keys(
         _.pickBy(studies, (v, k) => !v && k !== 'TEST'));
       this.restrictedStudies = requestableStudies;
+    },
+    globusLogin(accessToken) {
+      this.$emit('globusLogin', accessToken);
     },
   },
   mounted() {

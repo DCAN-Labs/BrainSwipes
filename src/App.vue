@@ -286,6 +286,7 @@ export default {
     },
     globusLogin(token) {
       this.globusToken = token;
+      console.log('globus login');
     },
     async getGlobusIdentities(token) {
       let identities = {};
