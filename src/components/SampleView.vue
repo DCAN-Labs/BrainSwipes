@@ -4,7 +4,6 @@
     <DatasetSelect
       :globusToken="globusToken"
       :getGlobusIdentities="getGlobusIdentities"
-      :errorCodes="errorCodes"
       :config="config"
       :datasetPrivileges="datasetPrivileges"
       :surpressArchived="false"
@@ -93,13 +92,6 @@ export default {
      */
     getGlobusIdentities: {
       type: Function,
-      required: true,
-    },
-    /**
-     * errors produced by brainswipes
-     */
-    errorCodes: {
-      type: Object,
       required: true,
     },
     /**

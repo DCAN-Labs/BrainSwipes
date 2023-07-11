@@ -1,6 +1,6 @@
 <template>
   <div id="restricted">
-    <b-alert v-for="error in errors" :key="error" :show="showErrors" variant="danger">{{errorCodes[error]}}</b-alert>
+    <b-alert v-for="error in errors" :key="error" :show="showErrors" variant="danger">{{config.errorCodes[error]}}</b-alert>
     <b-alert :show="showAuthError" variant="danger">Please attempt to login again. If this error persists contact an administrator.</b-alert>
     <div v-if="!authenticated">
       <b-button class="btn-swipes" @click="loginWithGlobus">Login with Globus</b-button>
@@ -68,9 +68,9 @@ export default {
       required: true,
     },
     /**
-     * errors produced by brainswipes
+     * the config document from firebase
      */
-    errorCodes: {
+    config: {
       type: Object,
       required: true,
     },

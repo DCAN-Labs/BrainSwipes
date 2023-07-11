@@ -54,7 +54,6 @@
           :globusToken="globusToken"
           @globusLogin="globusLogin"
           :getGlobusIdentities="getGlobusIdentities"
-          :errorCodes="errorCodes"
           :definitionsAdded="definitionsAdded"
           @markDefinitionsAdded="markDefinitionsAdded"
           :notifications="notifications"
@@ -150,17 +149,6 @@ export default {
        * Globus auth token
        */
       globusToken: '',
-      /**
-       * Errors thrown by brainswipes
-       */
-      errorCodes: {
-        0: 'Test Error',
-        1: 'This dataset requires additional authentication. Please login with Globus.',
-        2: 'The email associated with your BrainSwipes account is not associated with your Globus account. Please visit globus.org to add this identity.',
-        3: 'The organization associated with your BrainSwipes email does not match the organization associated with this email in Globus. Please contact a BrainSwipes administrator',
-        4: 'The email associated with your BrainSwipes account is not active in Globus.',
-        5: 'The email associated with your BrainSwipes account has not been verified. Please verify in your profile.',
-      },
       /**
        * prevents the tutorial addDefinitions function from running more than once
        */

@@ -14,7 +14,7 @@
     <hr class="seperator">
     <div v-if="showDatasets">
       <div v-if="!config.studies[selectedStudy].available && !globusAuthenticated && useGlobus">
-        <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{errorCodes[error]}}</p>
+        <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{config.errorCodes[error]}}</p>
         <b-button @click="routeToRestricted">Login with Globus</b-button>
       </div>
       <div class="buttons" v-else>
@@ -67,13 +67,6 @@ export default {
      */
     getGlobusIdentities: {
       type: Function,
-      required: true,
-    },
-    /**
-     * errors produced by brainswipes
-     */
-    errorCodes: {
-      type: Object,
       required: true,
     },
     /**

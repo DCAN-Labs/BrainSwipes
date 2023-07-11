@@ -5,7 +5,6 @@
       <DatasetSelect
         :globusToken="globusToken"
         :getGlobusIdentities="getGlobusIdentities"
-        :errorCodes="errorCodes"
         :config="config"
         :datasetPrivileges="datasetPrivileges"
         :surpressArchived="false"
@@ -81,12 +80,8 @@ export default {
       required: true,
     },
     /**
-     * errors produced by brainswipes
+     * the authenticated user object from firebase
      */
-    errorCodes: {
-      type: Object,
-      required: true,
-    },
     userInfo: {
       type: Object,
       required: true,
