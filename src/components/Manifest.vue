@@ -25,6 +25,9 @@
             :surpressArchived="false"
             :showUnavailable="true"
             :useGlobus="false"
+            :userInfo="userInfo"
+            redirectPath=""
+            redirectComponent=""
             @activateDataset="activateDataset"
             @activateStudy="activateStudy"
           />
@@ -292,6 +295,13 @@ export default {
      * the studies the user is allowed to see
      */
     datasetPrivileges: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * the authenticated user object from firebase
+     */
+    userInfo: {
       type: Object,
       required: true,
     },

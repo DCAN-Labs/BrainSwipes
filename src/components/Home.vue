@@ -30,7 +30,11 @@
               :datasetPrivileges="datasetPrivileges"
               :surpressArchived="true"
               :showUnavailable="true"
-              :useGlobus="false"
+              :useGlobus="true"
+              :userInfo="userInfo"
+              redirectPath=""
+              redirectComponent="Home"
+              @globusLogin="globusLogin"
               @activateDataset="routeToPlay"
             />
           </div>
@@ -148,6 +152,9 @@ export default {
       if (query.reroute) {
         this.$router.push({ path: query.reroute });
       }
+    },
+    globusLogin(accessToken) {
+      this.$emit('globusLogin', accessToken);
     },
   },
   mounted() {

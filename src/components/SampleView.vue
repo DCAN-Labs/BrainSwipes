@@ -9,6 +9,9 @@
       :surpressArchived="false"
       :showUnavailable="true"
       :useGlobus="false"
+      :userInfo="userInfo"
+      redirectPath=""
+      redirectComponent=""
       @activateDataset="setDataset"
       @activateStudy="dataset = ''"
     />

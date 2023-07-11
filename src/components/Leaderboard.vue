@@ -13,6 +13,9 @@
               :surpressArchived="false"
               :showUnavailable="false"
               :useGlobus="false"
+              :userInfo="userInfo"
+              redirectPath=""
+              redirectComponent=""
               @activateDataset="activateDataset"
             />
           </div>
@@ -276,6 +279,13 @@ export default {
      * the studies the user is allowed to see
      */
     datasetPrivileges: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * the authenticated user object from firebase
+     */
+    userInfo: {
       type: Object,
       required: true,
     },

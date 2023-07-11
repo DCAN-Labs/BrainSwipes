@@ -15,7 +15,6 @@
     <div v-if="showDatasets">
       <div v-if="!config.studies[selectedStudy].available && !globusAuthenticated && useGlobus">
         <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{config.errorCodes[error]}}</p>
-        <b-button @click="routeToRestricted">Login with Globus</b-button>
       </div>
       <div class="buttons" v-else>
         <div v-for="dataset in config.studies[selectedStudy].datasets" :key="dataset">
@@ -28,14 +27,28 @@
         </div>
       </div>
     </div>
+    <GlobusAuth
+      :globusToken="globusToken"
+      :getGlobusIdentities="getGlobusIdentities"
+      :userInfo="userInfo"
+      :config="config"
+      :redirectPath="redirectPath"
+      :redirectComponent="redirectComponent"
+      :showGlobusLogin="showGlobusLogin"
+      @globusLogin="globusLogin"
+    />
   </div>
 </template>
 
 <script>
 import firebase from 'firebase/app';
+import GlobusAuth from './GlobusAuth';
 
 export default {
   name: 'DatasetSelect',
+  components: {
+    GlobusAuth,
+  },
   data() {
     return {
       selectedDataset: '',
@@ -107,6 +120,27 @@ export default {
       type: Boolean,
       required: true,
     },
+    /**
+     * the authenticated user object from firebase
+     */
+    userInfo: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * the path used in the GLobus app redirect process
+     */
+    redirectPath: {
+      type: String,
+      required: true,
+    },
+    /**
+     * the component to redirect to after Globus Auth
+     */
+    redirectComponent: {
+      type: String,
+      required: true,
+    },
   },
   methods: {
     chooseStudy(study) {
@@ -149,12 +183,23 @@ export default {
         this.globusAuthenticated = true;
       }
     },
-    routeToRestricted() {
-      this.$router.push({ name: 'Restricted', query: { errors: this.globusAuthErrors } });
+    globusLogin(accessToken) {
+      this.$emit('globusLogin', accessToken);
     },
   },
   mounted() {
     this.allowRestrictedDatasets();
+  },
+  computed: {
+    showGlobusLogin() {
+      let showGlobusLogin = false;
+      if (this.showDatasets) {
+        showGlobusLogin = !this.config.studies[this.selectedStudy].available
+          && !this.globusAuthenticated
+          && this.useGlobus;
+      }
+      return showGlobusLogin;
+    },
   },
 };
 </script>

@@ -34,7 +34,7 @@
         :getGlobusIdentities="getGlobusIdentities"
         :userInfo="userInfo"
         :config="config"
-        redirect="access-request"
+        redirectPath="access-request"
         redirectComponent="AccessRequest"
         @globusLogin="globusLogin"
       />

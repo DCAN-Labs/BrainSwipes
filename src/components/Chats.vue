@@ -8,7 +8,11 @@
       :surpressArchived="false"
       :showUnavailable="false"
       :useGlobus="true"
+      :userInfo="userInfo"
+      redirectPath="chats"
+      redirectComponent="Chats"
       @activateDataset="activateDataset"
+      @globusLogin="globusLogin"
     />
     <div v-if="dataset">
       <h1>Chats for {{config.datasets[dataset].name}}</h1>
@@ -39,7 +43,6 @@
  */
 import _ from 'lodash';
 import 'firebase/auth';
-
 import DatasetSelect from './Widgets/DatasetSelect';
 
 export default {
@@ -112,6 +115,13 @@ export default {
       type: Object,
       required: true,
     },
+    /**
+     * the authenticated user object from firebase
+     */
+    userInfo: {
+      type: Object,
+      required: true,
+    },
   },
   components: {
     DatasetSelect,
@@ -160,6 +170,9 @@ export default {
         const dataset = query.dataset;
         this.activateDataset(study, dataset);
       }
+    },
+    globusLogin(accessToken) {
+      this.$emit('globusLogin', accessToken);
     },
   },
   mounted() {

@@ -10,6 +10,9 @@
         :surpressArchived="false"
         :showUnavailable="false"
         :useGlobus="true"
+        :userInfo="userInfo"
+        redirectPath=""
+        redirectComponent=""
         @activateDataset="activateDataset"
         @activateStudy="activateStudy"
       />
@@ -260,6 +263,13 @@
        */
       getGlobusIdentities: {
         type: Function,
+        required: true,
+      },
+      /**
+       * user info from firebase
+      */
+      userInfo: {
+        type: Object,
         required: true,
       },
     },

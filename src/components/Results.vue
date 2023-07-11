@@ -10,6 +10,10 @@
         :surpressArchived="false"
         :showUnavailable="false"
         :useGlobus="true"
+        :userInfo="userInfo"
+        redirectPath="results"
+        redirectComponent="Results"
+        @globusLogin="globusLogin"
         @activateDataset="activateDataset"
       />
       <div v-if="dataset">
@@ -104,6 +108,9 @@ export default {
     },
     activateDataset(study, dataset) {
       this.dataset = dataset;
+    },
+    globusLogin(accessToken) {
+      this.$emit('globusLogin', accessToken);
     },
   },
   components: {
