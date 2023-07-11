@@ -36,6 +36,7 @@
         :config="config"
         redirectPath="access-request"
         redirectComponent="AccessRequest"
+        showGlobusLogin="true"
         @globusLogin="globusLogin"
       />
     </div>
