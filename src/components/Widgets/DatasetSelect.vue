@@ -13,7 +13,7 @@
     </div>
     <hr class="seperator">
     <div v-if="showDatasets">
-      <div v-if="!config.studies[selectedStudy].available && !globusAuthenticated && useGlobus">
+      <div v-if="showGlobusLogin">
         <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{config.errorCodes[error]}}</p>
       </div>
       <div class="buttons" v-else>
@@ -194,9 +194,16 @@ export default {
     showGlobusLogin() {
       let showGlobusLogin = false;
       if (this.showDatasets) {
-        showGlobusLogin = !this.config.studies[this.selectedStudy].available
-          && !this.globusAuthenticated
-          && this.useGlobus;
+        if (this.showUnavailable) {
+          showGlobusLogin = !this.config.studies[this.selectedStudy].available
+            && !this.globusAuthenticated
+            && this.useGlobus
+            && this.datasetPrivileges[this.selectedStudy];
+        } else {
+          showGlobusLogin = !this.config.studies[this.selectedStudy].available
+            && !this.globusAuthenticated
+            && this.useGlobus;
+        }
       }
       return showGlobusLogin;
     },
