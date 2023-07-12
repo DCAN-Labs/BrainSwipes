@@ -183,14 +183,13 @@
       postRequest(pointer) {
         const bucket = this.config.datasets[this.dataset].bucket;
         let filepath = `${pointer}.png`;
-        if (Object.hasOwn(this.config.datasets[this.dataset], 's3path')) {
-          const config = this.config.datasets[this.dataset];
-          const s3path = config.s3path;
+        if (Object.hasOwn(this.config.datasets[this.dataset], 's3filepath')) {
+          const s3filepath = this.config.datasets[this.dataset].s3filepath;
           const subRegExp = /(sub-\d{6})/;
           const sesRegExp = /_(ses-.*?)_/;
           const ses = pointer.match(sesRegExp)[1];
           const sub = pointer.match(subRegExp)[1];
-          filepath = s3path.replace('{{SUBJECT}}', sub).replace('{{SESSION}}', ses).replace('{{FILENAME}}', `${pointer}.png`);
+          filepath = s3filepath.replace('{{SUBJECT}}', sub).replace('{{SESSION}}', ses).replace('{{FILENAME}}', pointer);
         }
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
