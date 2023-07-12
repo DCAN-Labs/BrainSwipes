@@ -10,7 +10,7 @@
     </div>
     <div v-if="!userInfo.emailVerified">
       <br>
-      <p>This dataset requires a verified email address.</p>
+      <p class="info">This dataset requires a verified email address.</p>
       <b-button class="btn-swipes" @click="verifyEmail">Verify Email</b-button>
     </div>
     <div>
