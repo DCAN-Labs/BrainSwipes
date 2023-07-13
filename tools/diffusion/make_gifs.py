@@ -1,37 +1,35 @@
 ## https://github.com/richford/fibr/blob/master/notebooks/2020-11-16-cloudknot-create-color-fa-gifs.ipynb
-def create_gifs(subject):
-    import AFQ.data as afqd
-    import AFQ.registration as reg
-    import bids
-    import dipy.reconst.dti as dti
-    import imageio
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import os
-    import os.path as op
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+import AFQ.registration as reg
+import bids
+import dipy.reconst.dti as dti
+import imageio
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import os.path as op
+import argparse
 
-    from dipy.io.image import load_nifti, save_nifti
-    from dipy.io import read_bvals_bvecs
-    from dipy.core.gradients import gradient_table
-    from pygifsicle import optimize
-    from s3fs import S3FileSystem
-    from scipy import ndimage
-    from scipy.special import expit
-    
-    # Instantiate a study object, grabbing only the S3 keys for the input subject
-    study = afqd.S3BIDSStudy(
-        study_id="hbn-qsiprep",
-        bucket="fcp-indi",
-        s3_prefix="data/Projects/HBN/BIDS_curated/derivatives/qsiprep",
-        anon=True,
-        subjects=[subject]
-    )
+from dipy.io.image import load_nifti, save_nifti
+from dipy.io import read_bvals_bvecs
+from dipy.core.gradients import gradient_table
+from pygifsicle import optimize
+from scipy import ndimage
+from scipy.special import expit
+
+def parse_args():
+    parser = argparse.ArgumentParser("make-gifs")
+
+    parser.add_argument("bids_dir")
+    parser.add_argument("subject")
+
+    return parser.parse_args()
+
+def create_gifs(bids_dir, subject):
     
     # Download that particular subject to a local folder
-    local_bids_folder = "hbn"
-    output_bucket = "fibr-gifs"
-    study.download(local_bids_folder)
-    layout = bids.BIDSLayout(local_bids_folder, validate=False)
+    layout = bids.BIDSLayout(bids_dir, validate=False)
 
     # Specify the slices that we would like to save as a fraction of total number of slices
     scale_fa = True
@@ -228,9 +226,10 @@ def create_gifs(subject):
             optimize(file_path)
             
             gif_fnames.append(op.abspath(file_path))
-            
-    fs = S3FileSystem()
-    
-    # Save output to S3
-    for fn in gif_fnames:
-        fs.put(fn, "/".join([output_bucket, op.basename(fn)]))
+
+def main():
+    args = parse_args()
+    create_gifs(args.bids_dir, args.subject)
+
+if __name__ == "__main__":
+    main()
