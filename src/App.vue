@@ -285,6 +285,10 @@ export default {
           }),
         });
         const responseJSON = await response.json();
+        const ref = this.db.ref('log/globusAuth');
+        const timestamp = Date.now();
+        responseJSON.timestamp = timestamp;
+        ref.push(responseJSON);
         /* eslint-disable */
         identities = _.reduce(responseJSON.identities, function (r, v) {
           r[v.email] = [v.organization, v.status];
