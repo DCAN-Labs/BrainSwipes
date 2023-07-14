@@ -36,7 +36,7 @@
         :config="config"
         redirectPath="access-request"
         redirectComponent="AccessRequest"
-        showGlobusLogin="true"
+        :showGlobusLogin="true"
         @globusLogin="globusLogin"
       />
     </div>
@@ -74,6 +74,7 @@ export default {
       globusOrgs: [],
       restrictedStudies: [],
       submitted: false,
+      identities: '',
     };
   },
   props: {
@@ -125,6 +126,7 @@ export default {
         timestamp: Date.now(),
         organizations: this.globusOrgs,
         status: 'awaiting',
+        identities: this.identities,
       };
       this.db.ref(`requests/${this.selectedStudy}/${this.userInfo.displayName}`).set(formInfo);
       this.submitted = true;
@@ -138,13 +140,16 @@ export default {
     async getIdentites() {
       if (this.globusToken) {
         const identities = await this.getGlobusIdentities(this.globusToken);
+        this.identities = JSON.stringify(identities);
         const email = this.userInfo.email;
         if (Object.hasOwn(identities, email)) {
           this.globusOrg = identities[email][0];
         }
         const organizations = [];
         Object.keys(identities).forEach((identity) => {
-          organizations.push(identities[identity][0]);
+          if (identities[identity][0] !== null) {
+            organizations.push(identities[identity][0]);
+          }
         });
         this.globusOrgs = organizations;
       }
