@@ -26,12 +26,16 @@
             <DatasetSelect
               :globusToken="globusToken"
               :getGlobusIdentities="getGlobusIdentities"
-              :errorCodes="errorCodes"
               :config="config"
               :datasetPrivileges="datasetPrivileges"
               :surpressArchived="true"
               :showUnavailable="true"
-              :useGlobus="false"
+              :useGlobus="true"
+              :userInfo="userInfo"
+              redirectPath=""
+              redirectComponent="Home"
+              :verifyEmail="verifyEmail"
+              @globusLogin="globusLogin"
               @activateDataset="routeToPlay"
             />
           </div>
@@ -101,13 +105,6 @@ export default {
       type: Function,
       required: true,
     },
-    /**
-     * errors produced by brainswipes
-     */
-    errorCodes: {
-      type: Object,
-      required: true,
-    },
     userInfo: {
       type: Object,
       required: true,
@@ -121,6 +118,14 @@ export default {
      */
     config: {
       type: Object,
+      required: true,
+    },
+    /**
+     * calls the built in firebase auth function to send the email
+     * from the template in the firebase console
+     */
+    verifyEmail: {
+      type: Function,
       required: true,
     },
   },
@@ -156,6 +161,9 @@ export default {
       if (query.reroute) {
         this.$router.push({ path: query.reroute });
       }
+    },
+    globusLogin(accessToken) {
+      this.$emit('globusLogin', accessToken);
     },
   },
   mounted() {

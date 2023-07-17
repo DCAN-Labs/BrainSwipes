@@ -82,7 +82,7 @@
                   </div>
                 </div>
                 <div v-else>
-                  <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{errorCodes[error]}}</p>
+                  <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{config.errorCodes[error]}}</p>
                   <b-button @click="routeToRestricted">Login with Globus</b-button>
                 </div>
               </div>
@@ -358,21 +358,15 @@ export default {
       required: true,
     },
     /**
-     * errors produced by brainswipes
+     * calls the built in firebase auth function to send the email
+     * from the template in the firebase console
      */
-    errorCodes: {
-      type: Object,
+    verifyEmail: {
+      type: Function,
       required: true,
     },
   },
   methods: {
-    /**
-     * calls the built in firebase auth function to send the email
-     * from the template in the firebase console
-     */
-    verifyEmail() {
-      firebase.auth().currentUser.sendEmailVerification();
-    },
     /**
      * gets chats for samples the current user has chatted on
      * for the specified dataset

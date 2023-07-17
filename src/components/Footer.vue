@@ -91,7 +91,8 @@ export default {
               if (idTokenResult.claims.admin) {
                 this.isAdmin = true;
               }
-            } else if (Object.hasOwn(idTokenResult.claims, 'studyAdmin')) {
+            }
+            if (Object.hasOwn(idTokenResult.claims, 'studyAdmin')) {
               if (Object.values(idTokenResult.claims.studyAdmin).includes(true)) {
                 this.isAdmin = true;
               }

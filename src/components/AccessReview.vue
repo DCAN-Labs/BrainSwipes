@@ -116,20 +116,6 @@ export default {
       type: Object,
       required: true,
     },
-    /**
-     * The auth token from Globus
-     */
-    globusToken: {
-      type: String,
-      required: true,
-    },
-    /**
-     * function that exchanges the Globus token for user information
-     */
-    getGlobusIdentities: {
-      type: Function,
-      required: true,
-    },
   },
   methods: {
     async getRequests() {

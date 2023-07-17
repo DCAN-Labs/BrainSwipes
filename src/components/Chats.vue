@@ -3,13 +3,16 @@
     <DatasetSelect
       :globusToken="globusToken"
       :getGlobusIdentities="getGlobusIdentities"
-      :errorCodes="errorCodes"
       :config="config"
       :datasetPrivileges="datasetPrivileges"
       :surpressArchived="false"
       :showUnavailable="false"
       :useGlobus="true"
+      :userInfo="userInfo"
+      redirectPath="chats"
+      redirectComponent="Chats"
       @activateDataset="activateDataset"
+      @globusLogin="globusLogin"
     />
     <div v-if="dataset">
       <h1>Chats for {{config.datasets[dataset].name}}</h1>
@@ -40,7 +43,6 @@
  */
 import _ from 'lodash';
 import 'firebase/auth';
-
 import DatasetSelect from './Widgets/DatasetSelect';
 
 export default {
@@ -100,13 +102,6 @@ export default {
       required: true,
     },
     /**
-     * errors produced by brainswipes
-     */
-    errorCodes: {
-      type: Object,
-      required: true,
-    },
-    /**
      * the configuration from firebase
      */
     config: {
@@ -117,6 +112,13 @@ export default {
      * the studies the user is allowed to see
      */
     datasetPrivileges: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * the authenticated user object from firebase
+     */
+    userInfo: {
       type: Object,
       required: true,
     },
@@ -168,6 +170,9 @@ export default {
         const dataset = query.dataset;
         this.activateDataset(study, dataset);
       }
+    },
+    globusLogin(accessToken) {
+      this.$emit('globusLogin', accessToken);
     },
   },
   mounted() {

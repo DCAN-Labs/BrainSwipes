@@ -422,8 +422,8 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             const objectsList = await listItems(bucket, input, []);
             let regexp = new RegExp("^([^\/]*)\.png");
             const subRegExp = new RegExp("(^sub-.*?)_");
-            if (Object.hasOwn(config, 's3path')) {
-              regexp = new RegExp(config.s3path.replace('/', '\/').replace('{{SESSION}}', 'ses-.*?').replace('{{SUBJECT}}', 'sub-\\d{6}').replace('{{FILENAME}}', '([^\/]*)\\.png'));
+            if (Object.hasOwn(config, 's3filepath')) {
+              regexp = new RegExp(config.s3filepath.replace('/', '\/').replace('{{SESSION}}', 'ses-.*?').replace('{{SUBJECT}}', 'sub-\\d{6}').replace('{{FILENAME}}', '([^\/]*)'));
             }
             // get exclusions
             const excludedSubjects = await getExcludedSubjects(dataset);

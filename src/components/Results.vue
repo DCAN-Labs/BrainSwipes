@@ -5,12 +5,15 @@
       <DatasetSelect
         :globusToken="globusToken"
         :getGlobusIdentities="getGlobusIdentities"
-        :errorCodes="errorCodes"
         :config="config"
         :datasetPrivileges="datasetPrivileges"
         :surpressArchived="false"
         :showUnavailable="false"
         :useGlobus="true"
+        :userInfo="userInfo"
+        redirectPath="results"
+        redirectComponent="Results"
+        @globusLogin="globusLogin"
         @activateDataset="activateDataset"
       />
       <div v-if="dataset">
@@ -81,12 +84,8 @@ export default {
       required: true,
     },
     /**
-     * errors produced by brainswipes
+     * the authenticated user object from firebase
      */
-    errorCodes: {
-      type: Object,
-      required: true,
-    },
     userInfo: {
       type: Object,
       required: true,
@@ -109,6 +108,9 @@ export default {
     },
     activateDataset(study, dataset) {
       this.dataset = dataset;
+    },
+    globusLogin(accessToken) {
+      this.$emit('globusLogin', accessToken);
     },
   },
   components: {

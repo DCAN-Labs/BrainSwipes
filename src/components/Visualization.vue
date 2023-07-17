@@ -5,12 +5,14 @@
       <DatasetSelect
         :globusToken="globusToken"
         :getGlobusIdentities="getGlobusIdentities"
-        :errorCodes="errorCodes"
         :config="config"
         :datasetPrivileges="datasetPrivileges"
         :surpressArchived="false"
         :showUnavailable="false"
         :useGlobus="true"
+        :userInfo="userInfo"
+        redirectPath=""
+        redirectComponent=""
         @activateDataset="activateDataset"
         @activateStudy="activateStudy"
       />
@@ -269,9 +271,9 @@
         required: true,
       },
       /**
-       * errors produced by brainswipes
-       */
-      errorCodes: {
+       * user info from firebase
+      */
+      userInfo: {
         type: Object,
         required: true,
       },

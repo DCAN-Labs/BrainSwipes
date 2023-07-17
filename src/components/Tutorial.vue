@@ -70,7 +70,12 @@
                       :checks="Object.values(tab.checks)[0]"
                       />
                     </div>
-                    <img :src="tab.image" class="mt-s pt-3 img"/>
+                    <img v-if="tab.image" :src="tab.image" class="mt-s pt-3 img"/>
+                    <ImageStatic v-else-if="tab.sample"
+                      :widgetPointer="tab.sample"
+                      :dataset="tab.dataset"
+                      :config="config"
+                    />
                   </b-tab>
                 </b-tabs>
               </b-card>
@@ -78,6 +83,13 @@
           </div>
           <div v-if="step.image">
             <img :src="step.image" class="mt-3 pt-3 img"/>
+          </div>
+          <div v-if="step.sample">
+            <ImageStatic
+              :widgetPointer="step.sample"
+              :dataset="step.dataset"
+              :config="config"
+            />
           </div>
           <div v-if="step.pointer" class="mt-3">
             <ImageSwipe
@@ -225,6 +237,7 @@
   import ImageSwipe from './Widgets/ImageSwipe';
   import { glossary, glossaryKeys } from '../glossary';
   import Checklist from './Widgets/Checklist';
+  import ImageStatic from './Widgets/ImageStatic';
 
   const VueScrollTo = require('vue-scrollto');
 
@@ -267,6 +280,7 @@
     components: {
       ImageSwipe,
       Checklist,
+      ImageStatic,
     },
     data() {
       return {

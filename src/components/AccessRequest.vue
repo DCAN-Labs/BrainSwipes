@@ -29,7 +29,17 @@
     <div v-else>
       <p>You must log in with Globus to submit a request</p>
       <br>
-      <b-button variant="warning" @click="routeToRestricted">To Globus Login Page</b-button>
+      <GlobusAuth
+        :globusToken="globusToken"
+        :getGlobusIdentities="getGlobusIdentities"
+        :userInfo="userInfo"
+        :config="config"
+        redirectPath="access-request"
+        redirectComponent="AccessRequest"
+        :showGlobusLogin="true"
+        @globusLogin="globusLogin"
+        :verifyEmail="verifyEmail"
+      />
     </div>
   </div>
 
@@ -50,9 +60,13 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import _ from 'lodash';
+import GlobusAuth from './Widgets/GlobusAuth';
 
 export default {
   name: 'access-request',
+  components: {
+    GlobusAuth,
+  },
   data() {
     return {
       globusOrg: '',
@@ -61,6 +75,7 @@ export default {
       globusOrgs: [],
       restrictedStudies: [],
       submitted: false,
+      identities: '',
     };
   },
   props: {
@@ -99,6 +114,14 @@ export default {
       type: Function,
       required: true,
     },
+    /**
+     * calls the built in firebase auth function to send the email
+     * from the template in the firebase console
+     */
+    verifyEmail: {
+      type: Function,
+      required: true,
+    },
   },
   methods: {
     onSubmit() {
@@ -112,6 +135,7 @@ export default {
         timestamp: Date.now(),
         organizations: this.globusOrgs,
         status: 'awaiting',
+        identities: this.identities,
       };
       this.db.ref(`requests/${this.selectedStudy}/${this.userInfo.displayName}`).set(formInfo);
       this.submitted = true;
@@ -125,6 +149,7 @@ export default {
     async getIdentites() {
       if (this.globusToken) {
         const identities = await this.getGlobusIdentities(this.globusToken);
+        this.identities = JSON.stringify(identities);
         const email = this.userInfo.email;
         if (Object.hasOwn(identities, email)) {
           this.globusOrg = identities[email][0];
@@ -148,6 +173,9 @@ export default {
       const requestableStudies = Object.keys(
         _.pickBy(studies, (v, k) => !v && k !== 'TEST'));
       this.restrictedStudies = requestableStudies;
+    },
+    globusLogin(accessToken) {
+      this.$emit('globusLogin', accessToken);
     },
   },
   mounted() {

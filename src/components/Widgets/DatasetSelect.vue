@@ -13,9 +13,8 @@
     </div>
     <hr class="seperator">
     <div v-if="showDatasets">
-      <div v-if="!config.studies[selectedStudy].available && !globusAuthenticated && useGlobus">
-        <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{errorCodes[error]}}</p>
-        <b-button @click="routeToRestricted">Login with Globus</b-button>
+      <div v-if="showGlobusLogin">
+        <p v-for="error in globusAuthErrors" :key="error" class="globus-auth-error">{{config.errorCodes[error]}}</p>
       </div>
       <div class="buttons" v-else>
         <div v-for="dataset in config.studies[selectedStudy].datasets" :key="dataset">
@@ -28,14 +27,29 @@
         </div>
       </div>
     </div>
+    <GlobusAuth
+      :globusToken="globusToken"
+      :getGlobusIdentities="getGlobusIdentities"
+      :userInfo="userInfo"
+      :config="config"
+      :redirectPath="redirectPath"
+      :redirectComponent="redirectComponent"
+      :showGlobusLogin="showGlobusLogin"
+      @globusLogin="globusLogin"
+      :verifyEmail="verifyEmail"
+    />
   </div>
 </template>
 
 <script>
 import firebase from 'firebase/app';
+import GlobusAuth from './GlobusAuth';
 
 export default {
   name: 'DatasetSelect',
+  components: {
+    GlobusAuth,
+  },
   data() {
     return {
       selectedDataset: '',
@@ -67,13 +81,6 @@ export default {
      */
     getGlobusIdentities: {
       type: Function,
-      required: true,
-    },
-    /**
-     * errors produced by brainswipes
-     */
-    errorCodes: {
-      type: Object,
       required: true,
     },
     /**
@@ -112,6 +119,35 @@ export default {
      */
     useGlobus: {
       type: Boolean,
+      required: true,
+    },
+    /**
+     * the authenticated user object from firebase
+     */
+    userInfo: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * the path used in the GLobus app redirect process
+     */
+    redirectPath: {
+      type: String,
+      required: true,
+    },
+    /**
+     * the component to redirect to after Globus Auth
+     */
+    redirectComponent: {
+      type: String,
+      required: true,
+    },
+    /**
+     * calls the built in firebase auth function to send the email
+     * from the template in the firebase console
+     */
+    verifyEmail: {
+      type: Function,
       required: true,
     },
   },
@@ -156,12 +192,30 @@ export default {
         this.globusAuthenticated = true;
       }
     },
-    routeToRestricted() {
-      this.$router.push({ name: 'Restricted', query: { errors: this.globusAuthErrors } });
+    globusLogin(accessToken) {
+      this.$emit('globusLogin', accessToken);
     },
   },
   mounted() {
     this.allowRestrictedDatasets();
+  },
+  computed: {
+    showGlobusLogin() {
+      let showGlobusLogin = false;
+      if (this.showDatasets) {
+        if (this.showUnavailable) {
+          showGlobusLogin = !this.config.studies[this.selectedStudy].available
+            && !this.globusAuthenticated
+            && this.useGlobus
+            && this.datasetPrivileges[this.selectedStudy];
+        } else {
+          showGlobusLogin = !this.config.studies[this.selectedStudy].available
+            && !this.globusAuthenticated
+            && this.useGlobus;
+        }
+      }
+      return showGlobusLogin;
+    },
   },
 };
 </script>

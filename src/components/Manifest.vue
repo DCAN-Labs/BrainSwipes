@@ -20,12 +20,14 @@
           <DatasetSelect
             :globusToken="globusToken"
             :getGlobusIdentities="getGlobusIdentities"
-            :errorCodes="errorCodes"
             :config="config"
             :datasetPrivileges="datasetPrivileges"
             :surpressArchived="false"
             :showUnavailable="true"
             :useGlobus="false"
+            :userInfo="userInfo"
+            redirectPath=""
+            redirectComponent=""
             @activateDataset="activateDataset"
             @activateStudy="activateStudy"
           />
@@ -283,13 +285,6 @@ export default {
       required: true,
     },
     /**
-     * errors produced by brainswipes
-     */
-    errorCodes: {
-      type: Object,
-      required: true,
-    },
-    /**
      * the configuration from firebase
      */
     config: {
@@ -300,6 +295,13 @@ export default {
      * the studies the user is allowed to see
      */
     datasetPrivileges: {
+      type: Object,
+      required: true,
+    },
+    /**
+     * the authenticated user object from firebase
+     */
+    userInfo: {
       type: Object,
       required: true,
     },

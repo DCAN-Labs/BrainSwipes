@@ -396,7 +396,7 @@
       getImageType() {
         const imageType = [];
         if (this.config.datasets[this.dataset].imageType === 'raw') {
-          imageType[0] = 'raw';
+          imageType[0] = 'anatRaw';
           imageType[1] = ' Pre-processed Image';
         } else if (this.widgetPointer.match(/atlas/i)) {
           imageType[0] = 'atlas';
@@ -424,6 +424,9 @@
             break;
           case 'Profile':
             this.$router.push({ name: 'Profile' });
+            break;
+          case 'Viewer':
+            this.$router.push({ name: 'SampleView' });
             break;
           default:
             break;
@@ -494,6 +497,9 @@
               break;
             case 'c':
               this.source = 'Chats';
+              break;
+            case 'v':
+              this.source = 'Viewer';
               break;
             default:
               this.source = '';

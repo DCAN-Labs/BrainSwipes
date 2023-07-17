@@ -1,5 +1,5 @@
 <template>
-  <div id="restricted">
+  <div id="globusauth" v-if="showGlobusLogin">
     <b-alert v-for="error in errors" :key="error" :show="showErrors" variant="danger">{{config.errorCodes[error]}}</b-alert>
     <b-alert :show="showAuthError" variant="danger">Please attempt to login again. If this error persists contact an administrator.</b-alert>
     <div v-if="!authenticated">
@@ -10,13 +10,15 @@
     </div>
     <div v-if="!userInfo.emailVerified">
       <br>
-      <p>This dataset requires a verified email address.</p>
+      <p class="info">This dataset requires a verified email address.</p>
       <b-button class="btn-swipes" @click="verifyEmail">Verify Email</b-button>
     </div>
     <div>
       <br>
-      <p>Globus unifies logins across institutions by using each organization's authentication system.</p>
-      <p>Read the <a href="https://docs.globus.org/how-to/get-started/" target="_blank">globus documentation</a> to learn more.</p>
+      <div class="info">
+        <p>Globus unifies logins across institutions by using each organization's authentication system.</p>
+        <p>Read the <a href="https://docs.globus.org/how-to/get-started/" target="_blank">globus documentation</a> to learn more.</p>
+      </div>
     </div>
   </div>
 </template>
@@ -24,10 +26,10 @@
 <script>
 // Reference: https://github.com/bpedroza/js-pkce
 import WordArray from 'crypto-js/lib-typedarrays';
-import PkceAuth from '../Auth';
+import PkceAuth from '../../Auth';
 
 export default {
-  name: 'restricted',
+  name: 'globusauth',
   data() {
     return {
       /**
@@ -68,10 +70,39 @@ export default {
       required: true,
     },
     /**
-     * the config document from firebase
+     * errors produced by brainswipes
      */
     config: {
       type: Object,
+      required: true,
+    },
+    /**
+     * The page to redirect to after authentication
+     */
+    redirectPath: {
+      type: String,
+      required: true,
+    },
+    /**
+     * The component to load after globus login
+     */
+    redirectComponent: {
+      type: String,
+      required: true,
+    },
+    /**
+     * whether to show the globus login button
+     */
+    showGlobusLogin: {
+      type: Boolean,
+      required: true,
+    },
+    /**
+     * calls the built in firebase auth function to send the email
+     * from the template in the firebase console
+     */
+    verifyEmail: {
+      type: Function,
       required: true,
     },
   },
@@ -100,7 +131,7 @@ export default {
           sessionStorage.removeItem('pkce_code_verifier');
           sessionStorage.removeItem('pkce_state');
 
-          this.$router.push({ name: 'Home' });
+          this.$router.push({ name: this.redirectComponent });
           /* eslint-disable */
         }).catch(function (e) {
           console.log(e);
@@ -133,12 +164,6 @@ export default {
       console.log(result);
     },
     /**
-     * route user to profile which already has a verify email function
-     */
-    verifyEmail() {
-      this.$router.push({ name: 'Profile' });
-    },
-    /**
      * check for incoming errors and display them
      */
     parseErrors() {
@@ -153,9 +178,9 @@ export default {
      * https://auth.globus.org/v2/web/developers
      */
     setRedirect() {
-      let redirectUri = 'https://brainswipes.us/restricted';
+      let redirectUri = `https://brainswipes.us/${this.redirectPath}`;
       if (process.env.NODE_ENV === 'development') {
-        redirectUri = 'http://localhost:8080/restricted';
+        redirectUri = `http://localhost:8080/${this.redirectPath}`;
       }
       PkceAuth.config.redirect_uri = redirectUri;
     },
@@ -181,6 +206,10 @@ export default {
 };
 </script>
 
-<style>
-
+<style scoped>
+  .info{
+    background-color: white;
+    padding: 5px;
+    margin: 5px;
+  }
 </style>
