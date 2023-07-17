@@ -57,6 +57,7 @@
           :definitionsAdded="definitionsAdded"
           @markDefinitionsAdded="markDefinitionsAdded"
           :notifications="notifications"
+          :verifyEmail="verifyEmail"
         />
       </div>
     </div>
@@ -274,7 +275,6 @@ export default {
     },
     globusLogin(token) {
       this.globusToken = token;
-      console.log('globus login');
     },
     async getGlobusIdentities(token) {
       let identities = {};
@@ -285,10 +285,7 @@ export default {
           }),
         });
         const responseJSON = await response.json();
-        const ref = this.db.ref('log/globusAuth');
-        const timestamp = Date.now();
-        responseJSON.timestamp = timestamp;
-        ref.push(responseJSON);
+        this.logToFirebase('globusAuth', responseJSON);
         /* eslint-disable */
         identities = _.reduce(responseJSON.identities, function (r, v) {
           r[v.email] = [v.organization, v.status];
@@ -320,6 +317,29 @@ export default {
           Vue.set(this.notifications, study, studyNotification);
         });
       });
+    },
+    /**
+     * calls the built in firebase auth function to send the email
+     * from the template in the firebase console
+     */
+    verifyEmail() {
+      firebase.auth().currentUser.sendEmailVerification()
+        .then(this.logToFirebase('emailVerify', { success: true }))
+        .catch(error => this.logToFirebase('emailVerify', { success: false, error }));
+    },
+    /**
+     * send info to the log document of firebase
+     */
+    logToFirebase(category, message) {
+      const timestamp = Date.now();
+      const username = this.userInfo.displayName;
+      const logMessage = {
+        message,
+        timestamp,
+        username,
+      };
+      const ref = this.db.ref(`log/${category}`);
+      ref.push(logMessage);
     },
   },
   /**

@@ -357,15 +357,16 @@ export default {
       type: Function,
       required: true,
     },
-  },
-  methods: {
     /**
      * calls the built in firebase auth function to send the email
      * from the template in the firebase console
      */
-    verifyEmail() {
-      firebase.auth().currentUser.sendEmailVerification();
+    verifyEmail: {
+      type: Function,
+      required: true,
     },
+  },
+  methods: {
     /**
      * gets chats for samples the current user has chatted on
      * for the specified dataset

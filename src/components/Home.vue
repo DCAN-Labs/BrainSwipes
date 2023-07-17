@@ -34,6 +34,7 @@
               :userInfo="userInfo"
               redirectPath=""
               redirectComponent="Home"
+              :verifyEmail="verifyEmail"
               @globusLogin="globusLogin"
               @activateDataset="routeToPlay"
             />
@@ -117,6 +118,14 @@ export default {
      */
     config: {
       type: Object,
+      required: true,
+    },
+    /**
+     * calls the built in firebase auth function to send the email
+     * from the template in the firebase console
+     */
+    verifyEmail: {
+      type: Function,
       required: true,
     },
   },

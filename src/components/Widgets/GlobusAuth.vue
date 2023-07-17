@@ -97,6 +97,14 @@ export default {
       type: Boolean,
       required: true,
     },
+    /**
+     * calls the built in firebase auth function to send the email
+     * from the template in the firebase console
+     */
+    verifyEmail: {
+      type: Function,
+      required: true,
+    },
   },
   methods: {
     /**
@@ -154,12 +162,6 @@ export default {
     async logIdentities() {
       const result = await this.getGlobusIdentities(this.globusToken);
       console.log(result);
-    },
-    /**
-     * route user to profile which already has a verify email function
-     */
-    verifyEmail() {
-      this.$router.push({ name: 'Profile' });
     },
     /**
      * check for incoming errors and display them

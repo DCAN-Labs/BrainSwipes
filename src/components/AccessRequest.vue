@@ -38,6 +38,7 @@
         redirectComponent="AccessRequest"
         :showGlobusLogin="true"
         @globusLogin="globusLogin"
+        :verifyEmail="verifyEmail"
       />
     </div>
   </div>
@@ -110,6 +111,14 @@ export default {
      * function that exchanges the Globus token for user information
      */
     getGlobusIdentities: {
+      type: Function,
+      required: true,
+    },
+    /**
+     * calls the built in firebase auth function to send the email
+     * from the template in the firebase console
+     */
+    verifyEmail: {
       type: Function,
       required: true,
     },
