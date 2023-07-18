@@ -54,13 +54,6 @@ export default {
       required: true,
     },
     /**
-     * function that exchanges the globus token for a list of identites
-     */
-    getGlobusIdentities: {
-      type: Function,
-      required: true,
-    },
-    /**
      * the authenticated user object from firebase
      */
     userInfo: {
@@ -124,13 +117,6 @@ export default {
       if (this.globusToken) {
         this.authenticated = true;
       }
-    },
-    /**
-     * function for testing auth token, not in use.
-     */
-    async logIdentities() {
-      const result = await this.getGlobusIdentities(this.globusToken);
-      console.log(result);
     },
     /**
      * route user to profile which already has a verify email function

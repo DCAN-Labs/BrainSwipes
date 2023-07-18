@@ -150,14 +150,10 @@ export default {
       if (this.globusToken) {
         const identities = await this.getGlobusIdentities(this.globusToken);
         this.identities = JSON.stringify(identities);
-        const email = this.userInfo.email;
-        if (Object.hasOwn(identities, email)) {
-          this.globusOrg = identities[email][0];
-        }
         const organizations = [];
         Object.keys(identities).forEach((identity) => {
-          if (identities[identity][0] !== null) {
-            organizations.push(identities[identity][0]);
+          if (Object.hasOwn(identities[identity], 'organization')) {
+            organizations.push(identities[identity].organization);
           }
         });
         this.globusOrgs = organizations;

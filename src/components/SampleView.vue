@@ -119,7 +119,7 @@ export default {
       this.dataset = dataset;
       if (!this.config.studies[study].available) {
         if (!this.globusToken) {
-          errors.push(1);
+          errors.push('noIdentities');
         }
         if (!this.userInfo.emailVerified) {
           errors.push(5);

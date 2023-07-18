@@ -277,7 +277,7 @@ export default {
       this.globusToken = token;
     },
     async getGlobusIdentities(token) {
-      let identities = {};
+      let identities = [];
       if (token) {
         const response = await fetch('https://auth.globus.org/p/whoami?include=identity_provider', {
           headers: new Headers({
@@ -286,12 +286,7 @@ export default {
         });
         const responseJSON = await response.json();
         this.logToFirebase('globusAuth', responseJSON);
-        /* eslint-disable */
-        identities = _.reduce(responseJSON.identities, function (r, v) {
-          r[v.email] = [v.organization, v.status];
-          return r;
-        }, {});
-        /* eslint-enable */
+        identities = responseJSON.identities;
       }
       return identities;
     },

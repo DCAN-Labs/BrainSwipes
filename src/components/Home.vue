@@ -140,7 +140,7 @@ export default {
         const errors = [];
         if (!this.config.studies[study].available) {
           if (!this.globusToken) {
-            errors.push(1);
+            errors.push('noIdentites');
           }
           if (!this.userInfo.emailVerified) {
             errors.push(5);

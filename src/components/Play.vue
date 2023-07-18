@@ -601,14 +601,33 @@
           const identities = await vm._props.getGlobusIdentities(vm._props.globusToken);
           /* eslint-enable no-underscore-dangle */
           const organization = idTokenResult.claims.org;
-          if (Object.keys(identities).length === 0) {
-            errors.push(1);
-          } else if (!identities[email]) {
-            errors.push(2);
-          } else if (identities[email][0] !== organization) {
-            errors.push(3);
-          } else if (identities[email][1] !== 'used') {
-            errors.push(4);
+          // check to see if the email in swipes is linked to the globus account
+          let hasSwipesEmail = false;
+          identities.forEach((identity) => {
+            if (identity.email === email) {
+              hasSwipesEmail = true;
+            }
+          });
+          // check to see if the organiztion the user is registered
+          // with is linked to the globus account
+          let hasOrg = false;
+          let orgUsed = false;
+          identities.forEach((identity) => {
+            if (identity.organization === organization) {
+              hasOrg = true;
+              if (identity.status === 'used') {
+                orgUsed = true;
+              }
+            }
+          });
+          if (identities.length === 0) {
+            errors.push('noIdentities');
+          } else if (!hasSwipesEmail) {
+            errors.push('noSwipesEmail');
+          } else if (!hasOrg) {
+            errors.push('noSwipesOrg');
+          } else if (!orgUsed) {
+            errors.push('orgNotUsed');
           }
         } if (errors.length) {
           vm.$router.push({ name: 'Restricted', query: { errors } });
