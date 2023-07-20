@@ -82,14 +82,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    /**
-     * calls the built in firebase auth function to send the email
-     * from the template in the firebase console
-     */
-    verifyEmail: {
-      type: Function,
-      required: true,
-    },
   },
   methods: {
     /**
