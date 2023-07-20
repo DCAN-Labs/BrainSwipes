@@ -8,11 +8,6 @@
     <div v-else>
       <b-button class="btn-swipes" @click="logoutOfGlobus">Logout of Globus</b-button>
     </div>
-    <div v-if="!userInfo.emailVerified">
-      <br>
-      <p>This dataset requires a verified email address.</p>
-      <b-button class="btn-swipes" @click="verifyEmail">Verify Email</b-button>
-    </div>
     <div>
       <br>
       <p>Globus unifies logins across institutions by using each organization's authentication system.</p>
@@ -51,13 +46,6 @@ export default {
      */
     globusToken: {
       type: String,
-      required: true,
-    },
-    /**
-     * function that exchanges the globus token for a list of identites
-     */
-    getGlobusIdentities: {
-      type: Function,
       required: true,
     },
     /**
@@ -124,13 +112,6 @@ export default {
       if (this.globusToken) {
         this.authenticated = true;
       }
-    },
-    /**
-     * function for testing auth token, not in use.
-     */
-    async logIdentities() {
-      const result = await this.getGlobusIdentities(this.globusToken);
-      console.log(result);
     },
     /**
      * route user to profile which already has a verify email function

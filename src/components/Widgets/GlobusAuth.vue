@@ -5,14 +5,6 @@
     <div v-if="!authenticated">
       <b-button class="btn-swipes" @click="loginWithGlobus">Login with Globus</b-button>
     </div>
-    <div v-else>
-      <b-button class="btn-swipes" @click="logoutOfGlobus">Logout of Globus</b-button>
-    </div>
-    <div v-if="!userInfo.emailVerified">
-      <br>
-      <p class="info">This dataset requires a verified email address.</p>
-      <b-button class="btn-swipes" @click="verifyEmail">Verify Email</b-button>
-    </div>
     <div>
       <br>
       <div class="info">
@@ -53,13 +45,6 @@ export default {
      */
     globusToken: {
       type: String,
-      required: true,
-    },
-    /**
-     * function that exchanges the globus token for a list of identites
-     */
-    getGlobusIdentities: {
-      type: Function,
       required: true,
     },
     /**
@@ -141,27 +126,12 @@ export default {
       }
     },
     /**
-     * wipe globus token and redirect to home.
-     * should maybe be more robust.
-     */
-    logoutOfGlobus() {
-      this.$emit('globusLogin', '');
-      this.$router.push({ name: 'Home' });
-    },
-    /**
      * show content that requires authentication
      */
     allowAccess() {
       if (this.globusToken) {
         this.authenticated = true;
       }
-    },
-    /**
-     * function for testing auth token, not in use.
-     */
-    async logIdentities() {
-      const result = await this.getGlobusIdentities(this.globusToken);
-      console.log(result);
     },
     /**
      * check for incoming errors and display them
