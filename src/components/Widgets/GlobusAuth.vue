@@ -5,11 +5,6 @@
     <div v-if="!authenticated">
       <b-button class="btn-swipes" @click="loginWithGlobus">Login with Globus</b-button>
     </div>
-    <div v-if="!userInfo.emailVerified">
-      <br>
-      <p class="info">This dataset requires a verified email address.</p>
-      <b-button class="btn-swipes" @click="verifyEmail">Verify Email</b-button>
-    </div>
     <div>
       <br>
       <div class="info">

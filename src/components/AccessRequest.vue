@@ -149,11 +149,14 @@ export default {
     async getIdentites() {
       if (this.globusToken) {
         const identities = await this.getGlobusIdentities(this.globusToken);
+        console.log(identities);
         this.identities = JSON.stringify(identities);
         const organizations = [];
         Object.keys(identities).forEach((identity) => {
           if (Object.hasOwn(identities[identity], 'organization')) {
-            organizations.push(identities[identity].organization);
+            if (identities[identity].organization !== null) {
+              organizations.push(identities[identity].organization);
+            }
           }
         });
         this.globusOrgs = organizations;

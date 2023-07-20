@@ -121,9 +121,6 @@ export default {
         if (!this.globusToken) {
           errors.push('noIdentities');
         }
-        if (!this.userInfo.emailVerified) {
-          errors.push(5);
-        }
       }
       if (errors.length) {
         this.$router.push({ name: 'Restricted', query: { errors } });
