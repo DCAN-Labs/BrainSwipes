@@ -134,7 +134,7 @@
             console.log(error);
           }
 
-          let modality = '';
+          let modality = 'Other';
           if (key.match(funcRegEx)) {
             if (key.match(runRegEx)) {
               const run = key.match(runRegEx)[1];
@@ -163,8 +163,6 @@
             } else {
               modality = 'T2';
             }
-          } else {
-            modality = 'Other';
           }
           ses ? result[ses] ? (result[ses][modality] || (result[ses][modality] = [])).push(value) : result[ses] = { [modality]: [value] } : null;
           return result;

@@ -32,12 +32,12 @@
                 ></b-form-checkbox-group>
               </b-dropdown-form>
             </b-dropdown>
-            <p class="control-note">Include/exclude votes by specific users in 'Evaluate Sessions' and 'See Results'</p>
+            <p class="control-note">Include/exclude votes by specific users in 'Evaluate Scans' and 'See Results'</p>
           </div>
           <div class="control-group">      
             <b-form-input id="range-minSwipes" v-model="minSwipes" type="range" min="1" :max="maxSwipes" :number="true"></b-form-input>
             <div class="mt-2">Include samples with a minimum of <span class="data-value">{{ minSwipes }}</span> swipes</div>
-            <p class="control-note">Affects 'Evaluate Users', 'Evaluate Sessions', 'See Results'</p>
+            <p class="control-note">Affects 'Evaluate Users', 'Evaluate Scans', 'See Results'</p>
           </div>
           <div class="control-group">
             <b-form-input id="range-threshold" v-model="threshold" type="range" min="0" max="100" step="5" :number="true"></b-form-input>
