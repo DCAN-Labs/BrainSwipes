@@ -6,20 +6,13 @@
       <h1>
         {{userInfo.displayName}}
       </h1>
+      <h2>
+        {{yourEmail}}
+      </h2>
 
       <p class="lead">
         You have {{userData.score}} points!
       </p>
-      <hr>
-      <h1>
-        {{yourEmail}}
-      </h1>
-      <p>
-        {{verificationStatus}}
-      </p>
-      <b-form v-if="!verified" @submit="verifyEmail">
-        <b-button id="verifyEmail" type="submit" class="btn-swipes">Verify Email</b-button>
-      </b-form>
       <hr>
       <div>
         <h1>Your Study Access</h1>
@@ -39,7 +32,7 @@
           </div>
         </div>
         <br>
-        <b-button variant="warning" @click="routeToAccessRequest" :disabled="!verified">Request Study Access</b-button>
+        <b-button variant="warning" @click="routeToAccessRequest">Request Study Access</b-button>
       </div>
       <hr>
       <div class="profile-pic-options">
@@ -277,18 +270,6 @@ export default {
     yourEmail() {
       return firebase.auth().currentUser.email;
     },
-    verificationStatus() {
-      let verificationStatus;
-      if (firebase.auth().currentUser.emailVerified) {
-        verificationStatus = 'Your email address is verified.';
-      } else {
-        verificationStatus = 'Please verify the email associated with this account.';
-      }
-      return verificationStatus;
-    },
-    verified() {
-      return firebase.auth().currentUser.emailVerified;
-    },
     allowedStudies() {
       const allowedStudies = [];
       Object.keys(this.datasetPrivileges).forEach((study) => {
@@ -354,14 +335,6 @@ export default {
      * function that exchanges the Globus token for user information
      */
     getGlobusIdentities: {
-      type: Function,
-      required: true,
-    },
-    /**
-     * calls the built in firebase auth function to send the email
-     * from the template in the firebase console
-     */
-    verifyEmail: {
       type: Function,
       required: true,
     },

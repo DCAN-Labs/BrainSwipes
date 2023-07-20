@@ -57,7 +57,6 @@
           :definitionsAdded="definitionsAdded"
           @markDefinitionsAdded="markDefinitionsAdded"
           :notifications="notifications"
-          :verifyEmail="verifyEmail"
         />
       </div>
     </div>
@@ -312,15 +311,6 @@ export default {
           Vue.set(this.notifications, study, studyNotification);
         });
       });
-    },
-    /**
-     * calls the built in firebase auth function to send the email
-     * from the template in the firebase console
-     */
-    verifyEmail() {
-      firebase.auth().currentUser.sendEmailVerification()
-        .then(this.logToFirebase('emailVerify', { success: true }))
-        .catch(error => this.logToFirebase('emailVerify', { success: false, error }));
     },
     /**
      * send info to the log document of firebase

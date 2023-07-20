@@ -36,7 +36,6 @@
       :redirectComponent="redirectComponent"
       :showGlobusLogin="showGlobusLogin"
       @globusLogin="globusLogin"
-      :verifyEmail="verifyEmail"
     />
   </div>
 </template>
@@ -140,14 +139,6 @@ export default {
      */
     redirectComponent: {
       type: String,
-      required: true,
-    },
-    /**
-     * calls the built in firebase auth function to send the email
-     * from the template in the firebase console
-     */
-    verifyEmail: {
-      type: Function,
       required: true,
     },
   },

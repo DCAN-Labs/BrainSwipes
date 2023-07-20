@@ -114,12 +114,6 @@ export default {
       }
     },
     /**
-     * route user to profile which already has a verify email function
-     */
-    verifyEmail() {
-      this.$router.push({ name: 'Profile' });
-    },
-    /**
      * check for incoming errors and display them
      */
     parseErrors() {

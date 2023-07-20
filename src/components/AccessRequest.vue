@@ -38,7 +38,6 @@
         redirectComponent="AccessRequest"
         :showGlobusLogin="true"
         @globusLogin="globusLogin"
-        :verifyEmail="verifyEmail"
       />
     </div>
   </div>
@@ -114,14 +113,6 @@ export default {
       type: Function,
       required: true,
     },
-    /**
-     * calls the built in firebase auth function to send the email
-     * from the template in the firebase console
-     */
-    verifyEmail: {
-      type: Function,
-      required: true,
-    },
   },
   methods: {
     onSubmit() {
@@ -149,7 +140,6 @@ export default {
     async getIdentites() {
       if (this.globusToken) {
         const identities = await this.getGlobusIdentities(this.globusToken);
-        console.log(identities);
         this.identities = JSON.stringify(identities);
         const organizations = [];
         Object.keys(identities).forEach((identity) => {

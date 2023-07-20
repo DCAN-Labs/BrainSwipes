@@ -37,10 +37,9 @@
         <hr>
         <div id="organizations">
           <h2>Associated Organization</h2>
-          <b-dropdown id="orgdropdown" :disabled="!userList[userData.username].admin" :text="userModified.org" class="m-md-2">
-            <b-dropdown-item v-for="org in config.allowedGlobusOrganizations" :key="org" @click="changeOrg(org)">{{org}}</b-dropdown-item>
-          </b-dropdown>
-          <p>Contact a BrainSwipes site-wide admin to change this</p>
+          <b-form-select :disabled="!userList[userData.username].admin" v-model="userModified.org" :options="globusOrgs"></b-form-select>
+          <p v-if="!userList[userData.username].admin">Contact a BrainSwipes site-wide admin to change this</p>
+          <p v-else>Open dropdown and type to search</p>
         </div>
       </div>
       <div slot="modal-footer" class="w-100">
@@ -315,6 +314,15 @@ export default {
         })));
       this.userList = filteredUserList;
       this.loading = false;
+    },
+  },
+  computed: {
+    globusOrgs() {
+      const globusOrgs = [];
+      this.config.allowedGlobusOrganizations.forEach((org) => {
+        globusOrgs.push({ value: org, text: org });
+      });
+      return globusOrgs;
     },
   },
 };
