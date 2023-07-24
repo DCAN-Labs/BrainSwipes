@@ -37,6 +37,34 @@
         <b-button @click="closeFlagWarning" type="submit" variant="primary">Cancel</b-button>
       </div>
     </b-modal>
+    <b-modal
+      id="adminactions"
+      title="Admin Actions"
+      ref="adminactions"
+      size="lg"
+    >
+      <h3>This sample is <span v-if="!Object.hasOwn(config.learn.gallery, widgetPointer)">NOT</span> in the gallery.</h3>
+      <b-button variant="warning" @click="addToGallery" :disabled="Object.hasOwn(config.learn.gallery, widgetPointer)">Add Sample to Gallery</b-button>
+      <div v-if="Object.keys(catchTrials).length > 0">
+        <div v-if="Object.keys(catchTrials).includes(widgetPointer)">
+          <h3>This image is a {{catchTrials[widgetPointer] == 'pass' ? 'PASS' : 'FAIL'}} catch trial.</h3>
+          <b-button @click="removeCatchTrial">Remove from catch trials</b-button>
+        </div>
+        <div v-else>
+          <h3>This sample is NOT a catch trial</h3>
+          <b-button variant="success" @click="setCatchTrial('pass')" :disabled="Object.keys(catchTrials).includes(widgetPointer)">Set as Catch Trial Pass</b-button>
+          <b-button variant="danger" @click="setCatchTrial('fail')" :disabled="Object.keys(catchTrials).includes(widgetPointer)">Set as Catch Trial Fail</b-button>
+        </div>
+      </div>
+      <div v-else>
+        <h3>This sample is NOT a catch trial.</h3>
+        <b-button variant="success" @click="setCatchTrial('pass')" :disabled="Object.keys(catchTrials).includes(widgetPointer)">Set as Catch Trial Pass</b-button>
+        <b-button variant="danger" @click="setCatchTrial('fail')" :disabled="Object.keys(catchTrials).includes(widgetPointer)">Set as Catch Trial Fail</b-button>
+      </div>
+    <div slot="modal-footer" class="w-100">
+      <b-button @click="closeAdminActions" type="submit" variant="primary">Close</b-button>
+    </div>
+    </b-modal>
     <div v-if="loading">
       LOADING
     </div>
@@ -67,7 +95,7 @@
       <div id="review-controls">
         <b-button variant="danger" @click="openFlagWarning" :disabled="flagged && !isAdmin">{{flagged ? 'This sample is flagged' : 'Flag for Expert Review'}}</b-button>
         <b-button v-if="source" variant="primary" @click="toSource">Back to {{source}}</b-button>
-        <b-button variant="warning" v-if="isAdmin" @click="addToGallery" :disabled="Object.hasOwn(config.learn.gallery, widgetPointer)">Add Sample to Gallery</b-button>
+        <b-button variant="warning" v-if="isAdmin" @click="openAdminActions">Admin Actions</b-button>
       </div>
       <hr>
       <div class="chat container">
@@ -288,6 +316,10 @@
          * shows the timestamp of the chat on hover
          */
         showChatTime: false,
+        /**
+         * list of catch trials for the current dataset
+         */
+        catchTrials: {},
       };
     },
     computed: {
@@ -328,6 +360,7 @@
       this.widgetPointer = this.$route.params.key;
       this.setSampleInfo(this.dataset);
       this.checkFlaggedStatus();
+      this.getCatchTrials();
       this.getUserRoles();
       this.getSource();
     },
@@ -442,6 +475,22 @@
       closeFlagWarning() {
         this.$refs.flagwarning.hide();
       },
+      openAdminActions() {
+        this.$refs.adminactions.show();
+      },
+      closeAdminActions() {
+        this.$refs.adminactions.hide();
+      },
+      setCatchTrial(passFail) {
+        this.db.ref(`datasets/${this.dataset}/catch/sampleCounts`)
+          .child(this.widgetPointer)
+          .set(passFail);
+      },
+      removeCatchTrial() {
+        this.db.ref(`datasets/${this.dataset}/catch/sampleCounts`)
+          .child(this.widgetPointer)
+          .remove();
+      },
       flagImage(e) {
         this.sendChat(e);
         this.addToFlagged();
@@ -485,6 +534,9 @@
         };
         this.db.ref(`config/learn/gallery/${this.widgetPointer}`).set(update);
       },
+      /**
+       * where the user was directed from
+       */
       getSource() {
         if (this.$route.query.f) {
           const from = this.$route.query.f;
@@ -506,6 +558,17 @@
               break;
           }
         }
+      },
+      /**
+       * populates a list of catch trials for this dataset
+       */
+      getCatchTrials() {
+        this.db.ref(`datasets/${this.dataset}/catch/sampleCounts`).on('value', (snap) => {
+          const sampleCounts = snap.val();
+          if (sampleCounts) {
+            this.catchTrials = sampleCounts;
+          }
+        });
       },
     },
     /**
