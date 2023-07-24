@@ -197,7 +197,6 @@ async function reconcileVotes(dataset){
           update[sample] = 0;
       }
   });
-  console.log(Object.keys(update).length);
   sampleCountsRef.set(update);
 }
 
@@ -449,7 +448,12 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             }
             // get exclusions
             const excludedSubjects = await getExcludedSubjects(dataset);
-            const excludedSubstrings = config.exclusions.substrings;
+            let excludedSubstrings = [];
+            if (Object.hasOwn(config, 'exclusions')) {
+              if (Object.hasOwn(config.exclusions, 'substrings')) {
+                excludedSubstrings = config.exclusions.substrings; 
+              }
+            }
             // update sampleCounts
             const update = {};
             objectsList.forEach(object => {
