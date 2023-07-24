@@ -159,10 +159,11 @@ async function getExcludedSubjects(dataset) {
   const excludedSubjects = [];
 
   if (Object.hasOwn(config, 'exclusions')) {
-      const data = await getObjectFromS3(bucket, config.exclusions.s3path);
+    if (Object.hasOwn(config.exclusions, 'fromTSV')) {
+      const data = await getObjectFromS3(bucket, config.exclusions.fromTSV.s3path);
       const arrayData = data.split(/\r\n|\r|\n/);
       const headers = arrayData[0].split(/\t/);
-      config.exclusions.rules.forEach(rule => {
+      config.exclusions.fromTSV.rules.forEach(rule => {
           const filterIndex = headers.indexOf(rule.filterCol);
           const idIndex = headers.indexOf(rule.idCol);
           const pattern = rule.pattern;
@@ -175,8 +176,29 @@ async function getExcludedSubjects(dataset) {
               }
           });
       });
+    }
   }
   return excludedSubjects;
+}
+
+async function reconcileVotes(dataset){
+  const sampleCountsRef = database.ref(`datasets/${dataset}/sampleCounts`);
+  const sampleSummaryRef = database.ref(`datasets/${dataset}/sampleSummary`);
+  const ssSnap = await sampleSummaryRef.once('value');
+  const scSnap = await sampleCountsRef.once('value');
+  const sampleSummary = ssSnap.val();
+  const sampleCounts = scSnap.val();
+
+  const update = {};
+  Object.keys(sampleCounts).forEach( (sample) => {
+      if (Object.hasOwn(sampleSummary, sample)) {
+          update[sample] = sampleSummary[sample].count;
+      } else {
+          update[sample] = 0;
+      }
+  });
+  console.log(Object.keys(update).length);
+  sampleCountsRef.set(update);
 }
 
 // standard webpack dev server config
@@ -427,6 +449,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             }
             // get exclusions
             const excludedSubjects = await getExcludedSubjects(dataset);
+            const excludedSubstrings = config.exclusions.substrings;
             // update sampleCounts
             const update = {};
             objectsList.forEach(object => {
@@ -438,7 +461,16 @@ const devWebpackConfig = merge(baseWebpackConfig, {
                   if (excludedSubjects.includes(sub)) {
                     // do nothing
                   } else if (!Object.keys(sampleCounts).includes(sample)){
-                    update[sample] = 0;
+                    let include = true;
+                    excludedSubstrings.every(substring => {
+                      if (sample.includes(substring)) {
+                        include = false
+                      }
+                      return include;
+                    });
+                    if (include) {
+                      update[sample] = 0;
+                    }
                   }
                 }
               });
@@ -449,6 +481,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             } else {
               res.send('No new PNG files found.')
             }
+            reconcileVotes(dataset);
           } catch (err) {
             res.send(String(err));
             logError("updateSampleCountsFromS3", err);
