@@ -25,6 +25,7 @@ import AccessRequest from '@/components/AccessRequest';
 import AccessReview from '@/components/AccessReview';
 import TutorialSelect from '@/components/TutorialSelect';
 import SampleView from '@/components/SampleView';
+import CatchTrials from '@/components/CatchTrials';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -226,6 +227,15 @@ const router = new Router({
       path: '/admin/sample-view',
       name: 'SampleView',
       component: SampleView,
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+      },
+    },
+    {
+      path: '/admin/catch-trials',
+      name: 'CatchTrials',
+      component: CatchTrials,
       meta: {
         requiresAuth: true,
         requiresAdmin: true,
