@@ -28,6 +28,7 @@
           :study="study"
           :config="config"
         />
+        <b-button :to="`/${study}/${dataset}/review/${catchTrial}`">Review</b-button>
         <hr>
       </div>
     </div>
@@ -125,6 +126,8 @@
       },
       activateStudy(study) {
         this.study = study;
+        this.catchTrials = {};
+        this.catchSummary = {};
         this.dataset = '';
       },
       /**
