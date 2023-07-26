@@ -145,25 +145,15 @@
           return result;
         },{});
 
+        const pairedUserRatios = _.toPairs(overallUserRatio);
+        pairedUserRatios.sort((a, b) => b[1] - a[1]);
+        const categories = [];
+        const data = [];
+        pairedUserRatios.forEach(userRatio => {
+          categories.push(userRatio[0]);
+          data.push(userRatio[1]);
+        });
 
-        // TO DO: child chart sorting trial results based on image type
-        // const reducedSampleCountsByModality = _.reduce(sampleCounts, function(result, value, key){
-        //   let modality = '';
-        //   if (key.match(funcRegEx)) {
-        //     modality = 'fMRI';
-        //    } else if (key.match(atlasRegEx)) {
-        //      modality = 'Atlas';
-        //   } else if (key.match(t1RegEx)) {
-        //     modality = 'T1';
-        //   } else if (key.match(t2RegEx)) {
-        //     modality = 'T2';
-        //   } else {
-        //     modality = 'Other';
-        //   }
-        //   result[value] ? result[value][modality] ? result[value][modality] += 1 : result[value][modality] = 1 : result[value] = {[modality]: 1 };
-        //   return result;
-        // },{});
-        // this.samplesByModality = reducedSampleCountsByModality;
         const markers = [];
         Object.keys(overallUserData).forEach((user, index) => {
           markers.push(this.formatMarkers(overallUserData[user].totalTrials, index));
@@ -190,7 +180,7 @@
           },
           xaxis: {
             type: 'category',
-            categories: Object.keys(overallUserRatio),
+            categories,
             labels: { rotate: -60, rotateAlways: true },
           },
           markers: { hover: { size: 20 }, discrete: markers },
@@ -212,7 +202,7 @@
         };
         const series = [{
           name: 'Correctness Ratio',
-          data: Object.values(overallUserRatio),
+          data,
         }];
 
         this.parentChartOptions = options;
