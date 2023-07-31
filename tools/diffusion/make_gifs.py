@@ -48,8 +48,7 @@ def create_gifs(bids_dir, subject):
     figsize = (img_width, img_height)
 
     # Specify local filenames
-    subject = subject.replace("sub-", "")    
-    fname_pdf = f"sub-{subject}_desc-b0colorfa_slice-"
+    subject = subject.replace("sub-", "")
     fname_gif = f"sub-{subject}_desc-b0colorfa_slice-"
     fname_fa = f"sub-{subject}_tensor_fa.nii.gz"
     fname_rgb = f"sub-{subject}_tensor_rgb.nii.gz"
@@ -80,7 +79,7 @@ def create_gifs(bids_dir, subject):
     FA = np.clip(FA, 0, 1)
 
     # Convert to colorFA image as in DIPY documentation
-    FA_masked = FA
+    FA_masked = FA * mask_data
     RGB = dti.color_fa(FA_masked, tenfit.evecs)
 
     RGB = np.array(255 * RGB, 'uint8')
