@@ -13,7 +13,6 @@ import argparse
 from dipy.io.image import load_nifti, save_nifti
 from dipy.io import read_bvals_bvecs
 from dipy.core.gradients import gradient_table
-# from pygifsicle import optimize
 from scipy import ndimage
 from scipy.special import expit
 
@@ -206,9 +205,8 @@ def create_gifs(bids_dir, subject):
             fname_gif + str(gif_idx) + ".gif"
         )
         
-        # Save and optimize the gif
+        # Save the gif
         imageio.mimsave(file_path, images, loop=0, fps=fps, subrectangles=True)
-        # optimize(file_path) ## needs apt-get install to work https://github.com/LucaCappelletti94/pygifsicle#readme
             
 def main():
     args = parse_args()
