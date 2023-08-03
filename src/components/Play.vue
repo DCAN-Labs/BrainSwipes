@@ -597,44 +597,55 @@
         if (to.params.dataset !== vm.dataset) {
           vm.$router.push({ name: 'Home' });
         } else if (restricted) {
-          const email = user.email;
-          const identities = await vm._props.getGlobusIdentities(vm._props.globusToken);
-          /* eslint-enable no-underscore-dangle */
-          const organization = idTokenResult.claims.org;
-          // check to see if the email in swipes is linked to the globus account
-          let hasSwipesEmail = false;
-          identities.forEach((identity) => {
-            if (identity.email === email) {
-              hasSwipesEmail = true;
-            }
-          });
-          // check to see if the organiztion the user is registered
-          // with is linked to the globus account
-          let hasOrg = false;
-          let orgUsed = false;
-          identities.forEach((identity) => {
-            if (identity.organization === organization) {
-              hasOrg = true;
-              if (identity.status === 'used') {
-                orgUsed = true;
+          if (vm.globusToken.length) {
+            const email = user.email;
+            const response = await vm._props.getGlobusIdentities(vm._props.globusToken);
+            const identities = response.identities;
+            const identityProviders = response.included.identity_providers;
+            /* eslint-enable no-underscore-dangle */
+            const organization = idTokenResult.claims.org;
+            // check to see if the email in swipes is linked to the globus account
+            let hasSwipesEmail = false;
+            identities.forEach((identity) => {
+              if (identity.email === email) {
+                hasSwipesEmail = true;
               }
+            });
+            // check to see if the organiztion the user is registered
+            // with is linked to the globus account
+            let hasOrg = false;
+            let orgUsed = false;
+            identityProviders.forEach((provider) => {
+              if (provider.name === organization) {
+                hasOrg = true;
+                const domains = provider.domains;
+                identities.forEach((identity) => {
+                  domains.forEach((domain) => {
+                    if (identity.email.includes(domain)) {
+                      if (identity.status === 'used') {
+                        orgUsed = true;
+                      }
+                    }
+                  });
+                });
+              }
+            });
+            if (identities.length === 0) {
+              errors.push('noIdentities');
+            } else if (!hasSwipesEmail) {
+              errors.push('noSwipesEmail');
+            } else if (!hasOrg) {
+              errors.push('noSwipesOrg');
+            } else if (!orgUsed) {
+              errors.push('orgNotUsed');
             }
-          });
-          if (identities.length === 0) {
-            errors.push('noIdentities');
-          } else if (!hasSwipesEmail) {
-            errors.push('noSwipesEmail');
-          } else if (!hasOrg) {
-            errors.push('noSwipesOrg');
-          } else if (!orgUsed) {
-            errors.push('orgNotUsed');
+          } if (errors.length) {
+            vm.$router.push({ name: 'Restricted', query: { errors } });
+          } else if (userAllowed) {
+          /* eslint-disable */
+          vm.allowed = true;
+          /* eslint-enable */
           }
-        } if (errors.length) {
-          vm.$router.push({ name: 'Restricted', query: { errors } });
-        } else if (userAllowed) {
-        /* eslint-disable */
-        vm.allowed = true;
-        /* eslint-enable */
         }
       });
     },

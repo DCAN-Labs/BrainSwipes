@@ -285,7 +285,7 @@ export default {
         });
         const responseJSON = await response.json();
         this.logToFirebase('globusAuth', responseJSON);
-        identities = responseJSON.identities;
+        identities = responseJSON;
       }
       return identities;
     },

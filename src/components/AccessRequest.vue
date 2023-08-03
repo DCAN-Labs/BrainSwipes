@@ -139,14 +139,14 @@ export default {
     },
     async getIdentites() {
       if (this.globusToken) {
-        const identities = await this.getGlobusIdentities(this.globusToken);
+        const response = await this.getGlobusIdentities(this.globusToken);
+        const identities = response.identities;
+        const identityProviders = response.included.identity_providers;
         this.identities = JSON.stringify(identities);
         const organizations = [];
-        Object.keys(identities).forEach((identity) => {
-          if (Object.hasOwn(identities[identity], 'organization')) {
-            if (identities[identity].organization !== null) {
-              organizations.push(identities[identity].organization);
-            }
+        Object.keys(identityProviders).forEach((identityProvider) => {
+          if (Object.hasOwn(identityProviders[identityProvider], 'name')) {
+            organizations.push(identityProviders[identityProvider].name);
           }
         });
         this.globusOrgs = organizations;
