@@ -630,14 +630,16 @@
             } else if (!orgUsed) {
               errors.push('orgNotUsed');
             }
-          } if (errors.length) {
-            vm.$router.push({ name: 'Restricted', query: { errors } });
-          } else if (userAllowed) {
+            if (errors.length) {
+              vm.$router.push({ name: 'Restricted', query: { errors } });
+            }
+          }
+        }
+        if (userAllowed) {
           /* eslint-disable */
           vm.allowed = true;
           vm.loading = false;
           /* eslint-enable */
-          }
         }
       });
     },
