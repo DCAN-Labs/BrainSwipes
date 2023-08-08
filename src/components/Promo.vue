@@ -3,12 +3,16 @@
     <div id="promo-background" :style="backgroundStyles()"></div>
     <div id="promo-content">
       <h1>{{config.studies[study].about.title}}</h1>
-      <p v-for="line in config.studies[study].about.text" :key="line" v-html="line"></p>
+      <div class="text-wrapper">
+        <p v-for="line in config.studies[study].about.text" :key="line" v-html="line" class="text"></p>
+      </div>
       <hr style="width: 80vw;">
       <h1>Available Datasets for {{study}}</h1>
       <div v-for="dataset in config.studies[study].datasets" :key="dataset">
         <h2>{{config.datasets[dataset].name}}</h2>
-        <p v-for="line in config.datasets[dataset].about.text" :key="line" v-html="line"></p>
+        <div class="text-wrapper">
+          <li v-for="line in config.datasets[dataset].about.text" :key="line" v-html="line" class="text"></li>
+        </div>
         <div v-if="config.datasets[dataset].archived" class="archived">
           <p>This dataset is archived and can no longer be swiped on.</p>
           <p>You can still view chats and results.</p>
@@ -16,15 +20,14 @@
       </div>
       <div v-if="!config.studies[study].available">
         <hr>
-        <p>If you believe you should have access to this study fill out the access form:</p>
-        <b-button @click="routeToRequest" variant="warning">To Access Form</b-button>
+        <b-button size="lg" @click="routeToRequest" variant="warning">Request Access to {{study}}</b-button>
       </div>
     </div>
   </div>
 
 </template>
 
-<style>
+<style scoped>
   #promo{
     height:100%;
   }
@@ -55,6 +58,14 @@
   .archived p{
     font-style: italic;
     color:gray;
+  }
+  .text-wrapper{
+    margin-top: 5px;
+    justify-content: center;
+    max-width: 500px;
+  }
+  .text{
+    text-align: justify;
   }
 </style>
 

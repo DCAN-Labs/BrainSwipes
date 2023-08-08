@@ -48,8 +48,10 @@
       <div v-for="(section, sectionIndex) in content" :key="`section${sectionIndex}`">
         <h1 :id="`section${sectionIndex}`">{{section.title}}</h1>
         <div v-for="(step, stepIndex) in content[sectionIndex].steps" :key="`step${stepIndex}`" :id="`section${sectionIndex}step${stepIndex}`" class="fullpage">
-          <div v-if="step.text" class="tutorial-step">
-            <p v-html="step.text"></p>
+          <div class="tutorial-tabs-wrapper">
+            <div v-if="step.text" class="tutorial-step">
+              <p v-html="step.text"></p>
+            </div>
           </div>
           <div v-if="step.checks">
             <Checklist
@@ -197,6 +199,8 @@
   
   .tutorial-step{
     margin: 0 10vw;
+    max-width: 500px;
+    text-align: justify;
   }
 
   dfn{
