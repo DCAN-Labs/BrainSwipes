@@ -3,7 +3,6 @@
     <b-alert :show="bannerStatus" variant="danger">BrainSwipes will be unavailable on {{config.maintenance.date}} for scheduled maintenance.</b-alert>
     <div class="jumbotron landing" :style="landingStyle">
       <div id="titles">
-        <h1>BrainSwipes by DCAN</h1>
         <p class="lead mt-3">
           {{Object.keys(userInfo).length ? needsTutorial ? 'Review our learning resources before you begin swiping' : 'Choose a dataset to QC' : 'Login to begin'}}
         </p>
@@ -36,6 +35,7 @@
               redirectComponent="Home"
               @globusLogin="globusLogin"
               @activateDataset="routeToPlay"
+              @activateStudy="chooseStudy"
             />
           </div>
           <div v-else>
@@ -152,6 +152,11 @@ export default {
     },
     globusLogin(accessToken) {
       this.$emit('globusLogin', accessToken);
+    },
+    chooseStudy(study) {
+      if (!this.datasetPrivileges[study]) {
+        this.$router.push({ name: 'Promo', params: { study } });
+      }
     },
   },
   mounted() {
