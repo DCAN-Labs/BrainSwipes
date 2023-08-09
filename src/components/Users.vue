@@ -1,7 +1,7 @@
 <template>
   <div id="users">
     <h1> Manage Users </h1>
-    <b-modal id="modifyuser" v-if="!loading" :title="`Modifying permissions for ${userModified.name}`"
+    <b-modal id="modifyuser" v-if="!loading" :title="`Modifying permissions for ${userModified.name} | ${userModified.email}`"
       ref="modifyuser" size="lg">
       <div>
         <div id="brainswipes-admin">
@@ -59,12 +59,14 @@
         <table id="user-table">
           <tr>
             <th>User</th>
+            <th>Email</th>
             <th>Admin</th>
             <th>Studies</th>
           </tr>
           <tr v-for="user in Object.keys(userList).sort((a, b) => { return (b > a)? -1 : 1 })" :key="user">
             <td><b-button variant="outline-dark" @click="modifyUser(user, userList[user])">{{user}}</b-button></td>
-            <td>{{ userList[user].admin ? 'BrainSwipes': Object.values(userList[user].studyAdmin).includes(true)? 'Study' : ''}}</td>
+            <td class="userlist-cell">{{userList[user].email}}</td>
+            <td class="userlist-cell">{{ userList[user].admin ? 'BrainSwipes': Object.values(userList[user].studyAdmin).includes(true)? 'Study' : ''}}</td>
             <td>
               <table class="studiesTable">
                 <tr>
@@ -98,6 +100,9 @@ table {
 th {
   font-weight: 800;
   width: 120px;
+}
+.userlist-cell {
+  border-right: 1px solid black;
 }
 .red {
   background-color: red;
@@ -201,6 +206,7 @@ export default {
       this.userModified.datasets = valueCopy.datasets;
       this.userModified.org = valueCopy.org;
       this.userModified.studyAdmin = valueCopy.studyAdmin;
+      this.userModified.email = valueCopy.email;
       this.$refs.modifyuser.show();
     },
     /**

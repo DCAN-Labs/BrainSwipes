@@ -364,7 +364,9 @@ const devWebpackConfig = merge(baseWebpackConfig, {
                     .listUsers(1000)
                     .then((listUsersResult) => {
                       listUsersResult.users.forEach((userRecord) => {
-                        allUsers[userRecord.displayName] = userRecord.customClaims;
+                        const userObj = {...userRecord.customClaims};
+                        userObj.email = userRecord.email;
+                        allUsers[userRecord.displayName] = userObj;
                       });
                       res.send(allUsers);
                     })
