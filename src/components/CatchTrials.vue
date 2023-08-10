@@ -119,8 +119,9 @@
       },
     },
     methods: {
-      activateDataset(dataset) {
+      activateDataset(study, dataset) {
         this.dataset = dataset;
+        this.study = study;
         this.getCatchTrials();
         this.getCatchSummary();
       },
