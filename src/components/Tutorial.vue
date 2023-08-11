@@ -3,7 +3,7 @@
     <!-- Title -->
     <div>
       <h1>{{config.learn.tutorials[module].name}}</h1>
-      <p class="lead">Scroll down to learn</p>
+      <p class="lead">Scroll down to take the tutorial</p>
     </div>
 
     <!-- Progress Bar -->
