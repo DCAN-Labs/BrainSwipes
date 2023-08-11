@@ -63,8 +63,8 @@
           <div class="tutorial-tabs-wrapper" v-if="step.tabs">
             <div class="tutorial-tabs">
               <b-card>
-                <b-tabs card pills fill>
-                  <b-tab v-for="(tab, index) in step.tabs" :key="index" :title="tab.title" :active="!index">
+                <b-tabs card pills fill active-nav-item-class="no-tab-pulse">
+                  <b-tab v-for="(tab, index) in step.tabs" :key="index" :title="tab.title" title-link-class="tab-pulse" :active="!index">
                     <div class="checklist-wrapper" v-if="tab.checks">
                       <Checklist
                       :config="config"
@@ -222,6 +222,14 @@
     padding-bottom: 15vh;
   }
 
+  .tab-pulse {
+    animation: pulse 2s infinite;
+  }
+
+  .no-tab-pulse {
+    animation: none !important;
+  }
+
   @media (min-width: 65em) {
 
     #help {
@@ -229,6 +237,23 @@
     }
 
   }
+
+  @keyframes pulse {
+	0% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7);
+	}
+
+	70% {
+		transform: scale(1);
+		box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+	}
+
+	100% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+	}
+}
 
 </style>
 
