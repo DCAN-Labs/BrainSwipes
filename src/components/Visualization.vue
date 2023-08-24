@@ -11,10 +11,11 @@
         :showUnavailable="false"
         :useGlobus="true"
         :userInfo="userInfo"
-        redirectPath=""
-        redirectComponent=""
+        redirectPath="visualization"
+        redirectComponent="Visualization"
         @activateDataset="activateDataset"
         @activateStudy="activateStudy"
+        @globusLogin="globusLogin"
       />
       <div v-if="showControls" class="center-flex">
         <div class="control-wrapper">
@@ -331,6 +332,9 @@
           this.selectedUsers = users;
           this.sortedUsersList = users.sort();
         });
+      },
+      globusLogin(accessToken) {
+        this.$emit('globusLogin', accessToken);
       },
     },
     watch: {
