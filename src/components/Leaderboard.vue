@@ -19,6 +19,13 @@
               @activateDataset="activateDataset"
             />
           </div>
+          <div v-if="selectedDataset !== 'All Datasets'">
+            <b-dropdown id="time-range-dropdown" variant="warning" :text="timeRange" class="m-md-2">
+              <b-dropdown-item @click="timeRange = 'All Time'">All Time</b-dropdown-item>
+              <b-dropdown-item @click="timeRange = 'Past Week'">Past Week</b-dropdown-item>
+              <b-dropdown-item @click="timeRange = 'Past Month'">Past Month</b-dropdown-item>
+            </b-dropdown>
+          </div>
           <br>
           <h1>Leaders for {{selectedDataset === 'All Datasets' ? 'All Datasets' : config.datasets[selectedDataset].name}}</h1>
           <br>
@@ -237,6 +244,10 @@ export default {
        * list of users and their scores sorted by score
        */
       sortedUsersList: [],
+      /**
+       * choose time range for votes that apply to leaderboard
+       */
+      timeRange: 'All Time',
     };
   },
   props: {
@@ -298,7 +309,7 @@ export default {
       return this.sortedUsersList.slice(0, this.displayLimit);
     },
     propsToWatch() {
-      return [this.selectedDataset];
+      return [this.selectedDataset, this.timeRange];
     },
   },
   watch: {
@@ -341,9 +352,26 @@ export default {
         const votesRef = this.db.ref(`datasets/${this.selectedDataset}/votes`);
         const votesSnap = await votesRef.once('value');
         const votes = votesSnap.val();
+        let cutoffTimestamp;
+        const date = new Date();
+        if (this.timeRange === 'Past Month') {
+          date.setMonth(date.getMonth() - 1);
+          cutoffTimestamp = date;
+        } else if (this.timeRange === 'Past Week') {
+          date.setDate(date.getDate() - 7);
+          cutoffTimestamp = date;
+        } else {
+          cutoffTimestamp = 0;
+        }
         // parse data
         /* eslint-disable */
-        const reducedVotes = _.reduce(votes, (result, value) => {
+        const limitTimeRange = this.timeRange === 'All Time' ? votes : _.reduce(votes, (result, value, key) => {
+          if (value.datetime > cutoffTimestamp) {
+            result[key] = value;
+          }
+          return result;
+        }, {});
+        const reducedVotes = _.reduce(limitTimeRange, (result, value) => {
           const name = value.user;
           result[name] ? result[name]['score'] = result[name]['score'] + 1 : result[name] = {name: name, score: 1, pic: this.allUsers[name].pic};
           return result;
