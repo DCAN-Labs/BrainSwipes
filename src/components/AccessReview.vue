@@ -8,7 +8,7 @@
           <h2>{{study}}</h2>
           <div v-if="Object.keys(requests[study]).length">
             <div v-for="request in Object.keys(requests[study])" :key="request" class="study-card-wrapper">
-              <b-card class="study-card">
+              <b-card v-if="requests[study][request].status === 'awaiting'">
                 <b-form-group label="Study" label-for="selectStudy" label-cols="4">
                   <b-form-input id="selectStudy" readonly v-model="requests[study][request].study"></b-form-input>
                 </b-form-group>
@@ -43,6 +43,14 @@
                   <b-button @click="confirmDeny(study, request)" variant="danger" :disabled="disableConfirmDeny(requests[study][request])">Confirm</b-button>
                 </div>
               </b-card>
+              <b-card v-else>
+                <b-form-group label-cols="4" label="Full Name" label-for="name">
+                  <b-form-input v-model="requests[study][request].name" readonly id="name"></b-form-input>
+                </b-form-group>
+                <b-alert show :variant="requests[study][request].status === 'denied' ? 'danger' : 'success'">
+                  {{requests[study][request].status}}
+                </b-alert>
+              </b-card>
             </div>
           </div>
           <div v-else>
@@ -59,8 +67,8 @@
 </template>
 
 <style scoped>
-  .study-card{
-    max-width: 500px;
+  .card{
+    width: 500px;
   }
   .study-card-wrapper{
     display: flex;
@@ -121,7 +129,7 @@ export default {
     async getRequests() {
       const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
       const claims = idTokenResult.claims;
-      this.db.ref('requests').on('value', (snap) => {
+      this.db.ref('requests').once('value', (snap) => {
         const requests = snap.val();
         Object.keys(requests).forEach((study) => {
           Object.keys(requests[study]).forEach((user) => {
