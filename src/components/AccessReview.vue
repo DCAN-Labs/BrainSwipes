@@ -69,6 +69,7 @@
 <style scoped>
   .card{
     width: 500px;
+    margin-bottom: 10px;
   }
   .study-card-wrapper{
     display: flex;
