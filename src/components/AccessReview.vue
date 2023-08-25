@@ -8,7 +8,7 @@
           <h2>{{study}}</h2>
           <div v-if="Object.keys(requests[study]).length">
             <div v-for="request in Object.keys(requests[study])" :key="request" class="study-card-wrapper">
-              <b-card v-if="requests[study][request].status === 'awaiting'">
+              <b-card v-if="requests[study][request].status === 'awaiting' || requests[study][request].status === 'pending-denial'">
                 <b-form-group label="Study" label-for="selectStudy" label-cols="4">
                   <b-form-input id="selectStudy" readonly v-model="requests[study][request].study"></b-form-input>
                 </b-form-group>
