@@ -459,7 +459,7 @@
             this.$router.push({ name: 'Profile' });
             break;
           case 'Viewer':
-            this.$router.push({ name: 'SampleView' });
+            this.$router.push({ name: 'SampleView', query: { dataset: this.dataset, study: this.study, sample: this.widgetPointer } });
             break;
           default:
             break;

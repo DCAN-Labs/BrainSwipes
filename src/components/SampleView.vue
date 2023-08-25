@@ -27,19 +27,36 @@
           required
         ></b-form-input>
         <br>
-        <b-button
-          :to="`/${study}/${dataset}/review/${sample}?f=v`"
+        <b-button 
+          @click="selectedSample = sample"
           variant="warning"
         >
           View Sample
         </b-button>
       </div>
     </div>
+    <div v-if="selectedSample">
+      <hr>
+      <h2>{{selectedSample}}</h2>
+      <ImageStatic
+        :widgetPointer="selectedSample"
+        :dataset="dataset"
+        :config="config"
+      />
+      <br>
+      <b-button
+        :to="`/${study}/${dataset}/review/${selectedSample}?f=v`"
+      >
+        Review Sample Data
+      </b-button>
+    </div>
   </div>
-
 </template>
 
 <style scoped>
+  #sample-view {
+    padding-bottom: 12vh;
+  }
   .selector-wrapper {
     display: flex;
     justify-content: center;
@@ -56,15 +73,21 @@
  * This makes reviewing a specific sample possible when globus login is required.
  */
 import DatasetSelect from './Widgets/DatasetSelect';
+import ImageStatic from './Widgets/ImageStatic';
 
 export default {
   name: 'sample-view',
   data() {
     return {
       /**
-       * The sample to view
+       * Models input to help set the sample to view
        */
       sample: '',
+      /**
+       * The sample name passed to the view widget.
+       * Copies 'sample' when user clicks 'view sample' button
+       */
+      selectedSample: '',
       /**
        * the dataset the sample is from
        */
@@ -113,6 +136,10 @@ export default {
     },
   },
   methods: {
+    /**
+     * gets dataset from dataset selector widget
+     * and sets dataset in this component
+     */
     setDataset(study, dataset) {
       const errors = [];
       this.study = study;
@@ -128,9 +155,25 @@ export default {
         this.$emit('changeDataset', dataset, study);
       }
     },
+    /**
+     * handles reroute from review page
+     */
+    async handleQuery() {
+      const query = this.$route.query;
+      if (query.study && query.dataset) {
+        const study = query.study;
+        const dataset = query.dataset;
+        this.setDataset(study, dataset);
+        this.selectedSample = query.sample;
+      }
+    },
+  },
+  mounted() {
+    this.handleQuery();
   },
   components: {
     DatasetSelect,
+    ImageStatic,
   },
 };
 </script>
