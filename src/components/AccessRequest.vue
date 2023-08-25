@@ -45,6 +45,9 @@
 </template>
 
 <style scoped>
+#access-request{
+  padding-bottom: 12vh;
+}
 #access-request-form{
   display: flex;
   justify-content: center;
