@@ -152,9 +152,6 @@ export default {
         this.globusOrgs = organizations;
       }
     },
-    routeToRestricted() {
-      this.$router.push({ name: 'Restricted', query: { errors: this.globusAuthErrors } });
-    },
     async getRestrictedStudies() {
       const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
       const studies = idTokenResult.claims.datasets;
