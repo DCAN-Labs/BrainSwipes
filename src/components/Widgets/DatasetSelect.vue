@@ -173,7 +173,8 @@ export default {
         // check to see if the email in swipes is linked to the globus account
         let hasSwipesEmail = false;
         identities.forEach((identity) => {
-          if (identity.email === email) {
+          const identityEmail = identity.email.toString();
+          if (identityEmail.toLowerCase() === email.toLowerCase()) {
             hasSwipesEmail = true;
           }
         });
