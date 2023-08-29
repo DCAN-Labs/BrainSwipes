@@ -129,7 +129,7 @@ export default {
 footer {
   width: 100%;
   position: fixed;
-  padding: 1.25em;
+  padding: 0em 1.25em;
   height: 10vh;
   background-color: white;
   z-index: 2;
@@ -139,6 +139,7 @@ footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 10vh;
 }
 .footer__container .logo {
   width: 3em;
@@ -157,9 +158,6 @@ footer {
   color: rgb(100, 0, 0);
 }
 @media (min-width: 65em) {
-  footer {
-    padding: 2em;
-  }
   .footer__container .logo {
     width: 3em;
     vertical-align: middle;
