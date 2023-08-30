@@ -1,7 +1,7 @@
 <template>
   <div class="imageSwipe">
       <transition :key="swipe" :name="swipe" >
-        <div class="user-card" :key="imgKey">
+        <div class="user-card" :class="zoom ? 'zoom': ''" :key="imgKey">
             <div class="image_area">
               <img class="user-card__picture mx-auto"
                 :src="imgUrl"
@@ -136,6 +136,13 @@
        */
       identifier: {
         type: String,
+        required: false,
+      },
+      /**
+       * for zooming in on the image
+       */
+      zoom: {
+        type: Boolean,
         required: false,
       },
     },
@@ -504,4 +511,11 @@
     to { box-shadow:0px 0px 20px 5px #17a2b8;}
   }
 
+  @media (min-width: 65em) {
+    .zoom{
+      max-width: 100% !important;;
+      padding-bottom: 10vh;
+      position: static;
+    }
+  }
 </style>

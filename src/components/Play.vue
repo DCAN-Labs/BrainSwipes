@@ -32,17 +32,21 @@
           </div>
 
           <ImageSwipe
-          v-else
-          :widgetPointer="widgetPointer"
-          :widgetSummary="widgetSummary"
-          v-on:widgetRating="sendWidgetResponse"
-          :playMode="playMode"
-          ref="widget"
-          :dataset="dataset"
-          :study="study"
-          :config="config"
+            v-else
+            :widgetPointer="widgetPointer"
+            :widgetSummary="widgetSummary"
+            v-on:widgetRating="sendWidgetResponse"
+            :playMode="playMode"
+            ref="widget"
+            :dataset="dataset"
+            :study="study"
+            :config="config"
+            :zoom="zoom"
           />
         </div>
+      </div>
+      <div id="play-menu">
+        <p class="zoom-btn" :class="zoom ? 'zoom-out' : 'zoom-in'" @click="zoom = !zoom"></p>
       </div>
     </div>
 
@@ -77,6 +81,53 @@
     }
   }
 
+
+  #play-menu p{
+    position: absolute;
+    left: -40px;
+    top: 15vh;
+    transition: 0.3s;
+    padding: 15px;
+    width: 60px;
+    text-decoration: none;
+    font-size: 20px;
+    border-radius: 0 5px 5px 0;
+    background-color: #800000;
+  }
+
+  #play-menu p:hover {
+    left: 0;
+    cursor: pointer;
+  }
+
+  .zoom-btn {
+    display: none;
+  }
+
+  @media (min-width: 65em) {
+    .zoom-btn {
+      display: unset;
+    }
+
+    .zoom-in::before{
+      display: block;
+      content: ' ';
+      background-image: url('../assets/zoom-in.svg');
+      background-repeat: no-repeat;
+      background-size: 24px 24px;
+      height: 24px;
+      width: 24px;
+    }
+    .zoom-out::before{
+      display: block;
+      content: ' ';
+      background-image: url('../assets/zoom-out.svg');
+      background-repeat: no-repeat;
+      background-size: 24px 24px;
+      height: 24px;
+      width: 24px;
+    }
+  }
 
 </style>
 
@@ -227,6 +278,10 @@
          * whether the widget should be in play mode or catch trial mode
          */
         playMode: 'play',
+        /*
+         * zoom in on the widget
+         */
+        zoom: false,
         /**
          * if there is nothing in the database, display a blank image
          */
