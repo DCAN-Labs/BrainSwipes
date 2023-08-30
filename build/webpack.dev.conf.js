@@ -519,7 +519,9 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             const command = new PutObjectCommand(input);
             const response = await s3Client.send(command);
             console.log(response);
+            res.send(`Backup JSON file added to S3:\n${filename}`);
           } catch (err) {
+            res.send(String(err));
             logError('firebaseBackups', err);
           }
         })()
