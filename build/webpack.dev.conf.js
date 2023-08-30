@@ -11,6 +11,7 @@ const bodyParser = require('body-parser');
 const S3Client = require('@aws-sdk/client-s3').S3Client;
 const GetObjectCommand = require('@aws-sdk/client-s3').GetObjectCommand;
 const ListObjectsV2Command = require('@aws-sdk/client-s3').ListObjectsV2Command;
+const PutObjectCommand = require('@aws-sdk/client-s3').PutObjectCommand;
 const getSignedUrl = require('@aws-sdk/s3-request-presigner').getSignedUrl;
 const msiKeys = require('../msiKeys.json');
 const serviceAccount = require('../brainswipes-firebase-adminsdk.json');
@@ -491,6 +492,35 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           } catch (err) {
             res.send(String(err));
             logError("updateSampleCountsFromS3", err);
+          }
+        })()
+      });
+      app.post('/firebaseBackup', function (req, res) {
+        (async () => {
+          try {
+            // get date string | https://stackoverflow.com/a/1056730/11878912
+            const date = new Date();
+            const curr_date = date.getDate();
+            const curr_month = date.getMonth() + 1;
+            const curr_year = date.getFullYear();
+            const today = curr_year + "-" + curr_month + "-" + curr_date;
+            const filename = `brainswipes-firebase-backup-${today}.json`
+            // get data from firebase
+            const backupRef = database.ref('/');
+            const snap = await backupRef.once('value');
+            const backup = snap.val();
+
+            const input = {
+              Bucket: 'brainswipes-backups',
+              Key: filename,
+              Body: JSON.stringify(backup),
+              ContentType: "application/json"
+            }
+            const command = new PutObjectCommand(input);
+            const response = await s3Client.send(command);
+            console.log(response);
+          } catch (err) {
+            logError('firebaseBackups', err);
           }
         })()
       });
