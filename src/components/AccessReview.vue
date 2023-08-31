@@ -8,7 +8,7 @@
           <h2>{{study}}</h2>
           <div v-if="Object.keys(requests[study]).length">
             <div v-for="request in Object.keys(requests[study])" :key="request" class="study-card-wrapper">
-              <b-card v-if="requests[study][request].status === 'awaiting' || requests[study][request].status === 'pending-denial'">
+              <b-card v-if="requests[study][request].status === 'awaiting' || requests[study][request].status === 'pending-denial' || requests[study][request].status === 'pending-acceptance'">
                 <b-form-group label="Study" label-for="selectStudy" label-cols="4">
                   <b-form-input id="selectStudy" readonly v-model="requests[study][request].study"></b-form-input>
                 </b-form-group>
@@ -29,18 +29,16 @@
                 </b-form-group>
                 <hr>
                 <div>
-                  <b-button @click="acceptRequest(study, request, requests[study][request].org)" variant="success">Accept</b-button>
+                  <b-button @click="acceptRequest(study, request)" variant="success">Accept</b-button>
                   <b-button @click="denyRequest(study, request)" variant="danger" >Deny</b-button>
                 </div>
                 <div v-if="requests[study][request].status == 'pending-denial'">
-                  <b-form-group label="Reason for denial of access">
-                    <b-form-radio v-model="requests[study][request].reason" value="Not Eligible">Not eligible</b-form-radio>
-                    <b-form-radio v-model="requests[study][request].reason" value="Other">Other</b-form-radio>
-                  </b-form-group>
-                  <b-form-group v-if="requests[study][request].reason == 'Other'" label="Additional Info" label-for="additional-info">
-                    <b-form-input id="additional-info" v-model="requests[study][request].other"></b-form-input>
-                  </b-form-group>
-                  <b-button @click="confirmDeny(study, request)" variant="danger" :disabled="disableConfirmDeny(requests[study][request])">Confirm</b-button>
+                  <br>
+                  <b-button @click="confirmDeny(study, request)" variant="danger">Confirm</b-button>
+                </div>
+                <div v-if="requests[study][request].status == 'pending-acceptance'">
+                  <br>
+                  <b-button @click="confirmAccept(study, request, requests[study][request].org)" variant="success">Confirm</b-button>
                 </div>
               </b-card>
               <b-card v-else>
@@ -50,6 +48,7 @@
                 <b-alert show :variant="requests[study][request].status === 'denied' ? 'danger' : 'success'">
                   {{requests[study][request].status}}
                 </b-alert>
+                <a target="_blank" :href="mailto">Send Email</a>
               </b-card>
             </div>
           </div>
@@ -101,6 +100,18 @@ export default {
        * is the data loading
        */
       loading: true,
+      /**
+       * the current request's user's email
+       */
+      userEmail: '',
+      /**
+       * the current request's study
+       */
+      requestedStudy: '',
+      /**
+       * whether the request has been accepted
+       */
+      requestAccepted: false,
     };
   },
   props: {
@@ -124,6 +135,20 @@ export default {
     db: {
       type: Object,
       required: true,
+    },
+  },
+  computed: {
+    /**
+     * formats the email to send to a user after request is processed
+     */
+    mailto() {
+      let mailto = '';
+      if (this.requestAccepted === true) {
+        mailto = `mailto:${this.userEmail}?subject=BrainSwipes access request approved&body=Your request to access ${this.requestedStudy} has been approved. Please visit https://brainswipes.us to begin swiping!`;
+      } else {
+        mailto = `mailto:${this.userEmail}?subject=BrainSwipes access request denied&body=Your request to access ${this.requestedStudy} has been denied. Please contact the study's administrator to be added to any required data contracts.`;
+      }
+      return mailto;
     },
   },
   methods: {
@@ -150,7 +175,13 @@ export default {
         this.loading = false;
       });
     },
-    async acceptRequest(study, user, org) {
+    acceptRequest(study, user) {
+      this.userEmail = this.requests[study][user].email;
+      this.requestedStudy = study;
+      this.requestAccepted = true;
+      this.requests[study][user].status = 'pending-acceptance';
+    },
+    async confirmAccept(study, user, org) {
       this.requests[study][user].status = 'accepted';
       this.db.ref(`requests/${study}/${user}`).update({ status: 'accepted' });
       this.requestUserPermissionUpdate(study, user, org);
@@ -174,31 +205,14 @@ export default {
       });
     },
     denyRequest(study, user) {
+      this.userEmail = this.requests[study][user].email;
+      this.requestedStudy = study;
+      this.requestAccepted = false;
       this.requests[study][user].status = 'pending-denial';
     },
     confirmDeny(study, user) {
       this.requests[study][user].status = 'denied';
-      const update = {
-        status: 'denied',
-        reason: this.requests[study][user].reason,
-      };
-      if (update.reason === 'Other') {
-        update.other = this.requests[study][user].other;
-      }
-      this.db.ref(`requests/${study}/${user}`).update(update);
-    },
-    disableConfirmDeny(request) {
-      let disabled = true;
-      if (Object.hasOwn(request, 'reason')) {
-        if (request.reason === 'Other') {
-          if (Object.hasOwn(request, 'other')) {
-            disabled = request.other.length < 1;
-          }
-        } else {
-          disabled = false;
-        }
-      }
-      return disabled;
+      this.db.ref(`requests/${study}/${user}`).update({ status: 'denied' });
     },
   },
   mounted() {

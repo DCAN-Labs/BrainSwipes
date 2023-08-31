@@ -26,7 +26,7 @@
             <h3>Your Access Requests</h3>
             <div v-for="study in Object.keys(userRequests)" :key="study">
             <p>
-              {{study}} : {{userRequests[study].status == 'denied' ? userRequests[study].reason == 'Other' ? `${userRequests[study].status} - ${userRequests[study].other}` : `${userRequests[study].status} - ${userRequests[study].reason}` : userRequests[study].status }}
+              {{study}} : {{userRequests[study].status }}
             </p>
             </div>
           </div>
