@@ -18,7 +18,7 @@
           SwipesForScience is an open source project that is easy to create and customizable to any dataset. Visit the <a href="https://swipesforscience.org/" target="_blank">SwipesForScience website</a> to learn more.
         </p>
       <h1>Contact Us</h1>
-        <p>If you have any questions please contact us at <a href="mailto:dcanlab@umn.edu" target="_blank">dcanlab@umn.edu</a>!</p>
+        <p>If you have any questions please contact us at <a href="mailto:dcanlab@umn.edu?subject=BrainSwipes" target="_blank">dcanlab@umn.edu</a>!</p>
         <p>Found a bug or other issue with the app? Post a <a href="https://github.com/DCAN-Labs/BrainSwipes/issues/new" target="_blank">GitHub issue.</a></p>
       <h1>Accessing Closed Studies</h1>
         <p>
