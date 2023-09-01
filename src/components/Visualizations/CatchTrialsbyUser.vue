@@ -138,12 +138,16 @@
           swipes.push(totalTrials);
           return result;
         },{});
+
+        console.log(overallUserData);
         this.maxSwipes = Math.max(...swipes);
         
         const overallUserRatio = _.reduce(overallUserData, (result, value, key) => {
           result[key] = (value.numberCorrect / value.totalTrials).toFixed(2);
           return result;
         },{});
+
+        console.log(overallUserRatio);
 
         const pairedUserRatios = _.toPairs(overallUserRatio);
         pairedUserRatios.sort((a, b) => b[1] - a[1]);
@@ -153,10 +157,11 @@
           categories.push(userRatio[0]);
           data.push(userRatio[1]);
         });
+        console.log(pairedUserRatios);
 
         const markers = [];
-        Object.keys(overallUserData).forEach((user, index) => {
-          markers.push(this.formatMarkers(overallUserData[user].totalTrials, index));
+        pairedUserRatios.forEach((user, index) => {
+          markers.push(this.formatMarkers(overallUserData[user[0]].totalTrials, index));
         });
 
         // create the chart
@@ -194,7 +199,7 @@
               },
               title: {
                 formatter(seriesName, value) {
-                  return `<p>${seriesName}: <strong>${value.series[0][value.dataPointIndex]}</strong></p><p>Trials Swiped: <strong>${overallUserData[Object.keys(overallUserData)[value.dataPointIndex]].totalTrials}</strong></p>`;
+                  return `<p>${seriesName}: <strong>${value.series[0][value.dataPointIndex]}</strong></p><p>Trials Swiped: <strong>${overallUserData[pairedUserRatios[value.dataPointIndex][0]].totalTrials}</strong></p>`;
                 },
               },
             },
