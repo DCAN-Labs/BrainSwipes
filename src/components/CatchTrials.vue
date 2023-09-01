@@ -175,7 +175,6 @@
         /**
          * parsed catch trial data for display in table
          */
-        tableItems: [],
         catchTrialSummary: {},
       };
     },
@@ -244,6 +243,7 @@
         this.selectedImageClass = '';
         this.selectedT1or2 = '';
         this.dataset = '';
+        this.catchTrialSummary = {};
       },
       chooseImageClass(imageClass) {
         this.selectedImageClass = imageClass;
