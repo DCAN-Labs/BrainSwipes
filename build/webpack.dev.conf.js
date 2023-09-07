@@ -16,7 +16,6 @@ const getSignedUrl = require('@aws-sdk/s3-request-presigner').getSignedUrl;
 const msiKeys = require('../msiKeys.json');
 const serviceAccount = require('../brainswipes-firebase-adminsdk.json');
 const axios = require('axios');
-const flatted = require('flatted');
 const rtdbToken = require('../brainswipes-rtdb-token.json');
 
 //init the firebase connection
@@ -513,7 +512,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             const input = {
               Bucket: 'brainswipes-backups',
               Key: filename,
-              Body: flatted.stringify(backup),
+              Body: JSON.stringify(backup.data),
               ContentType: "application/json",
             }
             const command = new PutObjectCommand(input);

@@ -22,7 +22,6 @@
     "crypto-js": "^4.1.1",
     "file-saver": "^2.0.5",
     "firebase": "^8.10.0",
-    "flatted": "^3.2.7",
     "javascript-color-gradient": "^2.3.4",
     "js-pkce": "^1.1.3",
     "json-query": "^2.2.2",
