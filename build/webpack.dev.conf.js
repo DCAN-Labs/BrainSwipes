@@ -16,6 +16,8 @@ const getSignedUrl = require('@aws-sdk/s3-request-presigner').getSignedUrl;
 const msiKeys = require('../msiKeys.json');
 const serviceAccount = require('../brainswipes-firebase-adminsdk.json');
 const axios = require('axios');
+const flatted = require('flatted');
+const rtdbToken = require('../brainswipes-rtdb-token.json');
 
 //init the firebase connection
 var admin = require("firebase-admin");
@@ -507,13 +509,12 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             const today = curr_year + "-" + curr_month + "-" + curr_date;
             const filename = `brainswipes-firebase-backup-${today}.json`
             // get data from firebase
-            const backup = await axios.get('https://brainswipes-default-rtdb.firebaseio.com/.json?auth=Jm9mEqQi9XLxhFuBrkYhOKZlWBgLAc2SZJbxkO6T');
-
+            const backup = await axios.get(`https://brainswipes-default-rtdb.firebaseio.com/.json?auth=${rtdbToken.token}`);
             const input = {
               Bucket: 'brainswipes-backups',
               Key: filename,
-              Body: JSON.stringify(backup),
-              ContentType: "application/json"
+              Body: flatted.stringify(backup),
+              ContentType: "application/json",
             }
             const command = new PutObjectCommand(input);
             const response = await s3Client.send(command);

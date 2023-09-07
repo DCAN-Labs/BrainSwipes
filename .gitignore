@@ -20,6 +20,7 @@ selenium-debug.log
 # firebase
 src/firebaseConfig.js
 brainswipes-firebase-adminsdk.json
+brainswipes-rtdb-token.json
 
 # MSI credentials
 msiKeys.json
