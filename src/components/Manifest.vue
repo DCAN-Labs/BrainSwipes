@@ -314,7 +314,7 @@ export default {
      * Reads the uploaded file and puts it somewhere
      * https://stackoverflow.com/a/59162687
      */
-    /* eslint-disable */
+    /* eslint-disable consistent-return */
     importFile() {
       const files = document.getElementById('selectFiles').files;
       if (files.length <= 0) {
@@ -329,17 +329,16 @@ export default {
       };
       fr.readAsText(files.item(0));
     },
-    /* eslint-enable */
+    /* eslint-enable consistent-return */
     /**
      * This method keeps track of sampleCounts, but only loads it once.
      */
     addFirebaseListener() {
       this.db.ref(`datasets/${this.selectedDataset}/sampleCounts`).once('value', (snap) => {
-        /* eslint-disable */
         this.sampleCounts = _.map(snap.val(), (val, key) => {
-          return { '.key': key, '.value': val };
+          const returnValue = { '.key': key, '.value': val };
+          return returnValue;
         });
-        /* eslint-enable */
         this.status = 'complete';
       });
     },
@@ -381,7 +380,7 @@ export default {
         }
       });
     },
-    /* eslint-disable */
+    /* eslint-disable consistent-return */
     updateManifest(firebaseEntries) {
       const filtered = _.filter(this.manifestEntries, m => firebaseEntries.indexOf(m) < 0);
       const target = filtered.length;
@@ -400,14 +399,12 @@ export default {
                   return ('done');
                 }
               })
-              .catch(() => {
-                return ('error');
-              });
+              .catch(() => ('error'));
             }
           });
       }
     },
-    /* eslint-enable */
+    /* eslint-enable consistent-return */
     /**
      * choose which dataset's data to modify
      */
@@ -561,9 +558,7 @@ export default {
       const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
       const admin = idTokenResult.claims.admin;
       if (admin) {
-        /* eslint-disable */
         vm.allowed = true;
-        /* eslint-enable */
         next();
       } else {
         vm.$router.push({ name: 'Unauthorized' });

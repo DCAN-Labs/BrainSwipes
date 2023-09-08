@@ -87,9 +87,6 @@
     },
     methods: {
       async createParentChart(dataset) {
-        /* eslint-disable */
-        // console.time('numberOfVotes');
-        // console.log('numberOfVotes start');
         this.loading = true;
         // RegEx
         const t1RegEx = RegExp('T1');
@@ -101,20 +98,21 @@
         const sampleCountsSnap = await sampleCountsRef.once('value');
         const sampleCounts = sampleCountsSnap.val();
         // parse data
-        const reducedSampleCounts = _.reduce(sampleCounts, function(result, value, key){
-          result[value] ? result[value] = result[value] + 1 : result[value] = 1;
+        const reducedSampleCounts = _.reduce(sampleCounts, (result, value) => {
+          // eslint-disable-next-line no-unused-expressions
+          result[value] ? result[value] += 1 : result[value] = 1;
           return result;
-        },{});
+        }, {});
         const sampleKeys = Object.keys(reducedSampleCounts);
         const sampleValues = Object.values(reducedSampleCounts);
 
 
-        const reducedSampleCountsByModality = _.reduce(sampleCounts, function(result, value, key){
+        const reducedSampleCountsByModality = _.reduce(sampleCounts, (result, value, key) => {
           let modality = '';
           if (key.match(funcRegEx)) {
             modality = 'fMRI';
           } else if (key.match(atlasRegEx)) {
-            modality = 'Atlas'
+            modality = 'Atlas';
           } else if (key.match(t1RegEx)) {
             modality = 'T1';
           } else if (key.match(t2RegEx)) {
@@ -122,9 +120,10 @@
           } else {
             modality = 'Other';
           }
-          result[value] ? result[value][modality] ? result[value][modality] += 1 : result[value][modality] = 1 : result[value] = {[modality]: 1 };
+          // eslint-disable-next-line
+          result[value] ? result[value][modality] ? result[value][modality] += 1 : result[value][modality] = 1 : result[value] = { [modality]: 1 };
           return result;
-        },{});
+        }, {});
         this.samplesByModality = reducedSampleCountsByModality;
 
         // set colors
@@ -149,7 +148,7 @@
               },
               legendClick: (event, seriesIndex, config) => {
                 const selectedCategory = config.config.xaxis.categories[seriesIndex];
-                const color = config.config.colors[seriesIndex]
+                const color = config.config.colors[seriesIndex];
                 this.handleClick(selectedCategory, color);
               },
             },
@@ -159,7 +158,7 @@
               borderRadius: 4,
               horizontal: false,
               distributed: true,
-            }
+            },
           },
           dataLabels: {
             enabled: true,
@@ -170,7 +169,7 @@
           },
           subtitle: {
             text: '(Click on bar to see modality specific data)',
-            offsetX: 15
+            offsetX: 15,
           },
           xaxis: {
             categories: sampleKeys,
@@ -195,8 +194,6 @@
         this.parentChartSeries = series;
 
         this.loading = false;
-        // console.timeEnd('numberOfVotes');
-        /* eslint-enable */
       },
       createChildChart(dataPoint, color) {
         const dataKeys = Object.keys(this.samplesByModality[dataPoint]);

@@ -101,9 +101,6 @@
     },
     methods: {
       async createParentChart(dataset) {
-        /* eslint-disable */
-        // console.time('recentSwipes');
-        // console.log('recentSwipes start');
         this.loading = true;
         // get data from db
         const votesRef = this.db.ref(`datasets/${dataset}/votes`);
@@ -111,11 +108,11 @@
         const votes = votesSnap.val();
         // parse data
         const dateRangeObject = this.makeDateRangeObject();
-        const reducedVotes = _.reduce(votes, function(result, value, key){
-          if( value.hasOwnProperty('datetime')) {
+        const reducedVotes = _.reduce(votes, (result, value) => {
+          if (Object.hasOwn(value, 'datetime')) {
             const date = new Date(value.datetime);
             const day = date.toLocaleDateString();
-            if (dateRangeObject.hasOwnProperty(day)){
+            if (Object.hasOwn(dateRangeObject, day)) {
               (result[day] || (result[day] = [])).push(value.user);
             }
           }
@@ -123,10 +120,10 @@
         }, dateRangeObject);
         this.votesByDay = reducedVotes;
 
-        const votesPerDay = _.reduce(reducedVotes, function(result, value, key){
-          result[key] = value.length
+        const votesPerDay = _.reduce(reducedVotes, (result, value, key) => {
+          result[key] = value.length;
           return result;
-        },{});
+        }, {});
         const votesPerDayKeys = Object.keys(votesPerDay);
         const votesPerDayValues = Object.values(votesPerDay);
 
@@ -152,7 +149,7 @@
               },
               legendClick: (event, seriesIndex, config) => {
                 const selectedCategory = config.config.xaxis.categories[seriesIndex];
-                const color = config.config.colors[seriesIndex]
+                const color = config.config.colors[seriesIndex];
                 this.handleClick(selectedCategory, color);
               },
             },
@@ -162,13 +159,13 @@
               borderRadius: 4,
               horizontal: false,
               distributed: true,
-            }
+            },
           },
           dataLabels: {
-            enabled: true
+            enabled: true,
           },
           legend: {
-            show: false
+            show: false,
           },
           colors: colorsArray,
           title: {
@@ -176,7 +173,7 @@
           },
           subtitle: {
             text: '(Click on bar to see user specific data)',
-            offsetX: 15
+            offsetX: 15,
           },
           xaxis: {
             categories: votesPerDayKeys,
@@ -200,16 +197,12 @@
         this.parentChartSeries = series;
 
         this.loading = false;
-        // console.timeEnd('recentSwipes');
-        /* eslint-enable */
       },
       createChildChart(dataPoint, color) {
-        /* eslint-disable */
-        const votesPerUser = _.reduce(this.votesByDay[dataPoint], function(result, value, key){
+        const votesPerUser = _.reduce(this.votesByDay[dataPoint], (result, value) => {
           result[value] = result[value] ? result[value] + 1 : 1;
           return result;
         }, {});
-        /* eslint-enable */
         const dataKeys = Object.keys(votesPerUser);
         const dataValues = Object.values(votesPerUser);
         const options = {
@@ -231,7 +224,6 @@
           },
           colors: color,
           title: {
-            // eslint-disable-next-line
             text: `Number of sample swiped on ${dataPoint} by user`,
           },
           stroke: {

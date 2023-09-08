@@ -109,12 +109,10 @@ export default {
           sessionStorage.removeItem('pkce_state');
 
           this.$router.push({ name: this.redirectComponent });
-          /* eslint-disable */
-        }).catch(function (e) {
+        }).catch((e) => {
           console.log(e);
           this.showAuthError = true;
         });
-        /* eslint-enable */
       }
     },
     /**

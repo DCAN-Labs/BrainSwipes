@@ -168,8 +168,7 @@ strong{
         const votesSnap = await votesRef.once('value');
         const samples = sampleSnap.val();
         const votes = votesSnap.val();
-        // eslint-disable-next-line no-unused-vars
-        const votesByUser = _.reduce(votes, (result, value, key) => {
+        const votesByUser = _.reduce(votes, (result, value) => {
           const user = value.user;
           const sample = value.sample;
           const response = value.response;
@@ -201,14 +200,11 @@ strong{
             }
             return VOTresult;
           }, []);
-          // eslint-disable-next-line no-param-reassign
           result[key] = correctVotes;
           return result;
         }, {});
         const userTotals = _.reduce(votesOverThreshold, (result, value, key) => {
-          // eslint-disable-next-line no-unused-vars
-          const userTotal = _.reduce(value, (UTresult, UTvalue, UTkey) => {
-            // eslint-disable-next-line no-param-reassign
+          const userTotal = _.reduce(value, (UTresult, UTvalue) => {
             UTresult += UTvalue;
             return UTresult;
           }, 0);
@@ -219,15 +215,14 @@ strong{
         return userTotals;
       },
       async createChart(dataset, threshold, minVotes) {
-        // console.time('userCorrectness');
-        // console.log('userCorrectness start');
         this.loading = true;
         const input = await this.getUserCorrectness(dataset, threshold, minVotes);
         const sortable = [];
         const swipes = [];
         Object.keys(input).forEach((user) => {
-          // eslint-disable-next-line
-          sortable.push([user, input[user][0], input[user][1], (input[user][0] / input[user][1]).toFixed(2)]);
+          sortable.push(
+            [user, input[user][0], input[user][1], (input[user][0] / input[user][1]).toFixed(2)],
+          );
           swipes.push(input[user][1]);
         });
         this.maxSwipes = Math.max(...swipes);

@@ -637,10 +637,8 @@
           }
         }
         if (userAllowed) {
-          /* eslint-disable */
           vm.allowed = true;
           vm.loading = false;
-          /* eslint-enable */
         }
       });
     },

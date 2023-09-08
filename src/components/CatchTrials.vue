@@ -304,7 +304,6 @@
         return imageType;
       },
       summarizeCatchTrials() {
-        /* eslint-disable no-param-reassign */
         const summary = _.reduce(this.catchTrials, (summaryResult, imageClassValues, imageClass) => {
           summaryResult[imageClass] =
             _.reduce(imageClassValues, (imageClassResult, t1or2values, t1or2) => {
@@ -316,7 +315,6 @@
             }, { T1: { pass: 0, fail: 0 }, T2: { pass: 0, fail: 0 } });
           return summaryResult;
         }, {});
-        /* eslint-enable no-param-reassign */
         this.catchTrialSummary = summary;
       },
     },

@@ -364,7 +364,6 @@ export default {
           cutoffTimestamp = 0;
         }
         // parse data
-        /* eslint-disable */
         const limitTimeRange = this.timeRange === 'All Time' ? votes : _.reduce(votes, (result, value, key) => {
           if (value.datetime > cutoffTimestamp) {
             result[key] = value;
@@ -373,13 +372,15 @@ export default {
         }, {});
         const reducedVotes = _.reduce(limitTimeRange, (result, value) => {
           const name = value.user;
-          result[name] ? result[name]['score'] = result[name]['score'] + 1 : result[name] = {name: name, score: 1, pic: this.allUsers[name].pic};
+          // eslint-disable-next-line no-unused-expressions
+          result[name] ?
+            result[name].score += 1 :
+            result[name] = { name, score: 1, pic: this.allUsers[name].pic };
           return result;
         }, {});
-        _.forIn(reducedVotes, (value, key) => {
+        _.forIn(reducedVotes, (value) => {
           allUsernames.push(value);
-        })
-        /* eslint-enable */
+        });
       }
       /* Sort descending by score */
       allUsernames.sort((a, b) => b.score - a.score);

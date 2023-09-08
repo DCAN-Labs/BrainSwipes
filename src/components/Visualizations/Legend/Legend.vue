@@ -66,9 +66,6 @@
         required: true,
       },
     },
-    created() {
-      // this.moveTooltip();
-    },
     methods: {
       legendMouseOver(n) {
         // eslint-disable-next-line
@@ -78,18 +75,6 @@
       legendMouseOff() {
         this.hidden = true;
       },
-      /* eslint-disable */
-      moveTooltip() {
-        document.addEventListener('mousemove', function(e) {
-          let body = document.querySelector('body');
-          let tooltip = document.getElementById('legend');
-          let left = e.clientX;
-          let top = e.clientY;
-          tooltip.style.left = left + 'px';
-          tooltip.style.top = top + 'px';
-        });
-      }
-      /* eslint-enable */
     },
   };
 </script>

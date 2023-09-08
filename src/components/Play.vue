@@ -295,11 +295,10 @@
        */
       widgetPointer() {
         const currentDataset = this.playMode === 'play' ? this.dataset : `${this.dataset}/catch`;
-        /* eslint-disable */
+        // eslint-disable-next-line no-unused-expressions
         this.widgetPointer ? this.db.ref(`datasets/${currentDataset}/sampleSummary`).child(this.widgetPointer).once('value', (snap) => {
           this.widgetSummary = snap.val();
         }) : null;
-        /* eslint-enable */
       },
     },
     /**
@@ -370,11 +369,10 @@
               flaggedSamples = Object.keys(snap2.val());
             }
             const sampleCounts = _.omit(snap.val(), flaggedSamples);
-            /* eslint-disable */
             this.sampleCounts = _.map(sampleCounts, (val, key) => {
-              return { '.key': key, '.value': val };
+              const returnValue = { '.key': key, '.value': val };
+              return returnValue;
             });
-            /* eslint-enable */
             if (!this.sampleCounts.length) {
               this.noData = true;
             } else {
@@ -387,11 +385,10 @@
       initCatchSampleCounts(dataset) {
         this.db.ref(`datasets/${dataset}/catch/sampleCounts`).once('value', (snap) => {
           const sampleCounts = snap.val();
-          /* eslint-disable */
           this.catchSampleCounts = _.map(sampleCounts, (val, key) => {
-            return { '.key': key, '.value': 0 };
+            const returnValue = { '.key': key, '.value': 0 };
+            return returnValue;
           });
-          /* eslint-enable */
         });
       },
       /**
@@ -402,11 +399,10 @@
         this.db.ref(`datasets/${dataset}/userSeenSamples`)
           .child(this.userInfo.displayName)
           .once('value', (snap) => {
-            /* eslint-disable */
             this.userSeenSamples = _.map(snap.val(), (val, key) => {
-              return { '.key': key, '.value': val };
+              const returnValue = { '.key': key, '.value': val };
+              return returnValue;
             });
-            /* eslint-enable */
           });
       },
       /**
@@ -416,11 +412,10 @@
         this.db.ref(`datasets/${dataset}/catch/userSeenSamples`)
           .child(this.userInfo.displayName)
           .once('value', (snap) => {
-            /* eslint-disable */
             this.userSeenCatchSamples = _.map(snap.val(), (val, key) => {
-              return { '.key': key, '.value': val };
+              const returnValue = { '.key': key, '.value': val };
+              return returnValue;
             });
-            /* eslint-enable */
           });
       },
       /**
@@ -439,10 +434,8 @@
           currentIndex -= 1;
           // And swap it with the current element.
           temporaryValue = array[currentIndex];
-          /* eslint-disable */
           array[currentIndex] = array[randomIndex];
           array[randomIndex] = temporaryValue;
-          /* eslint-enable */
         }
         return array;
       },
@@ -593,9 +586,7 @@
           // update the local copy
           _.map(this.sampleCounts, (val) => {
             if (val['.key'] === this.widgetPointer) {
-              /* eslint-disable */
               val['.value'] += 1;
-              /* eslint-enable */
             }
           });
         }
@@ -701,9 +692,7 @@
           }
         }
         if (userAllowed) {
-          /* eslint-disable */
           vm.allowed = true;
-          /* eslint-enable */
         }
       });
     },

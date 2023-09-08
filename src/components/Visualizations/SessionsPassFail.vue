@@ -97,9 +97,6 @@
     },
     methods: {
       async createChart(dataset, excludedUsers, sliceThreshold, minSwipes) {
-        /* eslint-disable */
-        // console.time('sessionsPassFail');
-        // console.log('sessionsPassFail start');
         this.loading = true;
         // RegEx
         const t1RegEx = RegExp('T1');
@@ -122,11 +119,11 @@
         }, {});
 
         // exclude samples that don't have enough swipes as defined by the user
-        const removeLowSwipeCounts = _.reduce(reducedBySample, function(result, value, key){
-            if (value.length >= minSwipes) {
-                result[key] = value;
-            }
-            return result;
+        const removeLowSwipeCounts = _.reduce(reducedBySample, (result, value, key) => {
+          if (value.length >= minSwipes) {
+            result[key] = value;
+          }
+          return result;
         }, {});
 
         // average the votes of each sample
@@ -156,7 +153,7 @@
               const run = key.match(runRegEx)[1];
               modality = `Atlas_${run}`;
             } else {
-              modality = 'Atlas'
+              modality = 'Atlas';
             }
           } else if (key.match(t1RegEx)) {
             if (key.match(runRegEx)) {
@@ -173,6 +170,7 @@
               modality = 'T2';
             }
           }
+          // eslint-disable-next-line no-unused-expressions
           ses ? (result[ses] || (result[ses] = [])).push({ [modality]: value }) : null;
           return result;
         }, {});
@@ -180,7 +178,10 @@
         // group by scan and check against minimum vote threshold
         const meetsThreshold = _.reduce(reducedBySession, (result, modalities, session) => {
           const reducedSample = _.reduce(modalities, (sampleResult, value) => {
-            sampleResult[Object.keys(value)] = sampleResult.hasOwnProperty(Object.keys(value)) ? sampleResult[Object.keys(value)] && Object.values(value) >= sliceThreshold : Object.values(value) >= sliceThreshold;
+            sampleResult[Object.keys(value)] =
+              Object.hasOwn(sampleResult, Object.keys(value)) ?
+              sampleResult[Object.keys(value)] && Object.values(value) >= sliceThreshold :
+              Object.values(value) >= sliceThreshold;
             return sampleResult;
           }, {});
           result[session] = reducedSample;
@@ -189,21 +190,32 @@
         this.passedScans = meetsThreshold;
 
         // count the number of scans of each modality that pass or fail
-        const numberOfPassFailScansByModality = _.reduce(meetsThreshold, function(result, value, key){
-          Object.keys(value).forEach(modality => {
-            let foundModality = modality;
-            const match = modality.match(/(.*)_run/);
-            if (match) {
-              foundModality = match[1];
-            }
-            if (value[modality]) {
-              result[foundModality]['Pass'] += 1;
-            } else {
-              result[foundModality]['Fail'] += 1;
-            }
-          });
-          return result;
-        },{'T1':{'Pass':0, 'Fail':0}, 'T2':{'Pass':0, 'Fail':0}, 'Atlas':{'Pass':0, 'Fail':0}, 'fMRI':{'Pass':0, 'Fail':0}, 'Other':{'Pass':0, 'Fail':0}});
+        const numberOfPassFailScansByModality =
+          _.reduce(
+            meetsThreshold,
+            (result, value) => {
+              Object.keys(value).forEach((modality) => {
+                let foundModality = modality;
+                const match = modality.match(/(.*)_run/);
+                if (match) {
+                  foundModality = match[1];
+                }
+                if (value[modality]) {
+                  result[foundModality].Pass += 1;
+                } else {
+                  result[foundModality].Fail += 1;
+                }
+              });
+              return result;
+            },
+            {
+              T1: { Pass: 0, Fail: 0 },
+              T2: { Pass: 0, Fail: 0 },
+              Atlas: { Pass: 0, Fail: 0 },
+              fMRI: { Pass: 0, Fail: 0 },
+              Other: { Pass: 0, Fail: 0 },
+            },
+          );
 
         // create the chart
         const options = {
@@ -220,7 +232,7 @@
             bar: {
               borderRadius: 4,
               horizontal: false,
-            }
+            },
           },
           dataLabels: {
             enabled: true,
@@ -244,11 +256,21 @@
         const series = [
           {
             name: 'Number of Passed Scans',
-            data: [numberOfPassFailScansByModality['T1']['Pass'], numberOfPassFailScansByModality['T2']['Pass'], numberOfPassFailScansByModality['Atlas']['Pass'], numberOfPassFailScansByModality['fMRI']['Pass']],
+            data: [
+              numberOfPassFailScansByModality.T1.Pass,
+              numberOfPassFailScansByModality.T2.Pass,
+              numberOfPassFailScansByModality.Atlas.Pass,
+              numberOfPassFailScansByModality.fMRI.Pass,
+            ],
           },
           {
             name: 'Number of Failed Scans',
-            data: [numberOfPassFailScansByModality['T1']['Fail'], numberOfPassFailScansByModality['T2']['Fail'], numberOfPassFailScansByModality['Atlas']['Fail'], numberOfPassFailScansByModality['fMRI']['Fail']],
+            data: [
+              numberOfPassFailScansByModality.T1.Fail,
+              numberOfPassFailScansByModality.T2.Fail,
+              numberOfPassFailScansByModality.Atlas.Fail,
+              numberOfPassFailScansByModality.fMRI.Fail,
+            ],
           },
         ];
 
@@ -257,8 +279,6 @@
         this.chartSeries = series;
 
         this.loading = false;
-        // console.timeEnd('sessionsPassFail');
-        /* eslint-enable */
       },
       findModality(key) {
         const t1RegEx = RegExp('T1');
@@ -281,17 +301,15 @@
         return modality;
       },
       generateCSV() {
-        /* eslint-disable */
-        const csv = _.reduce(this.passedScans, function(result, scans, session){
-          const sesLines = _.reduce(scans, function(lines, passFail, modality){
+        const csv = _.reduce(this.passedScans, (result, scans, session) => {
+          const sesLines = _.reduce(scans, (lines, passFail, modality) => {
             const text = `${session},${modality},${passFail}\n`;
             lines += text;
             return lines;
-          },'');
+          }, '');
           result += sesLines;
           return result;
-        },'Session,Scan,Pass\n');
-        /* eslint-enable */
+        }, 'Session,Scan,Pass\n');
         const blob = new Blob([csv], { type: 'text/plain;charset=utf-8' });
         saveAs(blob, `BrainSwipes-${this.dataset}-session-results.csv`);
       },

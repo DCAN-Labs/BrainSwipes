@@ -285,20 +285,20 @@
     y: true,
   });
 
-  /* eslint-disable */
+  /* eslint-d isable */
   // https://stackoverflow.com/a/42389266
   Vue.directive('click-outside', {
-    bind: function (el, binding, vnode) {
-      el.clickOutsideEvent = function (event) {
+    bind: (el, binding, vnode) => {
+      el.clickOutsideEvent = (event) => {
         // here I check that click was outside the el and its children
-        if (!(el == event.target || el.contains(event.target))) {
+        if (!(el === event.target || el.contains(event.target))) {
           // and if it did, call method provided in attribute value
           vnode.context[binding.expression](event);
         }
       };
       document.body.addEventListener('click', el.clickOutsideEvent);
     },
-    unbind: function (el) {
+    unbind: (el) => {
       document.body.removeEventListener('click', el.clickOutsideEvent);
     },
   });

@@ -91,9 +91,6 @@
     },
     methods: {
       async createChart(dataset, excludedUsers, minSwipes) {
-        /* eslint-disable */
-        // console.time('survivingSessions');
-        // console.log('survivingSessions start');
         this.loading = true;
         // RegEx
         const t1RegEx = RegExp('T1');
@@ -115,11 +112,11 @@
           return result;
         }, {});
 
-        const removeLowSwipeCounts = _.reduce(reducedBySample, function(result, value, key){
-            if (value.length >= minSwipes) {
-                result[key] = value;
-            }
-            return result;
+        const removeLowSwipeCounts = _.reduce(reducedBySample, (result, value, key) => {
+          if (value.length >= minSwipes) {
+            result[key] = value;
+          }
+          return result;
         }, {});
 
         const averageScoreBySample = _.mapValues(removeLowSwipeCounts, o => _.mean(o));
@@ -147,7 +144,7 @@
               const run = key.match(runRegEx)[1];
               modality = `Atlas_${run}`;
             } else {
-              modality = 'Atlas'
+              modality = 'Atlas';
             }
           } else if (key.match(t1RegEx)) {
             if (key.match(runRegEx)) {
@@ -164,6 +161,7 @@
               modality = 'T2';
             }
           }
+          // eslint-disable-next-line
           ses ? result[ses] ? (result[ses][modality] || (result[ses][modality] = [])).push(value) : result[ses] = { [modality]: [value] } : null;
           return result;
         }, {});
@@ -176,7 +174,7 @@
 
         const collapseRuns = _.reduce(minBySession, (result, scans, session) => {
           const runs = {};
-          Object.keys(scans).forEach(scan => {
+          Object.keys(scans).forEach((scan) => {
             const modality = this.findModality(scan);
             runs[modality] = runs[modality] || {};
             runs[modality][scans[scan]] = (runs[modality][scans[scan]] || 0) + 1;
@@ -185,37 +183,39 @@
           return result;
         }, {});
 
-        const ratingsByModality = _.reduce(collapseRuns, (result, modalities, session) => {
-          Object.keys(modalities).forEach(modality => {
-            Object.keys(modalities[modality]).forEach(ratio => {
+        const ratingsByModality = _.reduce(collapseRuns, (result, modalities) => {
+          Object.keys(modalities).forEach((modality) => {
+            Object.keys(modalities[modality]).forEach((ratio) => {
               result[modality][ratio] = (result[modality][ratio] || 0) + modalities[modality][ratio];
             });
           });
           return result;
         }, { T1: {}, T2: {}, Atlas: {}, fMRI: {} });
 
-        const numSamplesPerThreshold = _.reduce(ratingsByModality, (outerResult, scores, modality) => {
-          const modalityThresholds = _.reduce(scores, (result, value, key) => {
-            for (let i = 0; i < 105; i += 5) {
-              if (key >= i / 100) {
-                result[i] += value;
+        const numSamplesPerThreshold =
+          _.reduce(ratingsByModality, (outerResult, scores, modality) => {
+            const modalityThresholds = _.reduce(scores, (result, value, key) => {
+              for (let i = 0; i < 105; i += 5) {
+                if (key >= i / 100) {
+                  result[i] += value;
+                }
               }
-            }
-            return result;
-          }, { 0: 0, 5: 0, 10: 0, 15: 0, 20: 0, 25: 0, 30: 0, 35: 0, 40: 0, 45: 0, 50: 0, 55: 0, 60: 0, 65: 0, 70: 0, 75: 0, 80: 0, 85: 0, 90: 0, 95: 0, 100: 0 });
-          outerResult[modality] = modalityThresholds;
-          return outerResult;
-        }, { T1: {}, T2: {}, Atlas: {}, fMRI: {}});
+              return result;
+            // eslint-disable-next-line max-len
+            }, { 0: 0, 5: 0, 10: 0, 15: 0, 20: 0, 25: 0, 30: 0, 35: 0, 40: 0, 45: 0, 50: 0, 55: 0, 60: 0, 65: 0, 70: 0, 75: 0, 80: 0, 85: 0, 90: 0, 95: 0, 100: 0 });
+            outerResult[modality] = modalityThresholds;
+            return outerResult;
+          }, { T1: {}, T2: {}, Atlas: {}, fMRI: {} });
 
         const thresholdsAsPairs = _.reduce(numSamplesPerThreshold, (result, value, key) => {
           result[key] = _.toPairs(value);
           return result;
         }, {});
 
-        const thresholdsAsInt = _.reduce(thresholdsAsPairs, function(outerResult, outerValue, outerKey){
-          const thresholdAsInt = _.reduce(outerValue, function(result, value){
-              result.push(_.map(value, _.parseInt));
-              return result;
+        const thresholdsAsInt = _.reduce(thresholdsAsPairs, (outerResult, outerValue, outerKey) => {
+          const thresholdAsInt = _.reduce(outerValue, (result, value) => {
+            result.push(_.map(value, _.parseInt));
+            return result;
           }, []);
           outerResult[outerKey] = thresholdAsInt;
           return outerResult;
@@ -235,8 +235,6 @@
           data: thresholdsAsInt.Atlas,
         }];
         this.loading = false;
-        // console.timeEnd('survivingSessions');
-        /* eslint-enable */
       },
       findModality(key) {
         const t1RegEx = RegExp('T1');

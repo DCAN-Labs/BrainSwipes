@@ -74,15 +74,14 @@
         const votesSnap = await votesRef.once('value');
         const votes = votesSnap.val();
         // parse data
-        /* eslint-disable */
         const reducedVotes = _.reduce(votes, (result, value) => {
           const user = value.user;
           const response = value.response === 1 ? 'pass' : 'fail';
-          const notResponse = value.response === 1 ? 'fail': 'pass';
-          result[user] ? result[user][response] = result[user][response] + 1 : result[user] = { user: user, [response]: 1, [notResponse]: 0 };
+          const notResponse = value.response === 1 ? 'fail' : 'pass';
+          // eslint-disable-next-line
+          result[user] ? result[user][response] += 1 : result[user] = { user, [response]: 1, [notResponse]: 0 };
           return result;
         }, {});
-        /* eslint-enable */
         const sorted = _.sortBy(reducedVotes, [o => o.pass + o.fail]);
         let categories = [];
         let pass = [];

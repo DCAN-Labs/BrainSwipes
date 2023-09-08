@@ -102,7 +102,6 @@
     },
     methods: {
       async createParentChart(dataset) {
-        /* eslint-disable no-param-reassign */
         this.loading = true;
         // get data from db
         const catchAnswersRef = this.db.ref(`datasets/${dataset}/catch/sampleCounts`);
@@ -116,6 +115,7 @@
         const voteCorrectness = _.reduce(catchVotes, (result, value) => {
           const correctAnswer = catchAnswers[value.sample] === 'pass' ? 1 : 0;
           const wasCorrect = value.response === correctAnswer;
+          // eslint-disable-next-line no-unused-expressions
           Object.hasOwn(result, value.user) ?
             result[value.user].push({ sample: value.sample, wasCorrect }) :
             result[value.user] = [{ sample: value.sample, wasCorrect }];
@@ -204,7 +204,6 @@
         this.parentChartSeries = series;
 
         this.loading = false;
-        /* eslint-enable no-param-reassign */
       },
       createChildChart(dataPoint, color) {
         const dataKeys = Object.keys(this.samplesByModality[dataPoint]);
