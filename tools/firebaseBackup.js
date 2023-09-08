@@ -15,6 +15,7 @@ async function main() {
     const filename = `brainswipes-firebase-backup-${today}.json`
     // get data from firebase
     const backup = await axios.get(`https://brainswipes-default-rtdb.firebaseio.com/.json?auth=${rtdbToken.token}`);
+    console.log('Got firebase backup!');
 
     // put data in s3
     const s3Client = new S3Client({
@@ -35,7 +36,7 @@ async function main() {
     console.log(response);
     console.log(`Backup JSON file added to S3:\n${filename}`);
   } catch (err) {
-    console.log(err)
+    console.log("error getting backup:\n", err)
   }
 };
 
