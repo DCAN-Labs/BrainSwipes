@@ -43,7 +43,6 @@
   import Vue from 'vue';
   import VueApexCharts from 'vue-apexcharts';
   import _ from 'lodash';
-  import { labels } from '../../labels';
   import Legend from './Legend/Legend';
 
   Vue.use(VueApexCharts);
@@ -103,15 +102,8 @@
     },
     methods: {
       async createParentChart(dataset) {
-        /* eslint-disable */
-        // console.time('catchTrialsByUser');
-        // console.log('catchTrialsByUser start');
+        /* eslint-disable no-param-reassign */
         this.loading = true;
-        // RegEx
-        const t1RegEx = RegExp('T1');
-        const t2RegEx = RegExp('T2');
-        const funcRegEx = RegExp('_task');
-        const atlasRegEx = RegExp('Atlas');
         // get data from db
         const catchAnswersRef = this.db.ref(`datasets/${dataset}/catch/sampleCounts`);
         const catchAnswersSnap = await catchAnswersRef.once('value');
@@ -121,43 +113,41 @@
         const catchVotesSnap = await catchVotesRef.once('value');
         const catchVotes = catchVotesSnap.val();
         // parse data
-        const voteCorrectness = _.reduce(catchVotes, function(result, value){
+        const voteCorrectness = _.reduce(catchVotes, (result, value) => {
           const correctAnswer = catchAnswers[value.sample] === 'pass' ? 1 : 0;
           const wasCorrect = value.response === correctAnswer;
-          Object.hasOwnProperty.call(result, value.user) ? result[value.user].push({sample: value.sample, wasCorrect}) : result[value.user] = [{sample: value.sample, wasCorrect}];
+          Object.hasOwn(result, value.user) ?
+            result[value.user].push({ sample: value.sample, wasCorrect }) :
+            result[value.user] = [{ sample: value.sample, wasCorrect }];
           return result;
-        },{});
+        }, {});
         const swipes = [];
         const overallUserData = _.reduce(voteCorrectness, (result, value, key) => {
           const numberCorrect = _.reduce(value, (userResult, userValue) => {
-            userResult = userValue.wasCorrect ? userResult + 1 : userResult; 
+            userResult = userValue.wasCorrect ? userResult + 1 : userResult;
             return userResult;
-          },0);
+          }, 0);
           const totalTrials = value.length;
-          result[key] = {numberCorrect, totalTrials};
+          result[key] = { numberCorrect, totalTrials };
           swipes.push(totalTrials);
           return result;
-        },{});
+        }, {});
 
-        console.log(overallUserData);
         this.maxSwipes = Math.max(...swipes);
-        
+
         const overallUserRatio = _.reduce(overallUserData, (result, value, key) => {
           result[key] = (value.numberCorrect / value.totalTrials).toFixed(2);
           return result;
-        },{});
-
-        console.log(overallUserRatio);
+        }, {});
 
         const pairedUserRatios = _.toPairs(overallUserRatio);
         pairedUserRatios.sort((a, b) => b[1] - a[1]);
         const categories = [];
         const data = [];
-        pairedUserRatios.forEach(userRatio => {
+        pairedUserRatios.forEach((userRatio) => {
           categories.push(userRatio[0]);
           data.push(userRatio[1]);
         });
-        console.log(pairedUserRatios);
 
         const markers = [];
         pairedUserRatios.forEach((user, index) => {
@@ -214,8 +204,7 @@
         this.parentChartSeries = series;
 
         this.loading = false;
-        // console.timeEnd('catchTrialsByUser');
-        /* eslint-enable */
+        /* eslint-enable no-param-reassign */
       },
       createChildChart(dataPoint, color) {
         const dataKeys = Object.keys(this.samplesByModality[dataPoint]);
@@ -301,9 +290,6 @@
       },
       propsToWatch() {
         return [this.dataset];
-      },
-      labelsRegex() {
-        return new RegExp(labels.join('|'));
       },
     },
     watch: {

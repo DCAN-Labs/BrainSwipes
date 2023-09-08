@@ -38,7 +38,6 @@
   import VueApexCharts from 'vue-apexcharts';
   import _ from 'lodash';
   import colorGradient from 'javascript-color-gradient';
-  import { labels } from '../../labels';
 
   Vue.use(VueApexCharts);
 
@@ -255,9 +254,6 @@
     computed: {
       propsToWatch() {
         return [this.dataset];
-      },
-      labelsRegex() {
-        return new RegExp(labels.join('|'));
       },
     },
     watch: {

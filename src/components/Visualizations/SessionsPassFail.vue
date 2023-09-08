@@ -35,7 +35,6 @@
   import _ from 'lodash';
   import jsonQuery from 'json-query';
   import { saveAs } from 'file-saver';
-  import { labels } from '../../labels';
 
   Vue.use(VueApexCharts);
 
@@ -136,8 +135,9 @@
         // group samples by session
         const reducedBySession = _.reduce(averageScoreBySample, (result, value, key) => {
           let ses = '';
+          const sesRegEx = RegExp('sub-.*_ses.*?_');
           try {
-            ses = key.substring(0, key.match(this.labelsRegex).index);
+            ses = key.match(sesRegEx);
           } catch (error) {
             console.log(key);
             console.log(error);
@@ -299,9 +299,6 @@
     computed: {
       propsToWatch() {
         return [this.dataset, this.excludedUsers, this.sliceThreshold, this.minSwipes];
-      },
-      labelsRegex() {
-        return new RegExp(labels.join('|'));
       },
     },
     watch: {
