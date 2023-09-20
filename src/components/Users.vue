@@ -289,7 +289,8 @@ export default {
         admin: userRoles.admin,
         datasets: userRoles.datasets,
         org: userRoles.org,
-        studyAdmin: userRoles.studyAdmin };
+        studyAdmin: userRoles.studyAdmin,
+        email: userRoles.email };
     },
     /**
      * gets user roles from the server
