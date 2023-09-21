@@ -192,10 +192,18 @@
         let filepath = `${pointer}.png`;
         if (Object.hasOwn(this.config.datasets[this.dataset], 's3filepath')) {
           const s3filepath = this.config.datasets[this.dataset].s3filepath;
-          const subRegExp = /(sub-\d{6})/;
+          const subRegExp = /(sub-.*?)_/;
           const sesRegExp = /_(ses-.*?)_/;
-          const ses = pointer.match(sesRegExp)[1];
-          const sub = pointer.match(subRegExp)[1];
+          const sesMatch = pointer.match(sesRegExp);
+          const subMatch = pointer.match(subRegExp);
+          let ses = '';
+          let sub = '';
+          if (sesMatch) {
+            ses = pointer.match(sesRegExp)[1];
+          }
+          if (subMatch) {
+            sub = pointer.match(subRegExp)[1];
+          }
           filepath = s3filepath.replace('{{SUBJECT}}', sub).replace('{{SESSION}}', ses).replace('{{FILENAME}}', pointer);
         }
         return new Promise((resolve, reject) => {
