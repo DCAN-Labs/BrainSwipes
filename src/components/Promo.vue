@@ -40,7 +40,7 @@
     left: 0px;
     height: 90%;
     width: 100%;
-    background-color: rgba(255,255,255,0.95);
+    background-color: rgba(255,255,255,0.90);
   }
   #promo-content{
     position: absolute;
@@ -62,10 +62,10 @@
   .text-wrapper{
     margin-top: 5px;
     justify-content: center;
-    max-width: 500px;
+    max-width: 800px;
   }
   .text{
-    text-align: justify;
+    text-align: left;
   }
 </style>
 
@@ -96,6 +96,7 @@ export default {
         'background-position': 'center',
         'background-repeat': 'no-repeat',
         'background-attachment': 'fixed',
+        'background-size': '50%',
       };
     },
     routeToRequest() {
