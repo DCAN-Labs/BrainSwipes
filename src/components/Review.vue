@@ -598,7 +598,12 @@
             // to the globus account
             let hasSwipesEmail = false;
             identities.forEach((identity) => {
-              const identityEmail = identity.email.toString();
+              let identityEmail = '';
+              if (Object.hasOwn(identity, 'email')) {
+                if (identity.email != null) {
+                  identityEmail = identity.email.toString();
+                }
+              }
               if (identityEmail.toLowerCase() === email.toLowerCase()) {
                 hasSwipesEmail = true;
               }
@@ -612,8 +617,14 @@
                 hasOrg = true;
                 const domains = provider.domains;
                 identities.forEach((identity) => {
+                  let identityEmail = '';
+                  if (Object.hasOwn(identity, 'email')) {
+                    if (identity.email != null) {
+                      identityEmail = identity.email;
+                    }
+                  }
                   domains.forEach((domain) => {
-                    if (identity.email.includes(domain)) {
+                    if (identityEmail.includes(domain)) {
                       if (identity.status === 'used') {
                         orgUsed = true;
                       }
