@@ -190,13 +190,19 @@ async function reconcileVotes(dataset){
   const sampleCounts = scSnap.val();
 
   const update = {};
-  Object.keys(sampleCounts).forEach( (sample) => {
-      if (Object.hasOwn(sampleSummary, sample)) {
-          update[sample] = sampleSummary[sample].count;
-      } else {
-          update[sample] = 0;
-      }
+  if (sampleSummary != null) {
+    Object.keys(sampleCounts).forEach( (sample) => {
+        if (Object.hasOwn(sampleSummary, sample)) {
+            update[sample] = sampleSummary[sample].count;
+        } else {
+            update[sample] = 0;
+        }
+    });
+  } else {
+    Object.keys(sampleCounts).forEach( (sample) => {
+      update[sample] = 0;
   });
+  }
   sampleCountsRef.set(update);
 }
 
