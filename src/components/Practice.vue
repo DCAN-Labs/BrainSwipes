@@ -188,18 +188,18 @@
         this.swiped = !this.swiped;
       },
       getImageType(pointer) {
-        const imageType = [];
-        if (pointer.match(/atlas/i)) {
-          imageType[0] = 'atlasRegistration';
-          imageType[1] = 'Atlas Registration';
+        let imageType = 'other';
+        if (Object.hasOwn(this.config.learn.tutorials[this.module], 'imageType')) {
+          imageType = this.config.learn.tutorials[this.module].imageType;
+        } else if (pointer.match(/atlas/i)) {
+          imageType = 'atlas';
         } else if (pointer.match(/task/i)) {
-          imageType[0] = 'functionalRegistration';
-          imageType[1] = 'Functional Registration';
+          imageType = 'func';
         } else {
-          imageType[0] = 'surfaceDelineation';
-          imageType[1] = 'Structural Image';
+          imageType = 'anat';
         }
-        return imageType;
+        const imageTitle = this.config.imageTypes[imageType];
+        return [imageType, imageTitle];
       },
     },
     watch: {

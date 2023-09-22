@@ -284,8 +284,8 @@
       },
       getImageType(sample) {
         const imageType = [];
-        if (this.config.datasets[this.dataset].imageType === 'raw') {
-          imageType[0] = 'AnatRaw';
+        if (Object.hasOwn(this.config.datasets[this.dataset], 'imageType')) {
+          imageType[0] = this.config.datasets[this.dataset].imageType;
         } else if (sample.match(/atlas/i)) {
           imageType[0] = 'Atlas';
         } else if (sample.match(/task/i)) {

@@ -71,7 +71,7 @@
               <p>{{gallery[sample].text}}</p>
               <Checklist
                 :config="config"
-                :imageClass="getImageType(sample)[0]"
+                :imageClass="getImageType(sample, gallery[sample].dataset)[0]"
                 :checks="gallery[sample].checks"
               />
             </div>
@@ -220,19 +220,19 @@
       },
     },
     methods: {
-      getImageType(pointer) {
-        const imageType = [];
-        if (pointer.match(/atlas/i)) {
-          imageType[0] = 'atlas';
-          imageType[1] = 'Atlas Registration';
+      getImageType(pointer, dataset) {
+        let imageType = 'other';
+        if (Object.hasOwn(this.config.datasets[dataset], 'imageType')) {
+          imageType = this.config.datasets[dataset].imageType;
+        } else if (pointer.match(/atlas/i)) {
+          imageType = 'atlas';
         } else if (pointer.match(/task/i)) {
-          imageType[0] = 'func';
-          imageType[1] = 'Functional Registration';
+          imageType = 'func';
         } else {
-          imageType[0] = 'anat';
-          imageType[1] = 'Structural Image';
+          imageType = 'anat';
         }
-        return imageType;
+        const imageTitle = this.config.imageTypes[imageType];
+        return [imageType, imageTitle];
       },
       onSubmit(sample) {
         const valid = this.validateSubmit(sample);

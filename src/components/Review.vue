@@ -52,8 +52,8 @@
         </div>
         <div v-else>
           <h3>This sample is NOT a catch trial</h3>
-          <b-button variant="success" @click="setCatchTrial('pass')" :disabled="Object.keys(catchTrials).includes(widgetPointer)">Set as Catch Trial Pass</b-button>
           <b-button variant="danger" @click="setCatchTrial('fail')" :disabled="Object.keys(catchTrials).includes(widgetPointer)">Set as Catch Trial Fail</b-button>
+          <b-button variant="success" @click="setCatchTrial('pass')" :disabled="Object.keys(catchTrials).includes(widgetPointer)">Set as Catch Trial Pass</b-button>
         </div>
       </div>
       <div v-else>
@@ -72,7 +72,7 @@
       <div id="tutorial-tips">
         <div class="information-wrapper">
           <div class="inner-information-wrapper">
-            <h2>This is a{{imageType[1]}}.</h2>
+            <h2>This is {{imageType[1]}}.</h2>
             <div class="information" @click="toTutorial"></div>
           </div>
         </div>
@@ -427,21 +427,18 @@
           });
       },
       getImageType() {
-        const imageType = [];
-        if (this.config.datasets[this.dataset].imageType === 'raw') {
-          imageType[0] = 'anatRaw';
-          imageType[1] = ' Pre-processed Image';
+        let imageType = 'other';
+        if (Object.hasOwn(this.config.datasets[this.dataset], 'imageType')) {
+          imageType = this.config.datasets[this.dataset].imageType;
         } else if (this.widgetPointer.match(/atlas/i)) {
-          imageType[0] = 'atlas';
-          imageType[1] = 'n Atlas Registration';
+          imageType = 'atlas';
         } else if (this.widgetPointer.match(/task/i)) {
-          imageType[0] = 'func';
-          imageType[1] = ' Functional Registration';
+          imageType = 'func';
         } else {
-          imageType[0] = 'anat';
-          imageType[1] = ' Structural image';
+          imageType = 'anat';
         }
-        return imageType;
+        const imageTitle = this.formatImageTypeName(this.config.imageTypes[imageType]);
+        return [imageType, imageTitle];
       },
       toTutorial() {
         const routeData = this.$router.resolve({ name: 'Tutorial', params: { module: this.imageType[0] } });
@@ -569,6 +566,18 @@
             this.catchTrials = sampleCounts;
           }
         });
+      },
+      /**
+       * ensures proper use of 'a' vs 'an' and adds whitespace
+       */
+      formatImageTypeName(imageType) {
+        const firstLetter = imageType[0];
+        const vowels = ['A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u'];
+        let prefix = 'a ';
+        if (vowels.includes(firstLetter)) {
+          prefix = 'an ';
+        }
+        return prefix + imageType;
       },
     },
     /**
