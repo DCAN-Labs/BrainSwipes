@@ -33,6 +33,7 @@
         "BOLD":"Blood Oxygen Level Dependent signal. Detected in fMRI, BOLD measures how blood flow and oxygen levels in the brain change while performing tasks.",
         "Functional Image":"Images acquired through functional MRI. Used to measure changes in metabolism, chemical composition, blood flow and absorption.",
         "Anatomical Image":"Images of the anatomical structure of the brain. Used to study the shape, integrity, volume and developmental changes in the brain.",
-        "Slice":"A two dimensional image of a cross section of tissue collected during MRI."
+        "Slice":"A two dimensional image of a cross section of tissue collected during MRI.",
+        "Diffusion Weighted Imaging": "An MRI technique that uses the diffusion of water molecules to generate contrast in images."
     }
 }

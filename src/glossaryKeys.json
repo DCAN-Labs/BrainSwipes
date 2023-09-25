@@ -62,5 +62,9 @@
     "ANATOMICAL IMAGE":{"Category":"Neuroimaging Terms", "Term":"Anatomical Image"},
     "DELINEATE":{"Category":"Neuroimaging Terms", "Term":"Surface Delineation"},
     "SAGITTAL":{"Category":"Brain Anatomy", "Term":"Sagittal Plane"},
-    "SLICES":{"Category":"Neuroimaging Terms", "Term":"Slice"}
+    "SLICES":{"Category":"Neuroimaging Terms", "Term":"Slice"},
+    "DWI":{"Category":"Neuroimaging Terms", "Term":"Diffusion Weighted Imaging"},
+    "DIFFUSION WEIGHTED IMAGING":{"Category":"Neuroimaging Terms", "Term":"Diffusion Weighted Imaging"},
+    "DIFFUSION WEIGHTED IMAGES":{"Category":"Neuroimaging Terms", "Term":"Diffusion Weighted Imaging"},
+    "DIFFUSION WEIGHTED IMAGE":{"Category":"Neuroimaging Terms", "Term":"Diffusion Weighted Imaging"}
 }
