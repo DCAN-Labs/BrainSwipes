@@ -327,12 +327,19 @@ export default {
       ref.push(logMessage);
     },
   },
-  /**
-   * intialize the animate on scroll library (for tutorial) and listen to authentication state
-   */
   async created() {
     await this.getUserDatasets();
     await this.getConfig();
+    // intercept the console and send to firebase log
+    {
+      const log = console.log.bind(console);
+      console.log = (...args) => {
+        if (process.env.NODE_ENV === 'production') {
+          this.logToFirebase('console', args);
+        }
+        log(...args);
+      };
+    }
   },
 };
 </script>
