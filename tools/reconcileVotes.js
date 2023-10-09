@@ -1,6 +1,5 @@
 var admin = require("firebase-admin");
 var _ = require('lodash');
-var fs = require('fs');
 var serviceAccount = require("../brainswipes-firebase-adminsdk.json");
 const app = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
