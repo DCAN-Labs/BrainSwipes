@@ -104,7 +104,6 @@ export default {
     this.getMaintenanceDate();
     this.getMaintenanceStatus();
     this.getUserRoles();
-    console.log('test');
   },
   calculated: {
     maintenanceDate() {
