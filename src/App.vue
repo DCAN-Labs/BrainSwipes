@@ -335,9 +335,26 @@ export default {
       const log = console.log.bind(console);
       console.log = (...args) => {
         if (process.env.NODE_ENV === 'production') {
-          this.logToFirebase('console', args);
+          try {
+            this.logToFirebase('console', args);
+          } catch (e) {
+            this.logToFirebase('console', 'error logging log');
+          }
         }
         log(...args);
+      };
+    }
+    {
+      const error = console.error.bind(console);
+      console.error = (...args) => {
+        if (process.env.NODE_ENV === 'production') {
+          try {
+            this.logToFirebase('console', args.toString());
+          } catch (e) {
+            this.logToFirebase('console', 'error logging error');
+          }
+        }
+        error(...args);
       };
     }
   },
