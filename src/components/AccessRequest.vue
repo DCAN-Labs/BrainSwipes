@@ -19,7 +19,7 @@
         <b-form-group label="Organization" label-for="selectGlobusOrg" label-cols="4" description="This should be the organization you are a member of for purposes of this study's data use agreement.">
           <b-form-select id="selectGlobusOrg" v-model="globusOrg" :options="globusOrgs"></b-form-select>
         </b-form-group>
-        <b-button @click="onSubmit" :disabled="!(selectedStudy && submittedName)">Submit</b-button>
+        <b-button @click="onSubmit" :disabled="!(selectedStudy && submittedName && globusOrg)">Submit</b-button>
       </b-card>
       <div v-else>
         <p>You have successfully submitted a request to access {{selectedStudy}}.</p>
