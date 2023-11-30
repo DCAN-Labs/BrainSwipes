@@ -62,6 +62,11 @@
               :dataset="submittedDataset"
               :db="db"
               />
+              <hr>
+              <TotalTimeSwiping
+              :dataset="submittedDataset"
+              :db="db"
+              />
               <!-- calculate needed swipes -->
             </b-tab>
             <b-tab title="Evaluate Users">
@@ -161,7 +166,8 @@
   import _ from 'lodash';
   import NumberOfSwipesByUser from './Visualizations/NumberOfSwipesByUser';
   import CatchTrialsByUser from './Visualizations/CatchTrialsbyUser';
-  import SurvivngSessions from './Visualizations/SurvivingSessions';
+  import SurvivingSessions from './Visualizations/SurvivingSessions';
+  import TotalTimeSwiping from './Visualizations/TotalTimeSwiping';
   import SessionsPassFail from './Visualizations/SessionsPassFail';
   import UserCorrectness from './Visualizations/UserCorrectness';
   import AvgTimePerVote from './Visualizations/AvgTimePerVote';
@@ -172,7 +178,8 @@
 
   Vue.component('NumberOfSwipesByUser', NumberOfSwipesByUser);
   Vue.component('CatchTrialsByUser', CatchTrialsByUser);
-  Vue.component('SurvivingSessions', SurvivngSessions);
+  Vue.component('SurvivingSessions', SurvivingSessions);
+  Vue.component('TotalTimeSwiping', TotalTimeSwiping);
   Vue.component('SessionsPassFail', SessionsPassFail);
   Vue.component('UserCorrectness', UserCorrectness);
   Vue.component('AvgTimePerVote', AvgTimePerVote);
