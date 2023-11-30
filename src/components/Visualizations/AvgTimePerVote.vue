@@ -63,25 +63,16 @@
         const votesSnap = await votesRef.once('value');
         const votes = votesSnap.val();
 
-        // identify outliers
-        const times = _.reduce(votes, (result, value) => {
-          result.push(value.time);
-          return result;
-        }, []);
-        const [maxValue, minValue] = this.filterOutliers(times);
-
         // parse data
         const reducedVotes = _.reduce(votes, (result, value) => {
           if (Object.hasOwn(value, 'time')) {
-            if (maxValue >= value.time && value.time >= minValue) {
-              (result[value.user] || (result[value.user] = [])).push(value.time);
-            }
+            (result[value.user] || (result[value.user] = [])).push(value.time);
           }
           return result;
         }, {});
 
         const avgVoteTimePerUser = _.reduce(reducedVotes, (result, value, key) => {
-          const data = [value.length, Math.round(_.mean(value))];
+          const data = [value.length, Math.round(this.median(value))];
           result.push({ name: key, data: [data] });
           return result;
         }, []);
@@ -105,7 +96,7 @@
             show: false,
           },
           title: {
-            text: 'Average Time per Vote (milliseconds) vs Total Votes',
+            text: 'Median Time per Vote (milliseconds) vs Total Votes',
           },
           tooltip: {
             y: {
@@ -114,7 +105,7 @@
               },
               title: {
                 formatter() {
-                  return '<p>Average milliseconds per vote</p>';
+                  return '<p>Median milliseconds per vote</p>';
                 },
               },
             },
@@ -139,28 +130,22 @@
 
         this.loading = false;
       },
-      filterOutliers(someArray) {
-        // https://stackoverflow.com/a/20811670
-        // Copy the values, rather than operating on references to existing values
-        const values = someArray.concat();
+      median(values) {
+        // https://stackoverflow.com/a/45309555
+        if (values.length === 0) {
+          throw new Error('Input array is empty');
+        }
 
-        // Then sort
-        values.sort((a, b) => a - b);
+        // Sorting values, preventing original array
+        // from being mutated.
+        values = [...values].sort((a, b) => a - b);
 
-        /* Then find a generous IQR. This is generous because if (values.length / 4)
-        * is not an int, then really you should average the two elements on either
-        * side to find q1.
-        */
-        const q1 = values[Math.floor((values.length / 4))];
-        // Likewise for q3.
-        const q3 = values[Math.ceil((values.length * (3 / 4)))];
-        const iqr = q3 - q1;
+        const half = Math.floor(values.length / 2);
 
-        // Then find min and max values
-        const maxValue = q3 + (iqr * 1.5);
-        const minValue = q1 - (iqr * 1.5);
-
-        return [maxValue, minValue];
+        return (values.length % 2
+          ? values[half]
+          : (values[half - 1] + values[half]) / 2
+        );
       },
     },
     computed: {
