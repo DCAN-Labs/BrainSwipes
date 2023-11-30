@@ -452,8 +452,9 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             let regexp = new RegExp("^([^\/]*)\.png");
             const subRegExp = new RegExp("(^sub-.*?)_");
             if (Object.hasOwn(config, 's3filepath')) {
-              regexp = new RegExp(config.s3filepath.replace('/', '\/').replace('{{SESSION}}', 'ses-.*?').replace('{{SUBJECT}}', 'sub-\\d{6}').replace('{{FILENAME}}', '([^\/]*)'));
+              regexp = new RegExp(config.s3filepath.replace('/', '\/').replaceAll('{{SESSION}}', 'ses-.*?').replaceAll('{{SUBJECT}}', 'sub-\\d{6}').replaceAll('{{FILENAME}}', '([^\/]*)'));
             }
+            console.log(regexp);
             // get exclusions
             const excludedSubjects = await getExcludedSubjects(dataset);
             let excludedSubstrings = [];

@@ -65,7 +65,7 @@
           const sesRegExp = /_(ses-.*?)_/;
           const ses = pointer.match(sesRegExp)[1];
           const sub = pointer.match(subRegExp)[1];
-          filepath = s3filepath.replace('{{SUBJECT}}', sub).replace('{{SESSION}}', ses).replace('{{FILENAME}}', pointer);
+          filepath = s3filepath.replaceAll('{{SUBJECT}}', sub).replaceAll('{{SESSION}}', ses).replaceAll('{{FILENAME}}', pointer);
         }
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
