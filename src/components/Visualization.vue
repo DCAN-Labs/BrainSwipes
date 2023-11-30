@@ -62,6 +62,11 @@
               :dataset="submittedDataset"
               :db="db"
               />
+              <hr>
+              <TotalTimeSwiping
+              :dataset="submittedDataset"
+              :db="db"
+              />
               <!-- calculate needed swipes -->
             </b-tab>
             <b-tab title="Evaluate Users">
@@ -85,11 +90,10 @@
               :db="db"
               :gradientArray="gradientArray"
               />
-              <!-- <InterraterConcordance
-              :dataset="dataset"
+              <AvgTimePerVote
+              :dataset="selectedDataset"
               :db="db"
-              :gradientArray="gradientArray"
-              /> -->
+              />
             </b-tab>              
             <b-tab title="Evaluate Scans">
               <SurvivingSessions
@@ -160,23 +164,25 @@
   import Vue from 'vue';
   import colorGradient from 'javascript-color-gradient';
   import _ from 'lodash';
-  import InterraterConcordance from './Visualizations/InterraterConcordance';
   import NumberOfSwipesByUser from './Visualizations/NumberOfSwipesByUser';
   import CatchTrialsByUser from './Visualizations/CatchTrialsbyUser';
-  import SurvivngSessions from './Visualizations/SurvivingSessions';
+  import SurvivingSessions from './Visualizations/SurvivingSessions';
+  import TotalTimeSwiping from './Visualizations/TotalTimeSwiping';
   import SessionsPassFail from './Visualizations/SessionsPassFail';
   import UserCorrectness from './Visualizations/UserCorrectness';
+  import AvgTimePerVote from './Visualizations/AvgTimePerVote';
   import NumberOfVotes from './Visualizations/NumberOfVotes';
   import RecentSwipes from './Visualizations/RecentSwipes';
   import DatasetSelect from './Widgets/DatasetSelect';
 
 
-  Vue.component('InterraterConcordance', InterraterConcordance);
   Vue.component('NumberOfSwipesByUser', NumberOfSwipesByUser);
   Vue.component('CatchTrialsByUser', CatchTrialsByUser);
-  Vue.component('SurvivingSessions', SurvivngSessions);
+  Vue.component('SurvivingSessions', SurvivingSessions);
+  Vue.component('TotalTimeSwiping', TotalTimeSwiping);
   Vue.component('SessionsPassFail', SessionsPassFail);
   Vue.component('UserCorrectness', UserCorrectness);
+  Vue.component('AvgTimePerVote', AvgTimePerVote);
   Vue.component('NumberOfVotes', NumberOfVotes);
   Vue.component('RecentSwipes', RecentSwipes);
   Vue.component('DatasetSelect', DatasetSelect);
