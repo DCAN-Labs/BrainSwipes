@@ -300,6 +300,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
                       if (currentUserRecord.customClaims.studyAdmin[study]) {
                         claims.datasets[study] = obj.datasets[study];
                         claims.studyAdmin[study] = obj.studyAdmin[study];
+                        claims.org = obj.org;
                       }
                     });
                     admin.auth().setCustomUserClaims(uid, { admin: claims.admin, datasets: claims.datasets, org: claims.org, studyAdmin: claims.studyAdmin }).then(() => {
