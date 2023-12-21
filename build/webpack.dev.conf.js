@@ -14,6 +14,7 @@ const ListObjectsV2Command = require('@aws-sdk/client-s3').ListObjectsV2Command;
 const getSignedUrl = require('@aws-sdk/s3-request-presigner').getSignedUrl;
 const msiKeys = require('../msiKeys.json');
 const serviceAccount = require('../brainswipes-firebase-adminsdk.json');
+const HeadObjectCommand = require('@aws-sdk/client-s3').HeadBucketCommand;
 
 //init the firebase connection
 var admin = require("firebase-admin");
@@ -62,6 +63,9 @@ function createUrl(filepath, bucket) {
       Key: key,
     };
     const command = new GetObjectCommand(getObjectParams);
+
+    s3Client.send(command).then(result => console.log("Last Modified:\n", result.LastModified));
+
     // getting the signed URL
     const url = getSignedUrl(s3Client, command, { expiresIn: 5 });
     return url;
