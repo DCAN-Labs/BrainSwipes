@@ -47,7 +47,7 @@ async function consolidateSampleData(dataset, preview){
             data[sample] = { count: 0 };
         }
     });
-    //
+    // add samples in sampleSummary that aren't in sampleCounts
     Object.keys(sampleSummary).forEach(sample => {
         if (Object.hasOwn(data, sample)) {
             // nothing
@@ -57,21 +57,82 @@ async function consolidateSampleData(dataset, preview){
         }
     })
 
+    // mark flagged samples
+    Object.keys(flags).forEach(sample => {
+        if (Object.hasOwn(data, sample)) {
+            data[sample].flagged = true;
+        } else {
+            console.log(`Flagged sample not found ${sample}`);
+        }
+    })
 
-    console.log(data);
+    // user seen samples
+    Object.keys(userSeenSamples).forEach(user => {
+        Object.keys(userSeenSamples[user]).forEach(sample => {
+            if (Object.hasOwn(data, sample)) {
+                if (Object.hasOwn(data[sample], 'userSeenSamples')) {
+                    data[sample].userSeenSamples[user] = userSeenSamples[user][sample];
+                } else {
+                    data[sample].userSeenSamples = { [user]: userSeenSamples[user][sample] };
+                }
+            } else {
+                console.log(`userSeenSample not found ${sample}`);
+            }
+        })
+    })
+
+    // chats
+    Object.keys(chats.chats).forEach(sample => {
+        if (Object.hasOwn(data, sample)) {
+            data[sample].chats = { messages: chats.chats[sample].chats, notify: chats.chats[sample].notify };
+        } else {
+            console.log(`Chat sample not found ${sample}`);
+        }
+    })
+
+    // votes
+    Object.keys(votes).forEach(vote => {
+        sample = votes[vote].sample;
+        delete votes[vote].sample;
+        if (Object.hasOwn(data, sample)) {
+            if (Object.hasOwn(data[sample], 'votes')) {
+                data[sample].votes[vote] = votes[vote];
+            } else {
+                data[sample].votes = { [vote]: votes[vote] };
+            }
+        } else {
+            console.log(`Votes sample not found ${sample}`);
+        }
+    })
+
+    // https://gist.github.com/collingo/6700069
+    if (preview) {
+        const outputLocation = `consolidatedSampleData-${dataset}.json`
+        require('fs').writeFile(outputLocation, JSON.stringify(data, null, 4), function(err) {
+            if(err) {
+              console.log(err);
+            } else {
+              console.log("JSON saved to "+outputLocation);
+            }
+        });
+    }
+    return true
 }
 
 
 
 
-function main(){
+async function main(){
     const dataset = process.argv[2];
     const confirm = process.argv[3];
     let preview = true
     if (confirm == "confirm") {
         preview = false;
     }
-    consolidateSampleData(dataset, preview);
+    complete = await consolidateSampleData(dataset, preview);
+    if (complete) {
+        app.delete();
+    }
 }
 
 main();
