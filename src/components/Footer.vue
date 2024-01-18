@@ -1,7 +1,7 @@
 <template>
   <footer>
     <div class="footer__container">
-      <a href="https://innovation.umn.edu/developmental-cognition-and-neuroimaging-lab/" target="_blank"><img src="../assets/DCAN-logo.png" alt="DCAN logo" class="logo"></a>
+      <a href="https://innovation.umn.edu/developmental-cognition-and-neuroimaging-lab/" target="_blank"><img src="/static/DCAN-logo.png" alt="DCAN logo" class="logo"></a>
       <nav v-if="loadingAdmin">
       </nav>
       <nav v-else>
