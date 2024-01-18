@@ -324,7 +324,7 @@ export default {
         username,
       };
       const ref = this.db.ref(`log/${category}`);
-      ref.push(logMessage);
+      ref.push(JSON.stringify(logMessage));
     },
   },
   async created() {
