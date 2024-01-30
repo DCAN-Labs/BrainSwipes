@@ -112,7 +112,6 @@
             return result;
           }, {});
         }
-        console.log(reducedVotes);
         // sort users by number of votes
         const sortable = [];
         Object.keys(reducedVotes).forEach((user) => {
@@ -122,13 +121,15 @@
         const categories = [];
         const counts = [];
         const totalSamples = Object.keys(sampleCounts).length;
-        const wantedSwipes = this.wantedSwipes * totalSamples;
-        const wantedSwipesPerUser = Math.round(wantedSwipes / sorted.length);
+        const currentVotes = Object.keys(votes).length;
+        const wantedSwipes = (this.wantedSwipes * totalSamples) - currentVotes;
+        const wantedSwipesPerUser = Math.max(0, Math.round(wantedSwipes / sorted.length));
         const neededSwipes = [];
         sorted.forEach((element) => {
           categories.push(element[0]);
           counts.push(element[1]);
-          neededSwipes.push(wantedSwipesPerUser - element[1]);
+          const needed = wantedSwipesPerUser - element[1];
+          neededSwipes.push(Math.max(0, needed));
         });
 
         // data for apexcharts
@@ -166,6 +167,22 @@
             opacity: 1,
           },
           colors: ['#00C400', '#C40000'],
+          annotations: {
+            yaxis: [
+              {
+                y: wantedSwipesPerUser,
+                borderColor: '#0096E3',
+                label: {
+                  borderColor: '#0096E3',
+                  style: {
+                    color: '#fff',
+                    background: '#0096E3',
+                  },
+                  text: `${wantedSwipesPerUser} swipes remaining per user to finish QCing this dataset`,
+                },
+              },
+            ],
+          },
         };
         const series = [
           {
