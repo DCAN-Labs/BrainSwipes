@@ -48,13 +48,14 @@
           <div class="control-group">
             <input type="number" min="1" step="1" id="wantedSwipes" v-model="wantedSwipes">
             <div class="my-2">Goal number of swipes per image</div>
-            <p class="control-note">Affects 'Track Progress'</p>
+            <p class="control-note">Affects 'Number of Swipes Needed by User'</p>
           </div>
           <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
           <hr class="seperator">
         </div>
       </div>
       <div id="charts" v-if="showCharts">
+        <h2> {{this.config.datasets[selectedDataset].name}} </h2>
         <b-card no-body fill>
           <b-tabs card lazy>
             <b-tab title="Track Progress" active>
@@ -181,6 +182,7 @@
   import Vue from 'vue';
   import colorGradient from 'javascript-color-gradient';
   import _ from 'lodash';
+  import firebase from 'firebase/app';
   import NumberOfSwipesByUser from './Visualizations/NumberOfSwipesByUser';
   import CatchTrialsByUser from './Visualizations/CatchTrialsbyUser';
   import SurvivingSessions from './Visualizations/SurvivingSessions';
@@ -359,16 +361,51 @@
         this.updateCharts();
         this.showControls = true;
       },
-      sortUsersList() {
-        this.db.ref(`datasets/${this.selectedDataset}/userSeenSamples`).on('value', (snap) => {
-          const userSeenSamples = snap.val();
-          const users = Object.keys(userSeenSamples);
-          this.selectedUsers = users;
-          this.sortedUsersList = users.sort();
-        });
+      async sortUsersList() {
+        let restrictedStudy = false;
+        if (Object.hasOwn(this.config.studies, this.selectedStudy)) {
+          restrictedStudy = !this.config.studies[this.selectedStudy].available;
+        }
+        let users = [];
+        if (restrictedStudy) {
+          users = await this.getStudyUsers();
+        } else {
+          const ussRef = this.db.ref(`datasets/${this.selectedDataset}/userSeenSamples`);
+          const ussSnap = await ussRef.once('value');
+          const userSeenSamples = ussSnap.val();
+          users = Object.keys(userSeenSamples);
+        }
+        this.selectedUsers = users;
+        this.sortedUsersList = users.sort();
       },
       globusLogin(accessToken) {
         this.$emit('globusLogin', accessToken);
+      },
+      /**
+       * gets user roles from the server
+       */
+      requestAllUserRoles() {
+        return new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/getAllUsers', true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.onload = resolve;
+          xhr.onerror = reject;
+          xhr.send(JSON.stringify({
+            currentUser: firebase.auth().currentUser.uid,
+          }));
+        });
+      },
+      /**
+       * returns a list of users registered for the current study
+       */
+      async getStudyUsers() {
+        let userList = await this.requestAllUserRoles()
+          .then(data => JSON.parse(data.currentTarget.responseText));
+        userList = Object.keys(_.pickBy(userList, value =>
+          (value.datasets[this.submittedStudy]),
+        ));
+        return userList;
       },
     },
     watch: {

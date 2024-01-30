@@ -107,8 +107,10 @@
         } else {
           reducedVotes = _.reduce(votes, (result, value) => {
             const user = value.user;
-            // eslint-disable-next-line
-            result[user] ? result[user] += 1 : result[user] = 1;
+            if (!this.excludedUsers.includes(user)) {
+              // eslint-disable-next-line
+              result[user] ? result[user] += 1 : result[user] = 1;
+            }
             return result;
           }, {});
         }
@@ -219,17 +221,18 @@
        * returns a list of users registered for the current study
        */
       async getStudyUsers() {
-        const authUserList = await this.requestAllUserRoles()
+        let userList = await this.requestAllUserRoles()
           .then(data => JSON.parse(data.currentTarget.responseText));
-        const filteredUserList = Object.keys(_.pickBy(authUserList, value =>
+        userList = Object.keys(_.pickBy(userList, value =>
           (value.datasets[this.study]),
         ));
-        return _.zipObject(filteredUserList, Array(filteredUserList.length).fill(0));
+        userList = _.difference(userList, this.excludedUsers);
+        return _.zipObject(userList, Array(userList.length).fill(0));
       },
     },
     computed: {
       propsToWatch() {
-        return [this.dataset, this.wantedSwipes];
+        return [this.dataset, this.wantedSwipes, this.excludedUsers];
       },
     },
     watch: {
