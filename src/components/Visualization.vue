@@ -45,6 +45,11 @@
             <div class="mt-2"><span class="data-value">Slices</span> with a minimum pass percentage of <span class="data-value">{{threshold}}%</span> will be considered a pass</div>
             <p class="control-note">Use 'Evaluate Scans' to help choose this. Affects 'Evaluate Users', 'See Results'</p>
           </div>
+          <div class="control-group">
+            <input type="number" min="1" step="1" id="wantedSwipes" v-model="wantedSwipes">
+            <div class="my-2">Goal number of swipes per image</div>
+            <p class="control-note">Affects 'Track Progress'</p>
+          </div>
           <div class="submit-div"><b-button variant="danger" :disabled="submitDisabled" v-on:click="updateCharts">Submit</b-button></div>
           <hr class="seperator">
         </div>
@@ -54,63 +59,75 @@
           <b-tabs card lazy>
             <b-tab title="Track Progress" active>
               <NumberOfVotes
-              :dataset="submittedDataset"
-              :db="db"
+                :dataset="submittedDataset"
+                :db="db"
               />
               <hr>
-              <RecentSwipes
-              :dataset="submittedDataset"
-              :db="db"
+              <h3>Recent Swipes</h3>
+              <br>
+              <b-tabs card lazy>
+                <b-tab title="Number of Swipes" active>
+                  <RecentSwipes
+                    :dataset="submittedDataset"
+                    :db="db"
+                  />
+                </b-tab>
+                <b-tab title="Time Spent Swiping">
+                  <TotalTimeSwiping
+                    :dataset="submittedDataset"
+                    :db="db"
+                  />
+                </b-tab>
+              </b-tabs>
+              <NeededUserSwipes
+                :dataset="submittedDataset"
+                :db="db"
+                :config="config"
+                :study="submittedStudy"
+                :wantedSwipes="submittedWantedSwipes"
+                :excludedUsers="excludedUsers"
               />
-              <hr>
-              <TotalTimeSwiping
-              :dataset="submittedDataset"
-              :db="db"
-              />
-              <!-- calculate needed swipes -->
             </b-tab>
             <b-tab title="Evaluate Users">
               <UserCorrectness
-              :dataset="submittedDataset"
-              :threshold="submittedThreshold"
-              :minVotes="submittedMinSwipes"
-              :db="db"
-              :gradientArray="gradientArray"
+                :dataset="submittedDataset"
+                :threshold="submittedThreshold"
+                :minVotes="submittedMinSwipes"
+                :db="db"
+                :gradientArray="gradientArray"
               />
               <CatchTrialsByUser
-              :dataset="submittedDataset"
-              :threshold="submittedThreshold"
-              :minVotes="submittedMinSwipes"
-              :db="db"
-              :gradientArray="gradientArray"
+                :dataset="submittedDataset"
+                :threshold="submittedThreshold"
+                :minVotes="submittedMinSwipes"
+                :db="db"
+                :gradientArray="gradientArray"
               />
               <NumberOfSwipesByUser
-              :dataset="submittedDataset"
-              :threshold="submittedThreshold"
-              :db="db"
-              :gradientArray="gradientArray"
+                :dataset="submittedDataset"
+                :db="db"
               />
               <AvgTimePerVote
-              :dataset="selectedDataset"
-              :db="db"
+                :dataset="selectedDataset"
+                :db="db"
               />
             </b-tab>              
             <b-tab title="Evaluate Scans">
               <SurvivingSessions
-              :dataset="submittedDataset"
-              :minSwipes="submittedMinSwipes"
-              :excludedUsers="excludedUsers"
-              :sliceThreshold="submittedThreshold"
-              :db="db"
+                :dataset="submittedDataset"
+                :minSwipes="submittedMinSwipes"
+                :excludedUsers="excludedUsers"
+                :sliceThreshold="submittedThreshold"
+                :db="db"
               />
             </b-tab>
             <b-tab title="See Results">
               <SessionsPassFail
-              :dataset="submittedDataset"
-              :sliceThreshold="submittedThreshold"
-              :minSwipes="submittedMinSwipes"
-              :excludedUsers="excludedUsers"
-              :db="db"
+                :dataset="submittedDataset"
+                :sliceThreshold="submittedThreshold"
+                :minSwipes="submittedMinSwipes"
+                :excludedUsers="excludedUsers"
+                :db="db"
               />
             </b-tab>
           </b-tabs>
@@ -169,6 +186,7 @@
   import SurvivingSessions from './Visualizations/SurvivingSessions';
   import TotalTimeSwiping from './Visualizations/TotalTimeSwiping';
   import SessionsPassFail from './Visualizations/SessionsPassFail';
+  import NeededUserSwipes from './Visualizations/NeededUserSwipes';
   import UserCorrectness from './Visualizations/UserCorrectness';
   import AvgTimePerVote from './Visualizations/AvgTimePerVote';
   import NumberOfVotes from './Visualizations/NumberOfVotes';
@@ -181,6 +199,7 @@
   Vue.component('SurvivingSessions', SurvivingSessions);
   Vue.component('TotalTimeSwiping', TotalTimeSwiping);
   Vue.component('SessionsPassFail', SessionsPassFail);
+  Vue.component('NeededUserSwipes', NeededUserSwipes);
   Vue.component('UserCorrectness', UserCorrectness);
   Vue.component('AvgTimePerVote', AvgTimePerVote);
   Vue.component('NumberOfVotes', NumberOfVotes);
@@ -205,6 +224,7 @@
         /**
          * the dataset selected to view
          */
+        selectedStudy: '',
         selectedDataset: '',
         /**
          * prevents charts from showing until a study is selected
@@ -227,6 +247,7 @@
          * this seperates chart loading and selecting options
          */
         submittedMinSwipes: 1,
+        submittedStudy: '',
         submittedDataset: '',
         submittedThreshold: '',
         /**
@@ -238,7 +259,11 @@
          */
         globusAuthenticated: false,
         globusAuthErrors: [],
-
+        /**
+         * Number of desired swipes per image
+         */
+        wantedSwipes: 10,
+        submittedWantedSwipes: 10,
       };
     },
     props: {
@@ -313,16 +338,19 @@
         this.submitDisabled = true;
         this.submittedMinSwipes = this.minSwipes;
         this.submittedDataset = this.selectedDataset;
+        this.submittedStudy = this.selectedStudy;
         this.submittedThreshold = this.threshold / 100;
         this.excludedUsers = _.difference(this.sortedUsersList, this.selectedUsers);
         this.showCharts = true;
         this.submitDisabled = false;
+        this.submittedWantedSwipes = parseInt(this.wantedSwipes, 10);
       },
       selectAll() {
         this.selectedUsers = this.selectedUsers.length === this.sortedUsersList.length ?
           [] : _.clone(this.sortedUsersList);
       },
-      activateStudy() {
+      activateStudy(study) {
+        this.selectedStudy = study;
         this.showCharts = false;
         this.showControls = false;
       },
