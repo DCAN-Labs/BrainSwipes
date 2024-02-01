@@ -419,7 +419,6 @@ module.exports = {
             if (Object.hasOwn(config, 's3filepath')) {
               regexp = new RegExp(config.s3filepath.replace('/', '\/').replaceAll('{{SESSION}}', 'ses-.*?').replaceAll('{{SUBJECT}}', 'sub-\\d{6}').replaceAll('{{FILENAME}}', '([^\/]*)'));
             }
-            console.log(regexp);
             // get exclusions
             const excludedSubjects = await getExcludedSubjects(dataset);
             let excludedSubstrings = [];
@@ -433,8 +432,8 @@ module.exports = {
             objectsList.forEach(object => {
               object.forEach(item => {
                 const match = item.Key.match(regexp);
-                let include = true;
                 if (match) {
+                  let include = true;
                   const sample = match[1];
                   const subMatch = sample.match(subRegExp);
                   if(subMatch) {
@@ -443,7 +442,10 @@ module.exports = {
                       include = false;
                     }
                   }
-                  if (!Object.keys(sampleCounts).includes(sample)){
+                  if (Object.keys(sampleCounts).includes(sample)) {
+                    include = false;
+                  }
+                  else {
                     excludedSubstrings.every(substring => {
                       if (sample.includes(substring)) {
                         include = false
@@ -459,7 +461,7 @@ module.exports = {
             });
             sampleCountsRef.update(update);
             if (Object.keys(update).length){
-              res.send(`Updated sampleCounts.\n${JSON.stringify(update)}`);
+              res.send(`Updated sampleCounts.\n${Object.keys(update).length} samples added.`);
             } else {
               res.send('No new PNG files found.')
             }
