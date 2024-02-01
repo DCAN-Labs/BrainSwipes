@@ -255,7 +255,7 @@ export default {
       /**
        * List of profile pic options
        */
-      profilePics: ['kesh-profile-icon', 'UniversityOfMinnesota', 'dcan', 'elab', 'abide', 'connectome'],
+      profilePics: ['kesh-profile-icon', 'UniversityOfMinnesota', 'dcan', 'elab', 'abide', 'connectome', 'ohsu'],
       /**
        * list of studies the user has access to
        */
