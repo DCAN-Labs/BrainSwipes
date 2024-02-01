@@ -433,22 +433,26 @@ module.exports = {
             objectsList.forEach(object => {
               object.forEach(item => {
                 const match = item.Key.match(regexp);
+                let include = true;
                 if (match) {
                   const sample = match[1];
-                  const sub = sample.match(subRegExp)[1];
-                  if (excludedSubjects.includes(sub)) {
-                    // do nothing
-                  } else if (!Object.keys(sampleCounts).includes(sample)){
-                    let include = true;
+                  const subMatch = sample.match(subRegExp);
+                  if(subMatch) {
+                    const sub = subMatch[1];
+                    if (excludedSubjects.includes(sub)) {
+                      include = false;
+                    }
+                  }
+                  if (!Object.keys(sampleCounts).includes(sample)){
                     excludedSubstrings.every(substring => {
                       if (sample.includes(substring)) {
                         include = false
                       }
                       return include;
                     });
-                    if (include) {
-                      update[sample] = 0;
-                    }
+                  }
+                  if (include) {
+                    update[sample] = 0;
                   }
                 }
               });
