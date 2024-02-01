@@ -38,7 +38,7 @@
       <div class="profile-pic-options">
         <h1>Choose a Profile Picture!</h1>
         <br>
-        <img v-for="pic in profilePics" :key="pic" :src="`/static/profile_pics/${pic}.svg`" v-on:click="setProfilePic(pic)">
+        <img v-for="pic in config.profilePics" :key="pic" :src="`/static/profile_pics/${pic}.svg`" v-on:click="setProfilePic(pic)">
       </div>
       <hr>
       <h1>Samples you've commented on</h1>
@@ -252,10 +252,6 @@ export default {
        */
       globusAuthenticated: false,
       globusAuthErrors: [],
-      /**
-       * List of profile pic options
-       */
-      profilePics: ['kesh-profile-icon', 'UniversityOfMinnesota', 'dcan', 'elab', 'abide', 'connectome', 'ohsu'],
       /**
        * list of studies the user has access to
        */
