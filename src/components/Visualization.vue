@@ -80,6 +80,11 @@
                   />
                 </b-tab>
               </b-tabs>
+              <ForecastUsers
+                :dataset="submittedDataset"
+                :db="db"
+                :wantedSwipes="submittedWantedSwipes"
+              />
               <NeededUserSwipes
                 :dataset="submittedDataset"
                 :db="db"
@@ -192,6 +197,7 @@
   import UserCorrectness from './Visualizations/UserCorrectness';
   import AvgTimePerVote from './Visualizations/AvgTimePerVote';
   import NumberOfVotes from './Visualizations/NumberOfVotes';
+  import ForecastUsers from './Visualizations/ForecastUsers';
   import RecentSwipes from './Visualizations/RecentSwipes';
   import DatasetSelect from './Widgets/DatasetSelect';
 
@@ -205,6 +211,7 @@
   Vue.component('UserCorrectness', UserCorrectness);
   Vue.component('AvgTimePerVote', AvgTimePerVote);
   Vue.component('NumberOfVotes', NumberOfVotes);
+  Vue.component('ForecastUsers', ForecastUsers);
   Vue.component('RecentSwipes', RecentSwipes);
   Vue.component('DatasetSelect', DatasetSelect);
 
