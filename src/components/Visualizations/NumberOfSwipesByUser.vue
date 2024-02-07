@@ -46,24 +46,10 @@
         required: true,
       },
       /**
-       * ratio of pass/fail swipes to consider the sample passed
-       */
-      threshold: {
-        type: Number,
-        required: true,
-      },
-      /**
        * the intialized firebase database
        */
       db: {
         type: Object,
-        required: true,
-      },
-      /**
-       * Color palette
-       */
-      gradientArray: {
-        type: Array,
         required: true,
       },
     },

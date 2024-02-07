@@ -13,7 +13,7 @@
         <ul class="navRoot">
           <li class="navSection main-logo">
             <router-link to="/">
-              <img class="brainswipes-logo" src="../static/brainswipes-logo.svg" alt="BrainSwipes logo" />
+              <img class="brainswipes-logo" src="/static/brainswipes-logo.svg" alt="BrainSwipes logo" />
             </router-link>
           </li>
           <li class="navSection mobile-menu">
@@ -324,7 +324,7 @@ export default {
         username,
       };
       const ref = this.db.ref(`log/${category}`);
-      ref.push(logMessage);
+      ref.push(JSON.stringify(logMessage));
     },
   },
   async created() {
