@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 var admin = require("firebase-admin");
 var _ = require('lodash');
 var serviceAccount = require("../brainswipes-firebase-adminsdk.json");
@@ -55,16 +56,20 @@ async function consolidateSampleData(dataset, preview){
             data[sample] = sampleSummary[sample];
             data[sample].active = false;
         }
-    })
+    });
 
     // mark flagged samples
-    Object.keys(flags).forEach(sample => {
-        if (Object.hasOwn(data, sample)) {
-            data[sample].flagged = true;
-        } else {
-            console.log(`Flagged sample not found ${sample}`);
-        }
-    })
+    if(flags){
+        Object.keys(flags).forEach(sample => {
+            if (Object.hasOwn(data, sample)) {
+                data[sample].flagged = true;
+            } else {
+                console.log(`Flagged sample not found ${sample}`);
+            }
+        });
+    } else {
+        console.log('No flagged samples');
+    }
 
     // user seen samples
     Object.keys(userSeenSamples).forEach(user => {
@@ -78,17 +83,21 @@ async function consolidateSampleData(dataset, preview){
             } else {
                 console.log(`userSeenSample not found ${sample}`);
             }
-        })
-    })
+        });
+    });
 
     // chats
+    if(chats){
     Object.keys(chats.chats).forEach(sample => {
         if (Object.hasOwn(data, sample)) {
             data[sample].chats = { messages: chats.chats[sample].chats, notify: chats.chats[sample].notify };
         } else {
             console.log(`Chat sample not found ${sample}`);
         }
-    })
+    });
+    } else {
+        console.log('No chats');
+    }
 
     // votes
     Object.keys(votes).forEach(vote => {
@@ -103,7 +112,7 @@ async function consolidateSampleData(dataset, preview){
         } else {
             console.log(`Votes sample not found ${sample}`);
         }
-    })
+    });
 
     // https://gist.github.com/collingo/6700069
     if (preview) {
