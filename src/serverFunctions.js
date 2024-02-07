@@ -107,19 +107,16 @@ async function findUser(displayName){
 }
 
 // list items in s3 bucket
-async function listItems(bucket, input, objectsList) {
-    const command = new ListObjectsV2Command(input);
-    const response = await s3Client.send(command);
-    objectsList.push(response.Contents);
-    if (typeof response.NextContinuationToken == "string") {
-        const newInput = {
-        Bucket: bucket,
-        ContinuationToken: response.NextContinuationToken,
-        };
-        return await listItems(bucket, newInput, objectsList);
-    } else {
-        return objectsList;
-    }
+async function listItems(input, objectsList) {
+  const command = new ListObjectsV2Command(input);
+  const response = await s3Client.send(command);
+  const newObjectsList = objectsList.concat(response.Contents);
+  if (typeof response.NextContinuationToken == "string") {
+      input.ContinuationToken = response.NextContinuationToken;
+      return await listItems(input, newObjectsList);
+  } else {
+      return newObjectsList;
+  }
 }
 
 // get tsv data from s3
@@ -410,10 +407,22 @@ module.exports = {
             const sampleCountsSnap = await sampleCountsRef.once('value');
             const sampleCounts = sampleCountsSnap.val() ? sampleCountsSnap.val() : {};
             // get the list of items in the s3 bucket
-            const input = {
-              Bucket: bucket,
-            };
-            const objectsList = await listItems(bucket, input, []);
+            let objectsList = [];
+            if (Object.hasOwn(config, 'prefixes')) {
+              for (const prefix of config.prefixes) {
+                const input = {
+                  Bucket: bucket,
+                  Prefix: prefix,
+                }
+                const items = await listItems(input, []);
+                objectsList = objectsList.concat(items);
+              }
+            } else {
+              const input = {
+                Bucket: bucket,
+              };
+              objectsList = await listItems(input, []);
+            }
             let regexp = new RegExp("^([^\/]*)\.png");
             const subRegExp = new RegExp("(^sub-.*?)_");
             if (Object.hasOwn(config, 's3filepath')) {
@@ -430,34 +439,32 @@ module.exports = {
             // update sampleCounts
             const update = {};
             objectsList.forEach(object => {
-              object.forEach(item => {
-                const match = item.Key.match(regexp);
-                if (match) {
-                  let include = true;
-                  const sample = match[1];
-                  const subMatch = sample.match(subRegExp);
-                  if(subMatch) {
-                    const sub = subMatch[1];
-                    if (excludedSubjects.includes(sub)) {
-                      include = false;
-                    }
-                  }
-                  if (Object.keys(sampleCounts).includes(sample)) {
+              const match = object.Key.match(regexp);
+              if (match) {
+                let include = true;
+                const sample = match[1];
+                const subMatch = sample.match(subRegExp);
+                if(subMatch) {
+                  const sub = subMatch[1];
+                  if (excludedSubjects.includes(sub)) {
                     include = false;
                   }
-                  else {
-                    excludedSubstrings.every(substring => {
-                      if (sample.includes(substring)) {
-                        include = false
-                      }
-                      return include;
-                    });
-                  }
-                  if (include) {
-                    update[sample] = 0;
-                  }
                 }
-              });
+                if (Object.keys(sampleCounts).includes(sample)) {
+                  include = false;
+                }
+                else {
+                  excludedSubstrings.every(substring => {
+                    if (sample.includes(substring)) {
+                      include = false
+                    }
+                    return include;
+                  });
+                }
+                if (include) {
+                  update[sample] = 0;
+                }
+              }
             });
             sampleCountsRef.update(update);
             if (Object.keys(update).length){
