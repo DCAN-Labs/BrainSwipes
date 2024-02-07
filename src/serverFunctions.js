@@ -52,6 +52,7 @@ function createUrl(filepath, bucket) {
         Key: key,
         };
         const command = new GetObjectCommand(getObjectParams);
+        s3Client.send(command).then(result => console.log("Last Modified:\n", result.LastModified));
         // getting the signed URL
         const url = getSignedUrl(s3Client, command, { expiresIn: 5 });
         return url;
