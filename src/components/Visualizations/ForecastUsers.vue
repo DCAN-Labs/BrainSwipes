@@ -69,7 +69,7 @@
         // calculate needed swipes
         const numSamples = Object.keys(sampleCounts).length;
         const neededSwipes = [];
-        const numUsers = [1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000];
+        const numUsers = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000];
         for (let i = 0; i < numUsers.length; i += 1) {
           neededSwipes.push(Math.round((numSamples * this.wantedSwipes) / numUsers[i]));
         }
