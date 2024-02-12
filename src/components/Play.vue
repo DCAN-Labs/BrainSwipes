@@ -473,6 +473,11 @@
             // then filter the rest of the samples
             // so they are only the smallest seen value;
             const samplesSmallest = _.filter(samplesRemain, c => c['.value'] === minUnseen);
+            if (samplesRemain.length > 1) {
+              const secondLowestUnseen = samplesRemain[1]['.value'];
+              const secondSmallestSamples = _.filter(samplesRemain, c => c['.value'] === secondLowestUnseen);
+              return this.shuffle(samplesSmallest).concat(this.shuffle(secondSmallestSamples));
+            }
             // and then randomize the order;
             return this.shuffle(samplesSmallest);
           }
@@ -491,8 +496,9 @@
       * last, it will set the next sample.
       */
       sendWidgetResponse(response) {
+        const vote = response.val;
         // 1. get feedback from the widget, and display if needed
-        const feedback = this.$refs.widget.getFeedback(response);
+        const feedback = this.$refs.widget.getFeedback(vote);
         if (feedback.show) {
           this.feedback = feedback;
           this.showAlert();
@@ -505,9 +511,10 @@
         this.sendVote(response, timeDiff, currentDataset);
 
         // 3. update the score and count for the sample
-        this.updateScore(this.$refs.widget.getScore(response));
-        this.updateSummary(this.$refs.widget.getSummary(response), currentDataset);
-        this.updateCount(currentDataset);
+        const [summary, reset] = this.$refs.widget.getSummary(response);
+        this.updateScore(this.$refs.widget.getScore(vote));
+        this.updateSummary(summary, currentDataset);
+        this.updateCount(currentDataset, reset);
         this.updateSeen(currentDataset);
 
         // 3. clear router query if exists
@@ -535,7 +542,12 @@
           } else {
             this.playMode = 'play';
           }
-          sampleId = this.sampleUserPriority(this.playMode)[0];
+          const samplePriority = this.sampleUserPriority(this.playMode);
+          if (samplePriority.length > 1 && samplePriority[0]['.key'] === this.widgetPointer) {
+            sampleId = samplePriority[1];
+          } else {
+            sampleId = samplePriority[0];
+          }
         }
 
         // if sampleId isn't null, set the widgetPointer
@@ -551,9 +563,10 @@
         this.db.ref(`datasets/${dataset}/votes`).push({
           user: this.userInfo.displayName,
           sample: this.widgetPointer,
-          response,
+          response: response.val,
           time,
           datetime: Date.now(),
+          lastModified: response.lastModified,
         });
       },
       /**
@@ -576,12 +589,17 @@
       /**
        * Update the sampleCount of the current widgetPointer.
        */
-      updateCount(dataset) {
+      updateCount(dataset, reset) {
         if (this.playMode !== 'catch') {
           // update the firebase database copy
           this.db.ref(`datasets/${dataset}/sampleCounts`)
             .child(this.widgetPointer)
-            .transaction(count => (count || 0) + 1);
+            .transaction((count) => {
+              if (reset) {
+                return 1;
+              }
+              return (count || 0) + 1;
+            });
   
           // update the local copy
           _.map(this.sampleCounts, (val) => {

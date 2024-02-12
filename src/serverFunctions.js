@@ -29,10 +29,10 @@ async function logError(method, error) {
         const timestamp = Date.now();
         const server = 'dev';
         const entry = {
-        timestamp,
-        server,
-        method,
-        error: errorString
+          timestamp,
+          server,
+          method,
+          error: errorString
         }
         ref.push(entry);
         console.log(error);
@@ -42,7 +42,7 @@ async function logError(method, error) {
     }
 }
 
-function createUrl(filepath, bucket) {
+async function createUrl(filepath, bucket) {
     try{
         // choosing an image path from the firebase
         const key = filepath;
@@ -52,9 +52,11 @@ function createUrl(filepath, bucket) {
         Key: key,
         };
         const command = new GetObjectCommand(getObjectParams);
+        const result = await s3Client.send(command);
+        const lastModified = result.LastModified;
         // getting the signed URL
-        const url = getSignedUrl(s3Client, command, { expiresIn: 5 });
-        return url;
+        const url = await getSignedUrl(s3Client, command, { expiresIn: 5 });
+        return {url, lastModified};
     }
     catch(err) {
         logError("createUrl", err);
@@ -200,8 +202,8 @@ module.exports = {
             const filepath = req.body.filepath;
             const bucket = req.body.bucket;
             if (bucket && filepath) {
-              createUrl(filepath, bucket).then(imageUrl =>{
-                res.send(imageUrl);
+              createUrl(filepath, bucket).then(data =>{
+                res.send(data);
               });  
             }
           }
