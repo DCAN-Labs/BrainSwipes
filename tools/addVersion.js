@@ -11,15 +11,7 @@ const app = admin.initializeApp({
 });
 var database = admin.database();
 
-const s3Client = new S3Client({
-    credentials: {
-        accessKeyId: msiKeys.accessKeyId,
-        secretAccessKey: msiKeys.secretAccessKey },
-    endpoint: 'https://s3.msi.umn.edu',
-    region: 'global',
-});
-
-async function getLastModified(Bucket, Key) {
+async function getLastModified(s3Client, Bucket, Key) {
     try{
         const getObjectParams = {
             Bucket,
@@ -58,6 +50,13 @@ async function addVersion(dataset, confirm){
     const sesRegExp = /_(ses-.*?)_/;
     
     for (const sample of Object.keys(sampleSummary)) {
+        const s3Client = new S3Client({
+            credentials: {
+                accessKeyId: msiKeys.accessKeyId,
+                secretAccessKey: msiKeys.secretAccessKey },
+            endpoint: 'https://s3.msi.umn.edu',
+            region: 'global',
+        });
         const summary = sampleSummary[sample];
         let filepath = `${sample}.png`;
         if (Object.hasOwn(config, 's3filepath')) {
@@ -75,18 +74,30 @@ async function addVersion(dataset, confirm){
             filepath = s3filepath.replaceAll('{{SUBJECT}}', sub).replaceAll('{{SESSION}}', ses).replaceAll('{{FILENAME}}', sample);
         }
         console.log(filepath);
-        const lastModified = await getLastModified(bucket, filepath);
+        const lastModified = await getLastModified(s3Client, bucket, filepath);
         if (lastModified) {
             summary.lastModified = lastModified;
+            if (confirm){
+                const path = `datasets/${dataset}/sampleSummary/${sample}`;
+                const ref = database.ref(path);
+                ref.update(summary, (error) => {
+                    if (error) {
+                        console.error(error);
+                    } else {
+                        console.log(`data saved: ${sample}`);
+                    }
+                });
+            } else {
+                console.log(lastModified);
+            }
         }
-        console.log(summary);
     }
     return true;
 }
 
 async function main(){
     const dataset = process.argv[2];
-    const confirm = process.argv[3];
+    const confirm = process.argv[3] == 'confirm';
 
     complete = await addVersion(dataset, confirm);
 

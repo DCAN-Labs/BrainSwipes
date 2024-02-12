@@ -491,8 +491,9 @@
       * last, it will set the next sample.
       */
       sendWidgetResponse(response) {
+        const vote = response.val;
         // 1. get feedback from the widget, and display if needed
-        const feedback = this.$refs.widget.getFeedback(response);
+        const feedback = this.$refs.widget.getFeedback(vote);
         if (feedback.show) {
           this.feedback = feedback;
           this.showAlert();
@@ -505,7 +506,7 @@
         this.sendVote(response, timeDiff, currentDataset);
 
         // 3. update the score and count for the sample
-        this.updateScore(this.$refs.widget.getScore(response));
+        this.updateScore(this.$refs.widget.getScore(vote));
         this.updateSummary(this.$refs.widget.getSummary(response), currentDataset);
         this.updateCount(currentDataset);
         this.updateSeen(currentDataset);
@@ -551,9 +552,10 @@
         this.db.ref(`datasets/${dataset}/votes`).push({
           user: this.userInfo.displayName,
           sample: this.widgetPointer,
-          response,
+          response: response.val,
           time,
           datetime: Date.now(),
+          lastModified: response.lastModified,
         });
       },
       /**
