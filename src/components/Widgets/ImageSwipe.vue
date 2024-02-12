@@ -340,14 +340,14 @@
         // the number of votes and the average vote
         if (!this.widgetSummary) {
           // the summary isn't initialized yet
-          return {
+          return [{
             aveVote: response.val,
             count: 1,
             lastModified: response.lastModified,
-          };
+          }, false];
         }
         if (!this.widgetSummary.lastModified) {
-          console.log('no lastModified');
+          // console.log('no lastModified');
         } else if (response.lastModified !== this.widgetSummary.lastModified) {
           const versions = this.widgetSummary.versions ? this.widgetSummary.versions : [];
           const lastVersion = Object.assign({}, {
@@ -356,19 +356,19 @@
             lastModified: this.widgetSummary.lastModified,
           });
           versions.push(lastVersion);
-          return {
+          return [{
             aveVote: response.val,
             count: 1,
             lastModified: response.lastModified,
             versions,
-          };
+          }, true];
         }
         let newVote = ((this.widgetSummary.aveVote * this.widgetSummary.count) + response.val);
         newVote /= (this.widgetSummary.count + 1);
         const newWidgetSummary = Object.assign({}, this.widgetSummary);
         newWidgetSummary.aveVote = newVote;
         newWidgetSummary.count += 1;
-        return newWidgetSummary;
+        return [newWidgetSummary, false];
       },
       /**
        * emit an annotation to the parent.

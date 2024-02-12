@@ -511,9 +511,10 @@
         this.sendVote(response, timeDiff, currentDataset);
 
         // 3. update the score and count for the sample
+        const [summary, reset] = this.$refs.widget.getSummary(response);
         this.updateScore(this.$refs.widget.getScore(vote));
-        this.updateSummary(this.$refs.widget.getSummary(response), currentDataset);
-        this.updateCount(currentDataset);
+        this.updateSummary(summary, currentDataset);
+        this.updateCount(currentDataset, reset);
         this.updateSeen(currentDataset);
 
         // 3. clear router query if exists
@@ -588,12 +589,17 @@
       /**
        * Update the sampleCount of the current widgetPointer.
        */
-      updateCount(dataset) {
+      updateCount(dataset, reset) {
         if (this.playMode !== 'catch') {
           // update the firebase database copy
           this.db.ref(`datasets/${dataset}/sampleCounts`)
             .child(this.widgetPointer)
-            .transaction(count => (count || 0) + 1);
+            .transaction((count) => {
+              if (reset) {
+                return 1;
+              }
+              return (count || 0) + 1;
+            });
   
           // update the local copy
           _.map(this.sampleCounts, (val) => {
