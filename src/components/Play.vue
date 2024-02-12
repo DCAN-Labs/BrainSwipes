@@ -473,6 +473,11 @@
             // then filter the rest of the samples
             // so they are only the smallest seen value;
             const samplesSmallest = _.filter(samplesRemain, c => c['.value'] === minUnseen);
+            if (samplesRemain.length > 1) {
+              const secondLowestUnseen = samplesRemain[1]['.value'];
+              const secondSmallestSamples = _.filter(samplesRemain, c => c['.value'] === secondLowestUnseen);
+              return this.shuffle(samplesSmallest).concat(this.shuffle(secondSmallestSamples));
+            }
             // and then randomize the order;
             return this.shuffle(samplesSmallest);
           }
@@ -536,7 +541,12 @@
           } else {
             this.playMode = 'play';
           }
-          sampleId = this.sampleUserPriority(this.playMode)[0];
+          const samplePriority = this.sampleUserPriority(this.playMode);
+          if (samplePriority.length > 1 && samplePriority[0]['.key'] === this.widgetPointer) {
+            sampleId = samplePriority[1];
+          } else {
+            sampleId = samplePriority[0];
+          }
         }
 
         // if sampleId isn't null, set the widgetPointer
