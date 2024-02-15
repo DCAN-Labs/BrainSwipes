@@ -3,8 +3,8 @@ const S3Client = require('@aws-sdk/client-s3').S3Client;
 const GetObjectCommand = require('@aws-sdk/client-s3').GetObjectCommand;
 
 var admin = require("firebase-admin");
-const serviceAccount = require("../brainswipes-firebase-adminsdk.json");
-const msiKeys = require('../msiKeys.json');
+const serviceAccount = require("../../brainswipes-firebase-adminsdk.json");
+const msiKeys = require('../../msiKeys.json');
 const app = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://brainswipes-default-rtdb.firebaseio.com"

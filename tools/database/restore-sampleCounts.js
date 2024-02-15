@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const serviceAccount = require('../brainswipes-firebase-adminsdk.json');
+const serviceAccount = require('../../brainswipes-firebase-adminsdk.json');
 
 //init the firebase connection
 var admin = require("firebase-admin");

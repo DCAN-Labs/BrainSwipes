@@ -1,6 +1,6 @@
 var admin = require("firebase-admin");
 var _ = require('lodash');
-var serviceAccount = require("../brainswipes-firebase-adminsdk.json");
+var serviceAccount = require("../../brainswipes-firebase-adminsdk.json");
 const app = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://brainswipes-default-rtdb.firebaseio.com"
