@@ -61,10 +61,18 @@
         let filepath = `${pointer}.png`;
         if (Object.hasOwn(this.config.datasets[this.dataset], 's3filepath')) {
           const s3filepath = this.config.datasets[this.dataset].s3filepath;
-          const subRegExp = /(sub-\d{6})/;
+          const subRegExp = /(sub-.*?)_/;
           const sesRegExp = /_(ses-.*?)_/;
-          const ses = pointer.match(sesRegExp)[1];
-          const sub = pointer.match(subRegExp)[1];
+          const sesMatch = pointer.match(sesRegExp);
+          const subMatch = pointer.match(subRegExp);
+          let ses = '';
+          let sub = '';
+          if (sesMatch) {
+            ses = pointer.match(sesRegExp)[1];
+          }
+          if (subMatch) {
+            sub = pointer.match(subRegExp)[1];
+          }
           filepath = s3filepath.replaceAll('{{SUBJECT}}', sub).replaceAll('{{SESSION}}', ses).replaceAll('{{FILENAME}}', pointer);
         }
         return new Promise((resolve, reject) => {
@@ -84,9 +92,11 @@
        */
       async createUrl(pointer) {
         // getting the signed URL
-        const url = await this.postRequest(pointer).then(data =>
+        const response = await this.postRequest(pointer).then(data =>
           data.currentTarget.responseText,
         );
+        const responseData = JSON.parse(response);
+        const url = responseData.url;
         // setting the url key based on the new url
         const urlKey = url.split('?')[0];
         // updating the data elements
