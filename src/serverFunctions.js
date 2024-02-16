@@ -14,14 +14,6 @@ const firebaseApp = admin.initializeApp({
 });
 const database = admin.database();
 
-const s3Client = new S3Client({
-    credentials: {
-        accessKeyId: msiKeys.accessKeyId,
-        secretAccessKey: msiKeys.secretAccessKey },
-    endpoint: 'https://s3.msi.umn.edu',
-    region: 'global',
-});
-
 async function logError(method, error) {
     try {
         const errorString = String(error)
@@ -44,6 +36,13 @@ async function logError(method, error) {
 
 async function createUrl(filepath, bucket) {
     try{
+        const s3Client = new S3Client({
+          credentials: {
+              accessKeyId: msiKeys.accessKeyId,
+              secretAccessKey: msiKeys.secretAccessKey },
+          endpoint: 'https://s3.msi.umn.edu',
+          region: 'global',
+        });
         // choosing an image path from the firebase
         const key = filepath;
         // setting up the Get command
@@ -110,6 +109,13 @@ async function findUser(displayName){
 
 // list items in s3 bucket
 async function listItems(input, objectsList) {
+  const s3Client = new S3Client({
+    credentials: {
+        accessKeyId: msiKeys.accessKeyId,
+        secretAccessKey: msiKeys.secretAccessKey },
+    endpoint: 'https://s3.msi.umn.edu',
+    region: 'global',
+  });
   const command = new ListObjectsV2Command(input);
   const response = await s3Client.send(command);
   const newObjectsList = objectsList.concat(response.Contents);
@@ -123,6 +129,13 @@ async function listItems(input, objectsList) {
 
 // get tsv data from s3
 async function getObjectFromS3(bucket, object) {
+  const s3Client = new S3Client({
+    credentials: {
+        accessKeyId: msiKeys.accessKeyId,
+        secretAccessKey: msiKeys.secretAccessKey },
+    endpoint: 'https://s3.msi.umn.edu',
+    region: 'global',
+  });
     const command = new GetObjectCommand({
         Bucket: bucket,
         Key: object
