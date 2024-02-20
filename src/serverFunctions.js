@@ -19,7 +19,7 @@ async function logError(method, error) {
         const errorString = String(error)
         const ref = database.ref('log/serverErrors');
         const timestamp = Date.now();
-        const server = 'dev';
+        const server = process.env.NODE_ENV;
         const entry = {
           timestamp,
           server,
