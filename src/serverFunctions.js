@@ -47,15 +47,13 @@ async function createUrl(filepath, bucket) {
         const key = filepath;
         // setting up the Get command
         const getObjectParams = {
-        Bucket: bucket,
-        Key: key,
+          Bucket: bucket,
+          Key: key,
         };
         const command = new GetObjectCommand(getObjectParams);
-        const result = await s3Client.send(command);
-        const lastModified = result.LastModified;
         // getting the signed URL
         const url = await getSignedUrl(s3Client, command, { expiresIn: 5 });
-        return {url, lastModified};
+        return url;
     }
     catch(err) {
         logError("createUrl", err);
@@ -71,11 +69,11 @@ async function logUserManagement(method, modifierUid, modifiedUid, newRoles) {
         const modifiedUserRecord = await admin.auth().getUser(modifiedUid);
         const modified = modifiedUserRecord.displayName;
         const entry = {
-        method,
-        modifier,
-        modified,
-        newRoles,
-        timestamp
+          method,
+          modifier,
+          modified,
+          newRoles,
+          timestamp
         };
         ref.push(entry);
     }

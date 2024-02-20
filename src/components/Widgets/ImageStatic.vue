@@ -92,11 +92,9 @@
        */
       async createUrl(pointer) {
         // getting the signed URL
-        const response = await this.postRequest(pointer).then(data =>
+        const url = await this.postRequest(pointer).then(data =>
           data.currentTarget.responseText,
         );
-        const responseData = JSON.parse(response);
-        const url = responseData.url;
         // setting the url key based on the new url
         const urlKey = url.split('?')[0];
         // updating the data elements

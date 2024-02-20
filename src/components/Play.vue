@@ -11,13 +11,6 @@
       </div>
 
       <div v-else>
-        <b-alert :show="dismissCountDown"
-          :variant="feedback.variant"
-          class="toast"
-          @dismissed="dismissCountdown=0"
-          @dismiss-count-down="countDownChanged">
-          {{feedback.message}}
-        </b-alert>
 
         <div v-if="noData">
           <h1>Didn't find any samples to display</h1>
@@ -224,23 +217,6 @@
          * keep track of the time a user took to vote on a sample
          */
         startTime: null,
-        /**
-         * flags for the small toast that shows feedback
-         */
-        dismissSecs: 1,
-        /**
-         * flags for the small toast that shows feedback
-         */
-        dismissCountDown: 0,
-
-        /**
-         * feedback will be filled by the widget component
-         * for now its initialized here
-         */
-        feedback: {
-          variant: 'warning',
-          message: '',
-        },
 
         /**
          * status flag that is set to "complete" when the firebase keys are filled.
@@ -490,20 +466,11 @@
       },
       /**
       * this method is called from the child widget
-      * it will first get feedback from the child on the response
       * next, it will send the user response to the db
       * then it will update the user's score and the sample's view count
       * last, it will set the next sample.
       */
       sendWidgetResponse(response) {
-        const vote = response.val;
-        // 1. get feedback from the widget, and display if needed
-        const feedback = this.$refs.widget.getFeedback(vote);
-        if (feedback.show) {
-          this.feedback = feedback;
-          this.showAlert();
-        }
-
         const currentDataset = this.playMode === 'catch' ? `${this.dataset}/catch` : this.dataset;
 
         // 2. send the widget data
@@ -511,10 +478,10 @@
         this.sendVote(response, timeDiff, currentDataset);
 
         // 3. update the score and count for the sample
-        const [summary, reset] = this.$refs.widget.getSummary(response);
-        this.updateScore(this.$refs.widget.getScore(vote));
+        const summary = this.$refs.widget.getSummary(response);
+        this.updateScore(1);
         this.updateSummary(summary, currentDataset);
-        this.updateCount(currentDataset, reset);
+        this.updateCount(currentDataset);
         this.updateSeen(currentDataset);
 
         // 3. clear router query if exists
@@ -563,10 +530,9 @@
         this.db.ref(`datasets/${dataset}/votes`).push({
           user: this.userInfo.displayName,
           sample: this.widgetPointer,
-          response: response.val,
+          response,
           time,
           datetime: Date.now(),
-          lastModified: response.lastModified,
         });
       },
       /**
@@ -589,17 +555,12 @@
       /**
        * Update the sampleCount of the current widgetPointer.
        */
-      updateCount(dataset, reset) {
+      updateCount(dataset) {
         if (this.playMode !== 'catch') {
           // update the firebase database copy
           this.db.ref(`datasets/${dataset}/sampleCounts`)
             .child(this.widgetPointer)
-            .transaction((count) => {
-              if (reset) {
-                return 1;
-              }
-              return (count || 0) + 1;
-            });
+            .transaction(count => (count || 0) + 1);
   
           // update the local copy
           _.map(this.sampleCounts, (val) => {
@@ -622,18 +583,6 @@
 
         // update the local copy
         this.userSeenSamples.push({ '.key': this.widgetPointer, '.value': 1 });
-      },
-      /**
-       * This is for the toast component that shows feedback, to keep track of time.
-       */
-      countDownChanged(dismissCountDown) {
-        this.dismissCountDown = dismissCountDown;
-      },
-      /**
-       * This is to show the toast alert component, for widget feedback.
-       */
-      showAlert() {
-        this.dismissCountDown = this.dismissSecs;
       },
       /**
        * removes the router query

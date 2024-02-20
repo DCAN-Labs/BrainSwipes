@@ -170,10 +170,6 @@
          */
         lastClick: 0,
         delay: 500,
-        /**
-         * tracks LastModified time for the current image
-         */
-        lastModified: '',
       };
     },
     /**
@@ -227,12 +223,9 @@
        */
       async createUrl(pointer) {
         // getting the signed URL
-        const response = await this.postRequest(pointer).then(data =>
+        const url = await this.postRequest(pointer).then(data =>
           data.currentTarget.responseText,
         );
-        const responseData = JSON.parse(response);
-        const url = responseData.url;
-        this.lastModified = responseData.lastModified;
         // setting the url key based on the new url
         const urlKey = url.split('?')[0];
         // updating the data elements
@@ -276,62 +269,6 @@
         return output;
       },
       /**
-       * Get the score based on a user's response.
-       */
-      getScore(response) {
-        const fb = this.getFeedback(response);
-        if (fb.variant === 'danger') {
-          return 0;
-        }
-        return 1;
-      },
-      /**
-       * Get the feedback based on a user's response.
-       */
-      getFeedback(response) {
-        let widgetSummary;
-        if (!this.widgetSummary) {
-          widgetSummary = {
-            count: 0,
-          };
-        } else {
-          widgetSummary = this.widgetSummary;
-        }
-        if (widgetSummary.count > 4) {
-          // if this sample has been seen more than 4 times
-          // count the number of points
-          const aveVote = widgetSummary.aveVote;
-
-          if (aveVote >= 0.7 && !response) {
-            // on average, most people gave this sample some points. If you didn't, lose a point
-            return {
-              show: false,
-              variant: 'danger',
-              message: '+0 most people swiped right',
-            };
-          } else if (aveVote <= 0.3 && response) {
-            // on average, most people did not mark this image, but you did
-            return {
-              show: false,
-              variant: 'danger',
-              message: '+0 most people swiped left',
-            };
-          }
-
-          return {
-            show: true,
-            variant: 'success',
-            message: '+1 good job',
-          };
-        }
-
-        return {
-          show: true,
-          variant: 'success',
-          message: '+1 thanks',
-        };
-      },
-      /**
        * get the widget's new summary based on a user's response.
        * in this case its a running average.
        */
@@ -340,35 +277,17 @@
         // the number of votes and the average vote
         if (!this.widgetSummary) {
           // the summary isn't initialized yet
-          return [{
-            aveVote: response.val,
+          return {
+            aveVote: response,
             count: 1,
-            lastModified: response.lastModified,
-          }, false];
+          };
         }
-        if (!this.widgetSummary.lastModified) {
-          // console.log('no lastModified');
-        } else if (response.lastModified !== this.widgetSummary.lastModified) {
-          const versions = this.widgetSummary.versions ? this.widgetSummary.versions : [];
-          const lastVersion = Object.assign({}, {
-            aveVote: this.widgetSummary.aveVote,
-            count: this.widgetSummary.count,
-            lastModified: this.widgetSummary.lastModified,
-          });
-          versions.push(lastVersion);
-          return [{
-            aveVote: response.val,
-            count: 1,
-            lastModified: response.lastModified,
-            versions,
-          }, true];
-        }
-        let newVote = ((this.widgetSummary.aveVote * this.widgetSummary.count) + response.val);
+        let newVote = ((this.widgetSummary.aveVote * this.widgetSummary.count) + response);
         newVote /= (this.widgetSummary.count + 1);
         const newWidgetSummary = Object.assign({}, this.widgetSummary);
         newWidgetSummary.aveVote = newVote;
         newWidgetSummary.count += 1;
-        return [newWidgetSummary, false];
+        return newWidgetSummary;
       },
       /**
        * emit an annotation to the parent.
@@ -377,7 +296,7 @@
         if (this.playMode === 'tutorial') {
           this.$emit('widgetRating', [val, this.identifier, this.tutorialStep]);
         } else {
-          this.$emit('widgetRating', { val, lastModified: this.lastModified });
+          this.$emit('widgetRating', val);
         }
       },
       /**
