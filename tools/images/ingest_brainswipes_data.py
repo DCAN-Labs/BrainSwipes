@@ -9,13 +9,13 @@ from PIL import Image
 
 def get_args():
     parser = argparse.ArgumentParser(prog="ingest-brainSwipes-data",
-                                     description="Gets executive summary files from an s3 bucket, reformats registraions and pushes all .png files to a new s3 bucket.")
+                                     description="Gets executive summary files from an s3 bucket for all subjects and sessions, reformats registraions and pushes all .png files to a new s3 bucket.")
     parser.add_argument("source", help=("The name of the s3 bucket on MSI data is currently in. " "Do not include the prefix 's3://'"))
     parser.add_argument("subjects_path", help=("The path in the s3 bucket that holds the processed subjects. " "include a trailing '/'" "e.g. processed/abcd-hcp-pipeline/"))
-    parser.add_argument("imgs_path", help=("The path in the processed subject that holds the images to be ingested. " "include a trailing '/'" "e.g. files/summary_DCANBOLDProc_v4.0.0/executivesummary/img/"))
+    parser.add_argument("imgs_path", help=("The path in the processed subject/session that holds the images to be ingested. " "include a trailing '/'" "e.g. files/summary_DCANBOLDProc_v4.0.0/executivesummary/img/"))
     parser.add_argument("destination", help=("The name of the s3 bucket on MSI data will be placed after transformation. " "Do not include the prefix 's3://'"))
     parser.add_argument("--pipeline", choices=['dcan', 'xcpd'], default="dcan", help=("The pipleine used to generate the executive summary. " "Defaults to dcan"))
-
+    parser.add_argument("--start", type=int, default=1, help=("What number subject to start data ingestion at. Defaults to first subject."))
     return parser.parse_args()
 
 def get_subjects(args):
@@ -136,6 +136,8 @@ def main():
     pipeline = args.pipeline
 
     for index, subject in enumerate(subjects):
+        if index < args.start:
+            continue
         sessions = get_sessions(subject, args)
         for session in sessions:
             dir = subject + '-' + session
