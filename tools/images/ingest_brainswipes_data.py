@@ -49,8 +49,7 @@ def download_imgs(subject, session, dir, args):
         os.mkdir(dir)
         img_path = "s3://" + os.path.join(args.source, args.subjects_path, subject, session, args.imgs_path)
         cmd = ['s3cmd', 'get', '--recursive', img_path]
-        process = subprocess.Popen(cmd, cwd=f"./{dir}", stdout=subprocess.PIPE)
-        process.wait()
+        process = subprocess.check_call(cmd, cwd=f"./{dir}", stdout=subprocess.DEVNULL)
 
     except Exception as e:
         print("Error downloading images:")
@@ -125,8 +124,7 @@ def upload_imgs(dir, bucket):
             file = file[:-1] # strip \n character
             if file.endswith('.png'):
                 cmd = ["s3cmd", "put", file, bucket]
-                process2 = subprocess.Popen(cmd, cwd=f"./{dir}", stdout=subprocess.PIPE)
-                process2.wait()
+                process2 = subprocess.check_call(cmd, cwd=f"./{dir}", stdout=subprocess.DEVNULL)
 
 def main():
     args = get_args()
