@@ -134,7 +134,7 @@ def main():
     pipeline = args.pipeline
 
     for index, subject in enumerate(subjects):
-        if index < args.start:
+        if index + 1 < args.start:
             continue
         sessions = get_sessions(subject, args)
         for session in sessions:
