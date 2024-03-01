@@ -70,20 +70,27 @@
       </div>
       <div v-if="showModifyDataset">
         <div v-if="updateMethod=='s3'">
-          <p class="lead">Clicking update will:<p>
-          <div class="method-params">
-            <ul class="method-params-list">
-              <li>list all .png files in the s3 bucket defined in firebase config for the selected dataset</li>
-              <li>compare with the existing tracked png files in the sampleCounts document in firebase</li>
-              <li>add all missing samples to sampleCounts</li>
-              <li>this method never deletes entries from sampleCounts</li>
-              <li>the BrainSwipes service account needs s3:ListBucket action permission to use this method</li>
-            </ul>
+          <div v-if="server === 'development'">
+            <p class="lead">Clicking update will:<p>
+            <div class="method-params">
+              <ul class="method-params-list">
+                <li>list all .png files in the s3 bucket defined in firebase config for the selected dataset</li>
+                <li>compare with the existing tracked png files in the sampleCounts document in firebase</li>
+                <li>add all missing samples to sampleCounts</li>
+                <li>this method never deletes entries from sampleCounts</li>
+                <li>the BrainSwipes service account needs s3:ListBucket action permission to use this method</li>
+              </ul>
+            </div>
+            <br>
+            <b-button variant="warning" @click="handlePostRequest">Update {{config.datasets[selectedDataset].name}}</b-button>
+            <br>
+            <p class="lead">{{response}}</p>
           </div>
-          <br>
-          <b-button variant="warning" @click="handlePostRequest">Update {{config.datasets[selectedDataset].name}}</b-button>
-          <br>
-          <p class="lead">{{response}}</p>
+          <div v-else>
+            <p class="lead">S3 update disabled on production server</p>
+            <p>Using this method with large datasets requires more RAM than available on the server which can lead to crashes.</p>
+            <p>If you would like to use this method, please run the development server.</p>
+          </div>
         </div>
         <div v-else-if="updateMethod=='json'">
           <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
@@ -308,6 +315,11 @@ export default {
   },
   components: {
     DatasetSelect,
+  },
+  computed: {
+    server() {
+      return process.env.NODE_ENV;
+    },
   },
   methods: {
     /**
