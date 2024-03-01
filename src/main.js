@@ -27,7 +27,7 @@ firebase.initializeApp(firebaseKeys);
 //   console.log(`NODE_ENV=${process.env.NODE_ENV}`);
 //   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 // }
-firebase.appCheck().activate('6LderB8eAAAAACq8C9buhjI7V3HeznZpTkH2wB4K', true);
+// firebase.appCheck().activate('6LderB8eAAAAACq8C9buhjI7V3HeznZpTkH2wB4K', true);
 
 firebase.auth().onAuthStateChanged(() => {
   if (!app) {
