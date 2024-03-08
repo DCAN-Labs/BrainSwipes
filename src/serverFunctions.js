@@ -452,31 +452,35 @@ module.exports = {
             // update sampleCounts
             const update = {};
             objectsList.forEach(object => {
-              const match = object.Key.match(regexp);
-              if (match) {
-                let include = true;
-                const sample = match[1];
-                const subMatch = sample.match(subRegExp);
-                if(subMatch) {
-                  const sub = subMatch[1];
-                  if (excludedSubjects.includes(sub)) {
+              try {
+                const match = object.Key.match(regexp);
+                if (match) {
+                  let include = true;
+                  const sample = match[1];
+                  const subMatch = sample.match(subRegExp);
+                  if(subMatch) {
+                    const sub = subMatch[1];
+                    if (excludedSubjects.includes(sub)) {
+                      include = false;
+                    }
+                  }
+                  if (Object.keys(sampleCounts).includes(sample)) {
                     include = false;
                   }
+                  else {
+                    excludedSubstrings.every(substring => {
+                      if (sample.includes(substring)) {
+                        include = false
+                      }
+                      return include;
+                    });
+                  }
+                  if (include) {
+                    update[sample] = 0;
+                  }
                 }
-                if (Object.keys(sampleCounts).includes(sample)) {
-                  include = false;
-                }
-                else {
-                  excludedSubstrings.every(substring => {
-                    if (sample.includes(substring)) {
-                      include = false
-                    }
-                    return include;
-                  });
-                }
-                if (include) {
-                  update[sample] = 0;
-                }
+              } catch (error) {
+                logError('updateSampleCountsFromS3', error);
               }
             });
             sampleCountsRef.update(update);
