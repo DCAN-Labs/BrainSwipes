@@ -106,7 +106,7 @@ async function findUser(displayName){
 }
 
 // list items in s3 bucket
-async function listItems(input, objectsList) {
+async function listItems(input) {
   const s3Client = new S3Client({
     credentials: {
         accessKeyId: msiKeys.accessKeyId,
@@ -116,13 +116,45 @@ async function listItems(input, objectsList) {
   });
   const command = new ListObjectsV2Command(input);
   const response = await s3Client.send(command);
-  const newObjectsList = objectsList.concat(response.Contents);
-  if (typeof response.NextContinuationToken == "string") {
-      input.ContinuationToken = response.NextContinuationToken;
-      return await listItems(input, newObjectsList);
-  } else {
-      return newObjectsList;
-  }
+  return [response.Contents, response.NextContinuationToken];
+}
+
+function updateSampleCounts(objectsList, sampleCounts, regexp, subRegExp, excludedSubjects, excludedSubstrings, previousNumUpdates, dataset){
+  let numUpdates = previousNumUpdates;
+  objectsList.forEach(object => {
+    try {
+      const match = object.Key.match(regexp);
+      if (match) {
+        let include = true;
+        const sample = match[1];
+        const subMatch = sample.match(subRegExp);
+        if(subMatch) {
+          const sub = subMatch[1];
+          if (excludedSubjects.includes(sub)) {
+            include = false;
+          }
+        }
+        if (Object.keys(sampleCounts).includes(sample)) {
+          include = false;
+        }
+        else {
+          excludedSubstrings.every(substring => {
+            if (sample.includes(substring)) {
+              include = false
+            }
+            return include;
+          });
+        }
+        if (include) {
+          database.ref(`datasets/${dataset}/sampleCounts/${sample}`).set(0);
+          numUpdates +=1;
+        }
+      }
+    } catch (error) {
+      logError('updateSampleCountsFromS3', error);
+    }
+  });
+  return numUpdates;
 }
 
 // get tsv data from s3
@@ -419,23 +451,7 @@ module.exports = {
             const sampleCountsRef = database.ref(`datasets/${dataset}/sampleCounts`);
             const sampleCountsSnap = await sampleCountsRef.once('value');
             const sampleCounts = sampleCountsSnap.val() ? sampleCountsSnap.val() : {};
-            // get the list of items in the s3 bucket
-            let objectsList = [];
-            if (Object.hasOwn(config, 'prefixes')) {
-              for (const prefix of config.prefixes) {
-                const input = {
-                  Bucket: bucket,
-                  Prefix: prefix,
-                }
-                const items = await listItems(input, []);
-                objectsList = objectsList.concat(items);
-              }
-            } else {
-              const input = {
-                Bucket: bucket,
-              };
-              objectsList = await listItems(input, []);
-            }
+            // get matching pattern from config
             let regexp = new RegExp("^([^\/]*)\.png");
             const subRegExp = new RegExp("(^sub-.*?)_");
             if (Object.hasOwn(config, 's3filepath')) {
@@ -449,46 +465,55 @@ module.exports = {
                 excludedSubstrings = config.exclusions.substrings; 
               }
             }
-            // update sampleCounts
-            const update = {};
-            objectsList.forEach(object => {
-              try {
-                const match = object.Key.match(regexp);
-                if (match) {
-                  let include = true;
-                  const sample = match[1];
-                  const subMatch = sample.match(subRegExp);
-                  if(subMatch) {
-                    const sub = subMatch[1];
-                    if (excludedSubjects.includes(sub)) {
-                      include = false;
+            // get the list of items in the s3 bucket
+            let numUpdates = 0;
+            if (Object.hasOwn(config, 'prefixes')) {
+              for (const prefix of config.prefixes) {
+                const input = {
+                  Bucket: bucket,
+                  Prefix: prefix,
+                };
+                let continuate = true;
+                do {
+                  let [items, continuationToken] = await listItems(input);
+                  if (items == undefined) {
+                    continuate = false;
+                  } else {
+                    numUpdates = updateSampleCounts(items, sampleCounts, regexp, subRegExp, excludedSubjects, excludedSubstrings, numUpdates, dataset);
+                    if (typeof continuationToken == "string") {
+                      input.ContinuationToken = continuationToken;
+                    } else {
+                      continuate = false;
                     }
                   }
-                  if (Object.keys(sampleCounts).includes(sample)) {
-                    include = false;
-                  }
-                  else {
-                    excludedSubstrings.every(substring => {
-                      if (sample.includes(substring)) {
-                        include = false
-                      }
-                      return include;
-                    });
-                  }
-                  if (include) {
-                    update[sample] = 0;
+                } while(continuate);
+              }
+            } else {
+              const input = {
+                Bucket: bucket,
+              };
+              let continuate = true;
+              do {
+                let [items, continuationToken] = await listItems(input);
+                if (items == undefined) {
+                  continuate = false;
+                } else {
+                  numUpdates = updateSampleCounts(items, sampleCounts, regexp, subRegExp, excludedSubjects, excludedSubstrings, numUpdates, dataset);
+                  if (typeof continuationToken == "string") {
+                    input.ContinuationToken = continuationToken;
+                  } else {
+                    continuate = false;
                   }
                 }
-              } catch (error) {
-                logError('updateSampleCountsFromS3', error);
-              }
-            });
-            sampleCountsRef.update(update);
-            if (Object.keys(update).length){
-              res.send(`Updated sampleCounts.\n${Object.keys(update).length} samples added.`);
+              } while(continuate);
+            }
+            // respond with number of updates
+            if (numUpdates){
+              res.send(`Updated sampleCounts.\n${numUpdates} samples added.`);
             } else {
               res.send('No new PNG files found.')
             }
+            // ensure sampleCounts matches sampleSummary
             reconcileVotes(dataset);
           } catch (err) {
             res.send(String(err));
