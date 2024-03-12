@@ -1,6 +1,16 @@
 <template name="play">
   <div id="play" class="container">
-
+     <b-modal
+      id="userfeedback" 
+      title-html="<h1>Thanks for swiping!</h1>"
+      ref="userfeedback"
+      size="md"
+      ok-only
+      ok-title="Keep Swiping"
+    >
+    <p>{{feedback1}}</p>
+    <p>{{feedback2}}</p>
+    </b-modal>
     <div v-if="allowed" class="main">
       <div v-if="!completedTutorialRequirements">
         <h1>You must complete additional tutorials to swipe this dataset.</h1>
@@ -259,6 +269,11 @@
          */
         zoom: false,
         /**
+         * results of recent user catch trials for feedback modal
+         */
+        feedback1: '',
+        feedback2: '',
+        /**
          * if there is nothing in the database, display a blank image
          */
         blankImage: 'https://raw.githubusercontent.com/SwipesForScience/testConfig/master/images/undraw_blank_canvas.svg?sanitize=true',
@@ -479,10 +494,12 @@
 
         // 3. update the score and count for the sample
         const summary = this.$refs.widget.getSummary(response);
-        this.updateScore(1);
+        this.updateScore();
+        this.updateRecentCatchTrials(response);
         this.updateSummary(summary, currentDataset);
         this.updateCount(currentDataset);
         this.updateSeen(currentDataset);
+        this.sendFeedback();
 
         // 3. clear router query if exists
         if (this.$route.query.s) {
@@ -536,13 +553,38 @@
         });
       },
       /**
-      * this method update's the user's score by scoreIncrement;
+      * this method update's the user's score by 1;
       */
-      updateScore(scoreIncrement) {
+      updateScore() {
         this.db.ref('users')
           .child(this.userInfo.displayName)
           .child('score')
-          .transaction(score => (score || 0) + scoreIncrement);
+          .transaction(score => (score || 0) + 1);
+        this.db.ref(`users/${this.userInfo.displayName}/datasets/${this.dataset}/score`)
+          .transaction(score => (score || 0) + 1);
+      },
+      /**
+       * Update recent catch trial results
+       */
+      updateRecentCatchTrials(response) {
+        if (this.playMode === 'catch') {
+          this.db.ref(`datasets/${this.dataset}/catch/sampleCounts/${this.widgetPointer}`).once('value', (snap) => {
+            const value = snap.val();
+            const result = (response === 1 && value === 'pass') || (response === 0 && value === 'fail');
+            this.db.ref(`users/${this.userInfo.displayName}/datasets/${this.dataset}/catch`)
+              .transaction(catchTrials => (this.recentCatchTrials(catchTrials, result)));
+          });
+        }
+      },
+      recentCatchTrials(catchTrials, result) {
+        if (catchTrials) {
+          catchTrials.push(result);
+          if (catchTrials.length > 5) {
+            catchTrials.shift();
+          }
+          return catchTrials;
+        }
+        return [result];
       },
       /**
        * Update the summary of a given widgetPointer
@@ -583,6 +625,34 @@
 
         // update the local copy
         this.userSeenSamples.push({ '.key': this.widgetPointer, '.value': 1 });
+      },
+      /**
+       * Sends feedback every 100 swipes
+       */
+      sendFeedback() {
+        this.db.ref(`users/${this.userInfo.displayName}/datasets/${this.dataset}`).once('value', (snap) => {
+          const values = snap.val();
+          if (values.score % 100 === 0) {
+            this.feedback1 = `You've swiped ${this.dataset} images ${values.score} times!`;
+            if (Object.hasOwn(values, 'catch')) {
+              let catchTotals = 0;
+              values.catch.forEach((result) => {
+                if (result) {
+                  catchTotals += 1;
+                }
+              });
+              const catchRatio = catchTotals / values.catch.length;
+              if (catchRatio > 0.8) {
+                this.feedback2 = 'You are swiping with high accuracy! Keep up the good work!';
+              } else if (catchRatio > 0.6) {
+                this.feedback2 = 'You are swiping well! Be sure to stay focused as you have missed a few images.';
+              } else {
+                this.feedback2 = 'Our metrics show you are swiping with low accuracy. Consider refreshing your knowledge with the tutorials.';
+              }
+            }
+            this.$refs.userfeedback.show();
+          }
+        });
       },
       /**
        * removes the router query
