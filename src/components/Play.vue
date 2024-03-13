@@ -633,7 +633,8 @@
         this.db.ref(`users/${this.userInfo.displayName}/datasets/${this.dataset}`).once('value', (snap) => {
           const values = snap.val();
           if (values.score % 100 === 0) {
-            this.feedback1 = `You've swiped ${this.dataset} images ${values.score} times!`;
+            const name = this.config.datasets[this.dataset].name;
+            this.feedback1 = `You've swiped ${name} images ${values.score} times!`;
             if (Object.hasOwn(values, 'catch')) {
               let catchTotals = 0;
               values.catch.forEach((result) => {
