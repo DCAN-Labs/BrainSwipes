@@ -246,10 +246,12 @@ export default {
      * set the tutorial status of the current user
      */
     setTutorial(module, val) {
+      console.log(module);
       this.db
         .ref(`/users/${this.userInfo.displayName}/tutorials/${module}`)
         .set(val);
-      this.$router.push({ name: 'TutorialSelect' });
+      const name = module === 'basic' ? 'Home' : 'TutorialSelect';
+      this.$router.push({ name });
     },
     /**
      * Passed to child to update dataset on event
