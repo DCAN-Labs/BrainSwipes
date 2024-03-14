@@ -60,7 +60,7 @@ export default {
   name: 'Home',
   data() {
     return {
-      landingStyle: { 'background-image': 'url("/static/UMN_logos2_PRINT-09.svg")' },
+      landingStyle: { 'background-image': 'url("/static/DCAN-logo-no-text-yellow.svg")' },
       /**
        * whether to show the tooltip explaining private datasets
        */
