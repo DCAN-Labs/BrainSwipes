@@ -24,7 +24,6 @@ app.post('/setRoles', serverFunctions.setRoles);
 app.post('/setNewUserRoles', serverFunctions.setNewUserRoles);
 app.post('/getAllUsers', serverFunctions.getAllUsers);
 app.post('/addStudy', serverFunctions.addStudy);
-app.post('/updateSampleCountsFromS3', serverFunctions.updateSampleCountsFromS3);
 app.listen(port, () => {
   console.log(`BrainSwipes listening at http://localhost:${port}`)
 })
