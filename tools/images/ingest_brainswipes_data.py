@@ -117,16 +117,11 @@ def rearrange_image(gif, output_dir, pipeline):
     '''
     print(f"Rearranging {gif}")
     im = np.asarray(Image.open(gif))
-
-    if pipeline == "xpcd":
+    if pipeline == "xcpd":
         if 'Task' in os.path.basename(gif):
-            top_row = im[:,0:350,:]
-            mid_row = np.pad(im[:,350:640,:], ((0,0),(35,25),(0,0)), mode='constant')
-            bot_row = np.pad(im[:,640:,:], ((0,0), (26,25), (0,0)), mode='constant')
-        elif 'Subcort' in os.path.basename(gif):
-            top_row = im[:,0:321]
-            mid_row = np.pad(im[:,321:597], ((0,0),(20,25)), mode='constant')
-            bot_row = np.pad(im[:,597:], ((0,0), (20,25)), mode='constant')
+            top_row = im[:,0:654,:]
+            mid_row = np.pad(im[:,654:1200,:], ((0,0),(54,54),(0,0)), mode='constant')
+            bot_row = np.pad(im[:,1200:,:], ((0,0), (54,54), (0,0)), mode='constant')
         elif 'Atlas' in os.path.basename(gif):
             top_row = im[:,0:655,:]
             mid_row = np.pad(im[:,653:1193,:], ((0,0),(60,55),(0,0)), mode='constant')
