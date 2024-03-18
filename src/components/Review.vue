@@ -518,7 +518,7 @@
       async getUserRoles() {
         const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
         const userRoles = idTokenResult.claims;
-        this.isAdmin = userRoles.admin || userRoles.studyAdmin[this.dataset];
+        this.isAdmin = userRoles.admin || userRoles.studyAdmin[this.study];
       },
       /**
        * Adds the sample to the gallery
