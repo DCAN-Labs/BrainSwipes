@@ -2,8 +2,8 @@
 const axios = require('axios');
 const S3Client = require('@aws-sdk/client-s3').S3Client;
 const PutObjectCommand = require('@aws-sdk/client-s3').PutObjectCommand;
-const rtdbToken = require('../brainswipes-rtdb-token.json');
-const msiKeys = require('../msiKeys.json');
+const rtdbToken = require('../../brainswipes-rtdb-token.json');
+const msiKeys = require('../../msiKeys.json');
 
 async function main() {
   try {

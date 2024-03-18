@@ -70,26 +70,8 @@
       </div>
       <div v-if="showModifyDataset">
         <div v-if="updateMethod=='s3'">
-          <div v-if="server!=='development'">
-            <p>S3 update disabled on production server due to resource limitations.</p>
-            <p>Spin up a development server to use this method.</p>
-          </div>
-          <div v-else>
-            <p class="lead">Clicking update will:<p>
-            <div class="method-params">
-              <ul class="method-params-list">
-                <li>list all .png files in the s3 bucket defined in firebase config for the selected dataset</li>
-                <li>compare with the existing tracked png files in the sampleCounts document in firebase</li>
-                <li>add all missing samples to sampleCounts</li>
-                <li>this method never deletes entries from sampleCounts</li>
-                <li>the BrainSwipes service account needs s3:ListBucket action permission to use this method</li>
-              </ul>
-            </div>
-            <br>
-            <b-button variant="warning" @click="handlePostRequest" :disabled="response === 'working...'">Update {{config.datasets[selectedDataset].name}}</b-button>
-            <br>
-            <p class="lead">{{response}}</p>
-          </div>
+          <p>S3 update disabled on production server due to resource limitations.</p>
+          <p>Run updateSampleFromS3.js in the BrainSwipes tools directory.</p>
         </div>
         <div v-else-if="updateMethod=='json'">
           <p class="lead" v-if="status=='complete'">You have {{sampleCounts.length}} items currently</p>
@@ -534,25 +516,6 @@ export default {
     },
     selectStudy(study) {
       this.selectedStudy = study;
-    },
-    async handlePostRequest() {
-      this.response = 'working...';
-      const response = await this.postRequest().then(data =>
-        data.currentTarget.responseText,
-      );
-      this.response = response;
-    },
-    postRequest() {
-      return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/updateSampleCountsFromS3', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onload = resolve;
-        xhr.onerror = reject;
-        xhr.send(JSON.stringify({
-          dataset: this.selectedDataset,
-        }));
-      });
     },
     setUpdateMethod(method) {
       this.updateMethod = method;
