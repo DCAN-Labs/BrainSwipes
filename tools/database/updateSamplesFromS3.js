@@ -11,7 +11,8 @@ async function main(){
     const dataset = process.argv[2];
     const [app, database] = initFirebase();
 
-    console.log(`Updating ${dataset}`);
+    const now = new Date(Date.now());
+    console.log(`Updating ${dataset}: ${now.toUTCString()}`);
 
     const finishUpdate = await updateSamplesFromS3(database, dataset);
     const finishReconcile = await reconcileVotes(database, dataset);
