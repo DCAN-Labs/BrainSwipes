@@ -42,7 +42,6 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       app.post('/setNewUserRoles', serverFunctions.setNewUserRoles);
       app.post('/getAllUsers', serverFunctions.getAllUsers);
       app.post('/addStudy', serverFunctions.addStudy);
-      app.post('/updateSampleCountsFromS3', serverFunctions.updateSampleCountsFromS3);
     }
   },
   plugins: [
