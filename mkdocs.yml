@@ -1,7 +1,19 @@
-site_name: BrainSwipes Development and Management
+site_name: BrainSwipes
 theme: readthedocs
 plugins:
   - search
 docs_dir: docs
 nav:
-  - Welcome: index.md      
+  - Welcome: index.md
+  - Architecture:
+      - Overview: architecture.md
+      - AWS: aws.md
+      - Firebase: firebase.md
+      - MSI: msi.md
+  - Development:
+      - Setup: setup.md
+      - Deployment: deployment.md
+  - Management:
+      - Configuration: configuration.md
+      - Data Ingestion: ingest.md
+      - Tools: tools.md
