@@ -28,5 +28,5 @@ QSI-Prep images can be created by running [this BIDS app](https://github.com/DCA
 
 ## Other images
 BrainSwipes can be used with any simple image file (e.g. `.PNG` or `.GIF` files).
-If you have needs that are not mey by any of the existing image types feel free to generate your own.
+If you have needs that are not met by any of the existing image types feel free to generate your own.
 
