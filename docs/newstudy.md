@@ -48,19 +48,16 @@ Images can be added to the database in several ways.
 
     `manifest.json`:
 
-    ```
-    [
-        image-name1.png,
-        image-name2.png,
-        ...
-        image-name998.png,
-        image-name999.png
-    ]
-    ```
+        [
+            image-name1.png,
+            image-name2.png,
+            ...
+            image-name998.png,
+            image-name999.png
+        ]
 
 1. Images can be manually added to Firebase. Edit the `datasets/{{DATASET-NAME}}/sampleCounts` document with a list of key-value pairs where each key is a filename without the file extension and each value is `0`.
-    ```
-    sampleCounts    
-    ├──sub-999999_ses-test_T1-Axial: 0
-    └──sub-999999_ses-test_T2-Coronal: 0
-    ```
+
+        sampleCounts    
+        ├──sub-999999_ses-test_T1-Axial: 0
+        └──sub-999999_ses-test_T2-Coronal: 0
