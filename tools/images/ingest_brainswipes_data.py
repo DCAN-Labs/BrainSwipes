@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import numpy as np
+import math
 from PIL import Image
 
 def s3_path(arg_value):
@@ -34,7 +35,6 @@ def get_args():
     parser.add_argument("s3_subjects_path", type=s3_path, help=("The s3 bucket and path to the directory with the subjects list. " "`s3://BUCKET/` or `s3://BUCKET/OPTIONAL/PATH/`"))
     parser.add_argument("imgs_path", type=trailing_slash, help=("The path in the processed subject/session that holds the images to be ingested. " "include a trailing '/'" "e.g. files/summary_DCANBOLDProc_v4.0.0/executivesummary/img/"))
     parser.add_argument("destination", type=s3_path, help=("The s3 bucket and path where data will be placed after transformation. " "`s3://BUCKET/` or `s3://BUCKET/OPTIONAL/PATH/`"))
-    parser.add_argument("--pipeline", choices=['dcan', 'xcpd'], default="dcan", help=("The pipleine used to generate the executive summary. " "Defaults to dcan"))
     parser.add_argument("--start", type=int, default=1, help=("What number subject to start data ingestion at. Defaults to first subject."))
     parser.add_argument("--stop", type=int, help=("What number subject to stop data processing at. " "If not included will run all subjects."))
     parser.add_argument("--no_cleanup", "--no-cleanup", action="store_true", help=("Do not remove intermediary files."))
@@ -110,32 +110,27 @@ def cleanup(dir):
         print("Error cleaning up subject")
         print(e)
 
-def rearrange_image(gif, output_dir, pipeline):
+def rearrange_image(gif, output_dir):
     '''
     Transforms a image file with a 1x9 array of images into a 3x3 grid.
-    Expects specific image sizes. Depending on the specified pipeline will change its expected and output dimensions
+    Images sliced based on expected ratios defined in first_boundary and second_boundary
     '''
     print(f"Rearranging {gif}")
     im = np.asarray(Image.open(gif))
-    basename =  os.path.basename(gif)
-    if pipeline == "xcpd":
-        if 'Atlas' in basename or 'Task' in basename:
-            top_row = im[:,0:655,:]
-            mid_row = np.pad(im[:,653:1193,:], ((0,0),(60,55),(0,0)), mode='constant')
-            bot_row = np.pad(im[:,1193:1746,:], ((0,0), (47,55), (0,0)), mode='constant')
-    else:
-        if 'Task' in basename:
-            top_row = im[:,0:321,:]
-            mid_row = np.pad(im[:,321:597,:], ((0,0),(20,25),(0,0)), mode='constant')
-            bot_row = np.pad(im[:,597:,:], ((0,0), (20,25), (0,0)), mode='constant')
-        elif 'Subcort' in basename:
-            top_row = im[:,0:321]
-            mid_row = np.pad(im[:,321:597], ((0,0),(20,25)), mode='constant')
-            bot_row = np.pad(im[:,597:], ((0,0), (20,25)), mode='constant')
-        else:
-            top_row = im[:,0:640,:]
-            mid_row = np.pad(im[:,640:1193,:], ((0,0),(32,55),(0,0)), mode='constant')
-            bot_row = np.pad(im[:,1193:,:], ((0,0), (32,55), (0,0)), mode='constant')
+    full_length = im.shape[1]
+    # First section should always be the biggest
+    first_boundary = round(0.375 * full_length)
+    second_boundary = round(0.683 * full_length)
+    mid_length = second_boundary - first_boundary
+    bot_length = full_length - second_boundary
+
+    mid_padding = [math.floor((first_boundary - mid_length)/2), math.ceil((first_boundary - mid_length)/2)]
+    bot_padding = [math.floor((first_boundary - bot_length)/2), math.ceil((first_boundary - bot_length)/2)]
+
+    top_row = im[:,0:first_boundary,:]
+    mid_row = np.pad(im[:,first_boundary:second_boundary,:], ((0,0),(mid_padding[0],mid_padding[1]),(0,0)), mode='constant')
+    bot_row = np.pad(im[:,second_boundary:full_length,:], ((0,0), (bot_padding[0],bot_padding[1]), (0,0)), mode='constant')
+
 
     x = np.concatenate((top_row, mid_row, bot_row), axis=0)
     new_x = ((x - x.min()) * (1/(x.max() - x.min()) * 255)).astype('uint8')
@@ -146,9 +141,9 @@ def rearrange_image(gif, output_dir, pipeline):
 
     return
 
-def process_imgs(dir, pipeline):
+def process_imgs(dir, lookfor):
     '''
-    finds all .gif files in the directory and calls rearrange_image on them
+    finds all file matches in the directory and calls rearrange_image on them
     '''
     try:
         print(f"Processing images in {dir}")
@@ -156,10 +151,9 @@ def process_imgs(dir, pipeline):
         process.wait()
         with process.stdout:
             for file in process.stdout:
-                file = file[:-1] # strip \n character
-                if file.endswith('.gif'):
-                    filename = os.path.join(dir, file)
-                    rearrange_image(filename, dir, pipeline)
+                file = file.strip()
+                if any(string in file for string in lookfor):
+                    rearrange_image(file, dir)
     except Exception as e:
         print("Error processing images:")
         print(e)
@@ -174,7 +168,7 @@ def upload_imgs(dir, bucket):
         process.wait()
         with process.stdout:
             for file in process.stdout:
-                file = file[:-1] # strip \n character
+                file = file.strip()
                 if file.endswith('.png'):
                     cmd = ["s3cmd", "put", file, bucket]
                     subprocess.check_call(cmd, cwd=f"./{dir}", stdout=subprocess.DEVNULL)
@@ -186,7 +180,26 @@ def main():
     args = get_args()
     subjects = get_subjects(args)
     num_subjects = len(subjects)
-    pipeline = args.pipeline
+    lookfor = [
+        #XCPD image names
+        'desc-AnatOnAtlas_T1w.png',
+        'desc-AtlasOnAnat_T1w.png',
+        'desc-AnatOnAtlas_T2w.png',
+        'desc-AtlasOnAnat_T2w.png',
+        'desc-T1wOnTask_bold.png',
+        'desc-TaskOnT1w_bold.png',
+        'desc-T2wOnTask_bold.png',
+        'desc-TaskOnT2w_bold.png',
+        #DCANBOLDProc image names
+        'desc-AtlasInT1w.gif',
+        'desc-T1wInAtlas.gif',
+        'desc-T1InTask.gif',
+        'desc-TaskInT1.gif',
+        'desc-AtlasInT2w.gif',
+        'desc-T2wInAtlas.gif',
+        'desc-T2InTask.gif',
+        'desc-TaskInT2.gif'
+    ]
 
     for index, subject in enumerate(subjects):
         if index + 1 < args.start:
@@ -199,7 +212,7 @@ def main():
             dir = subject + '-' + session
             print(f"Processing {subject}/{session}")
             download_imgs(subject, session, dir, args)
-            process_imgs(dir, pipeline)
+            process_imgs(dir, lookfor)
             upload_imgs(dir, args.destination)
             if not args.no_cleanup:
                 cleanup(dir)
