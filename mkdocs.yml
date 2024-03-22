@@ -15,6 +15,7 @@ nav:
       - Deployment: deployment.md
   - Management:
       - Adding New Studies: newstudy.md
+      - Ongoing Study Config: ongoing.md
       - Available Image Types: imagetypes.md
       - Configuration: configuration.md
       - Data Ingestion: ingest.md
