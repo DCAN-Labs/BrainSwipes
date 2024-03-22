@@ -19,6 +19,8 @@ These are hard to see in BrainSwipes. We have in included a function that reshap
 ## Pre-Processed Images
 Pre-Processed images can be created by running [this BIDS app](https://github.com/erikglee/HBCD_Raw_Anat_QC_Container) on your dataset. This will output 3x3 grids of unprocessed T1w or T2w images to help QC raw anatomical data.
 
+<img src="../img/preprocessed.png" alt="Example Pre-Processed QC image" width="500"/>
+
 ## QSI-Prep Images
 QSI-Prep images can be created by running [this BIDS app](https://github.com/DCAN-Labs/QSIPREP_HBCD_QC) on your dataset. This will output `.GIF` files to help QC Diffusion Weighted Images.
 
@@ -28,4 +30,3 @@ QSI-Prep images can be created by running [this BIDS app](https://github.com/DCA
 BrainSwipes can be used with any simple image file (e.g. `.PNG` or `.GIF` files).
 If you have needs that are not mey by any of the existing image types feel free to generate your own.
 
-<img src="../img/preprocessed.png" alt="Example Pre-Processed QC image" width="500"/>
