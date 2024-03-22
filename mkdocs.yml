@@ -14,6 +14,8 @@ nav:
       - Setup: setup.md
       - Deployment: deployment.md
   - Management:
+      - Adding New Studies: newstudy.md
+      - Available Image Types: imagetypes.md
       - Configuration: configuration.md
       - Data Ingestion: ingest.md
       - Tools: tools.md
