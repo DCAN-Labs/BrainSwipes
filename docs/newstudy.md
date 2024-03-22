@@ -26,11 +26,13 @@ If a study is manually entered into the database no custom claims will be set, a
 
 ## Choose what types of images to use
 
-The most common use case involves pulling images from the executive summary. Several studies have used unprocessed images, QSI prep images and more. More image types are being developed and and kind of image can be served in the BrainSwipes application as long is they are easily renderable in a broswer (e.g. `.PNG` or `.GIF` files)
+See [Available Image Types](imagetypes.md)
 
 ## Populate the Database
 
 BrainSwipes randomly selects images to serve a user by looking through entries in the study's database documents. An image needs to exist in the dataset's S3 bucket and referenced in Firebase.
+
+If data for your study is still being collected and you want BrainSwipes to automatically update as new images are generated, see our [example configuration for ongoing studies](ongoing.md).
 
 ### Put your images in an S3 Bucket
 
