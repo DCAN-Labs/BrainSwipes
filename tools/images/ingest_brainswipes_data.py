@@ -153,7 +153,7 @@ def process_imgs(dir, lookfor):
             for file in process.stdout:
                 file = file.strip()
                 if any(string in file for string in lookfor):
-                    rearrange_image(file, dir)
+                    rearrange_image(os.path.join(dir, file), dir)
     except Exception as e:
         print("Error processing images:")
         print(e)
