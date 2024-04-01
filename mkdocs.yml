@@ -17,6 +17,7 @@ nav:
       - Setup: setup.md
       - Deployment: deployment.md
   - Management:
+      - Database Structure: database.md
       - Adding New Studies: newstudy.md
       - Ongoing Study Config: ongoing.md
       - Available Image Types: imagetypes.md
