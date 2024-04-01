@@ -3,6 +3,8 @@ theme: readthedocs
 plugins:
   - search
 docs_dir: docs
+theme:
+  logo: img/brainswipes-logo.svg
 nav:
   - Welcome: index.md
   - Architecture:
