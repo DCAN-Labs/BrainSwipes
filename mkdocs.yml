@@ -1,10 +1,11 @@
 site_name: BrainSwipes
-theme: readthedocs
+theme:
+  name: readthedocs
+  logo: img/brainswipes-logo.svg
+  favicon: img/favicon.png
 plugins:
   - search
 docs_dir: docs
-theme:
-  logo: img/brainswipes-logo.svg
 nav:
   - Welcome: index.md
   - Architecture:
