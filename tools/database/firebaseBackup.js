@@ -34,7 +34,7 @@ async function main() {
     }
     const command = new PutObjectCommand(input);
     const response = await s3Client.send(command);
-    console.log(response);
+    // console.log(response);
     console.log(`Backup JSON file added to S3:\n${filename}`);
   } catch (err) {
     console.log("error getting backup:\n", err)
