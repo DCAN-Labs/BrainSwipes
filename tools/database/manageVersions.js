@@ -60,61 +60,64 @@ async function addVersion(dataset, confirm){
         new: 0,
         modified: 0
     }
-
-    for (const sample of Object.keys(sampleSummary)) {
-        const s3Client = new S3Client({
-            credentials: {
-                accessKeyId: msiKeys.accessKeyId,
-                secretAccessKey: msiKeys.secretAccessKey },
-            endpoint: 'https://s3.msi.umn.edu',
-            region: 'global',
-        });
-        const summary = sampleSummary[sample];
-        let filepath = `${sample}.png`;
-        if (Object.hasOwn(config, 's3filepath')) {
-            const s3filepath = config.s3filepath;
-            const sesMatch = sample.match(sesRegExp);
-            const subMatch = sample.match(subRegExp);
-            let ses = '';
-            let sub = '';
-            if (sesMatch) {
-                ses = sample.match(sesRegExp)[1];
+    try {
+        for (const sample of Object.keys(sampleSummary)) {
+            const s3Client = new S3Client({
+                credentials: {
+                    accessKeyId: msiKeys.accessKeyId,
+                    secretAccessKey: msiKeys.secretAccessKey },
+                endpoint: 'https://s3.msi.umn.edu',
+                region: 'global',
+            });
+            const summary = sampleSummary[sample];
+            let filepath = `${sample}.png`;
+            if (Object.hasOwn(config, 's3filepath')) {
+                const s3filepath = config.s3filepath;
+                const sesMatch = sample.match(sesRegExp);
+                const subMatch = sample.match(subRegExp);
+                let ses = '';
+                let sub = '';
+                if (sesMatch) {
+                    ses = sample.match(sesRegExp)[1];
+                }
+                if (subMatch) {
+                    sub = sample.match(subRegExp)[1];
+                }
+                filepath = s3filepath.replaceAll('{{SUBJECT}}', sub).replaceAll('{{SESSION}}', ses).replaceAll('{{FILENAME}}', sample);
             }
-            if (subMatch) {
-                sub = sample.match(subRegExp)[1];
+            const lastModified = await getLastModified(s3Client, bucket, filepath);
+            const previousLastModified = summary.lastModified;
+    
+            if (lastModified) {
+                if (!summary.lastModified){
+                    summary.lastModified = lastModified;
+                    changed.new += 1;
+                } else if (JSON.stringify(lastModified).replaceAll('"', '') != previousLastModified){
+                    (summary.oldVersions || (summary.oldVersions = [])).push({ lastModified: previousLastModified, aveVote: summary.aveVote, count: summary.count })
+                    summary.lastModified = lastModified;
+                    summary.aveVote = 0;
+                    summary.count = 0;
+                    changed.modified += 1;
+                    resetSampleCount(dataset, sample, confirm)
+                }
+                if (confirm){
+                    const path = `datasets/${dataset}/sampleSummary/${sample}`;
+                    const ref = database.ref(path);
+                    ref.update(summary, (error) => {
+                        if (error) {
+                            console.error(error);
+                        } else {
+                            // console.log(`data saved: ${sample}`);
+                        }
+                    });
+                } else {
+                    console.log(sample);
+                    console.log(summary);
+                }
             }
-            filepath = s3filepath.replaceAll('{{SUBJECT}}', sub).replaceAll('{{SESSION}}', ses).replaceAll('{{FILENAME}}', sample);
         }
-        const lastModified = await getLastModified(s3Client, bucket, filepath);
-        const previousLastModified = summary.lastModified;
-
-        if (lastModified) {
-            if (!summary.lastModified){
-                summary.lastModified = lastModified;
-                changed.new += 1;
-            } else if (JSON.stringify(lastModified).replaceAll('"', '') != previousLastModified){
-                (summary.oldVersions || (summary.oldVersions = [])).push({ lastModified: previousLastModified, aveVote: summary.aveVote, count: summary.count })
-                summary.lastModified = lastModified;
-                summary.aveVote = 0;
-                summary.count = 0;
-                changed.modified += 1;
-                resetSampleCount(dataset, sample, confirm)
-            }
-            if (confirm){
-                const path = `datasets/${dataset}/sampleSummary/${sample}`;
-                const ref = database.ref(path);
-                ref.update(summary, (error) => {
-                    if (error) {
-                        console.error(error);
-                    } else {
-                        // console.log(`data saved: ${sample}`);
-                    }
-                });
-            } else {
-                console.log(sample);
-                console.log(summary);
-            }
-        }
+    } catch (error) {
+        console.error(`Error checking for versions ${dataset}\n`, error);
     }
     console.log(`Finished checking versions for ${dataset}.\nNewly tracked images: ${changed.new}, Modified images: ${changed.modified}`);
     return true;
