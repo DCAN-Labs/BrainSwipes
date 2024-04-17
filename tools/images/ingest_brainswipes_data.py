@@ -38,6 +38,7 @@ def get_args():
     parser.add_argument("--start", type=int, default=1, help=("What number subject to start data ingestion at. Defaults to first subject."))
     parser.add_argument("--stop", type=int, help=("What number subject to stop data processing at. " "If not included will run all subjects."))
     parser.add_argument("--no_cleanup", "--no-cleanup", action="store_true", help=("Do not remove intermediary files."))
+    parser.add_argument("--no_sessions", "--no-sessions", action="store_true", help=("Include this flag if your data does not have session levels."))
 
     return parser.parse_args()
 
@@ -207,11 +208,20 @@ def main():
         if args.stop:
             if index + 1 > args.stop:
                 break
-        sessions = get_sessions(subject, args)
-        for session in sessions:
-            dir = subject + '-' + session
-            print(f"Processing {subject}/{session}")
-            download_imgs(subject, session, dir, args)
+        if not args.no_sessions:
+            sessions = get_sessions(subject, args)
+            for session in sessions:
+                dir = subject + '-' + session
+                print(f"Processing {subject}/{session}")
+                download_imgs(subject, session, dir, args)
+                process_imgs(dir, lookfor)
+                upload_imgs(dir, args.destination)
+                if not args.no_cleanup:
+                    cleanup(dir)
+        else:
+            dir = subject
+            print(f"Processing {subject}")
+            download_imgs(subject, '', dir, args)
             process_imgs(dir, lookfor)
             upload_imgs(dir, args.destination)
             if not args.no_cleanup:
