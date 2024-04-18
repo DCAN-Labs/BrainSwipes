@@ -91,7 +91,9 @@ def download_imgs(subject, session, dir, args):
     try:
         print(f"Downloading {subject} {session} from S3")
         os.mkdir(dir)
-        img_path = args.s3_subjects_path + subject + '/' + session + '/' + args.imgs_path
+        if session:
+            session = session + '/'
+        img_path = args.s3_subjects_path + subject + '/' + session + args.imgs_path
         print(img_path)
         cmd = ['s3cmd', 'get', '--recursive', img_path]
         process = subprocess.check_call(cmd, cwd=f"./{dir}", stdout=subprocess.DEVNULL)
