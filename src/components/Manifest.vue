@@ -428,7 +428,7 @@ export default {
         if (mode === 'new-study') {
           const about = {
             text: ['This is a new study! An admin will update this shortly.'],
-            logo: 'test_logo.jpg',
+            logo: 'brainswipes.png',
             title: `Help QC ${newStudy} Images!`,
           };
           studies[newStudy] = { available: this.available, datasets: [newDataset], about };
