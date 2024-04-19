@@ -24,3 +24,5 @@ nav:
       - Configuration: configuration.md
       - Data Ingestion: ingest.md
       - Tools: tools.md
+  - Standard Operations:
+      - Access Requests: requests.md
