@@ -2,7 +2,7 @@
 const S3Client = require('@aws-sdk/client-s3').S3Client;
 const GetObjectCommand = require('@aws-sdk/client-s3').GetObjectCommand;
 const getSignedUrl = require('@aws-sdk/s3-request-presigner').getSignedUrl;
-const msiKeys = require('../msiKeys.json');
+const s3Config = require('../s3-config.json');
 const serviceAccount = require('../brainswipes-firebase-adminsdk.json');
 
 //init the firebase connection
@@ -33,21 +33,13 @@ async function logError(method, error) {
     }
 }
 
-async function createUrl(filepath, bucket) {
+async function createUrl(filepath, bucket, s3Credentials) {
     try{
-        const s3Client = new S3Client({
-          credentials: {
-              accessKeyId: msiKeys.accessKeyId,
-              secretAccessKey: msiKeys.secretAccessKey },
-          endpoint: 'https://s3.msi.umn.edu',
-          region: 'global',
-        });
-        // choosing an image path from the firebase
-        const key = filepath;
+        const s3Client = new S3Client(s3Credentials);
         // setting up the Get command
         const getObjectParams = {
           Bucket: bucket,
-          Key: key,
+          Key: filepath,
         };
         const command = new GetObjectCommand(getObjectParams);
         // getting the signed URL
@@ -110,8 +102,10 @@ module.exports = {
           try {
             const filepath = req.body.filepath;
             const bucket = req.body.bucket;
+            const s3cfg = req.body.s3cfg;
+            const s3Credentials = s3cfg ? s3Config[s3cfg] : s3Config.default;
             if (bucket && filepath) {
-              createUrl(filepath, bucket).then(data =>{
+              createUrl(filepath, bucket, s3Credentials).then(data =>{
                 res.send(data);
               });  
             }

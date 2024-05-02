@@ -206,6 +206,10 @@
           }
           filepath = s3filepath.replaceAll('{{SUBJECT}}', sub).replaceAll('{{SESSION}}', ses).replaceAll('{{FILENAME}}', pointer);
         }
+        let s3cfg = '';
+        if (Object.hasOwn(this.config.datasets[this.dataset], 's3cfg')) {
+          s3cfg = this.config.datasets[this.dataset].s3cfg;
+        }
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           xhr.open('POST', '/Image', true);
@@ -215,6 +219,7 @@
           xhr.send(JSON.stringify({
             filepath,
             bucket,
+            s3cfg,
           }));
         });
       },

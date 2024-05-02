@@ -4,7 +4,7 @@ const GetObjectCommand = require('@aws-sdk/client-s3').GetObjectCommand;
 
 var admin = require("firebase-admin");
 const serviceAccount = require("../../brainswipes-firebase-adminsdk.json");
-const msiKeys = require('../../msiKeys.json');
+const s3Config = require('../../s3-config.json');
 const app = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://brainswipes-default-rtdb.firebaseio.com"
@@ -60,15 +60,15 @@ async function addVersion(dataset, confirm){
         new: 0,
         modified: 0
     }
+    
+    let s3cfg = 'default';
+    if (Object.hasOwn(config, 's3cfg')) {
+        s3cfg = config.s3cfg;
+    }
+
     try {
         for (const sample of Object.keys(sampleSummary)) {
-            const s3Client = new S3Client({
-                credentials: {
-                    accessKeyId: msiKeys.accessKeyId,
-                    secretAccessKey: msiKeys.secretAccessKey },
-                endpoint: 'https://s3.msi.umn.edu',
-                region: 'global',
-            });
+            const s3Client = new S3Client(s3Config[s3cfg]);
             const summary = sampleSummary[sample];
             let filepath = `${sample}.png`;
             if (Object.hasOwn(config, 's3filepath')) {

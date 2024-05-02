@@ -22,5 +22,6 @@ src/firebaseConfig.js
 brainswipes-firebase-adminsdk.json
 brainswipes-rtdb-token.json
 
-# MSI credentials
+# S3 credentials
 msiKeys.json
+s3-config.json

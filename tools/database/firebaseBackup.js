@@ -3,7 +3,7 @@ const axios = require('axios');
 const S3Client = require('@aws-sdk/client-s3').S3Client;
 const PutObjectCommand = require('@aws-sdk/client-s3').PutObjectCommand;
 const rtdbToken = require('../../brainswipes-rtdb-token.json');
-const msiKeys = require('../../msiKeys.json');
+const s3Config = require('../../s3-config.json');
 
 async function main() {
   try {
@@ -19,13 +19,7 @@ async function main() {
     console.log('Got firebase backup!');
 
     // put data in s3
-    const s3Client = new S3Client({
-      credentials: {
-        accessKeyId: msiKeys.accessKeyId,
-        secretAccessKey: msiKeys.secretAccessKey },
-      endpoint: 'https://s3.msi.umn.edu',
-      region: 'global',
-    });
+    const s3Client = new S3Client(s3Config.default);
     const input = {
       Bucket: 'brainswipes-backups',
       Key: filename,

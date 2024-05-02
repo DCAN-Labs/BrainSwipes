@@ -4,7 +4,7 @@ const S3Client = require('@aws-sdk/client-s3').S3Client;
 const GetObjectCommand = require('@aws-sdk/client-s3').GetObjectCommand;
 const ListObjectsV2Command = require('@aws-sdk/client-s3').ListObjectsV2Command;
 const admin = require("firebase-admin");
-const msiKeys = require('../../msiKeys.json');
+const s3Config = require('../../s3-config.json');
 const serviceAccount = require('../../brainswipes-firebase-adminsdk.json');
 
 async function main(){
@@ -45,22 +45,26 @@ async function getExcludedSubjects(database, dataset) {
 
     if (Object.hasOwn(config, 'exclusions')) {
         if (Object.hasOwn(config.exclusions, 'fromTSV')) {
-        const data = await getObjectFromS3(bucket, config.exclusions.fromTSV.s3path);
-        const arrayData = data.split(/\r\n|\r|\n/);
-        const headers = arrayData[0].split(/\t/);
-        config.exclusions.fromTSV.rules.forEach(rule => {
-            const filterIndex = headers.indexOf(rule.filterCol);
-            const idIndex = headers.indexOf(rule.idCol);
-            const pattern = rule.pattern;
-            arrayData.forEach(row => {
-                const rowData = row.split(/\t/);
-                if (rowData.length == headers.length) {
-                    if (rowData[filterIndex].match(pattern)) {
-                        excludedSubjects.push(rowData[idIndex]);
+            let s3cfg = 'default';
+            if (Object.hasOwn(config, 's3cfg')) {
+                s3cfg = config.s3cfg;
+            }
+            const data = await getObjectFromS3(bucket, config.exclusions.fromTSV.s3path, s3cfg);
+            const arrayData = data.split(/\r\n|\r|\n/);
+            const headers = arrayData[0].split(/\t/);
+            config.exclusions.fromTSV.rules.forEach(rule => {
+                const filterIndex = headers.indexOf(rule.filterCol);
+                const idIndex = headers.indexOf(rule.idCol);
+                const pattern = rule.pattern;
+                arrayData.forEach(row => {
+                    const rowData = row.split(/\t/);
+                    if (rowData.length == headers.length) {
+                        if (rowData[filterIndex].match(pattern)) {
+                            excludedSubjects.push(rowData[idIndex]);
+                        }
                     }
-                }
+                });
             });
-        });
         }
     }
     return excludedSubjects;
@@ -105,14 +109,8 @@ function updateSampleCounts(database, objectsList, sampleCounts, regexp, subRegE
 }
 
 // get tsv data from s3
-async function getObjectFromS3(bucket, object) {
-    const s3Client = new S3Client({
-      credentials: {
-          accessKeyId: msiKeys.accessKeyId,
-          secretAccessKey: msiKeys.secretAccessKey },
-      endpoint: 'https://s3.msi.umn.edu',
-      region: 'global',
-    });
+async function getObjectFromS3(bucket, object, s3cfg) {
+    const s3Client = new S3Client(s3Config[s3cfg]);
       const command = new GetObjectCommand({
           Bucket: bucket,
           Key: object
@@ -160,14 +158,8 @@ async function reconcileVotes(database, dataset){
 }
 
 // list items in s3 bucket
-async function listItems(input) {
-    const s3Client = new S3Client({
-      credentials: {
-          accessKeyId: msiKeys.accessKeyId,
-          secretAccessKey: msiKeys.secretAccessKey },
-      endpoint: 'https://s3.msi.umn.edu',
-      region: 'global',
-    });
+async function listItems(input, s3cfg) {
+    const s3Client = new S3Client(s3Config[s3cfg]);
     const command = new ListObjectsV2Command(input);
     const response = await s3Client.send(command);
     return [response.Contents, response.NextContinuationToken];
@@ -194,9 +186,13 @@ async function updateSamplesFromS3(database, dataset){
         const excludedSubjects = await getExcludedSubjects(database, dataset);
         let excludedSubstrings = [];
         if (Object.hasOwn(config, 'exclusions')) {
-        if (Object.hasOwn(config.exclusions, 'substrings')) {
-            excludedSubstrings = config.exclusions.substrings; 
+            if (Object.hasOwn(config.exclusions, 'substrings')) {
+                excludedSubstrings = config.exclusions.substrings; 
+            }
         }
+        let s3cfg = 'default';
+        if (Object.hasOwn(config, 's3cfg')) {
+            s3cfg = config.s3cfg;
         }
         // get the list of items in the s3 bucket
         let numUpdates = 0;
@@ -208,7 +204,7 @@ async function updateSamplesFromS3(database, dataset){
             };
             let continuate = true;
             do {
-            let [items, continuationToken] = await listItems(input);
+            let [items, continuationToken] = await listItems(input, s3cfg);
             if (items == undefined) {
                 continuate = false;
             } else {
@@ -227,7 +223,7 @@ async function updateSamplesFromS3(database, dataset){
         };
         let continuate = true;
         do {
-            let [items, continuationToken] = await listItems(input);
+            let [items, continuationToken] = await listItems(input, s3cfg);
             if (items == undefined) {
             continuate = false;
             } else {
