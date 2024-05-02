@@ -43,7 +43,7 @@ async function createUrl(filepath, bucket, s3Credentials) {
         };
         const command = new GetObjectCommand(getObjectParams);
         // getting the signed URL
-        const url = await getSignedUrl(s3Client, command, { expiresIn: 5 });
+        const url = await getSignedUrl(s3Client, command, { expiresIn: 3 });
         return url;
     }
     catch(err) {
