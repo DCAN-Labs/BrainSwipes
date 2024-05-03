@@ -12,7 +12,7 @@ nav:
       - Overview: architecture.md
       - AWS: aws.md
       - Firebase: firebase.md
-      - MSI: msi.md
+      - S3: s3cfg.md
   - Development:
       - Setup: setup.md
       - Deployment: deployment.md
