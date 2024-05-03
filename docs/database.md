@@ -14,12 +14,9 @@ Used to match users with their organization during dataset registration and auth
 ## catchTrials
 Catch trial configuration
 
-### frequency
-
+- **frequency**
 How often a catch trial should be served. Should be a number between 1 and 0.
-
 For instance, 0.05 = 1/20, a user will recieve a catch trial approximately one in 20 samples.
-
 This process is random and checks if a random number is less than the number defined here.
 
 `Math.random() < this.config.catchTrials.frequency`
@@ -28,30 +25,27 @@ This process is random and checks if a random number is less than the number def
 
 Each key in this document is the name of a dataset. Under each dataset are a number of keys, some of which are optional.
 
-### about
+- **about**:
 **REQUIRED**
 
-#### text
+- text:
 A list of strings. Each string is a new line in the dataset's about description in the parent study's about page.
-
 When a new dataset is made in the admin dashboard, this defaults to placeholder text saying an admin will update it.
-
 Must be manually changed in Firebase.
 
-### archived
+- **archived**:
 Boolean. If `true`, the dataset cannot be swiped on but is still visible in the app.
 
-### bucket
+- **bucket**:
 **REQUIRED**
-
 The S3 bucket on MSI that images for this dataset are stored in.
 
-### exclusions
+- **exclusions**:
 
-#### fromTSV
+- fromTSV:
 rules for filtering based on a TSV file and s3path to find the TSV file in the dataset's bucket.
 See example
-
+    ```
     {
         "rules": [
             {
@@ -62,35 +56,32 @@ See example
         ],
         "s3path": "assembly_bids/participants.tsv"
     }
+    ```
 
-#### substrings
+- substrings:
 List of strings.
 Each string should be a pattern that when matched will exclude the sample from being added automatically to the dataset if found in the S3 bucket.
 
-### imageType
+- **imageType**:
 Determines the image type for various help and data visualization features.
 If not included, will default to func, anat or atlas based on pattern matching.
-
 See config/imageTypes for possible options.
 
-### name
+- **name**:
 **REQUIRED**
-
 The name for this dataset displayed in the app
 
-### prefixes
-
+- **prefixes**:
 List of strings.
 Filepaths relative to the S3 bucket to check for data when searching with `updateSamplesFromS3.js`
 
-### s3filepath
+- **s3filepath**:
 Where in the s3 bucket files are found. Used in searching for and rendering images.
 Replaces `{{SUBJECT}}`, `{{SESSION}}`, and `{{FILENAME}}` with the subject session and filename for a specific sample.
 If not included the application looks for images at the base level of the s3 bucket.
 
-### tutorials
+- **tutorials**:
 **REQUIRED**
-
 Which tutorial modules are required before swiping on this dataset.
 Can be set in the admin dashboard.
 
@@ -105,10 +96,10 @@ If not overridden in a dataset's ocnfiguration, will default to func, anat or at
 
 ## learn
 
-### checklists
+- **checklists**:
 Checklists used in various help related features. Each checklist corresponds to an imageType and is a list of strings.
 
-### gallery
+- **gallery**:
 Keys are sample names. Each sample name configures an image for the gallery. 
 Select images for the gallery in admin actions in the review route, populate the gallery item in gallery.
 
@@ -128,16 +119,16 @@ See example
         "text": "Dimness is a result of generating an image for QC and does not reflect the quality of the data. If all other criteria are met, dim images should be passed."
     }
 
-### tutorials
+- **tutorials**:
 Each key contains information for the identified tutorial.
 
 ## maintenance
 Used to display a banner on the homepage announcing upcoming application outage. Set in the admin console.
 
-### bannerStatus
+- **bannerStatus**:
 Boolean. Whether the maintenance banner is on.
 
-### date
+- **date**:
 The date to display in the maintenance banner.
 
 ## profilePics
@@ -146,13 +137,13 @@ List of strings. Each string is a the name of a `.SVG` file in `static/profile_p
 ## studies
 Configuration for each study.
 
-### about
+- **about**:
 Logo, text and title used in the about page for this study.
 
-### available
+- **available**:
 Boolean. Whether the study is accesible to the public.
 
-### datasets
+- **datasets**:
 List of strings. Which datasets are associated with the study.
 
 # datasets
@@ -161,7 +152,7 @@ Each dataset has a document here. This is where samples and votes are tracked
 ## catch
 Tracks the same data as tracked in a normal vote but kept here.
 
-### sampleCounts
+- sampleCounts
 Whether each catch trial should be passed or failed.
 
 ## chats
@@ -188,17 +179,17 @@ Tracks which samples a user has seen and how many times. Used in prioritizing sa
 
 Uses firebase's push method to generate a unique key that holds the data for a single vote.
 
-### response
+- **response**:
 What the user responded.
 0 for fail, 1 for pass.
 
-### sample
+- **sample**:
 The name of the sample
 
-### time
+- **time**:
 the number of milliseconds between loading the image and the user swiping on it
 
-### user
+- **user**:
 the username of the user that cast this vote.
 
 # log

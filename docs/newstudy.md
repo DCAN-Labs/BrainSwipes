@@ -46,16 +46,17 @@ Images can be added to the database in several ways.
     - This is the recommended option. Requires some configuration.
 1. Images can be ingested by feeding the application a `manifest.json` in the `Admin` -> `Manage Database` route.
     - Legacy method. Can take a long time.
-    - manifest json files are simply a list of filenames seperated by commas 
+    - manifest json files are a list of filenames seperated by commas
+    - Do not include file extensions on the filenames eg `image-file1` not `image-file1.png`
 
     `manifest.json`:
 
         [
-            image-name1.png,
-            image-name2.png,
+            image-name1,
+            image-name2,
             ...
-            image-name998.png,
-            image-name999.png
+            image-name998,
+            image-name999
         ]
 
 1. Images can be manually added to Firebase. Edit the `datasets/{{DATASET-NAME}}/sampleCounts` document with a list of key-value pairs where each key is a filename without the file extension and each value is `0`.
