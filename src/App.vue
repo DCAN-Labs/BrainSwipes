@@ -285,7 +285,8 @@ export default {
           }),
         });
         const responseJSON = await response.json();
-        this.logToFirebase('globusAuthentication', JSON.stringify(responseJSON));
+        // Can fill up Firebase, keep an eye out if you enable this.
+        // this.logToFirebase('globusAuthentication', JSON.stringify(responseJSON));
         identities = responseJSON;
       }
       return identities;
@@ -332,32 +333,33 @@ export default {
     await this.getUserDatasets();
     await this.getConfig();
     // intercept the console and send to firebase log
-    {
-      const log = console.log.bind(console);
-      console.log = (...args) => {
-        if (process.env.NODE_ENV === 'production') {
-          try {
-            this.logToFirebase('console', args);
-          } catch (e) {
-            this.logToFirebase('console', 'error logging log');
-          }
-        }
-        log(...args);
-      };
-    }
-    {
-      const error = console.error.bind(console);
-      console.error = (...args) => {
-        if (process.env.NODE_ENV === 'production') {
-          try {
-            this.logToFirebase('console', args.toString());
-          } catch (e) {
-            this.logToFirebase('console', 'error logging error');
-          }
-        }
-        error(...args);
-      };
-    }
+    // Can fill up Firebase, keep an eye out if you enable this.
+    // {
+    //   const log = console.log.bind(console);
+    //   console.log = (...args) => {
+    //     if (process.env.NODE_ENV === 'production') {
+    //       try {
+    //         this.logToFirebase('console', args);
+    //       } catch (e) {
+    //         this.logToFirebase('console', 'error logging log');
+    //       }
+    //     }
+    //     log(...args);
+    //   };
+    // }
+    // {
+    //   const error = console.error.bind(console);
+    //   console.error = (...args) => {
+    //     if (process.env.NODE_ENV === 'production') {
+    //       try {
+    //         this.logToFirebase('console', args.toString());
+    //       } catch (e) {
+    //         this.logToFirebase('console', 'error logging error');
+    //       }
+    //     }
+    //     error(...args);
+    //   };
+    // }
   },
 };
 </script>
