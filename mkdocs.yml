@@ -22,6 +22,7 @@ nav:
       - Ongoing Study Config: ongoing.md
       - Available Image Types: imagetypes.md
       - Configuration: configuration.md
+      - Configuring Tutorials: tutorials.md
       - Data Ingestion: ingest.md
       - Tools: tools.md
   - Standard Operations:
