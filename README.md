@@ -10,3 +10,5 @@ BrainSwipes is built off of the open source [Swipes For Science](https://docs.sw
 BrainSwipes is hosted on [AWS Lightsail](https://lightsail.aws.amazon.com/ls/webapp/home/instances?#), uses a [Firebase](https://firebase.google.com/) database to track data on swipes, and S3 storage on UMN's [Minnesota Supercomputing Institute (MSI)](https://www.msi.umn.edu/).
 
 ![Swipes app flow](./src/assets/swipes-flow.png "Standard flow for the swipes app")
+
+For development workflows and database management see the [readthedocs](https://brainswipes.readthedocs.io/)
