@@ -23,7 +23,6 @@ nav:
       - Available Image Types: imagetypes.md
       - Configuration: configuration.md
       - Configuring Tutorials: tutorials.md
-      - Data Ingestion: ingest.md
       - Tools: tools.md
   - Standard Operations:
       - Access Requests: requests.md
