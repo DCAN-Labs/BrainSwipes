@@ -13,6 +13,16 @@ Account credentials are reviewed and renewed in March of every year.
 For help with the keys for this service account reach out to `help@msi.umn.edu`.
 If you generate new keys for this service account be sure to update them in the `s3-config.json` on the AWS server.
 
+To perform s3cmd commands as the service account you will need to run commands with the `-c S3-CONFIG-FILE` option. The configuration file is [documented here](https://s3tools.org/kb/item14.htm). It only needs four parameters and should look like this:
+
+    [default]
+    access_key = MSI-S3-KEY
+    secret_key = MSI-S3-SECRET
+    host_base = s3.msi.umn.edu
+    host_bucket = s3.msi.umn.edu
+
+Consider naming the file `.s3cfg-brainswipes` and putting it in the top level directory where is is registered in the .gitignore file.
+
 ### MSI S3 buckets
 
 Below is a table showing buckets currently holding data used in BrainSwipes.
@@ -20,7 +30,7 @@ Below is a table showing buckets currently holding data used in BrainSwipes.
 | S3 Bucket                | study                | notes                                              |
 |--------------------------|----------------------|----------------------------------------------------|
 | s3://brainswipes         | DCAN Managed studies | Studies split into first level directories         |
-| s3://brainswipes-backup  |           -          | Bucket that the script firebaseBackup.js pushes to |
+| s3://brainswipes-backup  |           -          | Bucket that `firebaseBackup.js` pushes to |
 | s3://midb-hbcd-main-pr   | HBCD                 | HBCD main study, T1/T2 and Diffusion               |
 | s3://midb-hbcd-pilot-pr  | HBCD                 | HBCD pilot data, T1/T2 and Diffusion               |
 
