@@ -13,7 +13,7 @@ Account credentials are reviewed and renewed in March of every year.
 For help with the keys for this service account reach out to `help@msi.umn.edu`.
 If you generate new keys for this service account be sure to update them in the `s3-config.json` on the AWS server.
 
-To perform s3cmd commands as the service account you will need to run commands with the <code>-c&nbsp;S3-CONFIG-FILE</code> option. The configuration file is [documented here](https://s3tools.org/kb/item14.htm). It only needs four parameters and should look like this:
+To perform s3cmd commands as the service account you will need to run commands with the <code>&#8209;c&nbsp;S3&#8209;CONFIG&#8209;FILE</code> option. The configuration file is [documented here](https://s3tools.org/kb/item14.htm). It only needs four parameters and should look like this:
 
     [default]
     access_key = MSI-S3-KEY
