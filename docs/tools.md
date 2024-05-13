@@ -3,68 +3,102 @@
 A description of scripts in the tools folder.
 
 Scripts may require `brainswipes-firebase-adminsdk.json` or `brainswipes-rtdb-token.json` to run.
-To generate these JSONs visit the Firebase console. Put them in the top level directory where they will be git ignored.
+To generate these JSONs visit the Firebase console. Put them in the top level directory where they will be excluded from git via the `.gitignore` file.
 
-#### Database Interactions
-- reconcileVotes.js
+## Admin
+Tools in this folder interact with the Firebase Admin SDK. Operations with the Admin SDK will require the `brainswipes-firebase-adminsdk.json` which can be [downloaded from Firebase](https://firebase.google.com/docs/admin/setup#initialize_the_sdk_in_non-google_environments).
+You will need to use the Admin SDK to make changes to study access as this is managed by custom claims which are not accessible through other means.
+
+- **modifyUsers.js**
+
+    - This tool will do nothing out of the box. It is a collection of functions that interact with the admin sdk and firebase user records. Manual edits will be required to run this.
+    - Especially useful is the `updateCusomClaims` function for use when changing studies from restricted to open, or removing studies entirely.
+
+## Database
+Tools in this folder read or modify the firebase realtime database records. There are a variety of ways to get a snapshot of the database and restore it, please consider backing up the database before running these scripts if you are unsure.
+
+- **addDatasetScores.js**
+
+    - This script was built to update the database for the release of the user feedback feature. Unlikely to be needed in the future. 
+
+- **firebaseBackup.js**
+
+    - Pulls a copy of firebase and stashes it in an S3 bucket.
+
+    - Requires a `brainswipes-rtdb-token.json` which contains a [database secret](https://firebase.google.com/docs/database/rest/auth#legacy_tokens) from the firebase settings.
+        ```
+        {
+            "token": "FIREBASE-DATABASE-SECRET"
+        }
+        ```
+
+- **manageVersions.js**
+
+    - Adds a last modified date to a sample's sampleSummary document taken from the S3 object's metadata.
+
+    - If a last modified date is already listed it is compared to the current date on the S3 object.
+
+    - Objects where new versions are found have their data stashed in the sampleSummary document and votes reset in sampleCounts.
+
+- **reconcileVotes.js**
 
     - Takes the votes document in firebase `db/datasets/{DATASET}/votes` as the source of truth and syncs sampleCounts, sampleSummary and userSeenSamples to all match with it.
+
     - Run without `confirm` to only view console output of differences. Run with `confirm` to update firebase.
+
     - Example run command `node reconcileVotes.js ABIDE1 confirm`
 
-- removeImageType.js
+- **removeImageType.js**
 
     - Removes any image from Firebase in the specified study that matches the input pattern.
 
     - **USE WITH CAUTION.**
 
-- restore-sampleCounts.js
+- **restore-sampleCounts.js**
 
     - Takes the sampleSummary document in firebase `db/datasets/{DATASET}/sampleSummary` and updates sampleCounts to restore data for any removed images.
+
     - Designed to restore the dataset in cases where some images have been temporarily removed from circulation.
+
     - Differs from reconcileVotes because reconcileVotes will not add new samples to sampleCounts to maintain the subset of images served to users.
 
+- **updateSamplesFromS3.js**
 
-#### Making Images
-- make_diffusion_gifs.py
-
-    - Script used to make gifs for DWI images, one subject at a time.
-    - See the [version used in HBCD](https://github.com/DCAN-Labs/QSIPREP_HBCD_QC) for more advanced usage.
-
-- ingest_brainswipes_data.py
-
-    - Pulls executive summary images from the specifed input S3 location
-    - Transforms executive summary images that appear in a 1x9 grid to the 3x3 grid seen in BrainSwipes
-    - Uploads all `.png` files to the specifed output S3 location
-    - Once images are in the S3, configure the database uploads in the config document of firebase and run `s32firebase.js`
-
-- generate_manifest.sh
-
-    - generates a manifest JSON used by the legacy uploading option from the original SwipesForScience.
-    - may be useful for large datasets as the s3 interactions used in `s32firebase.js` can take a lot of memory.
-
-
-#### User management
-
-- modifyUsers.js
-
-    - Various functions to help manage user info that is only accessible through the Firebase Admin SDK.
+    - Updates sampleCounts in Firebase based on an `s3cmd ls` to the s3 bucket/prefix for the specified dataset in the database config.
     
-    - Inputs are hard coded, will need manual intervention to use.
+    - Excludes images determined in the configuration document for the study in firebase.
+    
+    - Reconciles votes for images that already have a document in `sampleSummary`
 
-    - Use `updateCustomClaims()` to modify users permissions when changing any part of a dataset's configuration that effects custom claims.
+## Images
+Tools in this directory are used to modify, move, or create images used in BrainSwipes.
 
+- **anat_qc_s3_wrapper.py**
 
-#### General Upkeep
+    - A python wrapper for the [hbcd_anat_qc](https://hub.docker.com/repository/docker/dcanumn/hbcd_anat_qc/general) container.
 
-- s32firebase.js
+    - Use `./anat_qc_s3_wrapper.py -h` for argparse help for this script.
 
-    - Updates sampleCounts in Firebase based on an `s3cmd ls` to the s3 bucket for the specified study.
-    - Designed for use on the production server as a cronjob to update studies regularly. `crontab -e` to view and edit cronjobs using vim.
-    - Example command: `node s32firebase.js BCPv101 localhost 8080`
-        - hostname + port will generally be `localhost 8080` if running a dev server (`npm run dev`) or `localhost 3000` for a production server (on AWS)
+- **generate_manifest.sh**
+ 
+    - A bash script that calls `s3cmd ls` and formats it into a manifest json for ingestion into BrainSwipes.
 
-- firebaseBackup.js
+    - Manifest JSONs are the legacy way to upload data. It is recommended to use `updateSamplesFromS3` instead.
 
-    - Pulls all data from firebase as a JSON file and puts it into `s3://brainswipes-backups`
-    - Takes too much RAM to be run on Lightsail. Run regularly on your local machine to back up data.
+- **ingest_brainswipes_data.py**
+
+    1. Pulls data from an executive summary in an S3 bucket
+
+    1. Resizes registrations for optimal rendering in BrainSwipes
+
+    1. Uploads all relevant images to the S3 bucket where BrainSwipes will be looking for the images
+
+- **make_diffusion_gifs.py**
+
+    - **DEPRECATED** 
+    
+    - Creates `.GIF` files from DWI images for use in BrainSwipes.
+
+    - See the [version used in HBCD](https://github.com/DCAN-Labs/QSIPREP_HBCD_QC) for an up to date version.
+
+    - Also available as [a container](https://hub.docker.com/repository/docker/dcanumn/qsiprep_qc/general).
