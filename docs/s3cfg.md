@@ -21,7 +21,7 @@ To perform s3cmd commands as the service account you will need to run commands w
     host_base = s3.msi.umn.edu
     host_bucket = s3.msi.umn.edu
 
-Consider naming the file `.s3cfg-brainswipes` and putting it in the top level directory where is is registered in the .gitignore file.
+Consider naming the file `.s3cfg-brainswipes` and putting it in the top level directory where it is registered in the .gitignore file.
 
 ### MSI S3 buckets
 
