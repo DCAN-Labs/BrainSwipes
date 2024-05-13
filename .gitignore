@@ -25,3 +25,4 @@ brainswipes-rtdb-token.json
 # S3 credentials
 msiKeys.json
 s3-config.json
+.s3cfg-brainswipes
