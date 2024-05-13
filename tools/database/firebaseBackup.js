@@ -21,7 +21,7 @@ async function main() {
     // put data in s3
     const s3Client = new S3Client(s3Config.default);
     const input = {
-      Bucket: 'brainswipes-backups',
+      Bucket: 'brainswipes-backup',
       Key: filename,
       Body: JSON.stringify(backup.data),
       ContentType: "application/json",

@@ -20,7 +20,7 @@ Below is a table showing buckets currently holding data used in BrainSwipes.
 | S3 Bucket                | study                | notes                                              |
 |--------------------------|----------------------|----------------------------------------------------|
 | s3://brainswipes         | DCAN Managed studies | Studies split into first level directories         |
-| s3://brainswipes-backups |           -          | Bucket that the script firebaseBackup.js pushes to |
+| s3://brainswipes-backup  |           -          | Bucket that the script firebaseBackup.js pushes to |
 | s3://midb-hbcd-main-pr   | HBCD                 | HBCD main study, T1/T2 and Diffusion               |
 | s3://midb-hbcd-pilot-pr  | HBCD                 | HBCD pilot data, T1/T2 and Diffusion               |
 
