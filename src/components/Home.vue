@@ -1,6 +1,5 @@
 <template>
   <div class="home container">
-    <b-alert :show="bannerStatus" variant="danger">BrainSwipes will be unavailable on {{config.maintenance.date}} for scheduled maintenance.</b-alert>
     <div class="jumbotron landing" :style="landingStyle">
       <div id="titles">
         <p class="lead mt-3">
@@ -163,9 +162,6 @@ export default {
     this.reroute();
   },
   computed: {
-    bannerStatus() {
-      return this.config.maintenance.bannerStatus;
-    },
     categorizedDatasets() {
       const open = [];
       const restricted = [];

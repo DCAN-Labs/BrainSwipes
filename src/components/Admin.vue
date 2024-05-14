@@ -12,12 +12,7 @@
         <router-link class="btn btn-warning" v-if="fullAdmin" :to="{name: 'Manifest'}">Manage Database</router-link>
       </p>
       <hr>
-      <div id=maintenance v-if="fullAdmin">
-        <h1 for="maintenance-datepicker">Choose a date to display in maintenance banner</h1>
-        <b-form-datepicker id="maintenance-datepicker" v-model="tempMaintenanceDate"></b-form-datepicker>
-        <p>Chosen Date: {{tempMaintenanceDate}}</p>
-        <b-button class="btn btn-warning" @click="changeBannerState">Banner is currently {{isBannerOn}}</b-button>
-      </div>
+      <p>See the BrainSwipes <a href="https://brainswipes.readthedocs.io/" target="blank">readthedocs</a> for information on administration of BrainSwipes.</p>
     </b-container>
 
   </div>
@@ -52,66 +47,20 @@ export default {
   data() {
     return {
       /**
-       * vars for setting the maintenance banner
-       */
-      tempMaintenanceDate: '',
-      isBannerOn: '',
-      /**
        * whether they are full admin or just a dataset admin
        */
       fullAdmin: false,
     };
   },
   methods: {
-    changeBannerState() {
-      let update;
-      if (this.isBannerOn === 'ON') {
-        this.isBannerOn = 'OFF';
-        update = { '/config/maintenance/bannerStatus': false, '/config/maintenance/date': this.tempMaintenanceDate };
-      } else {
-        this.isBannerOn = 'ON';
-        update = { '/config/maintenance/bannerStatus': true, '/config/maintenance/date': this.tempMaintenanceDate };
-      }
-      this.db.ref().update(update);
-    },
-    getMaintenanceDate() {
-      this.tempMaintenanceDate = this.maintenanceDate;
-    },
-    getMaintenanceStatus() {
-      if (this.maintenanceStatus) {
-        this.isBannerOn = 'ON';
-      } else {
-        this.isBannerOn = 'OFF';
-      }
-    },
     async getUserRoles() {
       const idTokenResult = await firebase.auth().currentUser.getIdTokenResult(true);
       const userRoles = idTokenResult.claims;
       this.fullAdmin = userRoles.admin;
     },
   },
-  props: {
-    config: {
-      type: Object,
-      required: true,
-    },
-    db: {
-      type: Object,
-      required: true,
-    },
-  },
   mounted() {
-    this.getMaintenanceDate();
-    this.getMaintenanceStatus();
     this.getUserRoles();
-  },
-  calculated: {
-    maintenanceDate() {
-      return this.config.maintenance.date;
-    },
-    maintenanceStatus() {
-      return this.config.maintenance.bannerStatus;
-    },
   },
 };
 </script>

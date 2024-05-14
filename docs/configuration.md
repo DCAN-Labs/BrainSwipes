@@ -100,17 +100,6 @@ Dataset specific configuration is done here as well, this is where information i
 
         - The various tutorial modules in the Learn section of the app. The content key will determine what elements will appear in the tutorial page.
 
-- maintenance
-
-    - bannerStatus
-
-        - Whether the upcoming maintenance banner is active in the app. Boolean value.
-
-    - date
-
-        - The date to display in the maintenance banner. 
-        - Example banner: `BrainSwipes will be unavailable on {{maintenanceDate}} for scheduled maintenance.`
-
 - studies
     
     *Configuration specific to a study. Each study has an entry with the following records:*

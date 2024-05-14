@@ -122,15 +122,6 @@ See example
 - **tutorials**:
 Each key contains information for the identified tutorial.
 
-## maintenance
-Used to display a banner on the homepage announcing upcoming application outage. Set in the admin console.
-
-- **bannerStatus**:
-Boolean. Whether the maintenance banner is on.
-
-- **date**:
-The date to display in the maintenance banner.
-
 ## profilePics
 List of strings. Each string is a the name of a `.SVG` file in `static/profile_pics` available to be used as a profile picture.
 
