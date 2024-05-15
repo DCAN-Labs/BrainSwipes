@@ -55,8 +55,9 @@ def get_subjects(args):
         with process.stdout:
             for line in process.stdout:
                 match = re.search(regex, line)
-                sub = match.group(1)
-                subjects.append(sub)
+                if match:
+                    sub = match.group(1)
+                    subjects.append(sub)
         print(f"Found {len(subjects)} subjects")
         return subjects
     except Exception as e:
