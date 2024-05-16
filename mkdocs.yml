@@ -27,3 +27,4 @@ nav:
   - Standard Operations:
       - Access Requests: requests.md
       - Globus Access: globus.md
+      - Admin Actions: admin.md
