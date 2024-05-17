@@ -7,7 +7,7 @@ If your study is still collecting data and want BrainSwipes to update as new ima
 ## S3 Access
 This paradigm assumes your data is being added to an S3 bucket specific to that study. You will not be copying images into a different s3 bucket.
 
-You will need to have the bucket owner give the BrainSwipes service account **read only access** to the study bucket. For information on setting read only access to a bucket, see [the page on MSI's S3](msi.md).
+You will need to have the bucket owner give the BrainSwipes service account **read only access** to the study bucket. For information on setting read only access to a bucket, see [the page on MSI's S3](s3cfg.md).
 
 ### Data Organization
 This paradigm assumes your data is in a consistent directory structure. If you use the [BIDS standard](https://bids.neuroimaging.io/), you're all set!
