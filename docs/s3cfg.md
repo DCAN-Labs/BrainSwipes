@@ -7,7 +7,7 @@ BrainSwipes primarily uses MSI's S3 service, but can be configured to use other 
 ## Getting S3 Credentials from MSI
 
 BrainSwipes has been granted an S3 service account by MSI.
-The sevice account's uid is **`77766`** and its sharing address is `specialsystemsperson+60@msi.umn.edu`.
+The service account's uid is **`77766`** and its sharing address is `specialsystemsperson+60@msi.umn.edu`.
 The account is owned by Ben Lynch `blynch@umn.edu` the director of MSI.
 Account credentials are reviewed and renewed in March of every year.
 For help with the keys for this service account reach out to `help@msi.umn.edu`.
