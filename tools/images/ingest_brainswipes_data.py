@@ -78,8 +78,9 @@ def get_sessions(subject, args):
         with process.stdout:
             for line in process.stdout:
                 match = re.search(regex, line)
-                ses = match.group(1)
-                sessions.append(ses)
+                if match:
+                    ses = match.group(1)
+                    sessions.append(ses)
         return sessions
     except Exception as e:
         print("Error getting sessions:")
