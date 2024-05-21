@@ -58,31 +58,32 @@ It is recommended to use the bucket `brainswipes` for all datasets that do not o
 This can be used to narrow down the images to be served to users. It filters files based on patterns in the filename. See the exclusions section of [configurations](configuration.md) for more details.
 If you are using a dataset from an executive summary include the exclusions in the example below.
 
--**prefixes**:
+- **prefixes**:
 A list of prefixes to narrow down the searching of images in the S3 bucket. Think of these as directories inside the S3 where images for this study are stored.
 Including these expediates the search for files when using `updateSamplesFromS3.js`. While not strictly necessary, if not included large buckets may cause the script to timeout.
 
--**s3filepath**:
+- **s3filepath**:
 If your image files are not in a flat structure at the base of an s3 bucket then you will need to change this. see [configurations](configuration.md) for more information.
 
-  ```
-  {
-    "bucket": "brainswipes",
-    "exclusions": {
-      "substrings": [
-        "InferiorTemporal-Cerebellum",
-        "_ref",
-        "_bold",
-        "Sagittal-CorpusCallosum",
-        "DVARS_"
-      ]
-    },
-    "prefixes": [
-      "BCP/"
-    ],
-    "s3filepath": "BCP/{{FILENAME}}.png"
-  }
-  ```
+Example configuration:
+
+    {
+      "bucket": "brainswipes",
+      "exclusions": {
+        "substrings": [
+          "InferiorTemporal-Cerebellum",
+          "_ref",
+          "_bold",
+          "Sagittal-CorpusCallosum",
+          "DVARS_"
+        ]
+      },
+      "prefixes": [
+        "BCP/"
+      ],
+      "s3filepath": "BCP/{{FILENAME}}.png"
+    }
+
 
 ### Tell Firebase where to find the images
 
