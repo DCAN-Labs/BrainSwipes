@@ -89,7 +89,7 @@ If your image files are not in a flat structure at the base of an s3 bucket then
 Images can be added to the database in several ways.
 
 1. Images can be automatically detected with the `updateSamplesFromS3.js` script located in the tools directory.
-    - **This is the recommended option**. Requires some configuration. See [tools](tools.md) for more information on this script.
+    - **This is the recommended option**. Requires the four configurations listed above. See [tools](tools.md) for more information on this script.
 1. Images can be ingested by feeding the application a `manifest.json` in the `Admin` -> `Manage Database` route.
     - Legacy method. Can take a long time.
     - manifest json files are a list of filenames seperated by commas
