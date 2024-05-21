@@ -23,7 +23,7 @@ This configuration relies on 4 keys in the dataset's config object in firebase. 
     - This is a way to exclude images that you don't want to be ingested into BrainSwipes. By default BrainSwipes will ingest all files with the file suffix you indicate in the `s3filepath` key.
     - You can exclude images by: 
         - matching substrings in the `subtrings` key
-        - parsing a TSV file in the `fromTSV` key (see [configuration](configuration.ms))
+        - parsing a TSV file in the `fromTSV` key (see [configuration](configuration.md))
 1. `prefixes`
     - This narrows down the search criteria for new images. If your s3 bucket has lots of objects it is recommended you use this key
 1. `s3filepath`

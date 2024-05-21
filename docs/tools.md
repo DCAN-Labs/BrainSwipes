@@ -87,6 +87,8 @@ Tools in this directory are used to modify, move, or create images used in Brain
 
 - **ingest_brainswipes_data.py**
 
+    - Uses argparse. Run `ingest_brainswipes_data.py -h` for infomration on running this script.
+
     1. Pulls data from an executive summary in an S3 bucket
 
     1. Resizes registrations for optimal rendering in BrainSwipes

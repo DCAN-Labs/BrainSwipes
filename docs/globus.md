@@ -15,11 +15,16 @@
 1. If this is the first time you have accessed Globus with this organization you will be prompted to continue with a new Globus account or link to an existing one. If you have never used Globus before, click continue. If you have accessed Globus with a different identity, click Link to an existing account.
 ![](img/successful-globus-login.png)
 
-1. If you clicked Continue on the previous step you will be forwarded to the Globus consent page. Accept and continue. Skip to step 7.
-![](img/globus-consent.png)
+1. You may also be prompted to share what you will be using your globus account for. Check "non-profit research of educational purposes", accept the terms of service and continue.
+![](img/account-use.png)
 
 1. If you clicked `Link to an existing account` in step 4 you will be asked to log into your primary identity. This will have you repeat steps 2-3 for your existing identity.
 ![](img/log-into-globus-primary-identity.png)
 
+1. Once your account is linked, or, if you did not link an account, you will be forwarded to the Globus consent page. Add a label, the default "my laptop" is fine. Accept and continue.
+![](img/globus-consent.png)
+
 1. You are now logged in to Globus. The BrainSwipes application will ask to see your identity details in the Globus interface. Provide a name for your device and click Allow.
 ![](img/globus-consent.png)
+
+1. If this is your first time logging in with globus you may have to log in again when you finish.

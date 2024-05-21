@@ -33,18 +33,24 @@ Dataset specific configuration is done here as well, this is where information i
 
         - fromTSV
 
-            - A list of rules that use regex matching to exclude anything that matches a pattern in a TSV file
+            - A list of rules that use regex matching to exclude anything that matches a pattern in a TSV file.
+                
+                - `filterCol` should be the column that will have some identifier in it that marks the participant for exclusion
+
+                - `idCol` will be the identifier for the participant that should be excluded. This will match a `sub-SUBJECT` portion of an image label.
+
+                - `pattern` will be a regular expression to be matched. Strings in the `filterCol` that match the `pattern` regex will signal BrainSwipes to exclude the correspondaing subject. [regexpal](https://www.regexpal.com/) is a great resource for testing regular expressions.
 
             ```
             "fromTSV": {
               "rules": [
                 {
-                  "filterCol": "status",
-                  "idCol": "subject",
-                  "pattern": "exclude"
+                  "filterCol": "pscid",
+                  "idCol": "participant_id",
+                  "pattern": "^QI"
                 }
               ],
-              "s3path": "bcp-subjects.tsv"
+              "s3path": "path/to/participants.tsv"
             },
             ```
 
