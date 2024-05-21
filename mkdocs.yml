@@ -24,6 +24,7 @@ nav:
       - Configuration: configuration.md
       - Configuring Tutorials: tutorials.md
       - Tools: tools.md
+      - Manipulate Datasets: datasets.md
   - Standard Operations:
       - Access Requests: requests.md
       - Globus Access: globus.md
