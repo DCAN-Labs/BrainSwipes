@@ -13,6 +13,7 @@ nav:
       - AWS: aws.md
       - Firebase: firebase.md
       - S3: s3cfg.md
+      - Globus: globus-dev.md
   - Development:
       - Setup: setup.md
       - Deployment: deployment.md
