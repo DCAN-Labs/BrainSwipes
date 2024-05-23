@@ -11,7 +11,7 @@ For more information on Globus Authentication, view the [developer's guide](http
 
 1. Go to Settings
 
-1. Optn the Developers tab
+1. Open the Developers tab
 
 1. Under Projects select BrainSwipes
 
