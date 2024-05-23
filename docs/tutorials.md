@@ -1,9 +1,17 @@
-# Congifuring Tutorials
+# Configuring Tutorials
 
 The tutorial route displays content based on the documents stored in Firebase at `/database/config/learn/tutorials`.
 At present the only way to add or change tutorial modules is by interacting directly with firebase.
 
+The key used in the tutorials config document will be its key in the tutorial URL,
+ie, the `anat` document in firebase will correspond to [brainswipes.us/tutorial/anat](https://brainswipes.us/tutorial/anat)
+
+In order to create a new tutorial it is recommended to first assemble example images illustrating the full variety of image types that will appear in the dataset and some explanations of what makes them good or bad.
+It is encouraged to look at other tutorials and compare them to their configuration documents to see what can be rendered.
+
 # Firebase Keys
+
+The following keys are used to render tutorials in the application. 
 
 - **about**:
 The description shown on the tutorial selection page
@@ -70,7 +78,7 @@ A user will recieve feedback based on how they swiped.
 Each step in a practice's `steps` document should have all of the following:
 
 - **answer**:
-1 for swipe right, 0 for swipe left.
+1 for pass, 0 for fail.
 
 - **checks**:
 Instructions for rendering a checklist component.
