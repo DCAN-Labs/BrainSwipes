@@ -56,19 +56,30 @@ Calls the `Checklist.vue` component and fills or leaves empty each checkbox base
 Define new Checklists in `/database/config/learn/checklists`
 
 - **image**:
-Displays a simple image. Images displayed here are generally saved in `/static/tutorial_imgs`
+Displays a simple image. Images displayed here are generally saved in `/static/tutorial_imgs` and can be added to the server via GitHub.
 
 - **pointer**:
 Pulls an image from S3 storage and displays it in the `ImageSwipe.vue` component.
 Use this if you want to pull an image from S3 instead of saving it to the repository in the static directory and need to highlight an interaction with the Pass/Fail/Help buttons.
+If this key is included, `dataset` must also be included.
+To configure the highlighted button include the `tutorialStep` key.
 
 - **sample**:
 Pulls an image from S3 storage and displays it in the `ImageStatic.vue` component.
 Use this if you want to pull an image from S3 instead of saving it to the repository in the static directory but do not need to highlight an interaction with the Pass/Fail/Help buttons.
+If this key is included, `dataset` must also be included.
+
+- **dataset**:
+Paired with `sample` or `pointer` to use the configuration of the specified dataset to find the requested image in S3.
+
+- **tutorialsStep**:
+Only has an effect when paired with a `pointer` key.
+Tells the ImageSwipe widget which button to highlight, `0` for fail, `1` for pass or `2` for help.
 
 - **tabs**:
 Used to stack images on top of eachother and lets the user switch between them by clicking the tabs at the top of the element.
 Can render images in an `image` or `sample` component. Can also contain a `checks` component.
+Requires a `title` key to label the tab.
 
 ## Practice Elements
 
