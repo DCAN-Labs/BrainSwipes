@@ -52,7 +52,7 @@ Below is an example JSON object from Firebase highlighting the relevant keys:
 ## Setting a cronjob
 
 With the above configurations set, running the script `updateSamplesFromS3.js` will find all desired images.
-For users of MSI, it is recommended to use [scrontab](https://slurm.schedmd.com/scrontab.html) which mimics a cronjob but lets you leverage SLURM.
+For users of MSI, it is recommended to use [scrontab](https://cdnis-brain.readthedocs.io/scron/) which mimics a cronjob but lets you leverage SLURM.
 
 Here is an example of the scrontab:
 
