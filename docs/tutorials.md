@@ -72,14 +72,14 @@ If this key is included, `dataset` must also be included.
 - **dataset**:
 Paired with `sample` or `pointer` to use the configuration of the specified dataset to find the requested image in S3.
 
-- **tutorialsStep**:
+- **tutorialStep**:
 Only has an effect when paired with a `pointer` key.
 Tells the ImageSwipe widget which button to highlight, `0` for fail, `1` for pass or `2` for help.
 
 - **tabs**:
 Used to stack images on top of eachother and lets the user switch between them by clicking the tabs at the top of the element.
 Can render images in an `image` or `sample` component. Can also contain a `checks` component.
-Requires a `title` key to label the tab.
+Images rendered will be a list inside the tabs element. Each element of the list requires a `title` key to label the tab. 
 
 ## Practice Elements
 
