@@ -1,14 +1,23 @@
 <template>
   <div class="dataset-select">
+    <div>
+      <html>
+        <b-button @click="toggleShowDatasets">
+          Toggle Datasets
+        </b-button>
+      </html> 
+    </div>
     <div v-if="showUnavailable" class="buttons">
       <div v-for="study in Object.keys(config.studies)" :key="study">
         <b-button v-if="study !== 'TEST'" :class="datasetPrivileges[study] ? 'btn-swipes' : 'btn-unavailable'" @click="chooseStudy(study)">{{study}}</b-button>
       </div>
       <b-button v-if="datasetPrivileges['TEST']" class="btn-swipes" @click="chooseStudy('TEST')">TEST</b-button>
+        <li>Unavailable</li>
     </div>
     <div v-else class="buttons">
       <div v-for="study in Object.keys(config.studies)" :key="study">
         <b-button v-if="datasetPrivileges[study]" class="btn-swipes" @click="chooseStudy(study)">{{study}}</b-button>
+        <li>Avalable</li>
       </div>
     </div>
     <hr class="seperator">
@@ -95,6 +104,7 @@ export default {
     datasetPrivileges: {
       type: Object,
       required: true,
+      default: () => ({}),
     },
     /**
      * changes the behavior of datasets that are archived
@@ -159,6 +169,9 @@ export default {
       this.$emit('activateDataset', this.selectedStudy, this.selectedDataset);
       this.selectedStudy = '';
       this.showDatasets = false;
+    },
+    toggleShowDatasets() {
+      this.showDatasets = !this.showDatasets;
     },
     async allowRestrictedDatasets() {
       if (this.globusToken.length) {
@@ -230,6 +243,7 @@ export default {
     },
   },
   mounted() {
+    console.log('datasetPrivileges:', this.datasetPrivileges);
     this.allowRestrictedDatasets();
   },
   computed: {

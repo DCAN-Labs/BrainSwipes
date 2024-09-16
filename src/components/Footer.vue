@@ -43,11 +43,12 @@ export default {
   props: {
     dataset: {
       type: String,
-      requred: true,
+      required: true,
     },
     datasetPrivileges: {
       type: Object,
       required: true,
+      default: () => ({}),
     },
     config: {
       type: Object,

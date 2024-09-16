@@ -81,9 +81,10 @@ export default {
     datasetPrivileges: {
       type: Object,
       required: true,
+      default: () => ({}),
     },
     /**
-     * the intialized firebase database
+     * the initialized firebase database
      */
     db: {
       type: Object,
@@ -160,6 +161,7 @@ export default {
   },
   mounted() {
     this.reroute();
+    console.log('datasetPrivileges:', this.datasetPrivileges);
   },
   computed: {
     categorizedDatasets() {

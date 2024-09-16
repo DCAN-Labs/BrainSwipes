@@ -142,7 +142,7 @@ export default {
        */
       showHeader: false,
       /**
-       * The user's dataset privalges
+       * The user's dataset privileges
        */
       datasetPrivileges: {},
       /**
@@ -271,7 +271,9 @@ export default {
       }
     },
     updateDatasetPermissions() {
+      console.log(this.datasetPrivileges);
       this.getUserDatasets();
+      console.log(this.datasetPrivileges);
     },
     globusLogin(token) {
       this.globusToken = token;
