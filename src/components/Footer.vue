@@ -81,6 +81,7 @@ export default {
     });
   },
   async created() {
+    console.log('Footer: Pre-addAdminRoutes => datasetPrivileges', this.datasetPrivileges);
     await this.addAdminRoutes();
   },
   methods: {

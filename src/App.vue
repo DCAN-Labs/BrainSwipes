@@ -61,8 +61,8 @@
       </div>
     </div>
     <div class="foot">
-      <Footer 
-        :config="config" 
+      <Footer
+        :config="config"
         @changeDataset="updateDataset"
         :dataset="dataset"
         :study="study"
@@ -263,17 +263,21 @@ export default {
      * What datasets the user can access
      */
     async getUserDatasets() {
+      console.log('currentUser @ getUserDatasets', firebase.auth().currentUser);
+      console.log('pre-getUserDatasets => datasetPrivileges', this.datasetPrivileges);
       if (firebase.auth().currentUser) {
         firebase.auth().currentUser.getIdTokenResult(true).then((idTokenResult) => {
           this.datasetPrivileges = idTokenResult.claims.datasets;
           this.getNotifications();
         });
       }
+      console.log('Post-getUserDatasets', this.datasetPrivileges);
     },
     updateDatasetPermissions() {
-      console.log(this.datasetPrivileges);
+      console.log('currentUser @ updateDatasetPermissions', firebase.auth().currentUser);
+      console.log('Pre-updateDatasetPermissions => datasetPrivileges', this.datasetPrivileges);
       this.getUserDatasets();
-      console.log(this.datasetPrivileges);
+      console.log('Post-updateDatasetPermissions => datasetPrivileges', this.datasetPrivileges);
     },
     globusLogin(token) {
       this.globusToken = token;
