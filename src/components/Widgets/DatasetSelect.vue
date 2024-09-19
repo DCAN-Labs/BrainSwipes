@@ -5,7 +5,7 @@
         <b-button @click="toggleShowDatasets">
           Toggle Datasets
         </b-button>
-      </html> 
+      </html>
     </div>
     <div v-if="showUnavailable" class="buttons">
       <div v-for="study in Object.keys(config.studies)" :key="study">
@@ -105,9 +105,19 @@ export default {
       type: Object,
       required: true,
       default: () => ({}),
+      // default: () => ({
+      //   ABCD: true,
+      //   ABIDE: true,
+      //   BCP: true,
+      //   HBCD: true,
+      //   HBN: true,
+      //   HCP: true,
+      //   TEST: true,
+      //   ePOD: true,
+      // }),
     },
     /**
-     * changes the behavior of datasets that are archived
+     * Changes the behavior of datasets that are archived
      */
     surpressArchived: {
       type: Boolean,
@@ -196,7 +206,7 @@ export default {
             hasSwipesEmail = true;
           }
         });
-        // check to see if the organiztion the user is registered with
+        // Check to see if the organization the user is registered with
         // is linked to the globus account
         let hasOrg = false;
         let orgUsed = false;

@@ -48,7 +48,17 @@ export default {
     datasetPrivileges: {
       type: Object,
       required: true,
-      default: () => ({}),
+      // default: () => ({}),
+      default: () => ({
+        ABCD: true,
+        ABIDE: true,
+        BCP: true,
+        HBCD: true,
+        HBN: true,
+        HCP: true,
+        TEST: true,
+        ePOD: true,
+      }),
     },
     config: {
       type: Object,
@@ -81,7 +91,7 @@ export default {
     });
   },
   async created() {
-    console.log('Footer: Pre-addAdminRoutes => datasetPrivileges', this.datasetPrivileges);
+    // console.log('Footer: Pre-addAdminRoutes => datasetPrivileges', this.datasetPrivileges);
     await this.addAdminRoutes();
   },
   methods: {

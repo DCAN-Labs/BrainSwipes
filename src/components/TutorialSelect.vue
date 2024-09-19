@@ -9,7 +9,8 @@
             <b-card-header header-tag="header" class="p-1" role="tab">
               <b-button block v-b-toggle="`accordion-${tutorial}`" class="btn-swipes">
                 <span class="center-flex vertical-align-center">
-                  <p class="header-text">{{config.learn.tutorials[tutorial].name}} <p>
+                  <p class="header-text">{{config.learn.tutorials[tutorial].name}} </p>
+                  <!-- <p> class="header-text">{{config.learn.tutorials[tutorial].name}} </p> -->
                   <div v-if="userData.tutorials[tutorial] === 'complete'" class="check-wrapper">
                     <div class="checked"></div>
                   </div>
