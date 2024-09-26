@@ -60,6 +60,49 @@
         />
       </div>
     </div>
+    <!-- -------------------------- -->
+    <!-- -------------------------- -->
+    <!-- -------------------------- -->
+    <div>
+      <h1>User Information</h1>
+      <div v-if="loading">Loading user data...</div>
+      <div v-else>
+        <table>
+          <thead>
+            <tr>
+              <th>Display Name</th>
+              <th>Email</th>
+              <th>Admin</th>
+              <th>Organization</th>
+              <th>Datasets</th>
+              <th>Study Admin</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(user, index) in users" :key="index">
+              <td>{{ user.displayName }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.admin ? 'Yes' : 'No' }}</td>
+              <td>{{ user.org }}</td>
+              <td>
+                <ul>
+                  <li v-for="(access, dataset) in user.datasets" :key="dataset">{{ dataset }}: {{ access ? 'Access' : 'No Access' }}</li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li v-for="(isStudyAdmin, study) in user.studyAdmin" :key="study">{{ study }}: {{ isStudyAdmin ? 'Yes' : 'No' }}</li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- -------------------------- -->
+    <!-- -------------------------- -->
+    <!-- -------------------------- -->
+
     <div class="foot">
       <Footer
         :config="config"
@@ -74,6 +117,7 @@
 </template>
 
 <script>
+
 /**
  * The main entrypoint to the app.
  */
@@ -113,6 +157,7 @@ window.firebase = firebase;
 /**
  * This is the main entrypoint to the app.
  */
+
 export default {
   name: 'app',
   data() {
@@ -162,6 +207,7 @@ export default {
        * if the user has notifications
        */
       notifications: {},
+      users: [],
     };
   },
   /**
@@ -334,10 +380,52 @@ export default {
       const ref = this.db.ref(`log/${category}`);
       ref.push(JSON.stringify(logMessage));
     },
+        async fetchUsers() {
+      try {
+        const response = await fetch('/api/getAllUsers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            currentUser: this.getCurrentUserUid() // Pass the UID of the current user
+          })
+        });
+        const data = await response.json();
+        this.users = this.formatUserData(data);
+        this.loading = false;
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        this.loading = false;
+      }
+    },
+    getCurrentUserUid() {
+      const user = firebase.auth().currentUser;
+      if (user) {
+        return user.uid;
+      } else {
+        console.error('No user is currently signed in.');
+        return null;
+      }
+    },
+    formatUserData(data) {
+      return Object.keys(data).map((displayName) => {
+        return {
+          displayName,
+          email: data[displayName].email || 'N/A',
+          admin: data[displayName].admin || false,
+          org: data[displayName].org || 'No Organization',
+          datasets: data[displayName].datasets || {},
+          studyAdmin: data[displayName].studyAdmin || {}
+        };
+      });
+    }
   },
   async created() {
     await this.getUserDatasets();
     await this.getConfig();
+    this.fetchUsers();
+
     // intercept the console and send to firebase log
     // Can fill up Firebase, keep an eye out if you enable this.
     // {
