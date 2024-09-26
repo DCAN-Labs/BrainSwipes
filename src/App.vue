@@ -60,6 +60,34 @@
         />
       </div>
     </div>
+    <!-- ----------------------------------------- -->
+    <!-- ----------------------------------------- -->
+    <!-- ----------------------------------------- -->
+    <!-- ----------------------------------------- -->
+    <!-- Button to trigger token fetch -->
+    <button @click="fetchIdTokenResult" class="btn-swipes">Fetch ID Token Result</button>
+
+    <!-- Section to display ID Token Result -->
+
+    <h2>ID Token Result Information:</h2>
+    <ul>
+      <li><strong>Auth Time:</strong> {{ idTokenResult.authTime }}</li>
+      <li><strong>Expiration Time:</strong> {{ idTokenResult.expirationTime }}</li>
+      <li><strong>Issued At Time:</strong> {{ idTokenResult.issuedAtTime }}</li>
+      <li><strong>Sign-In Provider:</strong> {{ idTokenResult.signInProvider }}</li>
+      <li><strong>Token:</strong> {{ idTokenResult.token }}</li>
+      <li><strong>Claims:</strong>
+        <ul>
+          <li v-for="(claimValue, claimKey) in idTokenResult.claims" :key="claimKey">
+            <strong>{{ claimKey }}:</strong> {{ claimValue }}
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <!-- ----------------------------------------- -->
+    <!-- ----------------------------------------- -->
+    <!-- ----------------------------------------- -->
+    <!-- ----------------------------------------- -->
     <div class="foot">
       <Footer
         :config="config"
@@ -162,6 +190,7 @@ export default {
        * if the user has notifications
        */
       notifications: {},
+      idTokenResult: {},
     };
   },
   /**
@@ -333,6 +362,19 @@ export default {
       };
       const ref = this.db.ref(`log/${category}`);
       ref.push(JSON.stringify(logMessage));
+    },
+    async fetchIdTokenResult() {
+      if (firebase.auth().currentUser) {
+        try {
+          const result = await firebase.auth().currentUser.getIdTokenResult(true);
+          this.idTokenResult = result;
+          console.log('ID Token Result:', this.idTokenResult);
+        } catch (error) {
+          console.error('Error fetching ID Token Result:', error);
+        }
+      } else {
+        console.log('No authenticated user found.');
+      }
     },
   },
   async created() {
