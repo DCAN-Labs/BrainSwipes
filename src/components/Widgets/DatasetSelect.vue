@@ -23,7 +23,7 @@
       <div class="buttons" v-else>
         <div v-for="dataset in config.studies[selectedStudy].datasets" :key="dataset">
           <b-button
-            v-if="study !== 'LearnExamples'"
+            v-if="dataset !== 'LearnExamples'"
             :class="config.datasets[dataset].archived && surpressArchived ? 'btn-unavailable' : datasetPrivileges[selectedStudy] ? 'btn-swipes' : 'btn-unavailable'"
             @click="chooseDataset(dataset)"
           >
