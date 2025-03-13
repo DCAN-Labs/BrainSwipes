@@ -13,6 +13,7 @@ const firebaseApp = admin.initializeApp({
 });
 const database = admin.database();
 
+// Error Logging function
 async function logError(method, error) {
     try {
         const errorString = String(error)
@@ -31,6 +32,41 @@ async function logError(method, error) {
     catch(err) {
         console.log(err);
     }
+}
+
+// Generates an oject for the 'dataset' key in customClaims.
+async function generateDatasetAccess() {
+  // Reference for the Firebase database.
+  const db = admin.database();
+  // Reference for the 'config' node in the database.
+  const configRef = db.ref('config');
+
+  try {
+    // Fetch the 'config' node from Firebase.
+    const snapshot = await configRef.once('value');
+    // Get the actual data from the snapshot.
+    const configData = snapshot.val();
+
+    // Initialize an empty object to store dataset access information.
+    let defaultAccess = {};
+    // Check if "configData" exists and contains a "studies" key.
+    if (configData && configData.studies) {
+      // Iterate though each study.
+      Object.keys(configData.studies).forEach(study => {
+        const studyData = configData.studies[study];
+        // If the "available"' field exists, store its value; otherwise, store a default of false
+        //   ** If we can't find information on a study it probably has not
+        //   been configured and we'll default to no access
+        defaultAccess[study] = (studyData && studyData.available !== undefined) ? studyData.available : false;
+      });
+    }
+    // Return the generated dataset access object
+    return defaultAccess;
+  // Log any errors to the console
+  } catch (error) {
+    console.error('Error fetching config data:', error);
+    throw new Error(`Error fetching config data: ${error.message}`);
+  }
 }
 
 async function createUrl(filepath, bucket, s3Credentials) {
@@ -107,7 +143,7 @@ module.exports = {
             if (bucket && filepath) {
               createUrl(filepath, bucket, s3Credentials).then(data =>{
                 res.send(data);
-              });  
+              });
             }
           }
           catch(err) {
@@ -193,36 +229,34 @@ module.exports = {
         })()
     },
     setNewUserRoles: function (req, res) {
-        (async () => {
-          try {
-            const uid = req.body.uid;
-            const dbRef = database.ref('config/studies');
-            const snap = await dbRef.once('value');
-            const studies = snap.val();
-            const datasets = {};
-            const studyAdmin = {};
-            Object.keys(studies).forEach(study => {
-              datasets[study] = studies[study].available;
-              studyAdmin[study] = false;
-            });
-            const defaultRoles = {
-              admin: false,
-              datasets,
-              org: 'No Organization',
-              studyAdmin
-            };
-            admin.auth().setCustomUserClaims(uid, defaultRoles).then(() => {
-              res.send('New user roles set');
-            })
-            .catch((error) => {
-              logError("setNewUserRoles", error);
-              res.send('Error setting new user roles');
-            });
-          }
-          catch(err) {
-            logError("setNewUserRoles", err);
-          }
-        })()
+      (async () => {
+        try {
+          const uid = req.body.uid;
+          const dbRef = database.ref('config/studies');
+          const snap = await dbRef.once('value');
+          const studies = snap.val();
+          // Initialize object for studyAdmin
+          const studyAdmin = {};
+          // Call the async function to generate dataset access
+          const datasets = await generateDatasetAccess();
+          const defaultRoles = {
+            admin: false,
+            datasets,
+            org: 'No Organization',
+            studyAdmin,
+          };
+          admin.auth().setCustomUserClaims(uid, defaultRoles).then(() => {
+            res.send('New user roles set');
+          })
+          .catch((error) => {
+            logError('setNewUserRoles', error);
+            res.send('Error setting new user roles');
+          });
+        }
+        catch (err) {
+          logError("setNewUserRoles", err);
+        }
+      })()
     },
     getAllUsers: function (req, res) {
         (async () => {
@@ -255,10 +289,10 @@ module.exports = {
                 res.send({});
               });
           }
-          catch(err) {
-            logError("getAllUsers", err);
+          catch (err) {
+            logError('getAllUsers', err);
           }
-        })()
+        })();
     },
     addStudy: function (req, res) {
         (async () => {
