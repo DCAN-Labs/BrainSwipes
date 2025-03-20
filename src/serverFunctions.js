@@ -239,6 +239,11 @@ module.exports = {
           const studyAdmin = {};
           // Call the async function to generate dataset access
           const datasets = await generateDatasetAccess();
+          // Generate initial study object
+          Object.keys(datasets).forEach(study => {
+            datasets[study] = studies[study].available;
+            studyAdmin[study] = false;
+          });
           const defaultRoles = {
             admin: false,
             datasets,
