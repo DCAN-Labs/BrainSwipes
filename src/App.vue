@@ -60,49 +60,34 @@
         />
       </div>
     </div>
-    <!-- -------------------------- -->
-    <!-- -------------------------- -->
-    <!-- -------------------------- -->
-    <div>
-      <h1>User Information</h1>
-      <div v-if="loading">Loading user data...</div>
-      <div v-else>
-        <table>
-          <thead>
-            <tr>
-              <th>Display Name</th>
-              <th>Email</th>
-              <th>Admin</th>
-              <th>Organization</th>
-              <th>Datasets</th>
-              <th>Study Admin</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(user, index) in users" :key="index">
-              <td>{{ user.displayName }}</td>
-              <td>{{ user.email }}</td>
-              <td>{{ user.admin ? 'Yes' : 'No' }}</td>
-              <td>{{ user.org }}</td>
-              <td>
-                <ul>
-                  <li v-for="(access, dataset) in user.datasets" :key="dataset">{{ dataset }}: {{ access ? 'Access' : 'No Access' }}</li>
-                </ul>
-              </td>
-              <td>
-                <ul>
-                  <li v-for="(isStudyAdmin, study) in user.studyAdmin" :key="study">{{ study }}: {{ isStudyAdmin ? 'Yes' : 'No' }}</li>
-                </ul>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!-- -------------------------- -->
-    <!-- -------------------------- -->
-    <!-- -------------------------- -->
+    <!-- ----------------------------------------- -->
+    <!-- ----------------------------------------- -->
+    <!-- ----------------------------------------- -->
+    <!-- ----------------------------------------- -->
+    <!-- Button to trigger token fetch -->
+    <button @click="fetchIdTokenResult" class="btn-swipes">Fetch ID Token Result</button>
 
+    <!-- Section to display ID Token Result -->
+
+    <h2>ID Token Result Information:</h2>
+    <ul>
+      <li><strong>Auth Time:</strong> {{ idTokenResult.authTime }}</li>
+      <li><strong>Expiration Time:</strong> {{ idTokenResult.expirationTime }}</li>
+      <li><strong>Issued At Time:</strong> {{ idTokenResult.issuedAtTime }}</li>
+      <li><strong>Sign-In Provider:</strong> {{ idTokenResult.signInProvider }}</li>
+      <li><strong>Token:</strong> {{ idTokenResult.token }}</li>
+      <li><strong>Claims:</strong>
+        <ul>
+          <li v-for="(claimValue, claimKey) in idTokenResult.claims" :key="claimKey">
+            <strong>{{ claimKey }}:</strong> {{ claimValue }}
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <!-- ----------------------------------------- -->
+    <!-- ----------------------------------------- -->
+    <!-- ----------------------------------------- -->
+    <!-- ----------------------------------------- -->
     <div class="foot">
       <Footer
         :config="config"
@@ -207,7 +192,7 @@ export default {
        * if the user has notifications
        */
       notifications: {},
-      users: [],
+      idTokenResult: {},
     };
   },
   /**
@@ -380,46 +365,19 @@ export default {
       const ref = this.db.ref(`log/${category}`);
       ref.push(JSON.stringify(logMessage));
     },
-        async fetchUsers() {
-      try {
-        const response = await fetch('/api/getAllUsers', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            currentUser: this.getCurrentUserUid() // Pass the UID of the current user
-          })
-        });
-        const data = await response.json();
-        this.users = this.formatUserData(data);
-        this.loading = false;
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        this.loading = false;
-      }
-    },
-    getCurrentUserUid() {
-      const user = firebase.auth().currentUser;
-      if (user) {
-        return user.uid;
+    async fetchIdTokenResult() {
+      if (firebase.auth().currentUser) {
+        try {
+          const result = await firebase.auth().currentUser.getIdTokenResult(true);
+          this.idTokenResult = result;
+          console.log('ID Token Result:', this.idTokenResult);
+        } catch (error) {
+          console.error('Error fetching ID Token Result:', error);
+        }
       } else {
-        console.error('No user is currently signed in.');
-        return null;
+        console.log('No authenticated user found.');
       }
     },
-    formatUserData(data) {
-      return Object.keys(data).map((displayName) => {
-        return {
-          displayName,
-          email: data[displayName].email || 'N/A',
-          admin: data[displayName].admin || false,
-          org: data[displayName].org || 'No Organization',
-          datasets: data[displayName].datasets || {},
-          studyAdmin: data[displayName].studyAdmin || {}
-        };
-      });
-    }
   },
   async created() {
     await this.getUserDatasets();
