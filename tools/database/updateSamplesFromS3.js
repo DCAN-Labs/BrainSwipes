@@ -180,7 +180,7 @@ async function updateSamplesFromS3(database, dataset){
         let regexp = new RegExp("^([^\/]*)\.png");
         const subRegExp = new RegExp("(^sub-.*?)_");
         if (Object.hasOwn(config, 's3filepath')) {
-        regexp = new RegExp(config.s3filepath.replace('/', '\/').replaceAll('{{SESSION}}', 'ses-.*?').replaceAll('{{SUBJECT}}', 'sub-\\d{6}').replaceAll('{{FILENAME}}', '([^\/]*)'));
+          regexp = new RegExp(config.s3filepath.replaceAll('{{SESSION}}', 'ses-.*?').replaceAll('{{SUBJECT}}', 'sub-[^/]*').replaceAll('{{FILENAME}}', '(sub-[^/]*)'));
         }
         // get exclusions
         const excludedSubjects = await getExcludedSubjects(database, dataset);
