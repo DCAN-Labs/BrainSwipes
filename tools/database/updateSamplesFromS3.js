@@ -25,7 +25,7 @@ async function main(){
 main();
 
 function initFirebase() {
-    //init the firebase connection
+    // init the firebase connection
     const firebaseApp = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://brainswipes-default-rtdb.firebaseio.com"
@@ -35,7 +35,7 @@ function initFirebase() {
     return [firebaseApp, database];
 }
 
-// get excluded subjects for "from TSV" exclusion option
+// get excluded subjects for "from TSV" exclusion option 
 async function getExcludedSubjects(database, dataset) {
     const configRef = database.ref(`config/datasets/${dataset}`);
     const snap = await configRef.once('value');
@@ -49,6 +49,7 @@ async function getExcludedSubjects(database, dataset) {
             if (Object.hasOwn(config, 's3cfg')) {
                 s3cfg = config.s3cfg;
             }
+            // use regex matching to exclude anything that matches a pattern in TSV
             const data = await getObjectFromS3(bucket, config.exclusions.fromTSV.s3path, s3cfg);
             const arrayData = data.split(/\r\n|\r|\n/);
             const headers = arrayData[0].split(/\t/);
@@ -72,7 +73,7 @@ async function getExcludedSubjects(database, dataset) {
 
 function updateSampleCounts(database, objectsList, sampleCounts, regexp, subRegExp, excludedSubjects, excludedSubstrings, previousNumUpdates, dataset){
     let numUpdates = previousNumUpdates;
-    // loop through s3 objects to determine if they should be added to sampleCounts
+    // loop through s3 objects (objectsList) to determine if they should be added to sampleCounts
     objectsList.forEach(object => {
       try {
         const match = object.Key.match(regexp);
@@ -82,14 +83,17 @@ function updateSampleCounts(database, objectsList, sampleCounts, regexp, subRegE
           const subMatch = sample.match(subRegExp);
           if(subMatch) {
             const sub = subMatch[1];
+            // Don't include excluded subjects
             if (excludedSubjects.includes(sub)) {
               include = false;
             }
           }
+          // Don't add image if it already exists in sampleCounts
           if (Object.keys(sampleCounts).includes(sample)) {
             include = false;
           }
           else {
+            // Don't include images w/ excluded substrings
             excludedSubstrings.every(substring => {
               if (sample.includes(substring)) {
                 include = false
@@ -97,6 +101,7 @@ function updateSampleCounts(database, objectsList, sampleCounts, regexp, subRegE
               return include;
             });
           }
+          // Add image to sampleCounts with 0 counts
           if (include) {
             database.ref(`datasets/${dataset}/sampleCounts/${sample}`).set(0);
             numUpdates +=1;
@@ -131,7 +136,7 @@ async function getObjectFromS3(bucket, object, s3cfg) {
 async function reconcileVotes(database, dataset){
     try {
         const sampleCountsRef = database.ref(`datasets/${dataset}/sampleCounts`); // stores counts
-        const sampleSummaryRef = database.ref(`datasets/${dataset}/sampleSummary`); // stores avgVote and counts, include images that have been removed from sampleCounts
+        const sampleSummaryRef = database.ref(`datasets/${dataset}/sampleSummary`); // stores avgVote and counts, includes images that have been removed from sampleCounts
         const ssSnap = await sampleSummaryRef.once('value');
         const scSnap = await sampleCountsRef.once('value');
         const sampleSummary = ssSnap.val();
@@ -192,6 +197,7 @@ async function updateSamplesFromS3(database, dataset){
                 excludedSubstrings = config.exclusions.substrings; 
             }
         }
+        // get s3 config
         let s3cfg = 'default';
         if (Object.hasOwn(config, 's3cfg')) {
             s3cfg = config.s3cfg;
