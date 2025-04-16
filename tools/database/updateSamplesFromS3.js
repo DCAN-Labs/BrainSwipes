@@ -8,7 +8,7 @@ const s3Config = require('../../s3-config.json');
 const serviceAccount = require('../../brainswipes-firebase-adminsdk.json');
 
 async function main(){
-    const dataset = process.argv[2];
+    const dataset = process.argv[2]; // input argument of dataset name in Firebase
     const [app, database] = initFirebase();
 
     const now = new Date(Date.now());
@@ -35,7 +35,7 @@ function initFirebase() {
     return [firebaseApp, database];
 }
 
-// get excluded subjects
+// get excluded subjects for "from TSV" exclusion option
 async function getExcludedSubjects(database, dataset) {
     const configRef = database.ref(`config/datasets/${dataset}`);
     const snap = await configRef.once('value');
@@ -72,6 +72,7 @@ async function getExcludedSubjects(database, dataset) {
 
 function updateSampleCounts(database, objectsList, sampleCounts, regexp, subRegExp, excludedSubjects, excludedSubstrings, previousNumUpdates, dataset){
     let numUpdates = previousNumUpdates;
+    // loop through s3 objects to determine if they should be added to sampleCounts
     objectsList.forEach(object => {
       try {
         const match = object.Key.match(regexp);
@@ -129,14 +130,15 @@ async function getObjectFromS3(bucket, object, s3cfg) {
 
 async function reconcileVotes(database, dataset){
     try {
-        const sampleCountsRef = database.ref(`datasets/${dataset}/sampleCounts`);
-        const sampleSummaryRef = database.ref(`datasets/${dataset}/sampleSummary`);
+        const sampleCountsRef = database.ref(`datasets/${dataset}/sampleCounts`); // stores counts
+        const sampleSummaryRef = database.ref(`datasets/${dataset}/sampleSummary`); // stores avgVote and counts, include images that have been removed from sampleCounts
         const ssSnap = await sampleSummaryRef.once('value');
         const scSnap = await sampleCountsRef.once('value');
         const sampleSummary = ssSnap.val();
         const sampleCounts = scSnap.val();
     
         const update = {};
+        // If sampleSummary already exists for the image, add that info to the new sampleCounts entry
         if (sampleSummary != null) {
             Object.keys(sampleCounts).forEach( (sample) => {
                 if (Object.hasOwn(sampleSummary, sample)) {
@@ -145,7 +147,7 @@ async function reconcileVotes(database, dataset){
                     update[sample] = 0;
                 }
             });
-        } else {
+        } else { // initialize count to 0
             Object.keys(sampleCounts).forEach( (sample) => {
             update[sample] = 0;
         });
@@ -195,6 +197,7 @@ async function updateSamplesFromS3(database, dataset){
             s3cfg = config.s3cfg;
         }
         // get the list of items in the s3 bucket
+        // I think some of this code can be collapsed, the only difference is the input?
         let numUpdates = 0;
         if (Object.hasOwn(config, 'prefixes')) {
         for (const prefix of config.prefixes) {
