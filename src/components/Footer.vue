@@ -25,6 +25,8 @@
           <a class="nav__link dropdown-button">Learn</a>
         </div>
         <router-link v-else to="/tutorial/basic" class="nav__link">Learn</router-link>
+        <!-- Contact Us link -->
+        <a href="mailto:testbrainswipes@umn.edu" class="nav__link">Contact Us</a>
       </nav>
 
     </div>
