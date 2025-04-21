@@ -1,29 +1,34 @@
 #!/usr/bin/env node
 
+// Import AWS S3 SDK commands
 const S3Client = require('@aws-sdk/client-s3').S3Client;
 const GetObjectCommand = require('@aws-sdk/client-s3').GetObjectCommand;
 const ListObjectsV2Command = require('@aws-sdk/client-s3').ListObjectsV2Command;
+// Import AWS S3 SDK commands
 const admin = require('firebase-admin');
+// Load S3 config and Firebase service account credentials
 const s3Config = require('../../s3-config.json');
 const serviceAccount = require('../../brainswipes-firebase-adminsdk.json');
 
+// Function to enter the script
 async function main() {
   // Input argument of dataset name in Firebase
   const dataset = process.argv[2];
   const [app, database] = initFirebase();
 
+  // Log timestamp for the update
   const now = new Date(Date.now());
   console.log(`Updating ${dataset}: ${now.toUTCString()}`);
 
   const finishUpdate = await updateSamplesFromS3(database, dataset);
   const finishReconcile = await reconcileVotes(database, dataset);
-
+  // If successful and data was correctly verified , shut down the Firebase app
   if (finishUpdate && finishReconcile) {
     app.delete();
   }
 }
-
 main();
+
 // Initialize the firebase connection
 function initFirebase() {
   const firebaseApp = admin.initializeApp({
@@ -41,7 +46,7 @@ async function getExcludedSubjects(database, dataset) {
   const config = snap.val();
   const bucket = config.bucket;
   const excludedSubjects = [];
-
+  // Check for TSV-based exclusion rules
   if (Object.hasOwn(config, 'exclusions')) {
     if (Object.hasOwn(config.exclusions, 'fromTSV')) {
       let s3cfg = 'default';
@@ -69,7 +74,7 @@ async function getExcludedSubjects(database, dataset) {
   }
   return excludedSubjects;
 }
-
+// Count and add new samples to Firebase if not already present or excluded
 function updateSampleCounts(database, objectsList, sampleCounts, regexp, subRegExp, excludedSubjects, excludedSubstrings, previousNumUpdates, dataset) {
   let numUpdates = previousNumUpdates;
   // Loop through s3 objects (objectsList) to determine if they should be added to sampleCounts
@@ -130,6 +135,7 @@ async function getObjectFromS3(bucket, object, s3cfg) {
   return responseBuffer.toString();
 }
 
+// Reconcile sample counts with vote summaries in Firebase.
 async function reconcileVotes(database, dataset) {
   try {
     const sampleCountsRef = database.ref(`datasets/${dataset}/sampleCounts`);
@@ -140,7 +146,7 @@ async function reconcileVotes(database, dataset) {
     const sampleCounts = scSnap.val();
 
     const update = {};
-    // If sampleSummary already exists for the image, add that info to the new sampleCounts entry
+    // If sampleSummary already exists for the image, add that info to the new sampleCounts entry.
     if (sampleSummary != null) {
       Object.keys(sampleCounts).forEach(sample => {
         if (Object.hasOwn(sampleSummary, sample)) {
@@ -168,25 +174,30 @@ async function listItems(input, s3cfg) {
   const response = await s3Client.send(command);
   return [response.Contents, response.NextContinuationToken];
 }
-
+// Checks for S3 files and updates Firebase when new samples are found.
 async function updateSamplesFromS3(database, dataset) {
   try {
+    // Get the config information from Firebase
     const configRef = database.ref(`config/datasets/${dataset}`);
     const snap = await configRef.once('value');
     const config = snap.val();
+    // - S3 bucket name (bucket)
     const bucket = config.bucket;
-    // Get the current sample counts from the database
+
+    // Get the current sample counts from the database.
     const sampleCountsRef = database.ref(`datasets/${dataset}/sampleCounts`);
     const sampleCountsSnap = await sampleCountsRef.once('value');
     const sampleCounts = sampleCountsSnap.val() ? sampleCountsSnap.val() : {};
-    // Get matching pattern from config
 
+    // Get matching pattern from config
     let regexp = new RegExp("^([^/]*)\\.png");
     const subRegExp = new RegExp("(^sub-.*?)_");
+
+    // If custom S3 path pattern was defined, define the regex for it.
     if (Object.hasOwn(config, 's3filepath')) {
       regexp = new RegExp(config.s3filepath.replaceAll('{{SESSION}}', 'ses-.*?').replaceAll('{{SUBJECT}}', 'sub-[^/]*').replaceAll('{{FILENAME}}', '(sub-[^/]*)'));
     }
-    // get exclusions
+    // Get exclusions rules
     const excludedSubjects = await getExcludedSubjects(database, dataset);
     let excludedSubstrings = [];
     if (Object.hasOwn(config, 'exclusions')) {
@@ -199,10 +210,12 @@ async function updateSamplesFromS3(database, dataset) {
     if (Object.hasOwn(config, 's3cfg')) {
       s3cfg = config.s3cfg;
     }
-    // get the list of items in the s3 bucket
-    // I think some of this code can be collapsed, the only difference is the input?
+    // Get the list of items in the s3 bucket
+    // NOTE  I think some of this code can be collapsed, the only difference is the input?
     let numUpdates = 0;
-    if (Object.hasOwn(config, 'prefixes')) {
+    // "prefixes" has a list of folder prefixes in the bucket
+    if (Object.hasOwn(config, 'v')) {
+      // Iterate over each prefix to list and process S3 objects
       for (const prefix of config.prefixes) {
         const input = { Bucket: bucket, Prefix: prefix };
         let continuate = true;
@@ -220,6 +233,7 @@ async function updateSamplesFromS3(database, dataset) {
           }
         } while (continuate);
       }
+    // When no prefix defined, list entire bucket
     } else {
       const input = { Bucket: bucket };
       let continuate = true;
