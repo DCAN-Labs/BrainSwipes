@@ -1,8 +1,13 @@
 <template>
   <div class="contact-us">
     <!-- Preferred Contact Method Notice -->
+    <h1>Contact Us</h1>
+
     <section class="form-section">
-      <h2>We prefer that you use the form below to contact us:</h2>
+      <h2>Google form to contact us</h2>
+      <p>If you have any questions on issues with your account or are having trouble access specific studies,
+        please contact us using the following form.</p>
+      <br>
       <b-button
         href="https://docs.google.com/forms/d/1dirzf9j-0s3hBNoEetuvOWAzr8MHkBs3Hexia4BdHOU/edit"
         target="_blank"
@@ -14,10 +19,13 @@
     </section>
 
     <hr class="section-divider" />
+    <hr class="section-divider" />
 
     <!-- Email Contact Section -->
     <section class="form-section">
       <h2>Alternatively, you can send us an email</h2>
+      <p>If you have any suggestions. or questions regarding Brainswipes as a whole, please send us an e-mail.</p>
+      <br>
       <b-form @submit.prevent="submitForm">
         <b-form-group label="Your Email" label-for="emailInput">
           <b-form-input
@@ -50,6 +58,10 @@
         </b-button>
       </b-form>
     </section>
+    <hr class="section-divider" />
+    <hr class="section-divider" />
+    <h2>Github</h2>
+    <p>Found a bug or other issue with the app? Post a <a href="https://github.com/DCAN-Labs/BrainSwipes/issues/new" target="_blank">GitHub issue.</a></p>
   </div>
 </template>
 
@@ -64,7 +76,12 @@ export default {
     };
   },
   created() {
-    if (this.$root?.$data?.user?.email) {
+    if (
+      this.$root &&
+      this.$root.$data &&
+      this.$root.$data.user &&
+      this.$root.$data.user.email
+    ) {
       this.email = this.$root.$data.user.email;
     }
   },
