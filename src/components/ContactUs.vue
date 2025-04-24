@@ -23,9 +23,22 @@
 
     <!-- Email Contact Section -->
     <section class="form-section">
-      <h2>Alternatively, you can send us an email</h2>
-      <p>If you have any suggestions. or questions regarding Brainswipes as a whole, please send us an e-mail.</p>
-      <br>
+      <h2>Alternatively, send us an email</h2>
+      <p>If you have any suggestions or questions regarding BrainSwipes as a whole, feel free to email us directly:</p>
+      <ul>
+        <li>
+          <code @click="copyEmail('testbrainswipes@umn.edu')" style="cursor: pointer;">
+            testbrainswipes@umn.edu
+          </code>
+          <span v-if="copied === 'testbrainswipes@umn.edu'" class="copied">Copied!</span>
+        </li>
+        <li>
+          <code @click="copyEmail('test2brainswipes@umn.edu')" style="cursor: pointer;">
+            test2brainswipes@umn.edu
+          </code>
+          <span v-if="copied === 'test2brainswipes@umn.edu'" class="copied">Copied!</span>
+        </li>
+      </ul>
       <b-form @submit.prevent="submitForm">
         <b-form-group label="Your Email" label-for="emailInput">
           <b-form-input
@@ -65,30 +78,46 @@
   </div>
 </template>
 
+
 <script>
 export default {
   name: 'ContactUs',
+  props: {
+    userInfo: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
       email: '',
       subject: '',
       body: '',
+      copied: '',
     };
   },
   created() {
-    if (
-      this.$root &&
-      this.$root.$data &&
-      this.$root.$data.user &&
-      this.$root.$data.user.email
-    ) {
-      this.email = this.$root.$data.user.email;
+    if (this.userInfo && this.userInfo.email) {
+      this.email = this.userInfo.email;
     }
   },
   methods: {
     submitForm() {
-      const mailtoLink = `mailto:testbrainswipes@umn.edu?subject=${encodeURIComponent(this.subject)}&body=${encodeURIComponent(this.body + '\n\nFrom: ' + this.email)}`;
+      const recipients = [
+        'mend0130@umn.edu',
+        'joanmem@gmail.com',
+      ];
+      const mailtoLink = `mailto:${recipients.join(',')}?subject=${encodeURIComponent(this.subject)}&body=${encodeURIComponent(`${this.body}\n\nFrom: ${this.email}`)}`;
+
       window.location.href = mailtoLink;
+    },
+    copyEmail(email) {
+      navigator.clipboard.writeText(email).then(() => {
+        this.copied = email;
+        setTimeout(() => {
+          this.copied = '';
+        }, 1500);
+      });
     },
   },
 };
@@ -106,5 +135,10 @@ export default {
 }
 .form-section h2 {
   margin-bottom: 1rem;
+}
+.copied {
+  margin-left: 0.5rem;
+  color: green;
+  font-weight: bold;
 }
 </style>
