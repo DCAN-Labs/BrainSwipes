@@ -24,7 +24,7 @@
     <!-- Email Contact Section -->
     <section class="form-section">
       <h2>Alternatively, send us an email</h2>
-      <p>If you have any suggestions or questions regarding BrainSwipes as a whole, feel free to email us directly:</p>
+      <p>If you have any suggestions or questions regarding BrainSwipes as a whole, please email us directly:</p>
       <ul>
         <li>
           <code @click="copyEmail('kweldon@umn.edu, mccol199@umn.edu')" style="cursor: pointer;">
