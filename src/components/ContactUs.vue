@@ -27,18 +27,14 @@
       <p>If you have any suggestions or questions regarding BrainSwipes as a whole, feel free to email us directly:</p>
       <ul>
         <li>
-          <code @click="copyEmail('testbrainswipes@umn.edu')" style="cursor: pointer;">
-            testbrainswipes@umn.edu
+          <code @click="copyEmail('kweldon@umn.edu, mccol199@umn.edu')" style="cursor: pointer;">
+            (kweldon@umn.edu, mccol199@umn.edu)
           </code>
-          <span v-if="copied === 'testbrainswipes@umn.edu'" class="copied">Copied!</span>
-        </li>
-        <li>
-          <code @click="copyEmail('test2brainswipes@umn.edu')" style="cursor: pointer;">
-            test2brainswipes@umn.edu
-          </code>
-          <span v-if="copied === 'test2brainswipes@umn.edu'" class="copied">Copied!</span>
+          <span v-if="copied === 'kweldon@umn.edu, mccol199@umn.edu'" class="copied">Copied!</span>
         </li>
       </ul>
+      <br>
+      (This form will open your e-mail client)
       <b-form @submit.prevent="submitForm">
         <b-form-group label="Your Email" label-for="emailInput">
           <b-form-input
