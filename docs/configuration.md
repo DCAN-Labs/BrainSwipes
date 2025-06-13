@@ -49,7 +49,7 @@ Dataset specific configurations. The REQUIRED sections are the sections that you
         ```
 
     - *substrings*: A list of substrings that use substring matching to exclude any filenames from being added automatically to the dataset where the pattern is found in the S3 bucket.
-        - These strings will be different depending on what pipeline and pipeline version the data was processed with. 
+        - These strings will be different depending on what pipeline and pipeline version the data was processed with. In general, you'll want to avoid the anatomical images around the midline (typically contain the strings *SagittalCorpusCallosum* and *AxialInferiorTemporalCerebellum*) and any statistical images (*DVARS_* and *FD*). For the ABCD-BIDS pipeline, you'll want to avoid raw BOLD images (*_bold* and *_ref*).
 
 - **imageType**: 
     - Used to override the existing pattern matching method of determining and displaying image types throughout the app. If not included, will default to func, anat or atlas based on pattern matching. See `config/imageTypes` for possible options.
@@ -62,6 +62,7 @@ Dataset specific configurations. The REQUIRED sections are the sections that you
 
 - **s3filepath: REQUIRED**
     - Filepath to where in the s3 bucket files are found. Do not include the bucket name. Used in searching for and rendering images. The ingestion script will replace `{{SUBJECT}}`, `{{SESSION}}`, and `{{FILENAME}}` with the information for a specific sample. If not included the application looks for images at the base level of the s3 bucket. 
+    - For XCP-D outputs, images are typically found in `/figures/`. For ABCD-BIDS outputs, images are typically found in `/files/summary_DCANBOLDProc_v4.0.0/executivesummary/img/`
 
 - **tutorials: REQUIRED** 
     - Which tutorial modules are required before swiping on this dataset. Can be set in the admin dashboard on the website. Keys should be true if required, and can be left out if not.
