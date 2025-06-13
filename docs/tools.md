@@ -87,13 +87,16 @@ Tools in this directory are used to modify, move, or create images used in Brain
 
 - **ingest_brainswipes_data.py**
 
-    - Uses argparse. Run `ingest_brainswipes_data.py -h` for infomration on running this script.
+    - Uses argparse. Intakes 3 required positional arguments: s3_subjects_path (path to subject s3 directories), imgs_path (path in subject directory where images are stored), destination (where to ingest the images, normally the `brainswipes` bucket)
 
-    1. Pulls data from an executive summary in an S3 bucket
+        - Example command: `python ingest_brainswipes_data.py s3://study-bucket/derivatives/xcpd-v0.7.0/ figures/ s3://brainswipes/dataset-name/`
+        - Run `ingest_brainswipes_data.py -h` for information on running this script and optional arguments.
 
-    1. Resizes registrations for optimal rendering in BrainSwipes
+    - Pulls data from the paths provided, filling in the subject ID: `s3_subjects_path + {{SUBJECTID}} + imgs_path`. The s3_subjects_path therefore needs to be the directory where the subject directories are stored. 
 
-    1. Uploads all relevant images to the S3 bucket where BrainSwipes will be looking for the images
+    - Resizes registrations for optimal rendering in BrainSwipes (no longer necessary for XCP-D, as they now create BrainSwipes specific pngs that are arranged correctly)
+
+    - Uploads all relevant images to the S3 bucket specified
 
 - **make_diffusion_gifs.py**
 

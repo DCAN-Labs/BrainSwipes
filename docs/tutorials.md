@@ -1,6 +1,6 @@
 # Configuring Tutorials
 
-The tutorial route displays content based on the documents stored in Firebase at `/database/config/learn/tutorials`.
+The tutorial page displays content based on the documents stored in Firebase at `/database/config/learn/tutorials`.
 At present the only way to add or change tutorial modules is by interacting directly with firebase.
 
 The key used in the tutorials config document will be its key in the tutorial URL,
@@ -9,7 +9,7 @@ ie, the `anat` document in firebase will correspond to [brainswipes.us/tutorial/
 In order to create a new tutorial it is recommended to first assemble example images illustrating the full variety of image types that will appear in the dataset and some explanations of what makes them good or bad.
 It is encouraged to look at other tutorials and compare them to their configuration documents to see what can be rendered.
 
-# Firebase Keys
+## Firebase Keys
 
 The following keys are used to render tutorials in the application. 
 
@@ -34,7 +34,7 @@ Set to true to have BrainSwipes render this tutorial as a practice. More on prac
 - **prereq**:
 What tutorials must be taken by a user before they can take this tutorial.
 
-# Content
+## Content
 
 The content document determines what is displayed in the tutorial.
 A tutorial's content document is a list where each item has a `steps` key and a `title` key.
@@ -46,7 +46,7 @@ It also appears in the dropdown menu for the tutorial and allows click naviagati
 A step can contain multiple elements.
 The list of elements is below
 
-## Tutorial Elements
+### Tutorial Elements
 
 - **text**:
 Text to display. Renders as a `<p>` html element.
@@ -81,7 +81,7 @@ Used to stack images on top of eachother and lets the user switch between them b
 Can render images in an `image` or `sample` component. Can also contain a `checks` component.
 Images rendered will be a list inside the tabs element. Each element of the list requires a `title` key to label the tab. 
 
-## Practice Elements
+### Practice Elements
 
 A practice will render its steps one at a time requiring a user to swipe on the rendered image.
 A user will recieve feedback based on how they swiped.

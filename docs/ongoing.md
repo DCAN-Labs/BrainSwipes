@@ -7,9 +7,8 @@ If your study is still collecting data and want BrainSwipes to update as new ima
 ## S3 Access
 This paradigm assumes your data is being added to an S3 bucket specific to that study. You will not be copying images into a different s3 bucket.
 
-You will need to have the bucket owner give the BrainSwipes service account **read only access** to the study bucket. For information on setting read only access to a bucket, see [the page on MSI's S3](s3cfg.md).
+You will need to have the bucket owner give the BrainSwipes service account **read only access** to the study bucket. For information on setting read only access to a bucket, see [the S3 page](s3cfg.md).
 
-### Data Organization
 This paradigm assumes your data is in a consistent directory structure. If you use the [BIDS standard](https://bids.neuroimaging.io/), you're all set!
 
 
@@ -28,7 +27,7 @@ This configuration relies on 4 keys in the dataset's config object in firebase. 
     - This narrows down the search criteria for new images. If your s3 bucket has lots of objects it is recommended you use this key
 1. `s3filepath`
     - The regular path in the S3 bucket where images will be found.
-    - `{{SESSION}}`, `{{SUBJECT}}`, and `{{FILENAME}}` will be replace with regex to find matching files.
+    - `{{SESSION}}`, `{{SUBJECT}}`, and `{{FILENAME}}` will be replaced using regex to find matching files.
 
 Below is an example JSON object from Firebase highlighting the relevant keys:
 
@@ -52,7 +51,7 @@ Below is an example JSON object from Firebase highlighting the relevant keys:
 ## Setting a cronjob
 
 With the above configurations set, running the script `updateSamplesFromS3.js` will find all desired images.
-For users of MSI, it is recommended to use [scrontab](https://cdnis-brain.readthedocs.io/scron/) which mimics a cronjob but lets you leverage SLURM.
+For users of MSI, it is recommended to use [scrontab](https://cdnis-brain.readthedocs.io/scron/) which mimics a cronjob but lets you leverage SLURM. Cronjobs let you run commands at regularly scheduled times.
 
 Here is an example of the scrontab:
 
