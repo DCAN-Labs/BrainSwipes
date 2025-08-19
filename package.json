@@ -82,7 +82,7 @@
     "worker-loader": "^2.0.0"
   },
   "engines": {
-    "node": "16.x",
+    "node": "17.x",
     "npm": "8.x"
   },
   "browserslist": [
