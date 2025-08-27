@@ -57,7 +57,7 @@ If a study is manually entered into the database no custom claims will be set, a
 
 ## Update the Firebase Config
 
-There are several keys that can effect the how BrainSwipes tracks references to S3 images in firebase. To configure these in Firebase, go to `database/config/datasets/{{DATASET}}`.
+There are several keys that can effect the how BrainSwipes tracks references to S3 images in firebase. To configure these in Firebase, go to `config/datasets/{{DATASET}}`.
 
 - **bucket**:
 This should be already be set by the initial configuration. If you change the bucket you will be storing images for this dataset, edit it here. 
@@ -96,12 +96,11 @@ Example configuration:
       "s3filepath": "BCP/{{FILENAME}}.png"
     }
 
-
 ## Tell Firebase where to find the images
 
 Images can be added to the database in several ways.
 
-1. Images can be automatically detected with the `updateSamplesFromS3.js` script located in the tools directory.
+1. Images can be automatically detected with the `updateSamplesFromS3.js` script located in the tools directory. This can be found on MSI at `/home/feckz001/shared/projects/Brainswipes/tools/database/`. For now, use the `rae-updateSamplesFromS3.js`, as the original script was hardcoded to only work with subject ID's that are numbers only. 
     - **This is the recommended option**. Requires the four configurations from the example listed above. See [tools](tools.md) for more information on this script.
 
     - If you are ingesting a study from an outside S3 bucket, you'll need to edit [line 49](https://github.com/DCAN-Labs/BrainSwipes/blob/aa64b4c228ae0677f4c73636ef83765a43ebb5fe/tools/database/updateSamplesFromS3.js#L49) to specify the label you added to the `s3-config.json`. 
@@ -125,3 +124,4 @@ Images can be added to the database in several ways.
         sampleCounts    
         ├──sub-999999_ses-test_T1-Axial: 0
         └──sub-999999_ses-test_T2-Coronal: 0
+        
