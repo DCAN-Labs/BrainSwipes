@@ -48,6 +48,13 @@
 
     <h2>New Study</h2>
     <p>If you would like to have your study on BrainSwipes, please fill out <a href="https://docs.google.com/forms/d/e/1FAIpQLSeSKbvCryYDvb9cX8ENLne5Xk8VlUlMDR-3ZjVbtqVy46ycvw/viewform?usp=sf_link" target="_blank">this new study ingestion form.</a></p>
+  
+    <hr class="section-divider" />
+    <hr class="section-divider" />
+
+    <hr class="section-divider" />
+    <hr class="section-divider" />
+  
   </div>
 </template>
 
