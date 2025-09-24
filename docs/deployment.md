@@ -8,6 +8,38 @@ If you modify `express.js` the `pm2 restart` command will not update this file. 
 
 
 We are using ``` ``` to build to create the source maps
+## From blank
+We use nvm to make sure we have consistent use of node versions
+nvm
+
+npm install -g pm2
+For staging we use
+```bash
+pm2 start express.js --name brainswipes
+```
+
+Add this process to be start whenever pm2 is restarted.
+pm2 save
+
+pm2 list
+
+If you want to check if it’s listening on the right port you can use ```sudo lsof -i -P -n | grep LISTEN```
+
+
+config PM2 to start on server restarts:
+
+pm2 startup and then copy that command
+
+## From blank
+We use nvm to make sure we have consistent use of node versions
+nvm
+
+npm install -g pm2
+
+For staging we use
+```bash
+pm2 start express.js --name brainswipes
+```
 
 ## Setting up a staging environment
 After setting up the pm2 process we set up a reverse proxy to re-rout traffic to the port it's listening on (3000).

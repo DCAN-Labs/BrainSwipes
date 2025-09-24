@@ -13,9 +13,9 @@ Close and reopen terminal to use nvm
 Install the version found in the ```.nvmrc``` file which should be the same as the version we have in the ```package.json``` file.
 
 ```bash
-nvm install 16
-nvm use 16
-nvm alias default 16
+nvm install 17
+nvm use 17
+nvm alias default 17
 ```
 
 You can confirm which version you are running
@@ -25,9 +25,22 @@ node -v
 npm -v
 # 8.19.4
 ```
+You can also confirm that
+
+``` bash
+which node
+node -v
+```
+```bash
+pm2 list
+pm2 describe express
+````
+
+
 ### Get configuration files in the root directory
 ```
-brainswipes-rtdb-token.json
 brainswipes-firebase-adminsdk.json
+brainswipes-public-firebase-info.json
+brainswipes-rtdb-token.json
 s3-config.json
 ```

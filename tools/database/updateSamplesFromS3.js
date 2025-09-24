@@ -6,6 +6,7 @@ const ListObjectsV2Command = require('@aws-sdk/client-s3').ListObjectsV2Command;
 const admin = require('firebase-admin');
 const s3Config = require('../../s3-config.json');
 const serviceAccount = require('../../brainswipes-firebase-adminsdk.json');
+const firebaseInfo = require('../../brainswipes-firebase-info.json');
 
 // Function entry point. Takes a dataset, updates the fire base counts. .
 async function main() {
@@ -29,7 +30,7 @@ main();
 function initFirebase() {
   const firebaseApp = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: 'https://brainswipes-default-rtdb.firebaseio.com',
+    databaseURL: firebaseInfo.firebase_url,
   });
   const database = admin.database();
 
