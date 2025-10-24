@@ -1,16 +1,18 @@
 <template>
-  <div class="imageSwipe">
-      <transition :key="swipe" :name="swipe" >
-        <div class="user-card" :class="zoom ? 'zoom': ''" :key="imgKey">
-            <div class="image_area">
-              <img class="user-card__picture mx-auto"
-                :src="imgUrl"
-                v-hammer:swipe.horizontal="onSwipe"
-                @error="imageError"
-              >
-            </div>
-
-            <div class="user-card__name">
+    <div class="imageSwipe">
+        <div class="user-card" :class="zoom ? 'zoom' : ''">
+              <div class="image_area">
+                  <img
+                     class="user-card__picture mx-auto"
+                     :src="imgUrl"
+                     decoding="async"
+                     fetchpriority="high"
+                     loading="eager"
+                     v-hammer:swipe.horizontal="onSwipe"
+                     @error="imageError"
+                  >
+              </div>
+          <div class="user-card__name">
               <b-button variant="danger"
                 v-if="playMode"
                 style="float:left"
@@ -342,6 +344,22 @@
       setSwipe(sw) {
         this.swipe = sw;
       },
+      /**
+       * Get a signed URL using the preloader.
+       */
+      async getSignedUrl(pointer) {
+        const url = await this.postRequest(pointer).then(e => e.currentTarget.responseText);
+        return url;
+      },
+      /**
+       * Get a signed URL using the preloader.
+       */
+      preload(url) {
+        const img = new Image();
+        img.decoding = 'async';
+        img.fetchPriority = 'high';
+        img.src = url;
+      }
     },
     watch: {
       async widgetPointer() {
