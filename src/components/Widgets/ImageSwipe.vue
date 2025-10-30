@@ -9,8 +9,6 @@
                 @error="imageError"
               >
             </div>
-
-            <div class="user-card__name">
           <div class="user-card__name">
               <b-button variant="danger"
                 v-if="playMode"
