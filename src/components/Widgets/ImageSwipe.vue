@@ -1,17 +1,16 @@
 <template>
-    <div class="imageSwipe">
-        <div class="user-card" :class="zoom ? 'zoom' : ''">
-              <div class="image_area">
-                  <img
-                     class="user-card__picture mx-auto"
-                     :src="imgUrl"
-                     decoding="async"
-                     fetchpriority="high"
-                     loading="eager"
-                     v-hammer:swipe.horizontal="onSwipe"
-                     @error="imageError"
-                  >
-              </div>
+  <div class="imageSwipe">
+      <transition :key="swipe" :name="swipe" >
+        <div class="user-card" :class="zoom ? 'zoom': ''" :key="imgKey">
+            <div class="image_area">
+              <img class="user-card__picture mx-auto"
+                :src="imgUrl"
+                v-hammer:swipe.horizontal="onSwipe"
+                @error="imageError"
+              >
+            </div>
+
+            <div class="user-card__name">
           <div class="user-card__name">
               <b-button variant="danger"
                 v-if="playMode"
