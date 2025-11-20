@@ -125,11 +125,11 @@ const router = new Router({
       },
     },
     {
-      path: '/:study/:dataset/review/:key/',
+      path: '/:study/:dataset/review',
       name: 'Review',
       component: Review,
       props: route => ({
-        widgetPointer: route.params.key,
+        // We no longer pass widgetPointer via route params.
         study: route.params.study,
         dataset: route.params.dataset,
       }),
