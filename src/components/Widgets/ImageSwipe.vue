@@ -29,11 +29,13 @@
                <span v-else>ave vote: N/A</span>
              </span>
 
-             <b-button v-if="playMode"
-              :to="playMode == 'tutorial' ? '' : `/${study}/${dataset}/review/${widgetPointer}?f=h`"
-              ref="helpButton"
-              class="helpbtn"
-              v-bind:class="{ focus: helpFocused }"
+             <b-button
+               v-if="playMode"
+               ref="helpButton"
+               class="helpbtn"
+               v-bind:class="{ focus: helpFocused }"
+               @click="onHelpClick"
+             >
               >Help</b-button>
 
               <b-button variant="success"
@@ -70,6 +72,7 @@
   import { VueHammer } from 'vue2-hammer';
   import imagesLoaded from 'vue-images-loaded';
   import GridLoader from 'vue-spinner/src/PulseLoader';
+  import { setReviewSampleKey } from '@/services/reviewKeyStore';
 
   Vue.use(VueHammer);
   Vue.use(require('vue-shortkey'));
@@ -221,6 +224,37 @@
             bucket,
             s3cfg,
           }));
+        });
+      },
+      /**
+       * Custom logic when flagging an image for review where we
+       * bypass using the file name in the URL
+       */
+      onHelpClick() {
+        // In tutorial mode, Help is just a visual cue, not navigation
+        if (this.playMode === 'tutorial') {
+          return;
+        }
+
+        if (!this.study || !this.dataset || !this.widgetPointer) {
+          // Nothing useful to do; you could log here if you want
+          return;
+        }
+
+        // Store the real sample key in a hidden, per-tab place
+        setReviewSampleKey(this.widgetPointer);
+
+        // Navigate to Review WITHOUT including the filename in the URL.
+        // This assumes your router has a named 'Review' route.
+        this.$router.push({
+          name: 'Review',
+          params: {
+            study: this.study,
+            dataset: this.dataset,
+            // IMPORTANT: do NOT pass widgetPointer here if you want it hidden
+            // sample: this.widgetPointer, // <- leave this out if sample is optional
+          },
+          query: { f: 'h' },
         });
       },
       /**

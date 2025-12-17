@@ -2,7 +2,7 @@
   <div id="review" class="container">
     <!-- Modal Component -->
     <b-modal
-      id="flagwarning" 
+      id="flagwarning"
       :title="flagged? 'Resolve Flag' : 'WARNING'"
       ref="flagwarning"
       size="lg"
@@ -161,7 +161,7 @@
   #tutorial-tips {
     margin: 0.5em;
   }
-  
+
   #flagwarning h5{
     font-size: 2em;
     font-weight: bold;
@@ -194,12 +194,16 @@
 </style>
 
 <script>
+  // Import helper for a hidden image name key
+  import { getReviewSampleKey, clearReviewSampleKey } from '@/services/reviewKeyStore';
+
   import firebase from 'firebase/app';
   import 'firebase/auth';
   import 'firebase/database';
   import _ from 'lodash';
   import ImageSwipe from './Widgets/ImageSwipe';
   import Checklist from './Widgets/Checklist';
+
 
   /**
    * The review component shows the widget for a pointer to a sample in its route,
@@ -345,19 +349,60 @@
     },
     watch: {
       /**
-       * When the route changes, set the current sample ID
-       * (`widgetPointer`) to the `key` parameter from the route.
-       */
+      * When the route changes, set the current sample ID
+      * (`widgetPointer`) to the `key` parameter from the route.
+      * Safe route that does not break the widgetPointer when we scrub the URL):
+      */
       $route() {
-        this.widgetPointer = this.$route.params.key;
+        if (this.$route.params && this.$route.params.key) {
+          this.widgetPointer = this.$route.params.key;
+        }
       },
     },
     /**
-     * When the component is mounted, set this components `widgetPointer`
-     * to the route's `key` parameter. Also grab this sample's chats and its summary.
+     * When the component is mounted, set this components `widgetPointer` to the
+     * route's `key` parameter or from the hidden storage from the ImageSwipe widget.
+     * Also grabs this sample's chats and summary data.
      */
     mounted() {
-      this.widgetPointer = this.$route.params.key;
+      // Try to get the key from the route first (legacy deep links)
+      const routeKey = this.$route.params && this.$route.params.key
+        ? this.$route.params.key
+        : null;
+
+      // Fallback to hidden storage (e.g., Help button from ImageSwipe)
+      let key = routeKey;
+      if (!key) {
+        const storedKey = getReviewSampleKey();
+        if (storedKey) {
+          key = storedKey;
+        }
+      }
+
+      // If we still don't have a key, there's nothing to review
+      if (!key) {
+        this.$router.replace({ name: 'Home' });
+        return;
+      }
+
+      // Use the resolved key as the sample ID
+      this.widgetPointer = key;
+
+      // If an image key was in the URL we remove it
+      if (routeKey) {
+        const newParams = { ...this.$route.params };
+        delete newParams.key; // remove the sensitive param
+
+        this.$router.replace({
+          name: this.$route.name,
+          params: newParams,
+          query: this.$route.query,
+        });
+      }
+
+      // We only need the hidden key for this page load
+      clearReviewSampleKey();
+
       this.setSampleInfo(this.dataset);
       this.checkFlaggedStatus();
       this.getCatchTrials();
