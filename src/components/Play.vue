@@ -517,26 +517,16 @@
 
         let sampleId = '';
 
-        // 1. Check if Review (or something else) requested a specific sample
-        //    via sessionStorage. This keeps the sample ID out of the URL.
-        const forcedSample = window.sessionStorage.getItem('brainswipesForcedSample');
-
-        if (forcedSample) {
-          sampleId = { '.key': forcedSample };
+        if (this.$route.query.s) {
+          sampleId = { '.key': Buffer.from(this.$route.query.s, 'base64').toString('ascii') };
           this.playMode = 'play';
-
-          // Use it once, then clear so normal random/prioritized behavior resumes
-          window.sessionStorage.removeItem('brainswipesForcedSample');
         } else {
-          // 2. Your existing logic that chooses the next sample
           if (Math.random() < this.config.catchTrials.frequency && this.catchSampleCounts.length) {
             this.playMode = 'catch';
           } else {
             this.playMode = 'play';
           }
-
           const samplePriority = this.sampleUserPriority(this.playMode);
-
           if (samplePriority.length > 1 && samplePriority[0]['.key'] === this.widgetPointer) {
             sampleId = samplePriority[1];
           } else {
@@ -613,7 +603,7 @@
           this.db.ref(`datasets/${dataset}/sampleCounts`)
             .child(this.widgetPointer)
             .transaction(count => (count || 0) + 1);
-  
+
           // update the local copy
           _.map(this.sampleCounts, (val) => {
             if (val['.key'] === this.widgetPointer) {
