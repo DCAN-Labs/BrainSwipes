@@ -10,7 +10,7 @@ const firebaseKeys = require('../brainswipes-public-firebase-info.json');
 var admin = require("firebase-admin");
 const firebaseApp = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: firebaseKeys.databaseURL
+  databaseURL: firebaseKeys.databaseURL,
 });
 const database = admin.database();
 
