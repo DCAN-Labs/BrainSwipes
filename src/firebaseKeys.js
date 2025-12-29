@@ -1,12 +1,15 @@
+// This load the public firebase information that is used client side to access the Firebase data
+const clientFBKeys = require('../brainswipes-public-firebase-info.json');
+
 const firebaseKeys = {
-  apiKey: 'AIzaSyAHYmTOolAYDczaOp-I22YZQCMAXTSzlt8',
-  authDomain: 'brainswipes.firebaseapp.com',
-  databaseURL: 'https://brainswipes-default-rtdb.firebaseio.com',
-  projectId: 'brainswipes',
-  storageBucket: 'brainswipes.appspot.com',
-  messagingSenderId: '518258041913',
-  appId: '1:518258041913:web:ae6cbc61a715d9941659e8',
-  measurementId: 'G-YNZSDHFLC7',
+  apiKey: clientFBKeys.apiKey,
+  authDomain: clientFBKeys.authDomain,
+  databaseURL: clientFBKeys.databaseURL,
+  projectId: clientFBKeys.projectId,
+  storageBucket: clientFBKeys.storageBucket,
+  messagingSenderId: clientFBKeys.messagingSenderId,
+  appId: clientFBKeys.appId,
+  measurementId: clientFBKeys.measurementId,
 };
 
 export default firebaseKeys;

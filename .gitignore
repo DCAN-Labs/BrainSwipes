@@ -20,6 +20,13 @@ selenium-debug.log
 # firebase
 src/firebaseConfig.js
 brainswipes-firebase-adminsdk.json
+brainswipes-firebase-adminsdk(staging).json
+brainswipes-firebase-adminsdk(production).json
+brainswipes-firebase-adminsdk(backup).json
+brainswipes-public-firebase-info.json
+brainswipes-public-firebase-info(staging).json
+brainswipes-public-firebase-info(production).json
+brainswipes-public-firebase-info(backup).json
 brainswipes-rtdb-token.json
 
 # S3 credentials

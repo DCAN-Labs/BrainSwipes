@@ -4,12 +4,13 @@ const GetObjectCommand = require('@aws-sdk/client-s3').GetObjectCommand;
 const getSignedUrl = require('@aws-sdk/s3-request-presigner').getSignedUrl;
 const s3Config = require('../s3-config.json');
 const serviceAccount = require('../brainswipes-firebase-adminsdk.json');
+const firebaseKeys = require('../brainswipes-public-firebase-info.json');
 
 //init the firebase connection
 var admin = require("firebase-admin");
 const firebaseApp = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://brainswipes-default-rtdb.firebaseio.com"
+  databaseURL: firebaseKeys.databaseURL
 });
 const database = admin.database();
 
@@ -107,7 +108,7 @@ module.exports = {
             if (bucket && filepath) {
               createUrl(filepath, bucket, s3Credentials).then(data =>{
                 res.send(data);
-              });  
+              });
             }
           }
           catch(err) {

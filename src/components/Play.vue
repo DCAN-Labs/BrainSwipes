@@ -533,14 +533,53 @@
             sampleId = samplePriority[0];
           }
         }
-
         // if sampleId isn't null, set the widgetPointer
         if (sampleId) {
           this.widgetPointer = sampleId['.key'];
+          // Get the next information on the nest image.
+          this.$nextTick(async () => {
+            const playMode = this.playMode;
+            const base = (playMode === 'catch') ? this.catchSampleCounts : this.sampleCounts;
+
+            // Build a list of the images without re-sorting everything:
+            //   i.e. The next unseen image with the lowest count and the second lowest.
+            const candidates = this._nextCandidatesNoSort(base, playMode, this.widgetPointer);
+            if (candidates.length) {
+              const peek = candidates[0]['.key'] === this.widgetPointer
+                ? (candidates[1] ? candidates[1]['.key'] : null)
+                : candidates[0]['.key'];
+              if (peek) {
+                const url = await this.$refs.widget.getSignedUrl(peek);
+                this.$refs.widget.preload(url);
+              }
+            }
+          });
         }
       },
+
+      _nextCandidatesNoSort(list, playMode, currentKey) {
+      // Convert images seen to set then filter the unseen images.
+      const seenSet = (playMode === 'catch') ? this.userSeenCatchSet : this.userSeenSet;
+      const remain = list.filter(v => !seenSet.has(v['.key']));
+
+      const pool = (remain.length ? remain : list);
+      if (!pool.length) return [];
+
+      // Find the lowest and second lowest counts.
+      let min = Infinity, second = Infinity;
+      for (const it of pool) {
+        const val = it['.value'];
+        if (val < min) { second = min; min = val; }
+        else if (val < second && val !== min) { second = val; }
+      }
+      const smallest = pool.filter(c => c['.value'] === min);
+      const secondSmallest = (isFinite(second)) ? pool.filter(c => c['.value'] === second) : [];
+
+      // Shuffle (reuse your existing shuffle)
+      return this.shuffle(smallest).concat(this.shuffle(secondSmallest));
+      },
       /**
-      * the user's response for the sample is sent to the db
+      * The user's response for the sample is sent to the db
       * along with their user displayName and the time they took to respond.
       */
       sendVote(response, time, dataset) {
@@ -701,7 +740,7 @@
                 hasSwipesEmail = true;
               }
             });
-            // check to see if the organiztion the user is registered
+            // check to see if the organization the user is registered
             // with is linked to the globus account
             let hasOrg = false;
             let orgUsed = false;

@@ -9,8 +9,7 @@
                 @error="imageError"
               >
             </div>
-
-            <div class="user-card__name">
+          <div class="user-card__name">
               <b-button variant="danger"
                 v-if="playMode"
                 style="float:left"
@@ -376,6 +375,22 @@
       setSwipe(sw) {
         this.swipe = sw;
       },
+      /**
+       * Get a signed URL using the preloader.
+       */
+      async getSignedUrl(pointer) {
+        const url = await this.postRequest(pointer).then(e => e.currentTarget.responseText);
+        return url;
+      },
+      /**
+       * Get a signed URL using the preloader.
+       */
+      preload(url) {
+        const img = new Image();
+        img.decoding = 'async';
+        img.fetchPriority = 'high';
+        img.src = url;
+      }
     },
     watch: {
       async widgetPointer() {
