@@ -582,15 +582,20 @@
         // Find the lowest and second lowest counts.
         let min = Infinity;
         let second = Infinity;
-        for (const it of pool) {
+        // Iterate through the pool of samples and determine the two lowest counts.
+        pool.forEach((it) => {
           const val = it['.value'];
+          // Current value is the new minimum.
           if (val < min) {
             second = min;
             min = val;
+          // Otherwise check if this value should become the second lowest.
+          // The `val !== min` check prevents duplicates of the lowest value
+          // from incorrectly replacing the second candidate.
           } else if (val < second && val !== min) {
             second = val;
           }
-        }
+        });
         const smallest = pool.filter(c => c['.value'] === min);
         const secondSmallest = (isFinite(second)) ? pool.filter(c => c['.value'] === second) : [];
 
