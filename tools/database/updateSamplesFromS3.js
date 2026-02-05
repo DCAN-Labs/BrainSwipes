@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // Please note that this code has hardcoded the s3 config credentials to use
-// so if you are trying to update a bucket that doesn't use MSI s3, you will need to update lines 54 and 207
+// so if you are trying to update a bucket that doesn't use MSI s3, you will need to update lines 54 and 205
 
 const S3Client = require('@aws-sdk/client-s3').S3Client;
 const GetObjectCommand = require('@aws-sdk/client-s3').GetObjectCommand;
