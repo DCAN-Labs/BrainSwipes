@@ -64,9 +64,25 @@
             <th>Studies</th>
           </tr>
           <tr v-for="user in Object.keys(userList).sort((a, b) => { return (b > a)? -1 : 1 })" :key="user">
+            <!-- Button Column-->
             <td><b-button variant="outline-dark" @click="modifyUser(user, userList[user])">{{user}}</b-button></td>
+            <!-- e-mail Column -->
             <td class="userlist-cell">{{userList[user].email}}</td>
-            <td class="userlist-cell">{{ userList[user].admin ? 'BrainSwipes': Object.values(userList[user].studyAdmin).includes(true)? 'Study' : ''}}</td>
+            <!-- Admin Column -->
+            <!-- Check for admin information in userData -  -->
+            <td v-if="userList[user].admin" class="userlist-cell">
+              BrainSwipes
+            </td>
+            <!-- Check for Study admin information -->
+            <td v-else-if="!userList[user].studyAdmin" class="userlist-cell" style="color: #990000;">
+              No Admin Data
+            </td>
+            <td v-else-if="userList[user].studyAdmin && Object.values(userList[user].studyAdmin).includes(true)" class="userlist-cell">
+              Study
+            </td>
+            <td v-else class="userlist-cell" >
+            </td>
+            <!-- Study Column -->
             <td>
               <table class="studiesTable">
                 <tr>
@@ -77,7 +93,6 @@
           </tr>
         </table>
       </div>
-
     </b-container>
 
   </div>
@@ -163,7 +178,7 @@ export default {
   },
   props: {
     /**
-     * the intialized firebase database
+     * the initialized firebase database
      */
     db: {
       type: Object,
@@ -308,17 +323,28 @@ export default {
       });
     },
     async getAllUserRoles() {
+      // Get object with all user information
       const authUserList = await this.requestAllUserRoles().then(data =>
         JSON.parse(data.currentTarget.responseText),
       );
-      const filteredUserList = _.pick(authUserList, Object.keys(
-        _.pickBy(this.allUsers, (user) => {
-          let includeUser = false;
-          if (Object.hasOwn(user, 'tutorials')) {
-            includeUser = user.tutorials.basic === 'complete';
-          }
-          return includeUser;
-        })));
+      // Create array using authUserList only selecting users with completed tutorials
+      const filteredUserList = _.pick(
+        authUserList,
+        Object.keys(
+          _.pickBy(this.allUsers, (user) => {
+            // Initialize variable to exclude user by default
+            let includeUser = false;
+            // Include user if the tutorial attribute exists and is set to 'complete'
+            if (Object.hasOwn(user, 'tutorials')) {
+              includeUser = user.tutorials.basic === 'complete';
+            }
+            // Return value to include user or not
+            return includeUser;
+          }),
+        ));
+      // console.log('filteredUserList:', filteredUserList);
+      // console.log('userList:', this.userList);
+      // Set values for UI use
       this.userList = filteredUserList;
       this.loading = false;
     },

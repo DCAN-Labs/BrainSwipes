@@ -29,6 +29,8 @@ import CatchTrials from '@/components/CatchTrials';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
+import ContactUs from '@/components/ContactUs';
+
 
 Vue.use(Router);
 
@@ -240,6 +242,11 @@ const router = new Router({
         requiresAuth: true,
         requiresAdmin: true,
       },
+    },
+    {
+      path: '/contact-us',
+      name: 'ContactUs',
+      component: ContactUs,
     },
   ],
 });

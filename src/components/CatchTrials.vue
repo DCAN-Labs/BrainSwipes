@@ -34,6 +34,9 @@
                 <tr>
                   <td>T2</td>
                 </tr>
+                <tr v-if="showOther">
+                  <td>Other</td>
+                </tr>
               </table>  
             </td>
             <td class="catch-table">
@@ -44,6 +47,9 @@
                 <tr>
                   <td>{{catchTrialSummary[imageClass].T2.pass}}</td>
                 </tr>
+                <tr v-if="showOther">
+                  <td>{{catchTrialSummary[imageClass].Other.pass}}</td>
+                </tr>
               </table>  
             </td>
             <td class="catch-table">
@@ -53,6 +59,9 @@
                 </tr>
                 <tr>
                   <td>{{catchTrialSummary[imageClass].T2.fail}}</td>
+                </tr>
+                <tr v-if="showOther">
+                  <td>{{catchTrialSummary[imageClass].Other.fail}}</td>
                 </tr>
               </table>  
             </td>
@@ -69,6 +78,7 @@
       <div v-if="selectedImageClass">
         <b-button @click="selectedT1or2 = 'T1'" :variant="selectedT1or2 === 'T1' ? 'primary' : 'outline-primary'">T1</b-button>
         <b-button @click="selectedT1or2 = 'T2'" :variant="selectedT1or2 === 'T2' ? 'primary' : 'outline-primary'">T2</b-button>
+        <b-button v-if="showOther" @click="selectedT1or2 = 'Other'" :variant="selectedT1or2 === 'Other' ? 'primary' : 'outline-primary'">Other</b-button>
         <hr>
         <div v-if="selectedT1or2">
           <div v-if="Object.hasOwn(catchTrials[selectedImageClass], selectedT1or2)">
@@ -176,6 +186,10 @@
          * parsed catch trial data for display in table
          */
         catchTrialSummary: {},
+        /**
+         * show the image category 'Other' if images other than T1/T2 are present
+         */
+        showOther: false,
       };
     },
     props: {
@@ -298,7 +312,6 @@
         } else if (sample.match(/T2/i)) {
           imageType[1] = 'T2';
         } else {
-          imageType[0] = 'Other';
           imageType[1] = 'Other';
         }
         return imageType;
@@ -312,10 +325,16 @@
                 return t1or2result;
               }, { pass: 0, fail: 0 });
               return imageClassResult;
-            }, { T1: { pass: 0, fail: 0 }, T2: { pass: 0, fail: 0 } });
+            }, { T1: { pass: 0, fail: 0 }, T2: { pass: 0, fail: 0 }, Other: { pass: 0, fail: 0 } });
           return summaryResult;
         }, {});
         this.catchTrialSummary = summary;
+        this.showOther = false;
+        Object.keys(summary).forEach((imageType) => {
+          if (summary[imageType].Other.pass || summary[imageType].Other.fail) {
+            this.showOther = true;
+          }
+        });
       },
     },
   };
