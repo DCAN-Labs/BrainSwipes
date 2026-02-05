@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+// Please note that this code has hardcoded the s3 config credentials to use
+// so if you are trying to update a bucket that doesn't use MSI s3, you will need to update lines 54 and 207
+
 const S3Client = require('@aws-sdk/client-s3').S3Client;
 const GetObjectCommand = require('@aws-sdk/client-s3').GetObjectCommand;
 const ListObjectsV2Command = require('@aws-sdk/client-s3').ListObjectsV2Command;
@@ -45,6 +48,9 @@ async function getExcludedSubjects(database, dataset) {
 
     if (Object.hasOwn(config, 'exclusions')) {
         if (Object.hasOwn(config.exclusions, 'fromTSV')) {
+            //////////////////////////////////////////////////////////////////////////////////
+            ///////////////// !!!!!!! HARDCODED SELECTION FOR CREDENTIALS !!!!!! /////////////
+            //////////////////////////////////////////////////////////////////////////////////
             let s3cfg = 'default';
             if (Object.hasOwn(config, 's3cfg')) {
                 s3cfg = config.s3cfg;
@@ -162,6 +168,7 @@ async function listItems(input, s3cfg) {
     const s3Client = new S3Client(s3Config[s3cfg]);
     const command = new ListObjectsV2Command(input);
     const response = await s3Client.send(command);
+//    console.log("Response Contents:", response.Contents); // for troubleshooting
     return [response.Contents, response.NextContinuationToken];
 }
 
@@ -182,6 +189,7 @@ async function updateSamplesFromS3(database, dataset){
         if (Object.hasOwn(config, 's3filepath')) {
         regexp = new RegExp(config.s3filepath.replace('/', '\/').replaceAll('{{SESSION}}', 'ses-.*?').replaceAll('{{SUBJECT}}', 'sub-\\d{6}').replaceAll('{{FILENAME}}', '([^\/]*)'));
         }
+        // console.log("REGEX", regexp) // for troubleshooting
         // get exclusions
         const excludedSubjects = await getExcludedSubjects(database, dataset);
         let excludedSubstrings = [];
@@ -190,6 +198,9 @@ async function updateSamplesFromS3(database, dataset){
                 excludedSubstrings = config.exclusions.substrings; 
             }
         }
+        //////////////////////////////////////////////////////////////////////////////////
+        ///////////////// !!!!!!! HARDCODED SELECTION FOR CREDENTIALS !!!!!! /////////////
+        //////////////////////////////////////////////////////////////////////////////////
         let s3cfg = 'default';
         if (Object.hasOwn(config, 's3cfg')) {
             s3cfg = config.s3cfg;
