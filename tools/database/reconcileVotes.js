@@ -30,6 +30,7 @@ async function reconcileVotes(dataset, preview){
         resultVSC[valueVSC.sample]? resultVSC[valueVSC.sample] += 1 : resultVSC[valueVSC.sample] = 1;
         return resultVSC;
     },{});
+    // console.log(reducedVotesToSampleCounts)
     
     const sampleCountsUpdate = Object.assign({}, sampleCounts);
 
@@ -56,7 +57,7 @@ async function reconcileVotes(dataset, preview){
         resultVUSS[valueVUSS.user]? resultVUSS[valueVUSS.user][valueVUSS.sample]? resultVUSS[valueVUSS.user][valueVUSS.sample] += 1 : resultVUSS[valueVUSS.user][valueVUSS.sample] = 1 : resultVUSS[valueVUSS.user] = {[valueVUSS.sample]: 1};
         return resultVUSS;
     },{});
-
+    console.log(reducedVotesToUserSeenSamples)
     console.log("userSeenSamples diff:");
     userSeenSamplesDiff(userSeenSamples, reducedVotesToUserSeenSamples);
 
@@ -87,6 +88,7 @@ async function reconcileVotes(dataset, preview){
         return r;
     },{});
 
+    // console.log(sampleSummary)
     console.log("sampleSummary diff:");
     sampleSummaryDiff(sampleSummary, updateSampleSummary);
 
@@ -116,20 +118,60 @@ function sampleCountsDiff(firstJSON, secondJSON){
 function sampleSummaryDiff(firstJSON, secondJSON) {
     const diffs = {};
     const aveVoteDiffs1 = Object.keys(secondJSON).filter(sample => firstJSON[sample]['aveVote'] != secondJSON[sample]['aveVote']);
-    const aveVoteDiffs2 = Object.keys(firstJSON).filter(sample => secondJSON[sample]['aveVote'] != firstJSON[sample]['aveVote']);
     const countDiffs1 = Object.keys(secondJSON).filter(sample => firstJSON[sample]['count'] != secondJSON[sample]['count']);
-    const countDiffs2 = Object.keys(firstJSON).filter(sample => secondJSON[sample]['count'] != firstJSON[sample]['count']);
+    const aveVoteDiffs2 = Object.keys(firstJSON).filter(sample => 
+       { if (secondJSON[sample]) { 
+            secondJSON[sample]['aveVote'] != firstJSON[sample]['aveVote'];
+             
+        } 
+        else { 
+            return false; 
+        }}
+    );
+    const countDiffs2 = Object.keys(firstJSON).filter(sample => 
+        { if (secondJSON[sample]) { 
+            secondJSON[sample]['count'] != firstJSON[sample]['count']; 
+        } 
+        else { 
+            return false; 
+        }}
+    )
+    console.log(countDiffs1)
+    console.log(countDiffs2)
     aveVoteDiffs1.forEach(sample => {
-        diffs[sample] = { db: firstJSON[sample], update: secondJSON[sample] };
+        if (secondJSON[sample]) {
+            console.log("The sample exists")
+            diffs[sample] = { db: firstJSON[sample], update: secondJSON[sample] };
+        }
+        else {
+            console.log("The sample doesn't exist")
+            diffs[sample] = { db: firstJSON[sample], update: 0 }
+        };
     });
     aveVoteDiffs2.forEach(sample => {
-        diffs[sample] = { db: firstJSON[sample], update: secondJSON[sample] };
+        if (secondJSON[sample]) {
+            diffs[sample] = { db: firstJSON[sample], update: secondJSON[sample] };
+        }
+        else {
+            diffs[sample] = { db: firstJSON[sample], update: 0 }
+        };
     });
     countDiffs1.forEach(sample => {
-        diffs[sample] = { db: firstJSON[sample], update: secondJSON[sample] };
+        if (secondJSON[sample]) {
+            diffs[sample] = { db: firstJSON[sample], update: secondJSON[sample] };
+        }
+        else {
+            diffs[sample] = { db: firstJSON[sample], update: 0 }
+        };
     });
     countDiffs2.forEach(sample => {
-        diffs[sample] = { db: firstJSON[sample], update: secondJSON[sample] };
+        if (secondJSON[sample]) {
+            diffs[sample] = { db: firstJSON[sample], update: secondJSON[sample] };
+        }
+        else {
+            diffs[sample] = { db: firstJSON[sample], update: 0
+        }
+         };
     });
     console.log(diffs);
 }
@@ -137,8 +179,12 @@ function sampleSummaryDiff(firstJSON, secondJSON) {
 function userSeenSamplesDiff(firstJSON, secondJSON) {
     const diffs = {};
     const diffs1 = {};
+    // breaks when a user doesn't exist in the secondJSON (reducedVotesToUserSeenSamples)
     Object.keys(firstJSON).forEach(user => {
-        diffs1[user] = Object.keys(secondJSON[user]).filter(sample => firstJSON[user][sample] != secondJSON[user][sample]);
+        // Check to see if updatedvotes (secondJSON) has the user in it
+        if (secondJSON[user]) {
+            diffs1[user] = Object.keys(secondJSON[user]).filter(sample => firstJSON[user][sample] != secondJSON[user][sample]);
+        } 
     });
     const diffs2 = {};
     Object.keys(secondJSON).forEach(user => {
@@ -148,7 +194,12 @@ function userSeenSamplesDiff(firstJSON, secondJSON) {
         if (Object.keys(diffs1[user]).length) {
             diffs[user] = {};
             diffs1[user].forEach(sample => {
-                diffs[user][sample] = { db: firstJSON[user][sample], update: secondJSON[user][sample] };
+                if (secondJSON[user] && secondJSON[user][sample]) {
+                    diffs[user][sample] = { db: firstJSON[user][sample], update: secondJSON[user][sample] };
+                }
+                else {
+                    diffs[user][sample] = { db: firstJSON[user][sample], update: 0 };
+                }
             });
         }
     });
@@ -156,7 +207,12 @@ function userSeenSamplesDiff(firstJSON, secondJSON) {
         if (Object.keys(diffs2[user]).length) {
             diffs[user] = diffs[user] ? diffs[user]: {};
             diffs2[user].forEach(sample => {
-                diffs[user][sample] = { db: firstJSON[user][sample], update: secondJSON[user][sample] };
+                if (secondJSON[user] && secondJSON[user][sample]) {
+                    diffs[user][sample] = { db: firstJSON[user][sample], update: secondJSON[user][sample] };
+                }
+                else {
+                    diffs[user][sample] = { db: firstJSON[user][sample], update: 0 };
+                }
             });
         }
     });
