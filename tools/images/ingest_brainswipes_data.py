@@ -49,7 +49,7 @@ def get_subjects(args):
     try:
         print("Getting subject list...")
         subjects = []
-        cmd = ['s3cmd', 'ls', args.s3_subjects_path]
+        cmd = ['s3cmd', 'ls', "-c","/projects/standard/feczk001/shared/projects/BrainSwipes/.s3cfg-brainswipes", args.s3_subjects_path]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
         regex = re.compile('(sub-.*)\/')
         with process.stdout:
@@ -72,7 +72,7 @@ def get_sessions(subject, args):
         print(f"Getting sessions for {subject}")
         sessions = []
         path_to_sessions = args.s3_subjects_path + subject + '/'
-        cmd = ['s3cmd', 'ls', path_to_sessions]
+        cmd = ['s3cmd', 'ls', path_to_sessions, "-c", "/projects/standard/feczk001/shared/projects/BrainSwipes/.s3cfg-brainswipes"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
         regex = re.compile('(ses-.*)\/')
         with process.stdout:
@@ -97,7 +97,7 @@ def download_imgs(subject, session, dir, args):
             session = session + '/'
         img_path = args.s3_subjects_path + subject + '/' + session + args.imgs_path
         print(img_path)
-        cmd = ['s3cmd', 'get', '--recursive', img_path]
+        cmd = ['s3cmd', 'get', '--recursive', img_path, "-c", "/projects/standard/feczk001/shared/projects/BrainSwipes/.s3cfg-brainswipes"]
         process = subprocess.check_call(cmd, cwd=f"./{dir}", stdout=subprocess.DEVNULL)
 
     except Exception as e:
@@ -171,11 +171,12 @@ def upload_imgs(dir, bucket):
         print(f"Uploading images to S3")
         process = subprocess.Popen(['ls', dir], stdout=subprocess.PIPE, universal_newlines=True)
         process.wait()
+        exclusions = ["FD", "Callosum", "InferiorTemporal", "_bold", "_ref"]
         with process.stdout:
             for file in process.stdout:
                 file = file.strip()
-                if file.endswith('.png'):
-                    cmd = ["s3cmd", "put", file, bucket]
+                if file.endswith('.png') and not any(string in file for string in exclusions):
+                    cmd = ["s3cmd", "put", file, bucket, "-c", "/projects/standard/feczk001/shared/projects/BrainSwipes/.s3cfg-brainswipes"]
                     subprocess.check_call(cmd, cwd=f"./{dir}", stdout=subprocess.DEVNULL)
     except Exception as e:
         print("Error uploading images:")
