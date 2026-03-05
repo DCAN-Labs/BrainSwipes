@@ -6,8 +6,11 @@ import 'firebase/app-check';
 import 'firebase/auth';
 import App from './App';
 import router from './router';
-import firebaseKeys from './firebaseKeys';
+// import firebaseKeys from './firebaseKeys';
 
+// Instead of importing the object at build time
+// we import an async function that fetches the config at runtime.
+import getFirebaseConfig from './firebaseKeys';
 
 Vue.config.productionTip = false;
 
@@ -22,21 +25,38 @@ This will make sure Firebase initializes before loading the app when a user refr
 - https://savvyapps.com/blog/definitive-guide-building-web-app-vuejs-firebase
 */
 
-firebase.initializeApp(firebaseKeys);
-// if (process.env.NODE_ENV === 'development') {
-//   console.log(`NODE_ENV=${process.env.NODE_ENV}`);
-//   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-// }
-// firebase.appCheck().activate('6LderB8eAAAAACq8C9buhjI7V3HeznZpTkH2wB4K', true);
+// Wrap initialization of FIrebase variables in async bootstrap function so we can
+// fetch runtime-config.json BEFORE calling firebase.initializeApp(...).
+async function bootstrap() {
+  // Runtime-loaded config avoids including firebase keys.
+  // The server provides them via runtime-config.json.
+  const firebaseConfig = await getFirebaseConfig();
 
-firebase.auth().onAuthStateChanged(() => {
-  if (!app) {
-    /* eslint-disable no-new */
-    app = new Vue({
-      el: '#app',
-      template: '<App/>',
-      components: { App },
-      router,
-    });
-  }
+  console.log('Firebase runtime config:', {
+    projectId: firebaseConfig.projectId,
+    apiKeyTail: (firebaseConfig.apiKey || '').slice(-10),
+  });
+
+  // Initialize Firebase before we create the Vue app.
+  firebase.initializeApp(firebaseConfig);
+
+  // Keep existing "initialize Firebase before loading app on refresh".
+  firebase.auth().onAuthStateChanged(() => {
+    if (!app) {
+      /* eslint-disable no-new */
+      app = new Vue({
+        el: '#app',
+        template: '<App/>',
+        components: { App },
+        router,
+      });
+    }
+  });
+}
+
+// Call bootstrap() and fail if config is missing/misconfigured.
+// We could also render an error screen here for a friendlier UI.
+bootstrap().catch((err) => {
+  // eslint-disable-next-line no-console
+  console.error(err);
 });

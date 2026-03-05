@@ -18,6 +18,7 @@ selenium-debug.log
 *.sln
 
 # firebase
+runtime-config.json
 src/firebaseConfig.js
 brainswipes-firebase-adminsdk.json
 brainswipes-firebase-adminsdk(staging).json
