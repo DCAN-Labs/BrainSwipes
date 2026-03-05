@@ -390,7 +390,7 @@
         img.decoding = 'async';
         img.fetchPriority = 'high';
         img.src = url;
-      }
+      },
     },
     watch: {
       async widgetPointer() {

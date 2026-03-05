@@ -509,23 +509,27 @@
         this.setNextSampleId();
       },
       /**
-      * method to get the next sample id to show in the widget
-      * view time gets reset first, then the new sample is found and set.
+      * Method to get the next sample id to show it in the widget.
+      * The view time gets reset first, then the new sample is found and set.
       */
       setNextSampleId() {
+        // Reset the timer used to measure how long the user views this sample.
         this.startTime = new Date();
 
         let sampleId = '';
-
+        // When a sample ID is provided in the URL query (`?s=`),
+        // decode it from base64 and use it directly.
         if (this.$route.query.s) {
           sampleId = { '.key': Buffer.from(this.$route.query.s, 'base64').toString('ascii') };
           this.playMode = 'play';
+        // Determine whether this should be a catch trial.
         } else {
           if (Math.random() < this.config.catchTrials.frequency && this.catchSampleCounts.length) {
             this.playMode = 'catch';
           } else {
             this.playMode = 'play';
           }
+          // Use the lowest-count samples appear first so the dataset stays balanced.
           const samplePriority = this.sampleUserPriority(this.playMode);
           if (samplePriority.length > 1 && samplePriority[0]['.key'] === this.widgetPointer) {
             sampleId = samplePriority[1];
@@ -533,23 +537,33 @@
             sampleId = samplePriority[0];
           }
         }
-        // if sampleId isn't null, set the widgetPointer
+        // If the sampleId isn't null, set the widgetPointer.
         if (sampleId) {
           this.widgetPointer = sampleId['.key'];
-          // Get the next information on the nest image.
+          // Start getting the next information on the next image.
           this.$nextTick(async () => {
             const playMode = this.playMode;
             const base = (playMode === 'catch') ? this.catchSampleCounts : this.sampleCounts;
 
             // Build a list of the images without re-sorting everything:
             //   i.e. The next unseen image with the lowest count and the second lowest.
-            const candidates = this._nextCandidatesNoSort(base, playMode, this.widgetPointer);
+            const candidates = this.nextCandidatesNoSort(base, playMode, this.widgetPointer);
             if (candidates.length) {
-              const peek = candidates[0]['.key'] === this.widgetPointer
-                ? (candidates[1] ? candidates[1]['.key'] : null)
-                : candidates[0]['.key'];
+              // Determine which image should be preloaded next (tracked with peek).
+              let peek = null;
+              // If the first image is the current image, we use the second candidate if it exists.
+              if (candidates[0]['.key'] === this.widgetPointer) {
+                if (candidates[1]) {
+                  peek = candidates[1]['.key'];
+                }
+              } else {
+                // Otherwise we preload the first candidate.
+                peek = candidates[0]['.key'];
+              }
               if (peek) {
+                // Request a signed S3 URL for the next image.
                 const url = await this.$refs.widget.getSignedUrl(peek);
+                // Preload the image into the browser cache so it can be displayed instantly.
                 this.$refs.widget.preload(url);
               }
             }
@@ -557,26 +571,31 @@
         }
       },
 
-      _nextCandidatesNoSort(list, playMode, currentKey) {
-      // Convert images seen to set then filter the unseen images.
-      const seenSet = (playMode === 'catch') ? this.userSeenCatchSet : this.userSeenSet;
-      const remain = list.filter(v => !seenSet.has(v['.key']));
+      nextCandidatesNoSort(list, playMode, currentKey) {
+        // Convert images seen to set then filter the unseen images.
+        const seenSet = (playMode === 'catch') ? this.userSeenCatchSet : this.userSeenSet;
+        const remain = list.filter(v => !seenSet.has(v['.key']));
 
-      const pool = (remain.length ? remain : list);
-      if (!pool.length) return [];
+        const pool = (remain.length ? remain : list);
+        if (!pool.length) return [];
 
-      // Find the lowest and second lowest counts.
-      let min = Infinity, second = Infinity;
-      for (const it of pool) {
-        const val = it['.value'];
-        if (val < min) { second = min; min = val; }
-        else if (val < second && val !== min) { second = val; }
-      }
-      const smallest = pool.filter(c => c['.value'] === min);
-      const secondSmallest = (isFinite(second)) ? pool.filter(c => c['.value'] === second) : [];
+        // Find the lowest and second lowest counts.
+        let min = Infinity;
+        let second = Infinity;
+        for (const it of pool) {
+          const val = it['.value'];
+          if (val < min) {
+            second = min;
+            min = val;
+          } else if (val < second && val !== min) {
+            second = val;
+          }
+        }
+        const smallest = pool.filter(c => c['.value'] === min);
+        const secondSmallest = (isFinite(second)) ? pool.filter(c => c['.value'] === second) : [];
 
-      // Shuffle (reuse your existing shuffle)
-      return this.shuffle(smallest).concat(this.shuffle(secondSmallest));
+        // Shuffle (reuse existing shuffle)
+        return this.shuffle(smallest).concat(this.shuffle(secondSmallest));
       },
       /**
       * The user's response for the sample is sent to the db
