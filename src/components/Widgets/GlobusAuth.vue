@@ -138,10 +138,8 @@ export default {
      * https://auth.globus.org/v2/web/developers
      */
     setRedirect() {
-      let redirectUri = `https://brainswipes.us/${this.redirectPath}`;
-      if (process.env.NODE_ENV === 'development') {
-        redirectUri = `http://localhost:8080/${this.redirectPath}`;
-      }
+      const path = this.redirectPath.replace(/^\/+/, '');
+      const redirectUri = `${window.location.origin}/${path}`;
       PkceAuth.config.redirect_uri = redirectUri;
     },
     /**
