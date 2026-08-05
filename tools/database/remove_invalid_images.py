@@ -3,7 +3,7 @@ import json
 import re
 
 # Author: rae McCollum
-# Purpose: Remove invalid samples from a BrainSwipes Firebase config file. Multiple methods to choose from: 
+# Purpose: Remove invalid samples from a BrainSwipes Firebase config file. Assuming config file from firebase_db/datasets/<study>/. Multiple methods to choose from: 
 # - ingest a list of valid or invalid subjects IDs (to remove excluded/removed subjects)
 # - ingest a list of valid image paths (to remove deleted images) 
 # - assign a list of excluded strings (to remove images with substrings that shouldn't be included). 
